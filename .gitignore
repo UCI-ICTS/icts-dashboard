@@ -1,0 +1,3 @@
+server/env*
+server/.secrets
+client/node_modules*
