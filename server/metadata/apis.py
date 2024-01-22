@@ -40,8 +40,42 @@ class GetMetadataAPI(APIView):
         
         return Response(status=status.HTTP_200_OK, data={"message": "user account created"})
     
-class SubmitMetadataAPI(APIView):
+class SubmitParticipantAPI(APIView):
+    class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Participant
+            fields = '__all__'
 
+    authentication_classes = []
+    permission_classes = []
+
+    request_body = openapi.Schema(
+        type=openapi.TYPE_ARRAY,
+        title="Participant Submission",
+        description="",
+        required=[""],
+        items=openapi.Items(type=openapi.TYPE_OBJECT)
+    )
+
+    @swagger_auto_schema(
+        request_body=request_body,
+        responses={
+            200: "All submissions of participants are successful.",
+            400: "Bad request"
+        }
+    )
     def post(self,request):
-        print(request)
-        return Response(status=status.HTTP_200_OK, data={"message":"it worked"})
+        results = {}
+        for datum in request.data:
+            identifier = datum['participant_id']
+            results[identifier] = {"number_of_errors": 0, "error_detail": []}
+            serializer = self.InputSerializer(data=datum)
+            if serializer.is_valid() is True:
+                results[identifier] = {"number_of_errors": 0, "error_detail": "Item saved"}
+                serializer.save()
+            else:
+                for item in serializer.errors:
+                    results[identifier]["number_of_errors"] += 1
+                    text = {item: serializer.errors[item][0].title()}
+                    results[identifier]['error_detail'].append(text)
+        return Response(status=status.HTTP_200_OK, data=results)

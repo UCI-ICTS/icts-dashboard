@@ -1,3 +1,28 @@
+#General
+.python-version
+*.DS_Store*
+
+#Server Items
 server/env*
 server/.secrets
-client/node_modules*
+
+#Client Items
+#Client dependencies
+client/node_modules
+client/.pnp
+client/.pnp.js
+
+#Client testing
+client//coverage
+
+#Client production
+client/build
+
+#Client misc
+client/.env.local
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*

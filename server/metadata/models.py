@@ -6,8 +6,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-class Participant(models.Model):
 
+class Participant(models.Model):
     # https://stackoverflow.com/questions/63255065/storing-arrays-in-django-models-not-postgresql
     # class InternalProjectId(models.Model):
     #         project_id = models.CharField(max_length=255)
@@ -30,8 +30,8 @@ class Participant(models.Model):
         HMB = "HMB", _("HMB")
     
     class Recontactable(models.TextChoices):
-        YES = "yes", _("yes")
-        NO = "no", _("no")
+        YES = "Yes", _("Yes")
+        NO = "No", _("No")
 
     participant_id = models.CharField(
         unique=True,

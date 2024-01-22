@@ -5,6 +5,6 @@ A proof-of-concept for a genomic metadata DB with API access.
 
 See [the docs](/docs/)
 
-## Insalation
+## Instalation
 
 See [installation instructions](/docs/install.md)

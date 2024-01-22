@@ -1,9 +1,9 @@
 # metadata/urls.py
 
 from django.urls import path
-from metadata.apis import GetMetadataAPI, SubmitMetadataAPI
+from metadata.apis import GetMetadataAPI, SubmitParticipantAPI
 
 urlpatterns = [
-    path('get/', GetMetadataAPI.as_view()),
-    path('post/', SubmitMetadataAPI.as_view())
+    path('get_metadata/', GetMetadataAPI.as_view()),
+    path('submit_participant/', SubmitParticipantAPI.as_view())
 ]
