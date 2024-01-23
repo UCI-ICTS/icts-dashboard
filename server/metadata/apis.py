@@ -66,16 +66,21 @@ class SubmitParticipantAPI(APIView):
     )
     def post(self,request):
         results = {}
-        for datum in request.data:
-            identifier = datum['participant_id']
-            results[identifier] = {"number_of_errors": 0, "error_detail": []}
-            serializer = self.InputSerializer(data=datum)
-            if serializer.is_valid() is True:
-                results[identifier] = {"number_of_errors": 0, "error_detail": "Item saved"}
-                serializer.save()
-            else:
-                for item in serializer.errors:
-                    results[identifier]["number_of_errors"] += 1
-                    text = {item: serializer.errors[item][0].title()}
-                    results[identifier]['error_detail'].append(text)
-        return Response(status=status.HTTP_200_OK, data=results)
+        try:
+            data = request.data['participant_list']
+            # import pdb; pdb.set_trace()
+            for datum in data:
+                identifier = datum['participant_id']
+                results[identifier] = {"number_of_errors": 0, "error_detail": []}
+                serializer = self.InputSerializer(data=datum)
+                if serializer.is_valid() is True:
+                    results[identifier] = {"number_of_errors": 0, "error_detail": "Item saved"}
+                    # serializer.save()
+                else:
+                    for item in serializer.errors:
+                        results[identifier]["number_of_errors"] += 1
+                        text = {item: serializer.errors[item][0].title()}
+                        results[identifier]['error_detail'].append(text)
+            return Response(status=status.HTTP_200_OK, data=results)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={str(error)})
