@@ -25,10 +25,10 @@ export const dataSlice = createSlice({
 
 export const submitParticipant = createAsyncThunk(
   "submitParticipant",
-  async ({data}, thunkAPI) => {
+  async ({data_list}, thunkAPI) => {
     try {
-      console.log("slice", data)
-      const response = await dataService.submitParticipant(data);
+      console.log("slice", data_list)
+      const response = await dataService.submitParticipant(data_list);
       console.log(response)
       return response.data
     } catch(error) {
