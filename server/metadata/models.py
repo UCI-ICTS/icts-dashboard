@@ -1,3 +1,4 @@
+#us
 #gregordb/metadata.py
 
 """
@@ -6,41 +7,119 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+# https://stackoverflow.com/questions/63255065/storing-arrays-in-django-models-not-postgresql
+class Family(models.Model):
+    family_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text=""
+    )
 
+class InternalProjectId(models.Model):
+    internal_project_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="An identifier used by GREGoR research centers to identify "\
+            "a set of participants for their internal tracking"
+    )
+
+    def __str__(self):
+        return self.internal_project_id
+
+class GregorCenter(models.TextChoices):
+    BCM = "BCM", _("Baylor College of Medicine Research Center")
+    BROAD = "BROAD", _("Broad Institute")
+    CNHI = "CNH_I", _("Children's National Hospital")
+    UWCRDR = "UW_CRDR", _("University of Washington Center for Rare Disease Research")
+    GSS = "GSS", _("GREGoR Stanford Site")
+    UWDCC = "UW_DCC", _("University of Washington’s School of Public Health")
+
+class ConsentCode(models.TextChoices):
+    GRU = "GRU", _("GRU")
+    HMB = "HMB", _("HMB")
+
+class Recontactable(models.TextChoices):
+    YES = "Yes", _("Yes")
+    NO = "No", _("No")
+    
+class PriorTesting(models.Model):
+    prior_testing = models.TextField(
+        primary_key=True,
+        help_text="Text description of any genetic testing for individual "\
+            "conductedprior to enrollment"
+    )
+
+    def __str__(self) -> str:
+        return self.prior_testing
+
+class PmidId(models.Model):
+    pmid_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="Publication which included participant; Used for "\
+            "publications which include participant known prior to or after"\
+            " inclusion in GREGoR"
+    )
+
+class TwinId(models.Model):
+    pmid_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="may be monozygotic, dizygotic, or polyzygotic"
+    )
+
+class ProbandRelationship(models.TextChoices):
+    "Self"
+    "Mother"
+    "Father"
+    "Sibling",
+    "Child",
+    "Maternal Half Sibling",
+    "Paternal Half Sibling",
+    "Maternal Grandmother",
+    "Maternal Grandfather",
+    "Paternal Grandmother",
+    "Paternal Grandfather",
+    "Maternal Aunt",
+    "Maternal Uncle",
+    "Paternal Aunt",
+    "Paternal Uncle",
+    "Niece",
+    "Nephew",
+    "Maternal 1st Cousin",
+    "Paternal 1st Cousin",
+    "Other",
+    "Unknown"
+
+class ReportedRace(models.TextChoices):
+    NATIVE_AMERICAN = "NATIVE_AMERICAN", _("American Indian or Alaska Native")
+    ASIAN = "ASIAN",_("Asian")
+    BLACK = "BLACK", _("Black or African American")
+    PACIFIC_ISLANDER = "PACIFIC_ISLANDER", _("Native Hawaiian or Other Pacific Islander")
+    MIDDLE_EASTERN = "MIDDLE_EASTERN", _("Middle Eastern or North African")
+    WHITE = "WHITE", _("White")
+
+class ReportedEthnicity(models.TextChoices):
+    HISPANIC = "HISPANIC", _("Hispanic or Latino",)
+    NON_HISPANIC = "NON_HISPANIC", _("Not Hispanic or Latino")
+
+class PhenotypeDescription(models.Model):
+    phenotype_description = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="For unaffected/relatives, can note 'parent of ...' or 'relative of ...'"
+    )
+    
 class Participant(models.Model):
-    # https://stackoverflow.com/questions/63255065/storing-arrays-in-django-models-not-postgresql
-    # class InternalProjectId(models.Model):
-    #         project_id = models.CharField(max_length=255)
-    #         participant_id = models.ForeignKey(
-    #             Participant,
-    #             related_name='project_id',
-    #             on_delete=models.CASCADE
-    #         )
-
-    class GregorCenter(models.TextChoices):
-        BCM = "BCM", _("Baylor College of Medicine Research Center")
-        BROAD = "BROAD", _("Broad Institute")
-        CNHI = "CNH_I", _("Children’s National Hospital")
-        UWCRDR = "UW_CRDR", _("University of Washington Center for Rare Disease Research")
-        GSS = "GSS", _("GREGoR Stanford Site")
-        UWDCC = "UW_DCC", _("University of Washington’s School of Public Health")
-    
-    class ConsentCode(models.TextChoices):
-        GRU = "GRU", _("GRU")
-        HMB = "HMB", _("HMB")
-    
-    class Recontactable(models.TextChoices):
-        YES = "Yes", _("Yes")
-        NO = "No", _("No")
-
     participant_id = models.CharField(
         unique=True,
         primary_key=True,
         max_length=255,
         help_text="Subject/Participant Identifier (primary key)"
         )
-    internal_project_id = models.CharField(
-        max_length=255,
+    internal_project_id = models.ManyToManyField(
+        InternalProjectId,
+        related_name="participant",
         blank=True,
         help_text="An identifier used by GREGoR research centers to identify" \
         "a set of participants for their internal tracking"
@@ -50,7 +129,8 @@ class Participant(models.Model):
         blank=True,
         choices=GregorCenter.choices,
         default=None,
-        help_text="GREGoR Center to which the participant is originally associated"
+        help_text="GREGoR Center to which the participant is originally "\
+            "associated"
         )
     consent_code = models.CharField(
         max_length=255,
@@ -61,19 +141,27 @@ class Participant(models.Model):
         max_length=255,
         blank=True,
         choices=Recontactable.choices,
-        help_text="Is the originating GREGoR Center likely able to recontact this participant"
+        help_text="Is the originating GREGoR Center likely able to recontact "\
+            "this participant"
         )
-    prior_testing = models.TextField(
+    prior_testing = models.ManyToManyField(
+        PriorTesting,
+        related_name="participant",
         blank=True,
-        help_text="Text description of any genetic testing for individual conducted prior to enrollment"
+        help_text="Text description of any genetic testing for individual "\
+            "conducted prior to enrollment"
         )
-    pmid_id = models.CharField(
+    pmid_id = models.ManyToManyField(
+        PmidId,
+        related_name="participant",
         blank=True,
-        max_length=255,
         help_text="Case specific PubMed ID if applicable"
         )
-    family_id = models.CharField(
-        max_length=255,
+    family_id = models.OneToOneField(
+        Family,
+        null=True,
+        blank=True,
+        on_delete = models.SET_NULL,
         help_text="Identifier for family"
         )
     paternal_id = models.CharField(
@@ -84,8 +172,9 @@ class Participant(models.Model):
         max_length=255,
         help_text="participant_id for mother; 0 if not available"
         )
-    twin_id = models.CharField(
-        max_length=255,
+    twin_id = models.ManyToManyField(
+        TwinId,
+        related_name="participant",
         blank=True,
         help_text="participant_id for twins, triplets, etc; 0 if not available"
         )
@@ -113,8 +202,11 @@ class Participant(models.Model):
     reported_ethnicity = models.CharField(
         max_length=255,
         blank=True,
+        default=None,
+        choices=ReportedEthnicity.choices,
         help_text="Self/submitter-reported ethnicity (OMB categories)"
         )
+    
     ancestry_detail = models.CharField(
         max_length=255,
         blank=True,
@@ -152,6 +244,7 @@ class Participant(models.Model):
     )
     #example values for fields
     participant_id.help_text += ' Example values: BCM_Subject_1, BROAD_subj89054.'
-
+    
     def __str__(self):
         return str(self.participant_id)
+    
