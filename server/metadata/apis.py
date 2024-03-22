@@ -8,7 +8,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from metadata.models import Participant
+from metadata.models import Participant, InternalProjectId
+from utilities.api_response import ApiResponse
+from metadata.selectors import get_sub_models
 
 class GetMetadataAPI(APIView):
     
@@ -37,11 +39,17 @@ class GetMetadataAPI(APIView):
             "phenotype_description",
             "age_at_enrollment"
         ]
-        
+        all = Participant.objects.all()
+        # import pdb; pdb.set_trace()
         return Response(status=status.HTTP_200_OK, data={"message": "user account created"})
     
-class SubmitParticipantAPI(APIView):
+class CreateParticipantAPI(APIView):
     class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Participant
+            fields = '__all__'
+    
+    class OutputSerializer(serializers.ModelSerializer):
         class Meta:
             model = Participant
             fields = '__all__'
@@ -54,33 +62,41 @@ class SubmitParticipantAPI(APIView):
         title="Participant Submission",
         description="",
         required=[""],
-        items=openapi.Items(type=openapi.TYPE_OBJECT)
+        items=openapi.Items(
+            type=openapi.TYPE_OBJECT
+        )
     )
 
     @swagger_auto_schema(
         request_body=request_body,
         responses={
             200: "All submissions of participants are successful.",
+            207: "Some submissions of participants were not successful.",
             400: "Bad request"
-        }
+        },
+        tags=["Participant"]
     )
     def post(self,request):
-        results = {}
+        api_response = ApiResponse(operation="create_participants")
         try:
-            data = request.data['participant_list']
-            # import pdb; pdb.set_trace()
-            for datum in data:
+            for datum in request.data:
                 identifier = datum['participant_id']
-                results[identifier] = {"number_of_errors": 0, "error_detail": []}
+                datum = get_sub_models(datum)
                 serializer = self.InputSerializer(data=datum)
                 if serializer.is_valid() is True:
-                    results[identifier] = {"number_of_errors": 0, "error_detail": "Item saved"}
-                    # serializer.save()
+                    api_response.add_success(identifier)
+                    serializer.save()
                 else:
                     for item in serializer.errors:
-                        results[identifier]["number_of_errors"] += 1
                         text = {item: serializer.errors[item][0].title()}
-                        results[identifier]['error_detail'].append(text)
-            return Response(status=status.HTTP_200_OK, data=results)
+                        api_response.add_error(identifier, text)
+
+            response_data = api_response.get_response()
+
+            if len(response_data['errors']) == 0:
+                return Response(status=status.HTTP_200_OK, data=response_data)
+            else:
+                return Response(status=status.HTTP_207_MULTI_STATUS, data=response_data)
+        
         except Exception as error:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={str(error)})
