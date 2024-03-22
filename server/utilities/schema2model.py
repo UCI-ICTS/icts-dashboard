@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
+"""Json Schema to Django Model
 """
-Json Schema to Django Model
-"""
+
 import json
 import argparse
 import logging
