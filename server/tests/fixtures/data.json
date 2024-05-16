@@ -1,18 +1,20 @@
-[    {
+[
+    {
         "model": "auth.user",
-        "pk": 1,
+        "pk": 2,
         "fields": {
-            "password": "pbkdf2_sha256$720000$MxgdzNtnwDFmkMnpnkjWmH$SrLBLC7nx2IbkR2lwxKAoEuZ4RYvixhX0GXDFetJkV4=",
-            "last_login": null,
+            "password": "pbkdf2_sha256$720000$5Zume6W5yJ6mG65dA4dDlK$vXsTd6lIx7VcS6tHvAaXszPsmLkSbwO3PjW1zJOuMjQ=",
+            "last_login": "2024-05-14T18:21:55.603Z",
             "is_superuser": true,
-            "username": "hadley_king",
+            "username": "wheel",
             "first_name": "",
             "last_name": "",
-            "email": "had@ley.king",
+            "email": "wheel@wheel.tst",
             "is_staff": true,
             "is_active": true,
-            "date_joined": "2024-02-15T13:17:47.531Z",
+            "date_joined": "2024-05-14T18:21:45.897Z",
             "groups": [],
             "user_permissions": []
         }
-    }]
+    }
+]
