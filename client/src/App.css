@@ -1,32 +1,115 @@
-.App {
+
+/* Outlet styles */
+.outlet-root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  flex-direction: column;
+}
+
+.outlet-container {
+  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding-top: 75px;
+}
+
+.outlet-main-content {
   text-align: center;
+  flex: 1 1 auto;
+  overflow: auto;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.outlet-content {
+  flex: 1 1 auto;
+  overflow: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Homepage Styles */
+.home-root {
+  background-color: rgb(250, 249, 246);
+  min-height: 100%;
+  margin-top: auto;
+  padding-bottom: 3;
+  padding-top: 3;
+  margin-left: auto;
+  min-width: 275;
+}
+
+.home-bullet {
+  display: inline-block;
+  margin: 0 2px;
+  transform: scale(0.8);
+}
+
+.home-centered {
+  min-Width: 275;
+  text-align: center;
+  margin-Top: 0;
+}
+
+.home-heightened {
+  min-height: 50px;
+}
+
+.home-intro-title {
+  font-size: 28px !important;
+  font-weight: bold !important;
+}
+
+.home-position {
+  margin-bottom: 12;
+}
+
+.home-margintop{
+  margin-top: 50px;
+}
+
+.home-colorBackground {
+  background-color: rgb(186, 209, 234);
+}
+
+.home-linkcard {
+  height: 250px;
+  min-width: 275;
+  text-align: center;
+  margin-top: 5;
+}
+
+.home-supportcard {
+  text-align: center;
+  margin-bottom: 10;
+  min-height: 460px;
+  min-width: 275;
+}
+
+.home-subtitle {
+  font-size: 24px !important;
+}
+
+.home-grid-item {
+  width: 100%; /* default to full width, equivalent to xs=12 */
+}
+
+@media (min-width: 600px) { /* sm breakpoint */
+  .home-grid-item {
+    width: 33.3333%; /* equivalent to sm=4 */
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+@media (min-width: 1200px) { /* lg breakpoint */
+  .home-grid-item {
+    width: 33.3333%; /* lg=4, though this is redundant if it doesn't change from sm */
+  }
 }
 
-.App-link {
-  color: #61dafb;
+@media (min-width: 1536px) { /* xl breakpoint */
+  .home-grid-item {
+    width: 33.3333%; /* xl=4, again redundant here but included for clarity */
+  }
 }
+
 
 @keyframes App-logo-spin {
   from {
@@ -36,3 +119,4 @@
     transform: rotate(360deg);
   }
 }
+
