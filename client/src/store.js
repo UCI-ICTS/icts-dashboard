@@ -1,6 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { dataReducer }  from './slices/dataSlice'
+import { configureStore } from "@reduxjs/toolkit"
+import { accountReducer } from "./slices/accountSlice"
+import { messageReducer } from "./slices/messageSlice"
 
-export default configureStore({
-  reducer: {data:dataReducer},
-});
+export const store = configureStore({
+  reducer: {
+    account: accountReducer,
+    message: messageReducer,
+  }
+})

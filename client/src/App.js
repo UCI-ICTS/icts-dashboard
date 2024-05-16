@@ -1,12 +1,14 @@
-
+import React from 'react';
+import logo from './logo.svg';
 import './App.css';
-import { Uploader } from './components/uploader/Uploader';
+import { BrowserRouter } from "react-router-dom";
+import Router from './routs';
 
 function App() {
   return (
-    <div className="App">
-        <Uploader />
-    </div>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
   );
 }
 

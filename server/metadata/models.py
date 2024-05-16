@@ -7,14 +7,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-# https://stackoverflow.com/questions/63255065/storing-arrays-in-django-models-not-postgresql
-class Family(models.Model):
-    family_id = models.CharField(
-        max_length=255,
-        primary_key=True,
-        help_text=""
-    )
-
 class InternalProjectId(models.Model):
     internal_project_id = models.CharField(
         max_length=255,
@@ -41,16 +33,6 @@ class ConsentCode(models.TextChoices):
 class Recontactable(models.TextChoices):
     YES = "Yes", _("Yes")
     NO = "No", _("No")
-    
-class PriorTesting(models.Model):
-    prior_testing = models.TextField(
-        primary_key=True,
-        help_text="Text description of any genetic testing for individual "\
-            "conductedprior to enrollment"
-    )
-
-    def __str__(self) -> str:
-        return self.prior_testing
 
 class PmidId(models.Model):
     pmid_id = models.CharField(
@@ -61,47 +43,61 @@ class PmidId(models.Model):
             " inclusion in GREGoR"
     )
 
+class Family(models.Model):
+    family_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text=""
+    )
+
 class TwinId(models.Model):
-    pmid_id = models.CharField(
+    twin_id = models.CharField(
         max_length=255,
         primary_key=True,
         help_text="may be monozygotic, dizygotic, or polyzygotic"
     )
+    def __str__(self):
+        return self.twin_id
 
 class ProbandRelationship(models.TextChoices):
-    "Self"
-    "Mother"
-    "Father"
-    "Sibling",
-    "Child",
-    "Maternal Half Sibling",
-    "Paternal Half Sibling",
-    "Maternal Grandmother",
-    "Maternal Grandfather",
-    "Paternal Grandmother",
-    "Paternal Grandfather",
-    "Maternal Aunt",
-    "Maternal Uncle",
-    "Paternal Aunt",
-    "Paternal Uncle",
-    "Niece",
-    "Nephew",
-    "Maternal 1st Cousin",
-    "Paternal 1st Cousin",
-    "Other",
-    "Unknown"
+    SELF = "Self", _("SELF")
+    MOTHER = "Mother", _("MOTHER")
+    FATHER = "Father", _("FATHER")
+    SIBLING = "Sibling", _("SIBLING")
+    CHILD = "Child", _("CHILD")
+    MATERNAL_HALF_SIBLING = "Maternal Half Sibling", _("MATERNAL_HALF_SIBLING")
+    PATERNAL_HALF_SIBLING = "Paternal Half Sibling", _("PATERNAL_HALF_SIBLING")
+    MATERNAL_GRANDMOTHER = "Maternal Grandmother", _("MATERNAL_GRANDMOTHER")
+    MATERNAL_GRANDFATHER = "Maternal Grandfather", _("MATERNAL_GRANDFATHER")
+    PATERNAL_GRANDMOTHER = "Paternal Grandmother", _("PATERNAL_GRANDMOTHER")
+    PATERNAL_GRANDFATHER = "Paternal Grandfather", _("PATERNAL_GRANDFATHER")
+    MATERNAL_AUNT = "Maternal Aunt", _("MATERNAL_AUNT")
+    MATERNAL_UNCLE = "Maternal Uncle", _("MATERNAL_UNCLE")
+    PATERNAL_AUNT = "Paternal Aunt", _("PATERNAL_AUNT")
+    PATERNAL_UNCLE = "Paternal Uncle", _("PATERNAL_UNCLE")
+    NIECE = "Niece", _("NIECE")
+    NEPHEW = "Nephew", _("NEPHEW")
+    MATERNAL_FIRST_COUSIN = "Maternal 1st Cousin", _("MATERNAL_FIRST_COUSIN")
+    PATERNAL_FIRST_COUSIN = "Paternal 1st Cousin", _("PATERNAL_FIRST_COUSIN")
+    OTHER = "Other", _("OTHER")
+    UNKNOWN = "Unknown", _("UNKNOWN")
+
+class BiologicalSex(models.TextChoices):
+    FEMALE = "Female", _("FEMALE")
+    MALE = "Male", _("MALE")
+    UNKNOWN = "Unknown", _("UNKNOWN")
 
 class ReportedRace(models.TextChoices):
-    NATIVE_AMERICAN = "NATIVE_AMERICAN", _("American Indian or Alaska Native")
-    ASIAN = "ASIAN",_("Asian")
-    BLACK = "BLACK", _("Black or African American")
-    PACIFIC_ISLANDER = "PACIFIC_ISLANDER", _("Native Hawaiian or Other Pacific Islander")
-    MIDDLE_EASTERN = "MIDDLE_EASTERN", _("Middle Eastern or North African")
-    WHITE = "WHITE", _("White")
+    NATIVE_AMERICAN = "American Indian or Alaska Native", _("NATIVE_AMERICAN")
+    ASIAN = "Asian",_("ASIAN")
+    BLACK = "Black or African American", _("BLACK")
+    PACIFIC_ISLANDER = "Native Hawaiian or Other Pacific Islander", _("PACIFIC_ISLANDER")
+    MIDDLE_EASTERN = "Middle Eastern or North African", _("MIDDLE_EASTERN")
+    WHITE = "White", _("WHITE")
 
 class ReportedEthnicity(models.TextChoices):
-    HISPANIC = "HISPANIC", _("Hispanic or Latino",)
-    NON_HISPANIC = "NON_HISPANIC", _("Not Hispanic or Latino")
+    HISPANIC = "Hispanic or Latino", _("HISPANIC",)
+    NON_HISPANIC = "Not Hispanic or Latino", _("NON_HISPANIC")
 
 class PhenotypeDescription(models.Model):
     phenotype_description = models.CharField(
@@ -141,22 +137,21 @@ class Participant(models.Model):
         max_length=255,
         blank=True,
         choices=Recontactable.choices,
+        default="No",
         help_text="Is the originating GREGoR Center likely able to recontact "\
             "this participant"
         )
-    prior_testing = models.ManyToManyField(
-        PriorTesting,
-        related_name="participant",
+    prior_testing = models.TextField(
         blank=True,
         help_text="Text description of any genetic testing for individual "\
             "conducted prior to enrollment"
-        )
+    )
     pmid_id = models.ManyToManyField(
         PmidId,
         related_name="participant",
         blank=True,
         help_text="Case specific PubMed ID if applicable"
-        )
+    )
     family_id = models.OneToOneField(
         Family,
         null=True,
@@ -166,10 +161,12 @@ class Participant(models.Model):
         )
     paternal_id = models.CharField(
         max_length=255,
+        default="0",
         help_text="participant_id for father; 0 if not available"
         )
     maternal_id = models.CharField(
         max_length=255,
+        default="0",
         help_text="participant_id for mother; 0 if not available"
         )
     twin_id = models.ManyToManyField(
@@ -180,6 +177,8 @@ class Participant(models.Model):
         )
     proband_relationship = models.CharField(
         max_length=255,
+        choices=ProbandRelationship.choices,
+        default=ProbandRelationship.UNKNOWN,
         help_text="Text description of individual relationship to proband in family, especially useful to capture relationships when connecting distant relatives and connecting relatives not studied"
         )
     proband_relationship_detail = models.TextField(
@@ -188,8 +187,10 @@ class Participant(models.Model):
         )
     sex = models.CharField(
         max_length=255,
+        choices=BiologicalSex.choices,
+        default=BiologicalSex.UNKNOWN,
         help_text="Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the phenotype information section."
-        )
+    )
     sex_detail = models.TextField(
         blank=True,
         help_text="Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype"
@@ -198,7 +199,7 @@ class Participant(models.Model):
         max_length=255,
         blank=True,
         help_text="Self/submitter-reported race (OMB categories"
-        )
+    )
     reported_ethnicity = models.CharField(
         max_length=255,
         blank=True,
@@ -247,4 +248,12 @@ class Participant(models.Model):
     
     def __str__(self):
         return str(self.participant_id)
+    
+    def get_prior_testing_list(self):
+        """Return a list of prior testing from the comma-separated string."""
+        return self.prior_testing.split('|') if self.prior_testing else []
+
+    def set_prior_testing_list(self, list_of_tests):
+        """Set the prior_testing field from a list."""
+        self.prior_testing = '|'.join(list_of_tests)
     
