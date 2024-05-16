@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # metadata/urls.py
 
 from django.urls import path
