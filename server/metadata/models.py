@@ -34,6 +34,12 @@ class Recontactable(models.TextChoices):
     YES = "Yes", _("Yes")
     NO = "No", _("No")
 
+class Consanguinity(models.TextChoices):
+    PRESENT = 'Present', _('Present')
+    SUSPECTED = 'Suspected', _('Suspected')
+    ABSENT = 'Absent', _('Absent')
+    UNKNOWN = 'Unknown', _('Unknown')
+
 class PmidId(models.Model):
     pmid_id = models.CharField(
         max_length=255,
@@ -42,12 +48,37 @@ class PmidId(models.Model):
             "publications which include participant known prior to or after"\
             " inclusion in GREGoR"
     )
+    def __str__(self):
+        return str(self.pmid_id)
 
 class Family(models.Model):
     family_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text=""
+        help_text="Identifier for family (primary key)"
+    )
+    consanguinity = models.CharField(
+        max_length=50,
+        choices=Consanguinity.choices,
+        default=Consanguinity.UNKNOWN,
+        help_text="Indicate if consanguinity is present or suspected within a family"
+    )
+    consanguinity_detail = models.TextField(
+        blank=True,
+        help_text="Free text description of any additional consanguinity details"
+    )
+    pedigree_file = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Name of file (renamed from pedigree_image because it can contain a PED file or image)"
+    )
+    pedigree_file_detail = models.TextField(
+        blank=True,
+        help_text="Free text description of other family structure/pedigree file caption or legend."
+    )
+    family_history_detail = models.TextField(
+        blank=True,
+        help_text="Details about family history that do not fit into structured fields. Family relationship terms should be relative to the proband."
     )
 
 class TwinId(models.Model):
@@ -147,16 +178,17 @@ class Participant(models.Model):
             "conducted prior to enrollment"
     )
     pmid_id = models.ManyToManyField(
-        PmidId,
-        related_name="participant",
+        'PmidId',
+        related_name="participants",
         blank=True,
         help_text="Case specific PubMed ID if applicable"
     )
-    family_id = models.OneToOneField(
+    family_id = models.ForeignKey(
         Family,
+        to_field="family_id",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete = models.SET_NULL,
         help_text="Identifier for family"
         )
     paternal_id = models.CharField(
@@ -207,14 +239,12 @@ class Participant(models.Model):
         choices=ReportedEthnicity.choices,
         help_text="Self/submitter-reported ethnicity (OMB categories)"
         )
-    
     ancestry_detail = models.CharField(
         max_length=255,
         blank=True,
         help_text="Additional specific ancestry description free text beyond what is captured by OMB race/ethnicity categories"
         )
-    age_at_last_observation = models.CharField(
-        max_length=255,
+    age_at_last_observation = models.FloatField(
         blank=True,
         help_text="Age at last observation, aka age in years at the last time the center can vouch for the accuracy phenotype data. For conditions with later age of onset, this field lets users know if individuals marked as unaffected were younger or older than the age when the phenotype is expected to appear"
         )
@@ -226,8 +256,7 @@ class Participant(models.Model):
         blank=True,
         help_text="human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband."
         )
-    age_at_enrollment = models.CharField(
-        max_length=255,
+    age_at_enrollment = models.FloatField(
         blank=True,
         help_text="age in years at which consent was originally obtained"
         )
@@ -243,17 +272,11 @@ class Participant(models.Model):
         blank=True,
         help_text="For missing variant cases, indicate gene(s) or region of interest and reason for inclusion in MVP"
     )
-    #example values for fields
-    participant_id.help_text += ' Example values: BCM_Subject_1, BROAD_subj89054.'
+
     
     def __str__(self):
         return str(self.participant_id)
-    
-    def get_prior_testing_list(self):
-        """Return a list of prior testing from the comma-separated string."""
-        return self.prior_testing.split('|') if self.prior_testing else []
 
-    def set_prior_testing_list(self, list_of_tests):
-        """Set the prior_testing field from a list."""
-        self.prior_testing = '|'.join(list_of_tests)
-    
+    def get_pmid_ids(self):
+        """Returns a list of primary key IDs for associated PmidIds."""
+        return list(self.pmid_id.values_list('id', flat=True))

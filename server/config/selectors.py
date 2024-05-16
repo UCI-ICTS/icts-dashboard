@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # config/services.py
 
+import os
+import jsonref
+import jsonschema
+from django.conf import settings
 from rest_framework import status
 
 """DB Level Services
@@ -9,6 +13,55 @@ from rest_framework import status
     It includes utility functions for handling response status determination,
     API data conversion, and constructing standardized response objects.
 """
+
+class TableValidator:
+    """Table Validator class to validate JSON objects against predefined JSON schemas."""
+
+    def __init__(self):
+        """Initializes the TableValidator with the path to JSON schemas."""
+        self.base_path = os.path.join(settings.BASE_DIR, "utilities/json_schemas/")
+        self.valid = False
+        self.errors = []
+
+    def validate_json(self, json_object: dict, table_name: str):
+        """
+        Validates a JSON object against a specified schema and updates the instance's valid and errors attributes.
+
+        Parameters:
+        - json_object (dict): The JSON object to be validated.
+        - table_name (str): The name of the table which corresponds to the schema file.
+        """
+        
+        schema_path = os.path.join(self.base_path, f"{table_name}.json")
+        try:
+            with open(schema_path, 'r') as schema_file:
+                schema = jsonref.load(schema_file)
+
+            validator = jsonschema.Draft7Validator(schema)
+            self.errors = [f"{list(error.path)}: {error.message}" for error in validator.iter_errors(json_object)]
+            self.valid = len(self.errors) == 0
+
+        except jsonschema.exceptions.ValidationError as e:
+            self.valid = False
+            self.errors = [str(e)]
+        except FileNotFoundError:
+            self.valid = False
+            self.errors = [f"Schema file not found for {table_name}."]
+        except Exception as e:
+            self.valid = False
+            self.errors = [f"An unexpected error occurred: {str(e)}."]
+
+    def get_validation_results(self):
+        """
+        Returns the validation results as a dictionary.
+
+        Returns:
+        - dict: A dictionary with 'valid' and 'errors' keys.
+        """
+        return {
+            "valid": self.valid,
+            "errors": self.errors
+        }
 
 def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
     """Determine Response Status
@@ -37,7 +90,7 @@ def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
 
     if accepted_requests is True and rejected_requests is False:
         status_code = status.HTTP_200_OK
-        
+
     return status_code
 
 def response_constructor(

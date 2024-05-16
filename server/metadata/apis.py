@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 # metadata/apis.py
 
 import json
+from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, serializers
@@ -10,7 +12,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from metadata.models import Participant, InternalProjectId
 from config.selectors import response_constructor, response_status
-from metadata.selectors import get_sub_models
+from metadata.services import ParticipantSerializer
+from config.selectors import TableValidator
+from metadata.services import get_or_create_sub_models
 
 class GetMetadataAPI(APIView):
     
@@ -40,14 +44,18 @@ class GetMetadataAPI(APIView):
             "age_at_enrollment"
         ]
         all = Participant.objects.all()
-        return Response(status=status.HTTP_200_OK, data={"message": "user account created"})
+        return Response(status=status.HTTP_200_OK, data=all)
     
 class CreateParticipantAPI(APIView):
+    """
+    """
+    
     class InputSerializer(serializers.ModelSerializer):
+        pmid_ids = serializers.SerializerMethodField()
         class Meta:
             model = Participant
             fields = '__all__'
-    
+
     class OutputSerializer(serializers.ModelSerializer):
         class Meta:
             model = Participant
@@ -67,36 +75,63 @@ class CreateParticipantAPI(APIView):
     )
 
     @swagger_auto_schema(
-        request_body=request_body,
+        request_body=InputSerializer(many=True),
         responses={
-            200: "All submissions of participants are successful.",
+            200: OutputSerializer(many=True),
             207: "Some submissions of participants were not successful.",
             400: "Bad request"
         },
         tags=["Participant"]
     )
+
+    @transaction.atomic
     def post(self,request):
+        validator = TableValidator()
         response_data = []
         rejected_requests = False
         accepted_requests = False
         try:
-            for datum in request.data:
+            for index, datum in enumerate(request.data):
                 identifier = datum['participant_id']
-                datum = get_sub_models(datum)
-                serializer = self.InputSerializer(data=datum)
-                if serializer.is_valid() is True:
-                    serializer.save()
-                    response_data.append(response_constructor(
-                        identifier=identifier,
-                        status = "SUCCESS",
-                        code= 200,
-                        message= f"Participant {identifier} created.",
-                    ))
-                    accepted_requests = True
+                # datum = get_sub_models(datum)
+                validator.validate_json(
+                    json_object=datum,
+                    table_name="participant"
+                )
+                results = validator.get_validation_results()
+
+                if results['valid'] is True:
+                    datum = get_or_create_sub_models(datum=datum)
+                    serializer = ParticipantSerializer(data=datum)
+                    
+                    if serializer.is_valid():
+                        serializer.create(validated_data=serializer.validated_data)
+                        
+                        response_data.append(response_constructor(
+                            identifier=identifier,
+                            status = "SUCCESS",
+                            code= 200,
+                            message= f"Participant {identifier} created.",
+                        ))
+                        accepted_requests = True
+                    else:
+                        error_data = []
+                        for item in serializer.errors:
+                            text = {item: serializer.errors[item]}
+                            error_data.append(text)
+                        response_data.append(response_constructor(
+                            identifier=identifier,
+                            status = "BAD REQUEST",
+                            code= 400,
+                            data=error_data
+                        ))
+                        rejected_requests = True
+                        continue
+
                 else:
                     error_data = []
-                    for item in serializer.errors:
-                        text = {item: serializer.errors[item][0].title()}
+                    for item in results['errors']:
+                        text = {[item][0].title()}
                         error_data.append(text)
                     response_data.append(response_constructor(
                         identifier=identifier,
@@ -106,9 +141,7 @@ class CreateParticipantAPI(APIView):
                     ))
                     rejected_requests = True
                     continue
-            
 
-            
             status_code = response_status(accepted_requests, rejected_requests)
             return Response(status=status_code, data=response_data)
 
