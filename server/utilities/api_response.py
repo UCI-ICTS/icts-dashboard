@@ -18,7 +18,6 @@ class ApiResponse:
                 "error_detail": []
             }
         self.response['errors'][identifier]["number_of_errors"] += 1
-        import pdb; pdb.set_trace()
         self.response['errors'][identifier]["error_detail"].append(error_message)
 
     def add_success(self, identifier):

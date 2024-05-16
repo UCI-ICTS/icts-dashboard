@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from metadata.models import Participant, InternalProjectId
-from utilities.api_response import ApiResponse
+from config.selectors import response_constructor, response_status
 from metadata.selectors import get_sub_models
 
 class GetMetadataAPI(APIView):
@@ -40,7 +40,6 @@ class GetMetadataAPI(APIView):
             "age_at_enrollment"
         ]
         all = Participant.objects.all()
-        # import pdb; pdb.set_trace()
         return Response(status=status.HTTP_200_OK, data={"message": "user account created"})
     
 class CreateParticipantAPI(APIView):
@@ -77,26 +76,41 @@ class CreateParticipantAPI(APIView):
         tags=["Participant"]
     )
     def post(self,request):
-        api_response = ApiResponse(operation="create_participants")
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
         try:
             for datum in request.data:
                 identifier = datum['participant_id']
                 datum = get_sub_models(datum)
                 serializer = self.InputSerializer(data=datum)
                 if serializer.is_valid() is True:
-                    api_response.add_success(identifier)
                     serializer.save()
+                    response_data.append(response_constructor(
+                        identifier=identifier,
+                        status = "SUCCESS",
+                        code= 200,
+                        message= f"Participant {identifier} created.",
+                    ))
+                    accepted_requests = True
                 else:
+                    error_data = []
                     for item in serializer.errors:
                         text = {item: serializer.errors[item][0].title()}
-                        api_response.add_error(identifier, text)
+                        error_data.append(text)
+                    response_data.append(response_constructor(
+                        identifier=identifier,
+                        status = "BAD REQUEST",
+                        code= 400,
+                        data=error_data
+                    ))
+                    rejected_requests = True
+                    continue
+            
 
-            response_data = api_response.get_response()
+            
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
 
-            if len(response_data['errors']) == 0:
-                return Response(status=status.HTTP_200_OK, data=response_data)
-            else:
-                return Response(status=status.HTTP_207_MULTI_STATUS, data=response_data)
-        
         except Exception as error:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={str(error)})
