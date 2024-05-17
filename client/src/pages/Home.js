@@ -2,11 +2,14 @@ import React from "react";
 import { Box, Container, Grid } from "@material-ui/core";
 import "../App.css"
 import { InfoBox } from "../components/InfoBox";
+import { TableForm } from "../components/TableForm";
+import { Uploader } from "../components/Uploader";
 
 const HomePage = () => {
     return (
       <Container >
-        <Grid item xs={12} sm={12} lg={12} xl={12} >
+        <Uploader/>
+        {/* <Grid item xs={12} sm={12} lg={12} xl={12} >
         We will leverage UCI Health’s expertise in genetics and genetic counseling to support an eConsult network 
             <Container className="home-margintop" maxWidth={false}>
               <Box>
@@ -35,7 +38,7 @@ const HomePage = () => {
                 </Grid>
               </Box>
             </Container>
-          </Grid>
+          </Grid> */}
       </Container>
     )
 }

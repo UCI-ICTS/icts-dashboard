@@ -144,9 +144,9 @@ class Participant(models.Model):
         max_length=255,
         help_text="Subject/Participant Identifier (primary key)"
         )
-    internal_project_id = models.ManyToManyField(
+    internal_project_ids = models.ManyToManyField(
         InternalProjectId,
-        related_name="participant",
+        related_name="participants",
         blank=True,
         help_text="An identifier used by GREGoR research centers to identify" \
         "a set of participants for their internal tracking"
@@ -177,7 +177,7 @@ class Participant(models.Model):
         help_text="Text description of any genetic testing for individual "\
             "conducted prior to enrollment"
     )
-    pmid_id = models.ManyToManyField(
+    pmid_ids = models.ManyToManyField(
         'PmidId',
         related_name="participants",
         blank=True,
@@ -201,9 +201,9 @@ class Participant(models.Model):
         default="0",
         help_text="participant_id for mother; 0 if not available"
         )
-    twin_id = models.ManyToManyField(
+    twin_ids = models.ManyToManyField(
         TwinId,
-        related_name="participant",
+        related_name="participants",
         blank=True,
         help_text="participant_id for twins, triplets, etc; 0 if not available"
         )
