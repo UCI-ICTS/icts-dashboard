@@ -1,0 +1,856 @@
+[
+    {
+        "model": "auth.permission",
+        "pk": 1,
+        "fields": {
+            "name": "Can add log entry",
+            "content_type": 1,
+            "codename": "add_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 2,
+        "fields": {
+            "name": "Can change log entry",
+            "content_type": 1,
+            "codename": "change_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 3,
+        "fields": {
+            "name": "Can delete log entry",
+            "content_type": 1,
+            "codename": "delete_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 4,
+        "fields": {
+            "name": "Can view log entry",
+            "content_type": 1,
+            "codename": "view_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 5,
+        "fields": {
+            "name": "Can add permission",
+            "content_type": 2,
+            "codename": "add_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 6,
+        "fields": {
+            "name": "Can change permission",
+            "content_type": 2,
+            "codename": "change_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 7,
+        "fields": {
+            "name": "Can delete permission",
+            "content_type": 2,
+            "codename": "delete_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 8,
+        "fields": {
+            "name": "Can view permission",
+            "content_type": 2,
+            "codename": "view_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 9,
+        "fields": {
+            "name": "Can add group",
+            "content_type": 3,
+            "codename": "add_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 10,
+        "fields": {
+            "name": "Can change group",
+            "content_type": 3,
+            "codename": "change_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 11,
+        "fields": {
+            "name": "Can delete group",
+            "content_type": 3,
+            "codename": "delete_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 12,
+        "fields": {
+            "name": "Can view group",
+            "content_type": 3,
+            "codename": "view_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 13,
+        "fields": {
+            "name": "Can add user",
+            "content_type": 4,
+            "codename": "add_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 14,
+        "fields": {
+            "name": "Can change user",
+            "content_type": 4,
+            "codename": "change_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 15,
+        "fields": {
+            "name": "Can delete user",
+            "content_type": 4,
+            "codename": "delete_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 16,
+        "fields": {
+            "name": "Can view user",
+            "content_type": 4,
+            "codename": "view_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 17,
+        "fields": {
+            "name": "Can add content type",
+            "content_type": 5,
+            "codename": "add_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 18,
+        "fields": {
+            "name": "Can change content type",
+            "content_type": 5,
+            "codename": "change_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 19,
+        "fields": {
+            "name": "Can delete content type",
+            "content_type": 5,
+            "codename": "delete_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 20,
+        "fields": {
+            "name": "Can view content type",
+            "content_type": 5,
+            "codename": "view_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 21,
+        "fields": {
+            "name": "Can add session",
+            "content_type": 6,
+            "codename": "add_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 22,
+        "fields": {
+            "name": "Can change session",
+            "content_type": 6,
+            "codename": "change_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 23,
+        "fields": {
+            "name": "Can delete session",
+            "content_type": 6,
+            "codename": "delete_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 24,
+        "fields": {
+            "name": "Can view session",
+            "content_type": 6,
+            "codename": "view_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 25,
+        "fields": {
+            "name": "Can add internal project id",
+            "content_type": 7,
+            "codename": "add_internalprojectid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 26,
+        "fields": {
+            "name": "Can change internal project id",
+            "content_type": 7,
+            "codename": "change_internalprojectid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 27,
+        "fields": {
+            "name": "Can delete internal project id",
+            "content_type": 7,
+            "codename": "delete_internalprojectid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 28,
+        "fields": {
+            "name": "Can view internal project id",
+            "content_type": 7,
+            "codename": "view_internalprojectid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 29,
+        "fields": {
+            "name": "Can add pmid id",
+            "content_type": 8,
+            "codename": "add_pmidid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 30,
+        "fields": {
+            "name": "Can change pmid id",
+            "content_type": 8,
+            "codename": "change_pmidid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 31,
+        "fields": {
+            "name": "Can delete pmid id",
+            "content_type": 8,
+            "codename": "delete_pmidid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 32,
+        "fields": {
+            "name": "Can view pmid id",
+            "content_type": 8,
+            "codename": "view_pmidid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 33,
+        "fields": {
+            "name": "Can add family",
+            "content_type": 9,
+            "codename": "add_family"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 34,
+        "fields": {
+            "name": "Can change family",
+            "content_type": 9,
+            "codename": "change_family"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 35,
+        "fields": {
+            "name": "Can delete family",
+            "content_type": 9,
+            "codename": "delete_family"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 36,
+        "fields": {
+            "name": "Can view family",
+            "content_type": 9,
+            "codename": "view_family"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 37,
+        "fields": {
+            "name": "Can add twin id",
+            "content_type": 10,
+            "codename": "add_twinid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 38,
+        "fields": {
+            "name": "Can change twin id",
+            "content_type": 10,
+            "codename": "change_twinid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 39,
+        "fields": {
+            "name": "Can delete twin id",
+            "content_type": 10,
+            "codename": "delete_twinid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 40,
+        "fields": {
+            "name": "Can view twin id",
+            "content_type": 10,
+            "codename": "view_twinid"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 41,
+        "fields": {
+            "name": "Can add phenotype description",
+            "content_type": 11,
+            "codename": "add_phenotypedescription"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 42,
+        "fields": {
+            "name": "Can change phenotype description",
+            "content_type": 11,
+            "codename": "change_phenotypedescription"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 43,
+        "fields": {
+            "name": "Can delete phenotype description",
+            "content_type": 11,
+            "codename": "delete_phenotypedescription"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 44,
+        "fields": {
+            "name": "Can view phenotype description",
+            "content_type": 11,
+            "codename": "view_phenotypedescription"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 45,
+        "fields": {
+            "name": "Can add participant",
+            "content_type": 12,
+            "codename": "add_participant"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 46,
+        "fields": {
+            "name": "Can change participant",
+            "content_type": 12,
+            "codename": "change_participant"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 47,
+        "fields": {
+            "name": "Can delete participant",
+            "content_type": 12,
+            "codename": "delete_participant"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 48,
+        "fields": {
+            "name": "Can view participant",
+            "content_type": 12,
+            "codename": "view_participant"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$5Zume6W5yJ6mG65dA4dDlK$vXsTd6lIx7VcS6tHvAaXszPsmLkSbwO3PjW1zJOuMjQ=",
+            "last_login": "2024-05-14T18:21:55.603Z",
+            "is_superuser": true,
+            "username": "wheel",
+            "first_name": "",
+            "last_name": "",
+            "email": "wheel@wheel.tst",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2024-05-14T18:21:45.897Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 1,
+        "fields": {
+            "app_label": "admin",
+            "model": "logentry"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 2,
+        "fields": {
+            "app_label": "auth",
+            "model": "permission"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 3,
+        "fields": {
+            "app_label": "auth",
+            "model": "group"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 4,
+        "fields": {
+            "app_label": "auth",
+            "model": "user"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 5,
+        "fields": {
+            "app_label": "contenttypes",
+            "model": "contenttype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 6,
+        "fields": {
+            "app_label": "sessions",
+            "model": "session"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 7,
+        "fields": {
+            "app_label": "metadata",
+            "model": "internalprojectid"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 8,
+        "fields": {
+            "app_label": "metadata",
+            "model": "pmidid"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 9,
+        "fields": {
+            "app_label": "metadata",
+            "model": "family"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 10,
+        "fields": {
+            "app_label": "metadata",
+            "model": "twinid"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 11,
+        "fields": {
+            "app_label": "metadata",
+            "model": "phenotypedescription"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 12,
+        "fields": {
+            "app_label": "metadata",
+            "model": "participant"
+        }
+    },
+    {
+        "model": "metadata.pmidid",
+        "pk": "000000",
+        "fields": {}
+    },
+    {
+        "model": "metadata.pmidid",
+        "pk": "111111",
+        "fields": {}
+    },
+    {
+        "model": "metadata.pmidid",
+        "pk": "Twin brother",
+        "fields": {}
+    },
+    {
+        "model": "metadata.pmidid",
+        "pk": "UCI",
+        "fields": {}
+    },
+    {
+        "model": "metadata.family",
+        "pk": "PMGRC-101",
+        "fields": {
+            "consanguinity": "Unknown",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
+            "pedigree_file_detail": "",
+            "family_history_detail": ""
+        }
+    },
+    {
+        "model": "metadata.family",
+        "pk": "PMGRC-1052",
+        "fields": {
+            "consanguinity": "Unknown",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
+            "pedigree_file_detail": "",
+            "family_history_detail": ""
+        }
+    },
+    {
+        "model": "metadata.family",
+        "pk": "PMGRC-494",
+        "fields": {
+            "consanguinity": "Unknown",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
+            "pedigree_file_detail": "",
+            "family_history_detail": ""
+        }
+    },
+    {
+        "model": "metadata.twinid",
+        "pk": "0",
+        "fields": {}
+    },
+    {
+        "model": "metadata.twinid",
+        "pk": "PMGRC-494-494-0",
+        "fields": {}
+    },
+    {
+        "model": "metadata.twinid",
+        "pk": "PMGRC-495-494-3",
+        "fields": {}
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-1052-1052-0",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "Yes",
+            "prior_testing": "['WES, many VUSes: Het T590M col6A2, Het G1240V RYR1, Het S395R SHANK3, Het c307dupC PCDH10, Het V174M SLC25A34']",
+            "family_id": "PMGRC-1052",
+            "paternal_id": "1054-1052-1",
+            "maternal_id": "1055-1052-2",
+            "proband_relationship": "Self",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "Unknown",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 13.9,
+            "affected_status": "Affected",
+            "phenotype_description": "cyclic vomiting, autism, developmental delays, muscle biopsy showed decreased activity in mitochondrial complex 1",
+            "age_at_enrollment": 13.9,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-1053-1052-3",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "Yes",
+            "prior_testing": "['CMA: (Xp22.31 (8,595,318-8,702,123) x2, 2q21.2 (132,721,612-133,358,558) x3 )', 'WES: heterozygous variant in FOXP1, maternally inherited']",
+            "family_id": "PMGRC-1052",
+            "paternal_id": "1054-1052-1",
+            "maternal_id": "1055-1052-2",
+            "proband_relationship": "Sibling",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "Unknown",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 12.3,
+            "affected_status": "Affected",
+            "phenotype_description": "autism, developmental delays, cyclic vomiting",
+            "age_at_enrollment": 12.3,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-1054-1052-1",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "Yes",
+            "prior_testing": "[]",
+            "family_id": "PMGRC-1052",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Father",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "Unknown",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 0.0,
+            "affected_status": "Unknown",
+            "phenotype_description": "",
+            "age_at_enrollment": 0.0,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-1055-1052-2",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "Yes",
+            "prior_testing": "[]",
+            "family_id": "PMGRC-1052",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Mother",
+            "proband_relationship_detail": "",
+            "sex": "Female",
+            "sex_detail": "",
+            "reported_race": "Unknown",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 0.0,
+            "affected_status": "Unknown",
+            "phenotype_description": "",
+            "age_at_enrollment": 0.0,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-494-494-0",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "No",
+            "prior_testing": "['Exome was completed on his brother and mother with negative findings (mother is a carrier for BBS1). Fragile X negative, seizure panel normal']",
+            "family_id": "PMGRC-494",
+            "paternal_id": "0",
+            "maternal_id": "PMGRC-496-494-2",
+            "proband_relationship": "Self",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "More than one race",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 0.0,
+            "affected_status": "Affected",
+            "phenotype_description": "autism, global developmental delay, expressive speech delay, horseshoe kidney, plagiocephaly, prematurity (25-26 weeks), ROP, CLD, large R choroid plexus cyst, aortic insufficiency, ASD, bilateral inguinal hernias, butterfly verterbrae, T6 rib deformity, hypospadias, epilepsy, triangular face, anterior hairline back, slightly broad forehead",
+            "age_at_enrollment": 0.0,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-495-494-3",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "No",
+            "prior_testing": "['seizure panel normal']",
+            "family_id": "PMGRC-494",
+            "paternal_id": "0",
+            "maternal_id": "PMGRC-496-494-2",
+            "proband_relationship": "Sibling",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "More than one race",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 0.0,
+            "affected_status": "Affected",
+            "phenotype_description": "horseshoe kidney, delays, epilepsy",
+            "age_at_enrollment": 0.0,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-496-494-2",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "No",
+            "prior_testing": "[]",
+            "family_id": "PMGRC-494",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Mother",
+            "proband_relationship_detail": "",
+            "sex": "Female",
+            "sex_detail": "",
+            "reported_race": "White",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 0.0,
+            "affected_status": "Unaffected",
+            "phenotype_description": "",
+            "age_at_enrollment": 0.0,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    },
+    {
+        "model": "metadata.participant",
+        "pk": "PMGRC-98-101-1",
+        "fields": {
+            "gregor_center": "CNH_I",
+            "consent_code": "GRU",
+            "recontactable": "Yes",
+            "prior_testing": "['variant in CBL c.1259G>A (p.Arg420Gln) likely pathogenic', 'stuff and more stuff']",
+            "family_id": "PMGRC-101",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Father",
+            "proband_relationship_detail": "",
+            "sex": "Male",
+            "sex_detail": "",
+            "reported_race": "White",
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 33.9,
+            "affected_status": "Unaffected",
+            "phenotype_description": "healthy",
+            "age_at_enrollment": 33.9,
+            "solve_status": "Unaffected",
+            "missing_variant_case": "Unknown",
+            "missing_variant_details": "",
+            "internal_project_ids": [],
+            "pmid_ids": [],
+            "twin_ids": []
+        }
+    }
+]
