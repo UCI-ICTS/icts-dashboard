@@ -224,7 +224,7 @@ class CreateFamilyApi(APIView):
                     rejected_requests = True
                     continue
 
-            # import pdb; pdb.set_trace()
+    
             status_code = response_status(accepted_requests, rejected_requests)
             
             return Response(status=status_code, data=response_data)

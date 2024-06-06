@@ -2,6 +2,7 @@
 # search/apis.py
 
 import json
+from django.apps import apps
 from django.db.models import Q
 from django.contrib.auth.models import User
 from drf_yasg import openapi
@@ -17,19 +18,22 @@ class SearchTablesAPI(APIView):
     """
 
     permission_classes = [AllowAny]
+    model_name_param = openapi.Parameter('model_name', openapi.IN_PATH, description="Name of the model to query", type=openapi.TYPE_STRING)
+    slow_client_param = openapi.Parameter('slowClient', openapi.IN_QUERY, description="Flag to indicate slow client handling", type=openapi.TYPE_BOOLEAN, required=False)
 
-    def get(self, request) -> Response:
-        
-        query = Q()
+    @swagger_auto_schema(
+    manual_parameters=[model_name_param, slow_client_param], responses={200: "JSON response of model data"})
+    def get(self, request, model_name):
+      try:
+            model = apps.get_model('metadata', model_name)
+      except LookupError:
+            return Response({"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        for field in return_values:
-           values = request.GET.getlist(field)
-           if values:
-              field_query = Q()
-              for value in values:
-                    field_query |= Q(**{f'{field}__icontains': value})
-              query &= field_query
+      query_params = request.query_params
+      filter_kwargs = {k: v for k, v in query_params.items() if hasattr(model, k)}
 
-        return_bco = viewable_bcos.filter(query)
-        bco_data = chain(return_bco.values(*return_values))
-        return Response(status=status.HTTP_200_OK, data=bco_data)
+      queryset = model.objects.filter(**filter_kwargs)
+      data = chain(queryset.values())
+      import pdb; pdb.set_trace()
+
+      return Response(data)

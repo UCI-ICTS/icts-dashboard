@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Phenotype",
+    "type": "object",
+    "properties": {
+        "phenotype_id": {
+            "type": "string",
+            "description": "Unique identifier for the phenotype entry."
+        },
+        "participant_id": {
+            "type": "string",
+            "description": "Identifier for the participant associated with this phenotype."
+        },
+        "term_id": {
+            "type": "string",
+            "description": "Identifier for the term within the ontology used to describe the phenotype."
+        },
+        "presence": {
+            "type": "string",
+            "enum": ["present", "absent", "unknown"],
+            "description": "Indicates if the phenotype is present, absent, or unknown."
+        },
+        "ontology": {
+            "type": "string",
+            "enum": ["hpo", "mp", "go"],
+            "description": "The ontology used to classify the phenotype term."
+        },
+        "additional_details": {
+            "type": "string",
+            "description": "Additional details about the phenotype that are not supported/available as a term in the specified ontology."
+        },
+        "onset_age_range": {
+            "type": "string",
+            "enum": ["neonatal", "infantile", "childhood", "adolescence", "adult", "old_age"],
+            "description": "The age range at which the phenotype onset occurs."
+        },
+        "additional_modifiers": {
+            "type": "string",
+            "description": "Additional modifiers that further specify the phenotype."
+        },
+        "syndromic": {
+            "type": "boolean",
+            "description": "Indicates if the phenotype is part of a syndromic condition."
+        }
+    },
+    "required": ["phenotype_id", "participant_id", "term_id", "presence", "ontology"]
+}
