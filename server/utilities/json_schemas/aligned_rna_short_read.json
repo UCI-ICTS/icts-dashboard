@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Aligned RNA Short Read",
+    "description": "Schema for aligned RNA short reads in a genomics context.",
+    "type": "object",
+    "properties": {
+      "aligned_rna_short_read_id": {
+        "type": "string",
+        "description": "Identifier for aligned_short_read (primary key)."
+      },
+      "experiment_rna_short_read_id": {
+        "type": "string",
+        "description": "Identifier for experiment."
+      },
+      "aligned_rna_short_read_file": {
+        "type": "string",
+        "description": "Name and path of file with aligned reads."
+      },
+      "aligned_rna_short_read_index_file": {
+        "type": "string",
+        "description": "Name and path of index file corresponding to aligned reads file."
+      },
+      "md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for file."
+      },
+      "reference_assembly": {
+        "type": "string",
+        "enum": ["GRCh38", "GRCh37", "NCBI36", "NCBI35", "NCBI34"],
+        "description": "Reference genome assembly used."
+      },
+      "reference_assembly_uri": {
+        "type": "string",
+        "description": "URI for reference assembly file."
+      },
+      "reference_assembly_details": {
+        "type": "string",
+        "description": "Details about the reference assembly used."
+      },
+      "gene_annotation": {
+        "type": "string",
+        "description": "Annotation file used for alignment."
+      },
+      "gene_annotation_details": {
+        "type": "string",
+        "description": "Detailed description of gene annotation used."
+      },
+      "alignment_software": {
+        "type": "string",
+        "description": "Software including version number used for alignment."
+      },
+      "alignment_log_file": {
+        "type": "string",
+        "description": "Path of (log) file with all parameters for alignment software."
+      },
+      "alignment_postprocessing": {
+        "type": "string",
+        "description": "Post processing applied to alignment."
+      },
+      "mean_coverage": {
+        "type": "number",
+        "description": "Mean coverage of either the genome or the targeted regions."
+      },
+      "percent_uniquely_aligned": {
+        "type": "number",
+        "description": "Percentage of reads that aligned to just one place."
+      },
+      "percent_multimapped": {
+        "type": "number",
+        "description": "Percentage of reads that aligned to multiple places."
+      },
+      "percent_unaligned": {
+        "type": "number",
+        "description": "Percentage of reads that didn't align."
+      },
+      "quality_issues": {
+        "type": "string",
+        "description": "Any QC issues that would be important to note."
+      }
+    },
+    "required": [
+      "aligned_rna_short_read_id",
+      "experiment_rna_short_read_id",
+      "aligned_rna_short_read_file",
+      "aligned_rna_short_read_index_file",
+      "md5sum",
+      "reference_assembly",
+      "gene_annotation",
+      "alignment_software",
+      "mean_coverage",
+      "percent_uniquely_aligned",
+      "percent_multimapped",
+      "percent_unaligned"
+    ]
+  }
+  
