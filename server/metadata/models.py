@@ -55,7 +55,7 @@ class Family(models.Model):
     family_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text="Identifier for family (primary key)"
+        help_text="Identifier for family (primary key). Needs to be Unique across centers, use participant.gregor_center as ID prefix."
     )
     consanguinity = models.CharField(
         max_length=50,
@@ -280,3 +280,400 @@ class Participant(models.Model):
     def get_pmid_ids(self):
         """Returns a list of primary key IDs for associated PmidIds."""
         return list(self.pmid_id.values_list('id', flat=True))
+
+class Phenotype(models.Model):
+    phenotype_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text='primary key'
+    )
+    participant = models.ForeignKey(
+        Participant,
+        on_delete=models.CASCADE,
+        related_name='phenotypes',
+        help_text='Subject/Participant Identifier'
+    )
+    term_id = models.CharField(
+        max_length=255,
+        help_text='Identifier for the term within the ontology'
+    )
+    presence = models.CharField(
+        max_length=100,
+        choices=[
+            ('present', 'Present'),
+            ('absent', 'Absent'),
+            ('unknown', 'Unknown')
+        ],
+        default='unknown',
+        help_text='Presence of the phenotype'
+    )
+    ontology = models.CharField(
+        max_length=100,
+        choices=[
+            ('hpo', 'Human Phenotype Ontology'),
+            ('mp', 'Mammalian Phenotype Ontology'),
+            ('go', 'Gene Ontology')
+        ],
+        default='hpo',
+        help_text='The ontology used for the term'
+    )
+    additional_details = models.TextField(
+        blank=True,
+        help_text='modifier of a term where the additional details are not supported/available as a term in HPO'
+    )
+    onset_age_range = models.CharField(
+        max_length=100,
+        choices=[
+            ('neonatal', 'Neonatal'),
+            ('infantile', 'Infantile'),
+            ('childhood', 'Childhood'),
+            ('adolescence', 'Adolescence'),
+            ('adult', 'Adult'),
+            ('old_age', 'Old Age')
+        ],
+        default='unknown',
+        help_text='Age range at the onset of the phenotype'
+    )
+    additional_modifiers = models.TextField(
+        blank=True,
+        help_text='Additional modifiers that further specify the phenotype'
+    )
+    syndromic = models.BooleanField(
+        default=False,
+        help_text='Indicates if the phenotype is part of a syndromic condition'
+    )
+
+    def __str__(self):
+        return f"{self.participant.participant_id} - {self.term_id}"
+
+class VariantType(models.TextChoices):
+    SNP = 'SNP', 'Single Nucleotide Polymorphism'
+    INDEL = 'INDEL', 'Insertion-Deletion'
+    CNV = 'CNV', 'Copy Number Variation'
+    SV = 'SV', 'Structural Variation'
+
+class Zygosity(models.TextChoices):
+    HOMOZYGOUS = 'Homozygous', 'Homozygous'
+    HETEROZYGOUS = 'Heterozygous', 'Heterozygous'
+    HEMIZYGOUS = 'Hemizygous', 'Hemizygous'
+
+class VariantInheritance(models.TextChoices):
+    DE_NOVO = 'De Novo', 'De Novo'
+    INHERITED = 'Inherited', 'Inherited'
+    UNKNOWN = 'Unknown', 'Unknown'
+
+class GeneDiseaseValidity(models.TextChoices):
+    VALID = 'Valid', 'Valid'
+    INVALID = 'Invalid', 'Invalid'
+
+class DiscoveryMethod(models.TextChoices):
+    SEQUENCING = 'Sequencing', 'Sequencing'
+    GWAS = 'GWAS', 'Genome Wide Association Study'
+
+class GeneticFindings(models.Model):
+    genetic_findings_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text='Unique ID of this variant in this participant'
+    )
+    participant_id = models.ForeignKey(
+        Participant,
+        on_delete=models.CASCADE,
+        help_text='Subject/Participant Identifier within project'
+    )
+    experiment_id = models.CharField(
+        max_length=255,
+        help_text='The experiment table and experiment ID(s) in which discovery was identified'
+    )
+    variant_type = models.CharField(
+        max_length=50,
+        choices=VariantType.choices,
+        help_text='Type of genetic variant'
+    )
+    sv_type = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Type of structural variant if applicable'
+    )
+    variant_reference_assembly = models.CharField(
+        max_length=50,
+        help_text='The genome build for identifying the variant position'
+    )
+    chrom = models.CharField(
+        max_length=10,
+        help_text='Chromosome of the variant'
+    )
+    chrom_end = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text='End position chromosome of SV'
+    )
+    pos = models.IntegerField(
+        help_text='Start position of the variant'
+    )
+    pos_end = models.IntegerField(
+        blank=True, null=True,
+        help_text='End position of SV'
+    )
+    ref = models.CharField(
+        max_length=255,
+        help_text='Reference allele of the variant'
+    )
+    alt = models.CharField(
+        max_length=255,
+        help_text='Alternate allele of the variant'
+    )
+    copy_number = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text='CNV copy number'
+    )
+    ClinGen_allele_ID = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='ClinGen Allele ID for cross table reference'
+    )
+    gene_of_interest = models.CharField(
+        max_length=255,
+        help_text='HGNC approved symbol of the known or candidate gene(s)'
+    )
+    transcript = models.CharField(
+        max_length=255, blank=True,
+        help_text='Text description of transcript overlapping the variant'
+    )
+    hgvsc = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='HGVS c. description of the variant'
+    )
+    hgvsp = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='HGVS p. description of the variant'
+    )
+    hgvs = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Genomic HGVS description of the variant'
+    )
+    zygosity = models.CharField(
+        max_length=50,
+        choices=Zygosity.choices,
+        help_text='Zygosity of variant'
+    )
+    allele_balance_or_heteroplasmy_percentage = models.FloatField(
+        blank=True,
+        null=True,
+        help_text='Reported allele balance (mosaic) or heteroplasmy percentage (mitochondrial)'
+    )
+    variant_inheritance = models.CharField(
+        max_length=50,
+        choices=VariantInheritance.choices,
+        help_text='Detection of variant in parents'
+    )
+    linked_variant = models.CharField(
+        max_length=255, 
+        blank=True, 
+        help_text='Second variant in recessive cases'
+    )
+    linked_variant_phase = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Phase of linked variants'
+    )
+    gene_known_for_phenotype = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Indicate if the gene listed is a candidate or known disease gene'
+    )
+    known_condition_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Condition name consistent with the variant/phenotype/inheritance'
+    )
+    condition_id = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='MONDO/OMIM number for condition used for variant interpretation'
+    )
+    condition_inheritance = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Expected inheritance of the condition used for variant interpretation'
+    )
+    GREGoR_variant_classification = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Clinical significance of variant described to condition listed as determined by the RC\'s variant curation'
+    )
+    GREGoR_ClinVar_SCV = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='ClinVar accession number for the variant curation submitted by your center'
+    )
+    gene_disease_validity = models.CharField(
+        max_length=50, 
+        choices=GeneDiseaseValidity.choices, help_text='Validity assessment of the gene-disease relationship'
+    )
+    public_database_other = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Public databases that this variant in this participant has been submitted by the RC'
+    )
+    public_database_ID_other = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Public database variant/case ID'
+    )
+    phenotype_contribution = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Contribution of variant-linked condition to participant\'s phenotype'
+    )
+    partial_contribution_explained = models.ManyToManyField(
+        Phenotype,
+        blank=True,
+        help_text='Specific phenotypes explained by the condition associated with this variant/gene in cases of partial contribution'
+    )
+    additional_family_members_with_variant = models.ManyToManyField(
+        Participant,
+        blank=True,
+        related_name='family_variants',
+        help_text='List of related participant IDs carrying the same variant'
+    )
+    method_of_discovery = models.CharField(
+        max_length=50,
+        choices=DiscoveryMethod.choices,
+        help_text='The method/assay(s) used to identify the candidate'
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text='Free text field to explain edge cases or discovery updates or list parallel experiment IDs or list parental allele balance when mosaic... etc.'
+    )
+
+    def __str__(self):
+        return self.genetic_findings_id
+
+class Analyte(models.Model):
+    analyte_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="Identifier for an analyte from a primary biosample source"
+    )
+    participant = models.ForeignKey(
+        Participant,
+        on_delete=models.CASCADE,
+        help_text="The participant from whom the biosample was taken"
+    )
+    analyte_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('DNA', 'DNA'),
+            ('RNA', 'RNA'),
+            ('cDNA', 'cDNA'),
+            ('blood plasma', 'blood plasma'),
+            ('frozen whole blood', 'frozen whole blood'),
+            ('high molecular weight DNA', 'high molecular weight DNA'),
+            ('urine', 'urine')
+        ],
+        help_text="Analyte derived from the primary biosample. The actual thing you're sticking into a machine to analyze/sequence"
+    )
+    analyte_processing_details = models.TextField(
+        help_text="Details about how the analyte or original biosample was extracted or processed"
+    )
+    primary_biosample = models.CharField(
+        max_length=100,
+        choices=[
+            ("UBERON:0000479", "tissue"),
+            ("UBERON:0003714", "neural tissue"),
+            ("UBERON:0001836", "saliva"),
+            ("UBERON:0001003", "skin epidermis"),
+            ("UBERON:0002385", "muscle tissue"),
+            ("UBERON:0000178", "whole blood"),
+            ("UBERON:0002371", "bone marrow"),
+            ("UBERON:0006956", "buccal mucosa"),
+            ("UBERON:0001359", "cerebrospinal fluid"),
+            ("UBERON:0001088", "urine"),
+            ("UBERON:0019306", "nose epithelium"),
+            ("CL:0000034", "iPSC"),
+            ("CL:0000576", "monocytes - PBMCs"),
+            ("CL:0000542", "lymphocytes - LCLs"),
+            ("CL:0000057", "fibroblasts"),
+            ("UBERON:0005291", "embryonic tissue"),
+            ("CL:0011020", "iPSC NPC"),
+            ("UBERON:0002037", "cerebellum tissue"),
+            ("UBERON:0001133", "cardiac tissue"),
+        ],
+        help_text="Tissue type of biosample taken from the participant that the analyte was extracted or processed from"
+    )
+    primary_biosample_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional ID for the biosample; allows for linking of multiple analytes extracted or processed from the same biosample"
+    )
+    primary_biosample_details = models.TextField(
+        blank=True,
+        help_text="Free text to capture information not in structured fields"
+    )
+    tissue_affected_status = models.BooleanField(
+        default=False,
+        help_text="If applicable to disease (suspected mosaic), indicates if the tissue is from an affected source."
+    )
+    age_at_collection = models.FloatField(
+        help_text="Age of participant in years at biosample collection"
+    )
+    participant_drugs_intake = models.TextField(
+        help_text="The list of drugs patient is on, at the time of sample collection. Helpful during analysis of metabolomics and immune assays"
+    )
+    participant_special_diet = models.TextField(
+        help_text="If the patient was fasting, when the sample was collected. Relevant when analyzing metabolomics data"
+    )
+    hours_since_last_meal = models.FloatField(
+        help_text="Hours since last meal, relevant when analyzing metabolomics data"
+    )
+    passage_number = models.IntegerField(
+        help_text="Passage number is relevant for fibroblast cultures and possibly iPSC."
+    )
+    time_to_freeze = models.FloatField(
+        help_text="Time (in hours) from collection to freezing the sample. Delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation)."
+    )
+    sample_transformation_detail = models.TextField(
+        help_text="Details regarding sample transformation"
+    )
+    quality_issues = models.TextField(
+        help_text="Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+    )
+
+    def __str__(self):
+        return f"Analyte {self.analyte_id} from participant {self.participant.participant_id}"
+
+class Experiment(models.Model):
+    EXPERIMENT_TYPES = [
+        ('experiment_dna_short_read', 'DNA Short Read'),
+        ('experiment_rna_short_read', 'RNA Short Read'),
+        ('experiment_nanopore', 'Nanopore'),
+        ('experiment_pac_bio', 'Pac Bio'),
+        ('experiment_atac_short_read', 'ATAC Short Read'),
+    ]
+
+    experiment_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="Unique ID of this experiment instance combining the table name and an ID within the table."
+    )
+    table_name = models.CharField(
+        max_length=50,
+        choices=EXPERIMENT_TYPES,
+        help_text="Specifies the experiment table."
+    )
+    id_in_table = models.CharField(
+        max_length=255, help_text="Unique identifier within the specific experiment table."
+    )
+    participant = models.ForeignKey(
+        'Participant',
+        on_delete=models.CASCADE,
+        help_text="References the participant associated with this experiment."
+    )
+
+    def __str__(self):
+        return f"{self.table_name} - {self.experiment_id}"

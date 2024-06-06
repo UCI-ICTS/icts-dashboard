@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Experiment",
+    "type": "object",
+    "properties": {
+      "experiment_id": {
+        "type": "string",
+        "description": "table_name.experiment_id_in_table",
+        "examples": ["experiment_dna_short_read.GSS201938-01-021-SG-1"]
+      },
+      "table_name": {
+        "type": "string",
+        "description": "Specifies the experiment table",
+        "enum": [
+          "experiment_dna_short_read",
+          "experiment_rna_short_read",
+          "experiment_nanopore",
+          "experiment_pac_bio",
+          "experiment_atac_short_read"
+        ],
+        "examples": ["experiment_dna_short_read"]
+      },
+      "id_in_table": {
+        "type": "string",
+        "description": "Unique identifier within the specific experiment table",
+        "examples": ["GSS201938-01-021-SG-1"]
+      },
+      "participant_id": {
+        "type": "string",
+        "description": "Subject/Participant Identifier within project",
+        "examples": ["GSS201938"]
+      }
+    },
+    "required": ["experiment_id", "table_name", "id_in_table", "participant_id"]
+  }
+  

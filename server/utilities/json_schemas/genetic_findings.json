@@ -1,0 +1,190 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Genetic Findings",
+    "description": "Schema for genetic findings related to participants in genetic research.",
+    "type": "object",
+    "properties": {
+        "genetic_findings_id": {
+            "type": "string",
+            "description": "Unique identifier for the genetic finding."
+        },
+        "participant_id": {
+            "type": "string",
+            "description": "Identifier for the participant associated with this genetic finding."
+        },
+        "experiment_id": {
+            "type": "string",
+            "description": "Identifier for the experiment where the genetic finding was identified."
+        },
+        "variant_type": {
+            "type": "string",
+            "enum": ["SNP", "INDEL", "CNV", "SV"],
+            "description": "Type of genetic variant."
+        },
+        "sv_type": {
+            "type": "string",
+            "description": "Specific type of structural variant, if applicable."
+        },
+        "variant_reference_assembly": {
+            "type": "string",
+            "description": "The genome build used for identifying the variant's position."
+        },
+        "chrom": {
+            "type": "string",
+            "description": "Chromosome on which the variant is located."
+        },
+        "chrom_end": {
+            "type": "string",
+            "description": "End position of the chromosome where the structural variant ends."
+        },
+        "pos": {
+            "type": "integer",
+            "description": "Start position of the variant on the chromosome."
+        },
+        "pos_end": {
+            "type": "integer",
+            "description": "End position of the variant on the chromosome."
+        },
+        "ref": {
+            "type": "string",
+            "description": "Reference allele of the variant."
+        },
+        "alt": {
+            "type": "string",
+            "description": "Alternate allele of the variant."
+        },
+        "copy_number": {
+            "type": "integer",
+            "description": "Copy number variation if applicable."
+        },
+        "ClinGen_allele_ID": {
+            "type": "string",
+            "description": "ClinGen Allele ID for cross-table reference."
+        },
+        "gene_of_interest": {
+            "type": "string",
+            "description": "HGNC approved symbol of the known or candidate gene(s) relevant for the phenotype."
+        },
+        "transcript": {
+            "type": "string",
+            "description": "Description of transcript overlapping the variant."
+        },
+        "hgvsc": {
+            "type": "string",
+            "description": "HGVS c. notation description of the variant."
+        },
+        "hgvsp": {
+            "type": "string",
+            "description": "HGVS p. notation description of the variant."
+        },
+        "hgvs": {
+            "type": "string",
+            "description": "Genomic HGVS description of the variant."
+        },
+        "zygosity": {
+            "type": "string",
+            "enum": ["Homozygous", "Heterozygous", "Hemizygous"],
+            "description": "Zygosity of the variant."
+        },
+        "allele_balance_or_heteroplasmy_percentage": {
+            "type": "number",
+            "description": "Reported allele balance (mosaic) or heteroplasmy percentage (mitochondrial)."
+        },
+        "variant_inheritance": {
+            "type": "string",
+            "enum": ["De Novo", "Inherited", "Unknown"],
+            "description": "Detection of variant in parents."
+        },
+        "linked_variant": {
+            "type": "string",
+            "description": "Second variant in recessive cases."
+        },
+        "linked_variant_phase": {
+            "type": "string",
+            "description": "Phase of linked variants."
+        },
+        "gene_known_for_phenotype": {
+            "type": "string",
+            "description": "Indicates if the gene listed is a candidate or known disease gene."
+        },
+        "known_condition_name": {
+            "type": "string",
+            "description": "Free text of condition name consistent with the variant/phenotype/inheritance."
+        },
+        "condition_id": {
+            "type": "string",
+            "description": "MONDO/OMIM number for condition used for variant interpretation."
+        },
+        "condition_inheritance": {
+            "type": "string",
+            "description": "Description of the expected inheritance of condition used for variant interpretation."
+        },
+        "GREGoR_variant_classification": {
+            "type": "string",
+            "description": "Clinical significance of variant described to condition listed as determined by the RC's variant curation."
+        },
+        "GREGoR_ClinVar_SCV": {
+            "type": "string",
+            "description": "ClinVar accession number for the variant curation submitted by your center."
+        },
+        "gene_disease_validity": {
+            "type": "string",
+            "description": "Validity assessment of the gene-disease relationship."
+        },
+        "public_database_other": {
+            "type": "string",
+            "description": "Public databases that this variant in this participant has been submitted by the RC."
+        },
+        "public_database_ID_other": {
+            "type": "string",
+            "description": "Public database variant/case ID."
+        },
+        "phenotype_contribution": {
+            "type": "string",
+            "description": "Contribution of variant-linked condition to participant's phenotype."
+        },
+        "partial_contribution_explained": {
+            "type": "array",
+            "description": "List of specific phenotypes explained by the condition associated with this variant/gene in cases of partial contribution.",
+            "items": {
+                "type": "string"
+            }
+        },
+        "additional_family_members_with_variant": {
+            "type": "array",
+            "description": "List of related participant IDs carrying the same variant.",
+            "items": {
+                "type": "string"
+            }
+        },
+        "method_of_discovery": {
+            "type": "string",
+            "description": "The method/assay(s) used to identify the candidate."
+        },
+        "notes": {
+            "type": "string",
+            "description": "Free text field to explain edge cases or discovery updates or list parallel experiment IDs or list parental allele balance when mosaic... etc."
+        }
+    },
+    "required": [
+        "genetic_findings_id",
+        "participant_id",
+        "variant_type",
+        "chrom",
+        "pos",
+        "ref",
+        "alt",
+        "gene_of_interest",
+        "transcript",
+        "hgvsc",
+        "hgvsp",
+        "hgvs",
+        "zygosity",
+        "variant_inheritance",
+        "gene_known_for_phenotype",
+        "known_condition_name",
+        "condition_id",
+        "GREGoR_variant_classification",
+        "gene_disease_validity"
+    ]
+}

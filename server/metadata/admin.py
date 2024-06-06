@@ -2,7 +2,14 @@
 """
 
 from django.contrib import admin
-from metadata.models import Participant, InternalProjectId, Family, PmidId
+from metadata.models import (
+    Participant,
+    InternalProjectId,
+    Family,
+    PmidId,
+    Phenotype,
+    GeneticFindings
+)
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display =["participant_id"]
@@ -16,7 +23,15 @@ class FamilyAdmin(admin.ModelAdmin):
 class PmidIdAdmin(admin.ModelAdmin):
     list_display=["pmid_id"]
 
+class PhenotypeAdmin(admin.ModelAdmin):
+    list_display=["phenotype_id"]
+
+class GeneticFindingsAdmin(admin.ModelAdmin):
+    list_display=["genetic_findings_id"]
+
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(InternalProjectId, InternalProjectIdAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(PmidId, PmidIdAdmin)
+admin.site.register(Phenotype, PhenotypeAdmin)
+admin.site.register(GeneticFindings, GeneticFindingsAdmin)
