@@ -3,81 +3,80 @@
 
 from django.db import transaction
 from rest_framework import serializers
-from metadata.models import Participant, Family, InternalProjectId, PmidId, TwinId
+from metadata.models import (
+    Participant,
+    Family,
+    InternalProjectId,
+    PmidId,
+    TwinId,
+    AlignedDNAShortRead,
+)
+
 
 class FamilySerializer(serializers.ModelSerializer):
     class Meta:
         model = Family
-        fields="__all__"
+        fields = "__all__"
+
 
 class ParticipantSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
         help_text="List of prior testing entries",
-        required=False
+        required=False,
     )
 
     internal_project_ids = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
-        help_text="An identifier used by GREGoR research centers to identify a set of participants for their internal tracking"
+        help_text="An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
     )
-    
+
     pmid_ids = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
-        help_text="Case specific PubMed IDs if applicable"
+        help_text="Case specific PubMed IDs if applicable",
     )
 
     twin_ids = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
-        help_text="Participant IDs for twins, triplets, etc."
+        help_text="Participant IDs for twins, triplets, etc.",
     )
 
     class Meta:
         model = Participant
-        fields = '__all__'
+        fields = "__all__"
 
     def create(self, validated_data):
-        internal_project_ids = validated_data.pop('internal_project_ids', [])
-        pmid_ids = validated_data.pop('pmid_ids', [])
-        twin_ids = validated_data.pop('twin_ids', [])
+        internal_project_ids = validated_data.pop("internal_project_ids", [])
+        pmid_ids = validated_data.pop("pmid_ids", [])
+        twin_ids = validated_data.pop("twin_ids", [])
 
         with transaction.atomic():
             participant = Participant.objects.create(**validated_data)
-        
+
             if len(internal_project_ids) != 0:
                 self._set_relationship(
                     participant,
                     InternalProjectId,
                     internal_project_ids,
-                    "internal_project_ids"
+                    "internal_project_ids",
                 )
             if len(pmid_ids) != 0:
-                self._set_relationship(
-                    participant,
-                    PmidId,
-                    pmid_ids,
-                    "pmid_ids"
-                )
+                self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
             if len(twin_ids) != 0:
-                self._set_relationship(
-                    participant,
-                    TwinId,
-                    twin_ids,
-                    "twin_ids"
-                )
+                self._set_relationship(participant, TwinId, twin_ids, "twin_ids")
 
         return participant
 
     def update(self, instance, validated_data):
-        internal_project_ids = validated_data.pop('internal_project_ids', [])
-        pmid_ids = validated_data.pop('pmid_ids', [])
-        twin_ids = validated_data.pop('twin_ids', [])
+        internal_project_ids = validated_data.pop("internal_project_ids", [])
+        pmid_ids = validated_data.pop("pmid_ids", [])
+        twin_ids = validated_data.pop("twin_ids", [])
 
         with transaction.atomic():
             for attr, value in validated_data.items():
@@ -95,13 +94,14 @@ class ParticipantSerializer(serializers.ModelSerializer):
         manager = getattr(instance, related_name)
         manager.set(model.objects.filter(pk__in=ids))
 
+
 def get_or_create_sub_models(datum):
     # Define how to handle creation of related objects
     mapping = {
         "family_id": (Family, "family_id"),
         "internal_project_id": (InternalProjectId, "internal_project_id"),
         "pmid_id": (PmidId, "pmid_id"),
-        "twin_id": (TwinId, "twin_id")
+        "twin_id": (TwinId, "twin_id"),
     }
 
     for key, (model, field_name) in mapping.items():
@@ -115,6 +115,28 @@ def get_or_create_sub_models(datum):
             if datum.get(key):
                 obj, created = model.objects.get_or_create(**{field_name: datum[key]})
                 datum[key] = obj.pk
-                
 
     return datum
+
+
+class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
+    """add a validation step in your serializer to enforce these conditions
+    more contextually, especially if the relationships and business logic are
+    more suited to be checked at the API level.
+    Works well within the context of Django REST Framework and is ideal for
+    API-driven projects."""
+
+    class Meta:
+        model = AlignedDNAShortRead
+        fields = "__all__"
+
+    def validate(self, data):
+        instance = AlignedDNAShortRead(**data)
+        if (
+            not instance.aligned_dna_short_read_set.exists()
+            and not instance.called_variants_dna_short_read.exists()
+        ):
+            raise serializers.ValidationError(
+                "Either aligned_dna_short_read_set or called_variants_dna_short_read is required."
+            )
+        return data

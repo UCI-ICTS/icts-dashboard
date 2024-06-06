@@ -1,0 +1,76 @@
+{
+    "title": "Aligned ATAC Short Read",
+    "type": "object",
+    "properties": {
+      "aligned_atac_short_read_id": {
+        "type": "string",
+        "description": "Identifier for aligned_atac_short_read (primary key). Experiment_short_read_id + alignment indicator."
+      },
+      "experiment_atac_short_read_id": {
+        "type": "string",
+        "description": "Identifier for experiment. Reference to experiment_atac_short_read.experiment_atac_short_read_id."
+      },
+      "aligned_atac_short_read_file": {
+        "type": "string",
+        "description": "Name and path of file with aligned reads.",
+        "format": "uri"
+      },
+      "aligned_atac_short_read_index_file": {
+        "type": "string",
+        "description": "Name and path of index file corresponding to aligned reads file.",
+        "format": "uri"
+      },
+      "md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for file."
+      },
+      "reference_assembly": {
+        "type": "string",
+        "description": "Reference assembly used.",
+        "enum": ["GRCh38", "GRCh37", "NCBI36", "NCBI35", "NCBI34"]
+      },
+      "reference_assembly_uri": {
+        "type": "string",
+        "format": "uri"
+      },
+      "reference_assembly_details": {
+        "type": "string"
+      },
+      "alignment_software": {
+        "type": "string",
+        "description": "Software including version number."
+      },
+      "gene_annotation_details": {
+        "type": "string"
+      },
+      "alignment_log_file": {
+        "type": "string",
+        "format": "uri"
+      },
+      "alignment_postprocessing": {
+        "type": "string"
+      },
+      "mean_coverage": {
+        "type": "number"
+      },
+      "percent_uniquely_aligned": {
+        "type": "number"
+      },
+      "percent_multimapped": {
+        "type": "number"
+      },
+      "percent_unaligned": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "aligned_atac_short_read_id",
+      "experiment_atac_short_read_id",
+      "aligned_atac_short_read_file",
+      "aligned_atac_short_read_index_file",
+      "md5sum",
+      "reference_assembly",
+      "alignment_software"
+    ]
+  }
+  
