@@ -7,4 +7,4 @@ See [the docs](/docs/)
 
 ## Instalation
 
-See [installation instructions](/docs/install.md)
+See [local installation instructions](/docs/install-local.md)
