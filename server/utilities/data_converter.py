@@ -42,7 +42,7 @@ class TableConverter:
 
         # set usages options
         parser = argparse.ArgumentParser(
-            prog='argosdb',
+            prog='data_converter',
             usage='%(prog)s [options]')
 
         # # version
@@ -51,13 +51,13 @@ class TableConverter:
         #     action='version',
         #     version='%(prog)s ' + __version__)
 
-        parser.add_argument('-c', '--csv',
+        parser.add_argument('-t', '--table',
                                     required=True,
-                                    help="CSV file to create.")
+                                    help="table file to convert.")
 
-        parser.add_argument('-s', '--schema',
-                                    # type = argparse.FileType('r'),
-                                    help="Root json schema to parse")
+        # parser.add_argument('-s', '--schema',
+        #                             # type = argparse.FileType('r'),
+        #                             help="Root json schema to parse")
 
         # Print usage message if no args are supplied.
         if len(sys.argv) <= 1:
@@ -69,5 +69,5 @@ class TableConverter:
 if __name__ == '__main__':
     options = TableConverter.usr_args()
 
-    json_output = TableConverter.convert_to_json(options.input_data)
+    json_output = TableConverter.convert_to_json(options.table)
     print(json_output)

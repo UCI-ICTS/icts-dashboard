@@ -10,11 +10,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from config.selectors import TableValidator, response_constructor, response_status
 from metadata.models import Participant, Family
-from config.selectors import response_constructor, response_status
-from metadata.services import ParticipantSerializer, FamilySerializer
-from config.selectors import TableValidator
-from metadata.services import get_or_create_sub_models
+from metadata.services import ParticipantSerializer, FamilySerializer, get_or_create_sub_models
+from metadata.selectors import parse_participant
 
 
 class GetMetadataAPI(APIView):
@@ -94,6 +93,7 @@ class CreateParticipantAPI(APIView):
         try:
             for index, datum in enumerate(request.data):
                 identifier = datum["participant_id"]
+                datum = parse_participant(participant=datum)
                 validator.validate_json(json_object=datum, table_name="participant")
                 results = validator.get_validation_results()
 
@@ -102,22 +102,34 @@ class CreateParticipantAPI(APIView):
                     serializer = ParticipantSerializer(data=datum)
 
                     if serializer.is_valid():
-                        participant_instance = serializer.create(
-                            validated_data=serializer.validated_data
-                        )
-                        participant_data = ParticipantSerializer(
-                            participant_instance
-                        ).data
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                                status="SUCCESS",
-                                code=200,
-                                message=f"Participant {identifier} created.",
-                                data=participant_data,
+                        try:
+                            participant_instance = serializer.create(
+                                validated_data=serializer.validated_data
                             )
-                        )
-                        accepted_requests = True
+                            participant_data = ParticipantSerializer(
+                                participant_instance
+                            ).data
+                            # response_data.append(
+                            #     response_constructor(
+                            #         identifier=identifier,
+                            #         status="SUCCESS",
+                            #         code=200,
+                            #         message=f"Participant {identifier} created.",
+                            #         data=participant_data,
+                            #     )
+                            # )
+                            accepted_requests = True
+                        except Exception as error:
+                            response_data.append(
+                                response_constructor(
+                                    identifier=identifier,
+                                    status="BAD REQUEST",
+                                    code=400,
+                                    data=str(error),
+                                )
+                            )
+                            rejected_requests = True
+                            continue
                     else:
                         error_data = []
                         for item in serializer.errors:

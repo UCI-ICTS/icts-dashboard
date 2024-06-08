@@ -9,7 +9,6 @@ from metadata.models import (
     InternalProjectId,
     PmidId,
     TwinId,
-    AlignedDNAShortRead,
 )
 
 
@@ -57,8 +56,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         twin_ids = validated_data.pop("twin_ids", [])
 
         with transaction.atomic():
-            participant = Participant.objects.create(**validated_data)
-
+            participant = Participant(**validated_data)
             if len(internal_project_ids) != 0:
                 self._set_relationship(
                     participant,
@@ -117,26 +115,3 @@ def get_or_create_sub_models(datum):
                 datum[key] = obj.pk
 
     return datum
-
-
-class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
-    """add a validation step in your serializer to enforce these conditions
-    more contextually, especially if the relationships and business logic are
-    more suited to be checked at the API level.
-    Works well within the context of Django REST Framework and is ideal for
-    API-driven projects."""
-
-    class Meta:
-        model = AlignedDNAShortRead
-        fields = "__all__"
-
-    def validate(self, data):
-        instance = AlignedDNAShortRead(**data)
-        if (
-            not instance.aligned_dna_short_read_set.exists()
-            and not instance.called_variants_dna_short_read.exists()
-        ):
-            raise serializers.ValidationError(
-                "Either aligned_dna_short_read_set or called_variants_dna_short_read is required."
-            )
-        return data

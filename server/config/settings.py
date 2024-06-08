@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
-    'metadata.apps.Metadata'
+    'metadata.apps.Metadata',
+    'experiments.apps.Experiment'
     
 ]
 
