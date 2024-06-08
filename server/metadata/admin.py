@@ -10,10 +10,6 @@ from metadata.models import (
     Phenotype,
     GeneticFindings,
     Analyte,
-    Experiment,
-    Aligned,
-    ExperimentDNAShortRead,
-    AlignedDNAShortRead,
 )
 
 
@@ -45,22 +41,6 @@ class AnalyteAdmin(admin.ModelAdmin):
     list_display = ["analyte_id"]
 
 
-class ExperimentAdmin(admin.ModelAdmin):
-    list_display = ["experiment_id"]
-
-
-class AlignedAdmin(admin.ModelAdmin):
-    list_display = ["aligned_id"]
-
-
-class ExperimentDNAShortReadAdmin(admin.ModelAdmin):
-    list_display = ["experiment_dna_short_read_id"]
-
-
-class AlignedDNAShortReadAdmin(admin.ModelAdmin):
-    list_display = ["aligned_dna_short_read_id"]
-
-
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(InternalProjectId, InternalProjectIdAdmin)
 admin.site.register(Family, FamilyAdmin)
@@ -68,7 +48,3 @@ admin.site.register(PmidId, PmidIdAdmin)
 admin.site.register(Phenotype, PhenotypeAdmin)
 admin.site.register(GeneticFindings, GeneticFindingsAdmin)
 admin.site.register(Analyte, AnalyteAdmin)
-admin.site.register(Experiment, ExperimentAdmin)
-admin.site.register(Aligned, AlignedAdmin)
-admin.site.register(ExperimentDNAShortRead, ExperimentDNAShortReadAdmin)
-admin.site.register(AlignedDNAShortRead, AlignedDNAShortReadAdmin)
