@@ -72,9 +72,9 @@ class Recontactable(models.TextChoices):
 
 
 class Consanguinity(models.TextChoices):
-    PRESENT = "Present", _("Present")
+    NONE_SUSPECTED = "None suspected", _("None suspected")
     SUSPECTED = "Suspected", _("Suspected")
-    ABSENT = "Absent", _("Absent")
+    PRESENT = "Present", _("Present")
     UNKNOWN = "Unknown", _("Unknown")
 
 
@@ -336,32 +336,42 @@ class Participant(models.Model):
 
 class Phenotype(models.Model):
     phenotype_id = models.CharField(
-        max_length=255, primary_key=True, help_text="primary key"
+        max_length=255, primary_key=True, 
+        help_text="Unique identifier for the phenotype entry. This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file"
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         Participant,
+        to_field='participant_id',
+        db_column='participant_id',
         on_delete=models.CASCADE,
         related_name="phenotypes",
-        help_text="Subject/Participant Identifier",
+        help_text="Identifier for the participant associated with this phenotype.",
     )
     term_id = models.CharField(
         max_length=255, help_text="Identifier for the term within the ontology"
     )
     presence = models.CharField(
         max_length=100,
-        choices=[("present", "Present"), ("absent", "Absent"), ("unknown", "Unknown")],
+        choices=[
+            ("Present", "Present"),
+            ("Absent", "Absent"),
+            ("Unknown", "Unknown")
+        ],
         default="unknown",
-        help_text="Presence of the phenotype",
+        help_text="Indicates if the phenotype is present, absent, or unknown.",
     )
     ontology = models.CharField(
         max_length=100,
         choices=[
-            ("hpo", "Human Phenotype Ontology"),
-            ("mp", "Mammalian Phenotype Ontology"),
-            ("go", "Gene Ontology"),
+            ("HPO", "Human Phenotype Ontology"),
+            ("MONDO", "Mondo Disease Ontology"),
+            ("OMIM", "Online Mendelian Inheritance in Man"),
+            ("ORPHANET", "Orphanet"),
+            ("SNOMED", "Systematized Nomenclature of Medicine"),
+            ("ICD10", "International Classification of Diseases - 10")
         ],
         default="hpo",
-        help_text="The ontology used for the term",
+        help_text="The ontology used to classify the phenotype term",
     )
     additional_details = models.TextField(
         blank=True,
@@ -370,12 +380,26 @@ class Phenotype(models.Model):
     onset_age_range = models.CharField(
         max_length=100,
         choices=[
-            ("neonatal", "Neonatal"),
-            ("infantile", "Infantile"),
-            ("childhood", "Childhood"),
-            ("adolescence", "Adolescence"),
-            ("adult", "Adult"),
-            ("old_age", "Old Age"),
+            ("HP:0003581", "Neonatal"),
+            ("HP:0030674", "Infantile"),
+            ("HP:0011463", "Childhood"),
+            ("HP:0003577", "Adolescence"),
+            ("HP:0025708", "Adult"),
+            ("HP:0011460", "Old Age"),
+            ("HP:0011461", "Young Adult"),
+            ("HP:0003593", "Middle Age"),
+            ("HP:0025709", "Late Adult"),
+            ("HP:0003621", "All"),
+            ("HP:0034199", "Early Childhood"),
+            ("HP:0003584", "Late Childhood"),
+            ("HP:0025710", "Young Middle Age"),
+            ("HP:0003596", "Late Neonatal"),
+            ("HP:0003623", "Late"),
+            ("HP:0410280", "Early Neonatal"),
+            ("HP:4000040", "Late Infancy"),
+            ("HP:0034198", "Second Decade"),
+            ("HP:0034197", "Third Decade"),
+            ("HP:0011462", "First Decade")
         ],
         default="unknown",
         help_text="Age range at the onset of the phenotype",
@@ -383,13 +407,15 @@ class Phenotype(models.Model):
     additional_modifiers = models.TextField(
         blank=True, help_text="Additional modifiers that further specify the phenotype"
     )
-    syndromic = models.BooleanField(
-        default=False,
+    syndromic = models.CharField(
+        max_length=50,
+        choices=[["syndromic", "non-syndromic"]],
+        default="non-syndromic",
         help_text="Indicates if the phenotype is part of a syndromic condition",
     )
 
     def __str__(self):
-        return f"{self.participant.participant_id} - {self.term_id}"
+        return f"{self.participant_id.participant_id} - {self.term_id}"
 
 
 class GeneticFindings(models.Model):

@@ -58,9 +58,15 @@ class TableValidator:
         Returns:
         - dict: A dictionary with 'valid' and 'errors' keys.
         """
+
+        error_data = [{
+            "field": error.split(":")[0].strip("[]' ").title(),  # Extract and clean up the field name, then capitalize
+            "error": error.split(":")[1].strip()  # Extract and clean up the error message
+        } for error in self.errors]
+
         return {
             "valid": self.valid,
-            "errors": self.errors
+            "errors": error_data
         }
 
 def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
