@@ -1,15 +1,33 @@
 #!/usr/bin/env python3
 # metadata/servces.py
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from rest_framework import serializers
 from metadata.models import (
     Participant,
     Family,
+    Phenotype,
     InternalProjectId,
     PmidId,
     TwinId,
 )
+
+
+class PhenotypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Phenotype
+        fields = '__all__'  # Includes all fields from the Phenotype model
+
+    def create(self, validated_data):
+        """Create a new Phenotype instance using the validated data"""
+        phenotype = Phenotype.objects.create(**validated_data)
+        return phenotype
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
 
 
 class FamilySerializer(serializers.ModelSerializer):
@@ -17,6 +35,20 @@ class FamilySerializer(serializers.ModelSerializer):
         model = Family
         fields = "__all__"
 
+    def create(self, validated_data):
+        family_id = validated_data.get('family_id')
+        family, created = Family.objects.get_or_create(
+            family_id=family_id,
+            defaults=validated_data
+        )
+        return family
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 class ParticipantSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
@@ -55,19 +87,23 @@ class ParticipantSerializer(serializers.ModelSerializer):
         pmid_ids = validated_data.pop("pmid_ids", [])
         twin_ids = validated_data.pop("twin_ids", [])
 
-        with transaction.atomic():
-            participant = Participant(**validated_data)
-            if len(internal_project_ids) != 0:
-                self._set_relationship(
-                    participant,
-                    InternalProjectId,
-                    internal_project_ids,
-                    "internal_project_ids",
-                )
-            if len(pmid_ids) != 0:
-                self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
-            if len(twin_ids) != 0:
-                self._set_relationship(participant, TwinId, twin_ids, "twin_ids")
+        try:
+            with transaction.atomic():
+                participant = Participant.objects.create(**validated_data)
+                if internal_project_ids:
+                    self._set_relationship(
+                        participant,
+                        InternalProjectId,
+                        internal_project_ids,
+                        "internal_project_ids",
+                    )
+                if pmid_ids:
+                    self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
+                if twin_ids:
+                    self._set_relationship(participant, TwinId, twin_ids, "twin_ids")
+                participant.save()
+        except IntegrityError as error:
+            raise serializers.ValidationError(error)
 
         return participant
 
@@ -88,7 +124,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
     def _set_relationship(self, instance, model, ids, related_name):
         # Setting ManyToMany relations
-        print("thing")
         manager = getattr(instance, related_name)
         manager.set(model.objects.filter(pk__in=ids))
 

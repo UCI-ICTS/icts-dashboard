@@ -5,7 +5,7 @@
     "properties": {
         "phenotype_id": {
             "type": "string",
-            "description": "Unique identifier for the phenotype entry."
+            "description": "Unique identifier for the phenotype entry.This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file"
         },
         "participant_id": {
             "type": "string",
@@ -17,12 +17,12 @@
         },
         "presence": {
             "type": "string",
-            "enum": ["present", "absent", "unknown"],
+            "enum": ["Present", "Absent", "Unknown"],
             "description": "Indicates if the phenotype is present, absent, or unknown."
         },
         "ontology": {
             "type": "string",
-            "enum": ["hpo", "mp", "go"],
+            "enum": ["HPO", "MONDO", "OMIM", "ORPHANET", "SNOMED", "ICD10"],
             "description": "The ontology used to classify the phenotype term."
         },
         "additional_details": {
@@ -31,7 +31,7 @@
         },
         "onset_age_range": {
             "type": "string",
-            "enum": ["neonatal", "infantile", "childhood", "adolescence", "adult", "old_age"],
+            "enum": ["HP:0003581", "HP:0030674", "HP:0011463", "HP:0003577", "HP:0025708", "HP:0011460", "HP:0011461", "HP:0003593", "HP:0025709", "HP:0003621", "HP:0034199", "HP:0003584", "HP:0025710", "HP:0003596", "HP:0003623", "HP:0410280", "HP:4000040", "HP:0034198", "HP:0034197", "HP:0011462"],
             "description": "The age range at which the phenotype onset occurs."
         },
         "additional_modifiers": {
@@ -39,7 +39,8 @@
             "description": "Additional modifiers that further specify the phenotype."
         },
         "syndromic": {
-            "type": "boolean",
+            "type": "string",
+            "enum": ["syndromic", "non-syndromic"],
             "description": "Indicates if the phenotype is part of a syndromic condition."
         }
     },
