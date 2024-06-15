@@ -2,6 +2,4 @@
 # search/selectors.py
 
 
-RETURN_VALUES = [
-    
-]
+RETURN_VALUES = []

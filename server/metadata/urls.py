@@ -2,7 +2,12 @@
 # metadata/urls.py
 
 from django.urls import path
-from metadata.apis import GetMetadataAPI, CreateParticipantAPI, CreateOrUpdateFamilyApi, CreateOrUpdatePhenotypeApi
+from metadata.apis import (
+    GetMetadataAPI,
+    CreateParticipantAPI,
+    CreateOrUpdateFamilyApi,
+    CreateOrUpdatePhenotypeApi,
+)
 
 urlpatterns = [
     path("get_metadata/", GetMetadataAPI.as_view()),

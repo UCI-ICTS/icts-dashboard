@@ -16,7 +16,7 @@ from metadata.models import (
 class PhenotypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phenotype
-        fields = '__all__'  # Includes all fields from the Phenotype model
+        fields = "__all__"  # Includes all fields from the Phenotype model
 
     def create(self, validated_data):
         """Create a new Phenotype instance using the validated data"""
@@ -36,10 +36,9 @@ class FamilySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        family_id = validated_data.get('family_id')
+        family_id = validated_data.get("family_id")
         family, created = Family.objects.get_or_create(
-            family_id=family_id,
-            defaults=validated_data
+            family_id=family_id, defaults=validated_data
         )
         return family
 
@@ -49,6 +48,7 @@ class FamilySerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
 
 class ParticipantSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(

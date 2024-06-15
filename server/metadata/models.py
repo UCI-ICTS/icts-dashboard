@@ -19,6 +19,7 @@ class InternalProjectId(models.Model):
     def __str__(self):
         return self.internal_project_id
 
+
 class VariantType(models.TextChoices):
     SNV = "SNV", "Single Nucleotide Variant"
     INDEL = "INDEL", "Insertion/Deletion"
@@ -311,7 +312,7 @@ class Participant(models.Model):
     age_at_enrollment = models.FloatField(
         null=True,
         blank=True,
-        help_text="age in years at which consent was originally obtained"
+        help_text="age in years at which consent was originally obtained",
     )
     solve_status = models.CharField(
         max_length=255,
@@ -336,13 +337,14 @@ class Participant(models.Model):
 
 class Phenotype(models.Model):
     phenotype_id = models.CharField(
-        max_length=255, primary_key=True, 
-        help_text="Unique identifier for the phenotype entry. This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file"
+        max_length=255,
+        primary_key=True,
+        help_text="Unique identifier for the phenotype entry. This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file",
     )
     participant_id = models.ForeignKey(
         Participant,
-        to_field='participant_id',
-        db_column='participant_id',
+        to_field="participant_id",
+        db_column="participant_id",
         on_delete=models.CASCADE,
         related_name="phenotypes",
         help_text="Identifier for the participant associated with this phenotype.",
@@ -352,11 +354,7 @@ class Phenotype(models.Model):
     )
     presence = models.CharField(
         max_length=100,
-        choices=[
-            ("Present", "Present"),
-            ("Absent", "Absent"),
-            ("Unknown", "Unknown")
-        ],
+        choices=[("Present", "Present"), ("Absent", "Absent"), ("Unknown", "Unknown")],
         default="unknown",
         help_text="Indicates if the phenotype is present, absent, or unknown.",
     )
@@ -368,7 +366,7 @@ class Phenotype(models.Model):
             ("OMIM", "Online Mendelian Inheritance in Man"),
             ("ORPHANET", "Orphanet"),
             ("SNOMED", "Systematized Nomenclature of Medicine"),
-            ("ICD10", "International Classification of Diseases - 10")
+            ("ICD10", "International Classification of Diseases - 10"),
         ],
         default="hpo",
         help_text="The ontology used to classify the phenotype term",
@@ -399,7 +397,7 @@ class Phenotype(models.Model):
             ("HP:4000040", "Late Infancy"),
             ("HP:0034198", "Second Decade"),
             ("HP:0034197", "Third Decade"),
-            ("HP:0011462", "First Decade")
+            ("HP:0011462", "First Decade"),
         ],
         default="unknown",
         help_text="Age range at the onset of the phenotype",

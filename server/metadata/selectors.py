@@ -4,10 +4,8 @@
 """Metadata Selectors
 """
 
-from metadata.models import (
-    Family,
-    Phenotype
-)
+from metadata.models import Family, Phenotype
+
 
 def get_phenotype(phenotype_id: str) -> Family:
     """Retrieve a phenotype instance by its ID or return None if not found."""
@@ -25,21 +23,23 @@ def get_family(family_id: str) -> Family:
         return family_instance
     except Family.DoesNotExist:
         return None
-    
+
+
 def parse_phenotype(phenotype: dict) -> dict:
     """Parse Phenotype
     Remove `NA` from submissions
     """
-    
-    parsed_phenotype = {k: v for k, v in phenotype.items() if v != 'NA'}
-    
+
+    parsed_phenotype = {k: v for k, v in phenotype.items() if v != "NA"}
+
     return parsed_phenotype
+
 
 def parse_participant(participant: dict) -> dict:
     """
     Parses and processes the participant dictionary to format and clean specific fields.
 
-    The function handles specific fields that may contain delimiters or need conversion to different data types. 
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
     It removes or transforms values based on their content to ensure consistent data handling downstream.
 
     Parameters:
@@ -47,7 +47,7 @@ def parse_participant(participant: dict) -> dict:
       'prior_testing', 'age_at_last_observation', and 'age_at_enrollment'.
 
     Returns:
-    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric 
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
       fields are properly formatted.
 
     Notes:
@@ -56,33 +56,40 @@ def parse_participant(participant: dict) -> dict:
     - 'age_at_last_observation' and 'age_at_enrollment': Converts the string to a float. Sets to 0 if conversion fails.
     """
 
-    if "twin_id" in participant and participant["twin_id"] != 'NA':
+    if "twin_id" in participant and participant["twin_id"] != "NA":
         try:
             participant["twin_id"] = participant["twin_id"].split("|")
         except ValueError:
             participant["twin_id"] = "NA"
 
-    if "internal_project_id" in participant and participant["internal_project_id"] != 'NA':
+    if (
+        "internal_project_id" in participant
+        and participant["internal_project_id"] != "NA"
+    ):
         try:
-            participant["internal_project_id"] = participant["internal_project_id"].split("|")
+            participant["internal_project_id"] = participant[
+                "internal_project_id"
+            ].split("|")
         except ValueError:
             participant["internal_project_id"] = "NA"
-    
-    if "prior_testing" in participant and participant["prior_testing"] != 'NA':
+
+    if "prior_testing" in participant and participant["prior_testing"] != "NA":
         try:
             participant["prior_testing"] = [participant["prior_testing"]]
         except ValueError:
             participant["prior_testing"] = "NA"
     try:
-        participant["age_at_last_observation"] = float(participant["age_at_last_observation"])
+        participant["age_at_last_observation"] = float(
+            participant["age_at_last_observation"]
+        )
     except ValueError:
         participant["age_at_last_observation"] = 0
-    
+
     try:
         participant["age_at_enrollment"] = float(participant["age_at_enrollment"])
     except ValueError:
         participant["age_at_enrollment"] = 0
-        
-    parsed_participant = {k: v for k, v in participant.items() if v != 'NA'}
+
+    parsed_participant = {k: v for k, v in participant.items() if v != "NA"}
 
     return parsed_participant

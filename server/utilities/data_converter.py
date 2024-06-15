@@ -7,16 +7,18 @@ import csv
 import json
 import argparse
 
+
 class TableConverter:
     """Class for converting tabular data"""
+
     @staticmethod
     def convert_to_json(input_data: dict) -> json:
         """Converts a CSV or TSV to a list of JSON objects"""
         sheet = []
-        extension = input_data.split('.')[-1]
-        delimiter = '\t' if extension == 'tsv' else ','
+        extension = input_data.split(".")[-1]
+        delimiter = "\t" if extension == "tsv" else ","
 
-        with open(input_data, 'r', encoding='utf-8') as file:
+        with open(input_data, "r", encoding="utf-8") as file:
             data = csv.reader(file, delimiter=delimiter)
             header = next(data)
             for datum in data:
@@ -34,7 +36,7 @@ class TableConverter:
 
     def usr_args():
         """User Arguments
-        
+
         arguments for command line invocation
         """
 
@@ -42,8 +44,8 @@ class TableConverter:
 
         # set usages options
         parser = argparse.ArgumentParser(
-            prog='data_converter',
-            usage='%(prog)s [options]')
+            prog="data_converter", usage="%(prog)s [options]"
+        )
 
         # # version
         # parser.add_argument(
@@ -51,9 +53,9 @@ class TableConverter:
         #     action='version',
         #     version='%(prog)s ' + __version__)
 
-        parser.add_argument('-t', '--table',
-                                    required=True,
-                                    help="table file to convert.")
+        parser.add_argument(
+            "-t", "--table", required=True, help="table file to convert."
+        )
 
         # parser.add_argument('-s', '--schema',
         #                             # type = argparse.FileType('r'),
@@ -61,12 +63,13 @@ class TableConverter:
 
         # Print usage message if no args are supplied.
         if len(sys.argv) <= 1:
-            sys.argv.append('--help')
+            sys.argv.append("--help")
 
         options = parser.parse_args()
         return options
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     options = TableConverter.usr_args()
 
     json_output = TableConverter.convert_to_json(options.table)
