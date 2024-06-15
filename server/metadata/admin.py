@@ -32,6 +32,7 @@ class PmidIdAdmin(admin.ModelAdmin):
 class PhenotypeAdmin(admin.ModelAdmin):
     list_display = ["phenotype_id"]
 
+
 class GeneticFindingsAdmin(admin.ModelAdmin):
     list_display = ["genetic_findings_id"]
 

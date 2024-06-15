@@ -14,6 +14,7 @@ from rest_framework import status
     API data conversion, and constructing standardized response objects.
 """
 
+
 class TableValidator:
     """Table Validator class to validate JSON objects against predefined JSON schemas."""
 
@@ -31,14 +32,17 @@ class TableValidator:
         - json_object (dict): The JSON object to be validated.
         - table_name (str): The name of the table which corresponds to the schema file.
         """
-        
+
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
-            with open(schema_path, 'r') as schema_file:
+            with open(schema_path, "r") as schema_file:
                 schema = jsonref.load(schema_file)
 
             validator = jsonschema.Draft7Validator(schema)
-            self.errors = [f"{list(error.path)}: {error.message}" for error in validator.iter_errors(json_object)]
+            self.errors = [
+                f"{list(error.path)}: {error.message}"
+                for error in validator.iter_errors(json_object)
+            ]
             self.valid = len(self.errors) == 0
 
         except jsonschema.exceptions.ValidationError as e:
@@ -59,20 +63,25 @@ class TableValidator:
         - dict: A dictionary with 'valid' and 'errors' keys.
         """
 
-        error_data = [{
-            "field": error.split(":")[0].strip("[]' ").title(),  # Extract and clean up the field name, then capitalize
-            "error": error.split(":")[1].strip()  # Extract and clean up the error message
-        } for error in self.errors]
+        error_data = [
+            {
+                "field": error.split(":")[0]
+                .strip("[]' ")
+                .title(),  # Extract and clean up the field name, then capitalize
+                "error": error.split(":")[
+                    1
+                ].strip(),  # Extract and clean up the error message
+            }
+            for error in self.errors
+        ]
 
-        return {
-            "valid": self.valid,
-            "errors": error_data
-        }
+        return {"valid": self.valid, "errors": error_data}
 
-def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
+
+def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
     """Determine Response Status
-    
-    Determines the appropriate HTTP response status code based on the 
+
+    Determines the appropriate HTTP response status code based on the
     acceptance or rejection of requests.
 
     Parameters:
@@ -87,10 +96,10 @@ def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
         - status.HTTP_207_MULTI_STATUS (207) if there is a mix of accepted and rejected requests.
         - status.HTTP_200_OK (200) if all requests are accepted.
     """
-    
+
     if accepted_requests is False and rejected_requests == True:
         status_code = status.HTTP_400_BAD_REQUEST
-    
+
     if accepted_requests is True and rejected_requests is True:
         status_code = status.HTTP_207_MULTI_STATUS
 
@@ -99,14 +108,10 @@ def response_status(accepted_requests: bool, rejected_requests: bool)-> status:
 
     return status_code
 
-def response_constructor(
-    identifier: str,
-    status: str,
-    code: str,
-    message: str=None,
-    data: dict= None
-        )-> dict:
 
+def response_constructor(
+    identifier: str, status: str, code: str, message: str = None, data: dict = None
+) -> dict:
     """Constructs a structured response dictionary.
 
     This function creates a standardized response object for API responses.
@@ -114,28 +119,28 @@ def response_constructor(
     details such as status, code, an optional message, and optional data.
 
     Parameters:
-    - identifier (str): 
+    - identifier (str):
         A unique identifier for the response object.
-    - status (str): 
+    - status (str):
         The request status (e.g., 'success', 'error')indicating the outcome
         of the operation.
-    - code (str): 
+    - code (str):
         The HTTP status code representing the result of the operation.
     - message (str, optional):
         An optional message providing additional information about the
         response or the result of the operation. Default is None.
-    - data (dict, optional): 
+    - data (dict, optional):
         An optional dictionary containing any data that should be returned in
         the response. This can include the payload of a successful request or
         details of an error. Default is None.
     """
 
     response_object = {
-	    "identifier": identifier,
+        "identifier": identifier,
         "request_status": status,
-        "status_code": code
+        "status_code": code,
     }
-    
+
     if data is not None:
         response_object["data"] = data
     if message is not None:

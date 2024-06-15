@@ -12,8 +12,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from config.selectors import TableValidator, response_constructor, response_status
 from metadata.models import Participant, Family
-from metadata.services import ParticipantSerializer, FamilySerializer, PhenotypeSerializer, get_or_create_sub_models
-from metadata.selectors import parse_participant, get_family, get_phenotype, parse_phenotype
+from metadata.services import (
+    ParticipantSerializer,
+    FamilySerializer,
+    PhenotypeSerializer,
+    get_or_create_sub_models,
+)
+from metadata.selectors import (
+    parse_participant,
+    get_family,
+    get_phenotype,
+    parse_phenotype,
+)
 
 
 class GetMetadataAPI(APIView):
@@ -44,7 +54,7 @@ class GetMetadataAPI(APIView):
             "age_at_enrollment",
         ]
         all = Participant.objects.all()
-    
+
         return Response(status=status.HTTP_200_OK, data=all)
 
 
@@ -107,7 +117,7 @@ class CreateParticipantAPI(APIView):
                             participant_data = ParticipantSerializer(
                                 participant_instance
                             ).data
-                            
+
                             response_data.append(
                                 response_constructor(
                                     identifier=identifier,
@@ -168,9 +178,9 @@ class CreateParticipantAPI(APIView):
 
 class CreateOrUpdateFamilyApi(APIView):
     """
-    API view to create or update Family entries. 
+    API view to create or update Family entries.
 
-    This API endpoint accepts a list of family data objects, validates them, and either creates new entries or updates existing ones based on the presence of a 'family_id'. 
+    This API endpoint accepts a list of family data objects, validates them, and either creates new entries or updates existing ones based on the presence of a 'family_id'.
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
     - Returns HTTP 207 if some operations fail.
@@ -199,9 +209,9 @@ class CreateOrUpdateFamilyApi(APIView):
                 results = validator.get_validation_results()
 
                 if results["valid"] is True:
-                    family_instance = get_family(family_id = identifier)
+                    family_instance = get_family(family_id=identifier)
                     serializer = FamilySerializer(family_instance, data=datum)
-                    
+
                     if serializer.is_valid():
                         family_instance = serializer.save()
                         response_data.append(
@@ -209,14 +219,21 @@ class CreateOrUpdateFamilyApi(APIView):
                                 identifier=identifier,
                                 status="UPDATED" if family_instance else "CREATED",
                                 code=200 if family_instance else 201,
-                                message=f"Family {identifier} updated." if family_instance else f"Family {identifier} created.",
+                                message=(
+                                    f"Family {identifier} updated."
+                                    if family_instance
+                                    else f"Family {identifier} created."
+                                ),
                                 data=FamilySerializer(family_instance).data,
                             )
                         )
                         accepted_requests = True
 
                     else:
-                        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+                        error_data = [
+                            {item: serializer.errors[item]}
+                            for item in serializer.errors
+                        ]
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
@@ -253,6 +270,7 @@ class CreateOrUpdateFamilyApi(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+
 class CreateOrUpdatePhenotypeApi(APIView):
     """"""
 
@@ -266,22 +284,25 @@ class CreateOrUpdatePhenotypeApi(APIView):
         },
         tags=["Phenotype"],
     )
-
     def post(self, request):
         validator = TableValidator()
         response_data = []
         rejected_requests = False
         accepted_requests = False
         try:
-            for index, datum in enumerate(request.data):
+            for datum in request.data:
                 identifier = datum["phenotype_id"]
                 parsed_phenotype = parse_phenotype(phenotype=datum)
-                validator.validate_json(json_object=parsed_phenotype, table_name="phenotype")
+                validator.validate_json(
+                    json_object=parsed_phenotype, table_name="phenotype"
+                )
                 results = validator.get_validation_results()
                 if results["valid"] is True:
-                    existing_phenotype = get_phenotype(phenotype_id = identifier)
-                    serializer = PhenotypeSerializer(existing_phenotype, data=parsed_phenotype)
-                    
+                    existing_phenotype = get_phenotype(phenotype_id=identifier)
+                    serializer = PhenotypeSerializer(
+                        existing_phenotype, data=parsed_phenotype
+                    )
+
                     if serializer.is_valid():
                         phenotype_instance = serializer.save()
                         response_data.append(
@@ -289,14 +310,21 @@ class CreateOrUpdatePhenotypeApi(APIView):
                                 identifier=identifier,
                                 status="UPDATED" if existing_phenotype else "CREATED",
                                 code=201 if existing_phenotype else 200,
-                                message=f"Phenotype {identifier} updated." if existing_phenotype else f"Phenotype {identifier} created.",
-                                data=PhenotypeSerializer(phenotype_instance).data
+                                message=(
+                                    f"Phenotype {identifier} updated."
+                                    if existing_phenotype
+                                    else f"Phenotype {identifier} created."
+                                ),
+                                data=PhenotypeSerializer(phenotype_instance).data,
                             )
                         )
                         accepted_requests = True
 
                     else:
-                        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+                        error_data = [
+                            {item: serializer.errors[item]}
+                            for item in serializer.errors
+                        ]
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
