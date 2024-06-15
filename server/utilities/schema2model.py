@@ -61,9 +61,7 @@ def parse_model():
 
     with open(filename) as f:
         json_model = json.load(f)
-    import pdb
 
-    pdb.set_trace()
     # Make sure not list, but object
     if json_model["type"] != "object":
 

@@ -6,7 +6,7 @@
     "properties": {
         "genetic_findings_id": {
             "type": "string",
-            "description": "Unique identifier for the genetic finding."
+            "description": "Unique identifier for the genetic findings in this participant."
         },
         "participant_id": {
             "type": "string",
