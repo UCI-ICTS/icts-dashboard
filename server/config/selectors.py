@@ -35,6 +35,7 @@ class TableValidator:
 
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
+            print("here", schema_path)
             with open(schema_path, "r") as schema_file:
                 schema = jsonref.load(schema_file)
 
@@ -77,6 +78,14 @@ class TableValidator:
 
         return {"valid": self.valid, "errors": error_data}
 
+def remove_na(datum: dict) -> dict:
+    """Remove NA
+    Remove `NA` from submissions
+    """
+
+    parsed_datum = {k: v for k, v in datum.items() if v != "NA"}
+
+    return parsed_datum
 
 def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
     """Determine Response Status

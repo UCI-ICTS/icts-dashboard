@@ -4,6 +4,7 @@
 from django.db import transaction, IntegrityError
 from rest_framework import serializers
 from metadata.models import (
+    Analyte,
     Participant,
     Family,
     Phenotype,
@@ -12,11 +13,27 @@ from metadata.models import (
     TwinId,
 )
 
+class AnalyteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Analyte
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new Analyte instance using the validated data"""
+        analyte_instance = Analyte.objects.create(**validated_data)
+        return analyte_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
+
 
 class PhenotypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phenotype
-        fields = "__all__"  # Includes all fields from the Phenotype model
+        fields = "__all__"
 
     def create(self, validated_data):
         """Create a new Phenotype instance using the validated data"""

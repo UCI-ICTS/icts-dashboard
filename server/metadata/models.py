@@ -67,7 +67,7 @@ class ConsentCode(models.TextChoices):
     HMB = "HMB", _("HMB")
 
 
-class Recontactable(models.TextChoices):
+class YesNo(models.TextChoices):
     YES = "Yes", _("Yes")
     NO = "No", _("No")
 
@@ -219,7 +219,7 @@ class Participant(models.Model):
     recontactable = models.CharField(
         max_length=255,
         blank=True,
-        choices=Recontactable.choices,
+        choices=YesNo.choices,
         default="No",
         help_text="Is the originating GREGoR Center likely able to recontact "
         "this participant",
@@ -572,9 +572,12 @@ class Analyte(models.Model):
         primary_key=True,
         help_text="Identifier for an analyte from a primary biosample source",
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         Participant,
+        to_field="participant_id",
+        db_column="participant_id",
         on_delete=models.CASCADE,
+        related_name="analytes",
         help_text="The participant from whom the biosample was taken",
     )
     analyte_type = models.CharField(
@@ -627,7 +630,9 @@ class Analyte(models.Model):
         blank=True,
         help_text="Free text to capture information not in structured fields",
     )
-    tissue_affected_status = models.BooleanField(
+    tissue_affected_status = models.CharField(
+        max_length=50,
+        choices=YesNo.choices,
         default=False,
         help_text="If applicable to disease (suspected mosaic), indicates if the tissue is from an affected source.",
     )

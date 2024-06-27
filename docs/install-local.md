@@ -6,41 +6,6 @@
 - [Python 3](https://www.python.org/downloads/)
 - [PyEnv](https://github.com/pyenv/pyenv) (optional but recommended)
 
-
-## MGRC GREGoR Dashboard Client deployment  (GREGor_dashboard/client)
-
-- For HTTPS access: 
-
-`git clone https://github.com/UCI-GREGoR/GREGor_dashboard/` 
-
-- For SSH access*(RECCOMENDED)*: 
-
-`git@github.com:UCI-GREGoR/GREGor_dashboard.git` 
-
-**Then**
-
-`cd GREGor_dashboard/`
-
-**Make sure you are on the desired branch:**
-
-`git switch <BRANCH NAME>` *(for whatever branch you need)*
-
-### Enter the repository, create a environment file, and install the required packages
-
-`cd GREGor_dashboard/client/`
-
-**Install Node packages via Node Package Manager (NPM)**
-
-`npm install`
-
-### **Start service**
-
-`npm run start`
-
-This will open `http://localhost:3000/` in your default webbrowser if everything went according to plan. If not, see the [troubleshooting tips](troubleshooting.md).
-
-This terminal will be serving the React frontend.
-
 ## MGRC GREGoR Dashboard Server deployment  (GREGor_dashboard/server)
 
 **Open a new terminal and retrun to the project root**
@@ -143,3 +108,37 @@ Use the following credentials to log in:
 username: wheel
 password: wheel
 ````
+
+## [WIP] MGRC GREGoR Dashboard Client deployment  (GREGor_dashboard/client)
+
+- For HTTPS access: 
+
+`git clone https://github.com/UCI-GREGoR/GREGor_dashboard/` 
+
+- For SSH access*(RECCOMENDED)*: 
+
+`git@github.com:UCI-GREGoR/GREGor_dashboard.git` 
+
+**Then**
+
+`cd GREGor_dashboard/`
+
+**Make sure you are on the desired branch:**
+
+`git switch <BRANCH NAME>` *(for whatever branch you need)*
+
+### Enter the repository, create a environment file, and install the required packages
+
+`cd GREGor_dashboard/client/`
+
+**Install Node packages via Node Package Manager (NPM)**
+
+`npm install`
+
+### **Start service**
+
+`npm run start`
+
+This will open `http://localhost:3000/` in your default webbrowser if everything went according to plan. If not, see the [troubleshooting tips](troubleshooting.md).
+
+This terminal will be serving the React frontend.

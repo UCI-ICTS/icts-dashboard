@@ -32,9 +32,12 @@ class Experiment(models.Model):
         max_length=255,
         help_text="Unique identifier within the specific experiment table.",
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         Participant,
+        to_field="participant_id",
+        db_column="participant_id",
         on_delete=models.CASCADE,
+        related_name="experiments",
         help_text="References the participant associated with this experiment.",
     )
 
@@ -98,7 +101,7 @@ class ExperimentDNAShortRead(models.Model):
         primary_key=True,
         help_text="identifier for experiment_dna_short_read (primary key)",
     )
-    analyte = models.ForeignKey(
+    analyte_id = models.ForeignKey(
         Analyte,
         on_delete=models.CASCADE,
         help_text="reference to an analyte from which this experiment was derived",

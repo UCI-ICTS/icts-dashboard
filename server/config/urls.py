@@ -26,6 +26,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("metadata/", include("metadata.urls")),
+    path("experiments/", include("experiments.urls")),
     path("search/", include("search.urls")),
     path(
         "swagger/",

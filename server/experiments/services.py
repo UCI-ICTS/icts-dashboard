@@ -3,7 +3,48 @@
 
 from django.db import transaction
 from rest_framework import serializers
-from experiments.models import AlignedDNAShortRead
+from experiments.models import AlignedDNAShortRead, Experiment, ExperimentDNAShortRead
+
+class ExperimentShortReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperimentDNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new ExperimentDNAShortRead instance using the validated data"""
+
+        experiment_dna_short_read_id = validated_data.get("experiment_dna_short_read_id")
+        experiment_dna_short_read, created = ExperimentDNAShortRead.objects.get_or_create(
+            experiment_dna_short_read_id=experiment_dna_short_read_id,
+            defaults=validated_data
+        )
+        return experiment_dna_short_read
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
+
+class ExperimentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Experiment
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new Experiment instance using the validated data"""
+
+        experiment_id = validated_data.get("experiment_id")
+        experiment, created = Experiment.objects.get_or_create(
+            experiment_id=experiment_id, defaults=validated_data
+        )
+        return experiment
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
 
 
 class AlignedDNAShortReadSerializer(serializers.ModelSerializer):

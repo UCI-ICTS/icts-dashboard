@@ -10,9 +10,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from config.selectors import TableValidator, response_constructor, response_status
-from metadata.models import Participant, Family
+from config.selectors import TableValidator, response_constructor, response_status, remove_na
+from metadata.models import Participant, Family, Analyte
 from metadata.services import (
+    AnalyteSerializer,
     ParticipantSerializer,
     FamilySerializer,
     PhenotypeSerializer,
@@ -22,12 +23,11 @@ from metadata.selectors import (
     parse_participant,
     get_family,
     get_phenotype,
-    parse_phenotype,
 )
 
 
 class GetMetadataAPI(APIView):
-
+    """[WIP] Placeholder: Does Not Work"""
     def get(self, request):
         print(request)
         return_values = [
@@ -272,7 +272,20 @@ class CreateOrUpdateFamilyApi(APIView):
 
 
 class CreateOrUpdatePhenotypeApi(APIView):
-    """"""
+    """
+    API view to create or update phenotype entries.
+
+    This API endpoint allows clients to submit multiple phenotype entries at once. Each phenotype can either be
+    created or updated depending on whether it already exists. The request must be in the form of a JSON array of
+    phenotype objects.
+
+    Attributes:
+        swagger_auto_schema: A decorator that provides Swagger UI with metadata about this API endpoint,
+            including the expected structure of the request body, possible response statuses, and associated tags.
+
+    Methods:
+        post(request): Processes a POST request that submits phenotype data.
+    """
 
     @swagger_auto_schema(
         operation_id="create_phenotype",
@@ -292,7 +305,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
         try:
             for datum in request.data:
                 identifier = datum["phenotype_id"]
-                parsed_phenotype = parse_phenotype(phenotype=datum)
+                parsed_phenotype = remove_na(datum=datum)
                 validator.validate_json(
                     json_object=parsed_phenotype, table_name="phenotype"
                 )
@@ -316,6 +329,95 @@ class CreateOrUpdatePhenotypeApi(APIView):
                                     else f"Phenotype {identifier} created."
                                 ),
                                 data=PhenotypeSerializer(phenotype_instance).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: serializer.errors[item]}
+                            for item in serializer.errors
+                        ]
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=results["errors"],
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class CreateOrUpdateAnalyte(APIView):
+    """
+    """
+
+    @swagger_auto_schema(
+        operation_id="create_family",
+        request_body=AnalyteSerializer(many=True),
+        responses={
+            200: "All submissions of families were successfull",
+            207: "Some submissions of families were not successful.",
+            400: "Bad request",
+        },
+        tags=["Analyte"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["analyte_id"]
+                parsed_analyte = remove_na(datum=datum)
+                validator.validate_json(json_object=parsed_analyte, table_name="analyte")
+                
+                results = validator.get_validation_results()
+                
+                if results["valid"] is True:
+                    family_instance = get_family(family_id=identifier)
+                    serializer = FamilySerializer(family_instance, data=datum)
+
+                    if serializer.is_valid():
+                        family_instance = serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="UPDATED" if family_instance else "CREATED",
+                                code=200 if family_instance else 201,
+                                message=(
+                                    f"Family {identifier} updated."
+                                    if family_instance
+                                    else f"Family {identifier} created."
+                                ),
+                                data=FamilySerializer(family_instance).data,
                             )
                         )
                         accepted_requests = True
