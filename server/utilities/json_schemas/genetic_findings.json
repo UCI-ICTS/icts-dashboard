@@ -6,7 +6,7 @@
     "properties": {
         "genetic_findings_id": {
             "type": "string",
-            "description": "Unique identifier for the genetic findings in this participant."
+            "description": "Unique identifier for the genetic findings in this participant. Encourage conventional naming (genomic coordinate + participant id)"
         },
         "participant_id": {
             "type": "string",
@@ -31,6 +31,7 @@
         },
         "chrom": {
             "type": "string",
+            "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y", "MT"],
             "description": "Chromosome on which the variant is located."
         },
         "chrom_end": {

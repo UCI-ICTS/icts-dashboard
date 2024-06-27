@@ -5,7 +5,7 @@
 """
 
 from metadata.models import Family, Phenotype
-
+from config.selectors import remove_na
 
 def get_phenotype(phenotype_id: str) -> Family:
     """Retrieve a phenotype instance by its ID or return None if not found."""
@@ -23,16 +23,6 @@ def get_family(family_id: str) -> Family:
         return family_instance
     except Family.DoesNotExist:
         return None
-
-
-def parse_phenotype(phenotype: dict) -> dict:
-    """Parse Phenotype
-    Remove `NA` from submissions
-    """
-
-    parsed_phenotype = {k: v for k, v in phenotype.items() if v != "NA"}
-
-    return parsed_phenotype
 
 
 def parse_participant(participant: dict) -> dict:
@@ -90,6 +80,6 @@ def parse_participant(participant: dict) -> dict:
     except ValueError:
         participant["age_at_enrollment"] = 0
 
-    parsed_participant = {k: v for k, v in participant.items() if v != "NA"}
+    parsed_participant = remove_na(datum=participant)
 
     return parsed_participant
