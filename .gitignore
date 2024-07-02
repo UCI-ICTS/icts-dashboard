@@ -6,6 +6,7 @@
 server/env*
 server/.secrets
 server/db.sqlite3
+server/env
 
 #Client Items
 #Client dependencies

@@ -1,0 +1,8 @@
+[Unit]
+Description=GREGoR Dashboard gunicorn socket
+
+[Socket]
+ListenStream=/var/run/gregor.sock
+
+[Install]
+WantedBy=sockets.target
