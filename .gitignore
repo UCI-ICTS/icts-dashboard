@@ -1,6 +1,6 @@
 #General
 #.python-version
-*.DS_Store*
+**.DS_Store**
 
 #Server Items
 server/env*

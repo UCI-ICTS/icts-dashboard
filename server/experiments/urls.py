@@ -8,6 +8,6 @@ from experiments.apis import (
 )
 
 urlpatterns = [
-    path("create_experiment/", CreateOrUpdateExperimentApi.as_view()),
+    path("create_experiments/", CreateOrUpdateExperimentApi.as_view()),
     path("create_short_read_experiment/", CreateOrUpdateExperimentShortReadApi.as_view()),
 ]
