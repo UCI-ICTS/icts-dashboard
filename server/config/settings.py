@@ -31,13 +31,13 @@ else:
     SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = secrets["SERVER"]["DEBUG"]
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = secrets["SERVER"]["ALLOWED_HOSTS"].split(',')
 
 VERSION = secrets["SERVER"]["SERVER_VERSION"]
 
-PUBLIC_HOSTNAME = secrets["SERVER"]["SERVER_URL"]
+PUBLIC_HOSTNAME = secrets["SERVER"]["DASHBOARD_URL"]
 
 # Application definition
 
