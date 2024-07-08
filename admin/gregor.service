@@ -11,4 +11,3 @@ ExecStart=/var/www/github/GREGor_dashboard/server/env/bin/gunicorn --access-logf
 
 [Install]
 WantedBy=multi-user.target
-
