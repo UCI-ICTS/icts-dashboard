@@ -35,7 +35,6 @@ class TableValidator:
 
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
-            print("here", schema_path)
             with open(schema_path, "r") as schema_file:
                 schema = jsonref.load(schema_file)
 

@@ -12,7 +12,7 @@ class ExperimentShortReadSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new ExperimentDNAShortRead instance using the validated data"""
-
+        print('hhhh')
         experiment_dna_short_read_id = validated_data.get("experiment_dna_short_read_id")
         experiment_dna_short_read, created = ExperimentDNAShortRead.objects.get_or_create(
             experiment_dna_short_read_id=experiment_dna_short_read_id,

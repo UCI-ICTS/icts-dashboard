@@ -23,6 +23,7 @@ from metadata.selectors import (
     parse_participant,
     get_family,
     get_phenotype,
+    get_analyte,
 )
 
 
@@ -291,8 +292,8 @@ class CreateOrUpdatePhenotypeApi(APIView):
         operation_id="create_phenotype",
         request_body=PhenotypeSerializer(many=True),
         responses={
-            200: "All submissions of families were successfull",
-            207: "Some submissions of families were not successful.",
+            200: "All submissions of phenotypes were successfull",
+            207: "Some submissions of phenotypes were not successful.",
             400: "Bad request",
         },
         tags=["Phenotype"],
@@ -374,16 +375,17 @@ class CreateOrUpdatePhenotypeApi(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+
 class CreateOrUpdateAnalyte(APIView):
     """
     """
 
     @swagger_auto_schema(
-        operation_id="create_family",
+        operation_id="create_analyte",
         request_body=AnalyteSerializer(many=True),
         responses={
-            200: "All submissions of families were successfull",
-            207: "Some submissions of families were not successful.",
+            200: "All submissions of analytes were successfull",
+            207: "Some submissions of analytes were not successful.",
             400: "Bad request",
         },
         tags=["Analyte"],
@@ -402,22 +404,22 @@ class CreateOrUpdateAnalyte(APIView):
                 results = validator.get_validation_results()
                 
                 if results["valid"] is True:
-                    family_instance = get_family(family_id=identifier)
-                    serializer = FamilySerializer(family_instance, data=datum)
+                    analyte_instance = get_analyte(analyte_id=identifier)
+                    serializer = AnalyteSerializer(analyte_instance, data=parsed_analyte)
 
                     if serializer.is_valid():
-                        family_instance = serializer.save()
+                        analyte_instance = serializer.save()
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if family_instance else "CREATED",
-                                code=200 if family_instance else 201,
+                                status="UPDATED" if analyte_instance else "CREATED",
+                                code=200 if analyte_instance else 201,
                                 message=(
-                                    f"Family {identifier} updated."
-                                    if family_instance
-                                    else f"Family {identifier} created."
+                                    f"Analyte {identifier} updated."
+                                    if analyte_instance
+                                    else f"Analyte {identifier} created."
                                 ),
-                                data=FamilySerializer(family_instance).data,
+                                data=AnalyteSerializer(analyte_instance).data,
                             )
                         )
                         accepted_requests = True

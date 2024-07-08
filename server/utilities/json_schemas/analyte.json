@@ -78,7 +78,6 @@
         "analyte_id",
         "participant_id",
         "analyte_type",
-        "primary_biosample",
-        "age_at_collection"
+        "primary_biosample"
     ]
 }

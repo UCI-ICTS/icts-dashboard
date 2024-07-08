@@ -12,6 +12,7 @@ from metadata.models import (
     PmidId,
     TwinId,
 )
+from metadata.selectors import get_participant
 
 class AnalyteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,6 +21,14 @@ class AnalyteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new Analyte instance using the validated data"""
+
+        # participant_instance = validated_data["participant_id"]
+        # if "age_at_collection" in validated_data:
+        #     try:
+        #         participant_instance.age_at_enrollment == validated_data["age_at_collection"]
+        #     except:
+        #         raise ValueError
+        # import pdb; pdb.set_trace()
         analyte_instance = Analyte.objects.create(**validated_data)
         return analyte_instance
 
