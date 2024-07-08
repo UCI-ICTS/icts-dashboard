@@ -4,7 +4,7 @@ from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from experiments.services import ExperimentSerializer, ExperimentShortReadSerializer
-from experiments.selectors import get_experiment, get_experiment_dna_short_read
+from experiments.selectors import get_experiment, get_experiment_dna_short_read, parse_short_read
 from rest_framework import status, serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -32,6 +32,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
         try:
             for datum in request.data:
                 identifier = datum["experiment_dna_short_read_id"]
+                datum = parse_short_read(short_read=datum)
                 validator.validate_json(
                     json_object=datum, table_name="experiment_dna_short_read"
                 )

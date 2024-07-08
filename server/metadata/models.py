@@ -594,6 +594,8 @@ class Analyte(models.Model):
         help_text="Analyte derived from the primary biosample. The actual thing you're sticking into a machine to analyze/sequence",
     )
     analyte_processing_details = models.TextField(
+        null=True,
+        blank=True,
         help_text="Details about how the analyte or original biosample was extracted or processed"
     )
     primary_biosample = models.CharField(
@@ -622,12 +624,14 @@ class Analyte(models.Model):
         help_text="Tissue type of biosample taken from the participant that the analyte was extracted or processed from",
     )
     primary_biosample_id = models.CharField(
-        max_length=255,
         blank=True,
+        null=True,
+        max_length=255,
         help_text="Optional ID for the biosample; allows for linking of multiple analytes extracted or processed from the same biosample",
     )
     primary_biosample_details = models.TextField(
         blank=True,
+        null=True,
         help_text="Free text to capture information not in structured fields",
     )
     tissue_affected_status = models.CharField(
@@ -637,29 +641,45 @@ class Analyte(models.Model):
         help_text="If applicable to disease (suspected mosaic), indicates if the tissue is from an affected source.",
     )
     age_at_collection = models.FloatField(
+        blank=True,
+        null=True,
         help_text="Age of participant in years at biosample collection"
     )
     participant_drugs_intake = models.TextField(
+        blank=True,
+        null=True,
         help_text="The list of drugs patient is on, at the time of sample collection. Helpful during analysis of metabolomics and immune assays"
     )
     participant_special_diet = models.TextField(
+        blank=True,
+        null=True,
         help_text="If the patient was fasting, when the sample was collected. Relevant when analyzing metabolomics data"
     )
     hours_since_last_meal = models.FloatField(
+        null=True,
+        blank=True,
         help_text="Hours since last meal, relevant when analyzing metabolomics data"
     )
     passage_number = models.IntegerField(
+        blank=True,
+        null=True,
         help_text="Passage number is relevant for fibroblast cultures and possibly iPSC."
     )
     time_to_freeze = models.FloatField(
+        blank=True,
+        null=True,
         help_text="Time (in hours) from collection to freezing the sample. Delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation)."
     )
     sample_transformation_detail = models.TextField(
+        blank=True,
+        null=True,
         help_text="Details regarding sample transformation"
     )
     quality_issues = models.TextField(
+        blank=True,
+        null=True,
         help_text="Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
     )
 
     def __str__(self):
-        return f"Analyte {self.analyte_id} from participant {self.participant.participant_id}"
+        return f"Analyte {self.analyte_id} from participant {self.participant_id.participant_id}"

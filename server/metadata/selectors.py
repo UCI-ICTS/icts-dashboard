@@ -4,8 +4,16 @@
 """Metadata Selectors
 """
 
-from metadata.models import Family, Phenotype
+from metadata.models import Family, Phenotype, Analyte, Participant
 from config.selectors import remove_na
+
+def get_analyte(analyte_id: str) -> Family:
+    """Retrieve an analyte instance by its ID or return None if not found."""
+    try:
+        analyte_instance = Analyte.objects.get(analyte_id=analyte_id)
+        return analyte_instance
+    except Analyte.DoesNotExist:
+        return None
 
 def get_phenotype(phenotype_id: str) -> Family:
     """Retrieve a phenotype instance by its ID or return None if not found."""
@@ -22,6 +30,14 @@ def get_family(family_id: str) -> Family:
         family_instance = Family.objects.get(family_id=family_id)
         return family_instance
     except Family.DoesNotExist:
+        return None
+    
+def get_participant(participant_id: str) -> Participant:
+    """Retrieve a family instance by its ID or return None if not found."""
+    try:
+        participant_instance = Participant.objects.get(participant_id=participant_id)
+        return participant_instance
+    except Participant.DoesNotExist:
         return None
 
 
