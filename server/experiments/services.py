@@ -12,7 +12,7 @@ class ExperimentShortReadSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new ExperimentDNAShortRead instance using the validated data"""
-        print('hhhh')
+
         experiment_dna_short_read_id = validated_data.get("experiment_dna_short_read_id")
         experiment_dna_short_read, created = ExperimentDNAShortRead.objects.get_or_create(
             experiment_dna_short_read_id=experiment_dna_short_read_id,
@@ -25,6 +25,29 @@ class ExperimentShortReadSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         return instance
+
+class ExperimentService:
+    @staticmethod
+    def create_or_update_experiment(data):
+        identifier = data["experiment_id"]
+        existing_experiment = Experiment.objects.filter(experiment_id=identifier).first()
+        
+        # Determine if it's a creation or update
+        if existing_experiment:
+            serializer = ExperimentSerializer(existing_experiment, data=data)
+        else:
+            serializer = ExperimentSerializer(data=data)
+        
+        if serializer.is_valid():
+            experiment_instance = serializer.save()
+            return serializer
+        else:
+            return serializer
+
+    @staticmethod
+    def validate_experiment(data, validator):
+        validator.validate_json(json_object=data, table_name="experiment")
+        return validator.get_validation_results()
 
 class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:

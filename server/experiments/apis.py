@@ -3,7 +3,7 @@ from config.selectors import TableValidator, response_constructor, response_stat
 from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from experiments.services import ExperimentSerializer, ExperimentShortReadSerializer
+from experiments.services import ExperimentSerializer, ExperimentShortReadSerializer, ExperimentService
 from experiments.selectors import get_experiment, get_experiment_dna_short_read, parse_short_read
 from rest_framework import status, serializers
 from rest_framework.authtoken.models import Token
@@ -32,39 +32,54 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
         try:
             for datum in request.data:
                 identifier = datum["experiment_dna_short_read_id"]
-                datum = parse_short_read(short_read=datum)
+                experiment_data = {
+                    "experiment_id": "experiment_dna_short_read" + "." + identifier,
+                    "table_name": "experiment_dna_short_read",
+                    "id_in_table": identifier,
+                    "participant_id": identifier.split("_")[0]
+                }
+                
+                experiment_results = experiment_results = ExperimentService.validate_experiment(experiment_data, validator)
+                parsed_short_read = parse_short_read(short_read=datum)
                 validator.validate_json(
-                    json_object=datum, table_name="experiment_dna_short_read"
+                    json_object=parsed_short_read, table_name="experiment_dna_short_read"
                 )
-                results = validator.get_validation_results()
-                if results["valid"] is True:
-                    existing_experiment = get_experiment_dna_short_read(experiment_dna_short_read_id=identifier)
-                    serializer = ExperimentShortReadSerializer(
-                        existing_experiment, data=datum
+                short_read_results = validator.get_validation_results()
+                if short_read_results["valid"] is True and experiment_results["valid"] is True:
+                    existing_short_read = get_experiment_dna_short_read(experiment_dna_short_read_id=identifier)
+                    short_read_serializer = ExperimentShortReadSerializer(
+                        existing_short_read, data=parsed_short_read
                     )
-
-                    if serializer.is_valid():
-                        experiment_instance = serializer.save()
+                    experiment_serializer = ExperimentService.create_or_update_experiment(experiment_data)
+                    short_read_valid = short_read_serializer.is_valid()
+                    experiment_valid = experiment_serializer.is_valid()
+                    if experiment_valid and short_read_valid:
+                        short_read_instance = short_read_serializer.save()
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_experiment else "CREATED",
-                                code=201 if existing_experiment else 200,
+                                status="UPDATED" if existing_short_read else "CREATED",
+                                code=200 if existing_short_read else 201,
                                 message=(
                                     f"Short read experiment {identifier} updated."
-                                    if existing_experiment
+                                    if existing_short_read
                                     else f"Short read experiment {identifier} created."
                                 ),
-                                data=(experiment_instance).data,
+                                data=ExperimentShortReadSerializer(short_read_instance).data,
                             )
                         )
                         accepted_requests = True
 
                     else:
                         error_data = [
-                            {item: serializer.errors[item]}
-                            for item in serializer.errors
+                            {item: short_read_serializer.errors[item]}
+                            for item in short_read_serializer.errors
                         ]
+                        error_data.extend(
+                            {item: experiment_serializer.errors[item]}
+                            for item in experiment_serializer.errors
+                        )
+
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
@@ -77,12 +92,13 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                         continue
 
                 else:
+                    errors = short_read_results["errors"] + experiment_results["errors"]
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
                             status="BAD REQUEST",
                             code=400,
-                            data=results["errors"],
+                            data=errors,
                         )
                     )
                     rejected_requests = True
