@@ -2,10 +2,14 @@
 # config/services.py
 
 import os
+import re
 import jsonref
 import jsonschema
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from rest_framework import status
+from requests.models import PreparedRequest
+import requests.exceptions
 
 """DB Level Services
 
@@ -155,3 +159,34 @@ def response_constructor(
         response_object["message"] = message
 
     return response_object
+
+def validate_cloud_url(url):
+    """
+    Validates that a given URL is correctly formatted according to the standards
+    expected by the Requests library. This validation ensures that the URL can be
+    properly handled by Requests without causing errors in the preparation phase.
+
+    Parameters:
+    - url (str): The URL to be validated.
+
+    Returns:
+    - None: If the URL is valid, the function completes without returning anything.
+
+    Raises:
+    - ValidationError: If the URL preparation fails, indicating the URL is not
+      valid or well-formed.
+
+    Notes:
+    - This function utilizes the `PreparedRequest.prepare_url` method from the
+      Requests library, which can throw various exceptions if the URL does not
+      meet expected standards. If such an exception is caught, this function
+      raises a `ValidationError` with a message describing the issue.
+    """
+
+    prepared_request = PreparedRequest()
+    try:
+        prepared_request.prepare_url(url, None)
+    except Exception as exc:
+        return ValidationError(f"{url} is not a valid URL. Error: {str(exc)}")
+
+    
