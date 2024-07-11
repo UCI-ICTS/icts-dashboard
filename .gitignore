@@ -1,6 +1,7 @@
 #General
 #.python-version
 **.DS_Store**
+**__pycache__**
 
 #Server Items
 server/env*
@@ -10,6 +11,8 @@ server/env
 server/config/fixtures/full_local_data.json
 server/gregor-google-key.json
 server/utilities/anvil**
+server/static*
+
 #Client Items
 #Client dependencies
 client/node_modules
