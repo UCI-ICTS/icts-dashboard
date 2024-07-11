@@ -14,6 +14,37 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
+class TestConnection(APIView):
+    """Test Connection
+
+    API for testing connections to DB
+    """
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        operation_id="test_connection",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={}
+            )
+        ),
+        responses={
+            200: "All submissions of analytes were successfull",
+            207: "Some submissions of analytes were not successful.",
+            400: "Bad request",
+        },
+        tags=["Test"],
+    )
+
+    def post(self, request):
+        
+        data = {"request":str(request.data)}
+
+
+        return Response(data)
+
+
 class SearchTablesAPI(APIView):
     """ """
 
@@ -49,8 +80,6 @@ class SearchTablesAPI(APIView):
 
         queryset = model.objects.filter(**filter_kwargs)
         data = chain(queryset.values())
-        import pdb
 
-        pdb.set_trace()
 
         return Response(data)
