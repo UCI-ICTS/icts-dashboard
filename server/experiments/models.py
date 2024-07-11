@@ -7,7 +7,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from metadata.models import Analyte, Participant, VariantType
-
+from config.selectors import validate_cloud_url
 
 class Experiment(models.Model):
     EXPERIMENT_TYPES = [
@@ -67,8 +67,10 @@ class Aligned(models.Model):
         max_length=255,
         help_text="Identifier for the specific entry in the referenced table",
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         Participant,
+        to_field="participant_id",
+        db_column="participant_id",
         on_delete=models.CASCADE,
         help_text="The participant associated with this aligned data",
     )
@@ -151,11 +153,20 @@ class ExperimentDNAShortRead(models.Model):
 
 class AlignedDNAShortRead(models.Model):
     aligned_dna_short_read_id = models.CharField(max_length=255, primary_key=True)
-    experiment_dna_short_read = models.ForeignKey(
-        "ExperimentDNAShortRead", on_delete=models.CASCADE
+    experiment_dna_short_read_id = models.ForeignKey(
+        "ExperimentDNAShortRead",
+        on_delete=models.CASCADE,
+        to_field="experiment_dna_short_read_id",
+        db_column="experiment_dna_short_read_id"
     )
-    aligned_dna_short_read_file = models.URLField(max_length=1024)
-    aligned_dna_short_read_index_file = models.URLField(max_length=1024)
+    aligned_dna_short_read_file = models.CharField(
+        max_length=1024,
+        validators=[validate_cloud_url]
+    )
+    aligned_dna_short_read_index_file = models.CharField(
+        max_length=1024,
+        validators=[validate_cloud_url]
+    )
     md5sum = models.CharField(max_length=32, unique=True)
     reference_assembly = models.CharField(
         max_length=50,

@@ -4,11 +4,40 @@
 """Experiments Selectors
 """
 
-from experiments.models import Experiment, ExperimentDNAShortRead
+from experiments.models import (
+    AlignedDNAShortRead,
+    Experiment,
+    ExperimentDNAShortRead
+)
+
 from config.selectors import remove_na
 
+def parse_short_read_aligned(short_read_aligned: dict) -> dict:
+    """
+    Parses and processes the short_read_aligned dictionary to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - short_read_aligned (dict): A dictionary containing short_read data.
+
+    Returns:
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
+      fields are properly formatted.
+
+    """
+
+    if "mean_coverage" in short_read_aligned and short_read_aligned["mean_coverage"] != "NA":
+        try:
+            short_read_aligned["mean_coverage"] = int(short_read_aligned["mean_coverage"])
+        except ValueError:
+            short_read_aligned["mean_coverage"] = "NA"
+
+    parsed_short_read_aligned = remove_na(datum=short_read_aligned)
+    return parsed_short_read_aligned
+
 def parse_short_read(short_read: dict) -> dict:
-    #TODO: document
     """
     Parses and processes the short_read dictionary to format and clean specific fields.
 
@@ -23,6 +52,7 @@ def parse_short_read(short_read: dict) -> dict:
       fields are properly formatted.
 
     """
+
     if "read_length" in short_read and short_read["read_length"] != "NA":
         try:
             short_read["read_length"] = int(short_read["read_length"])
@@ -35,13 +65,12 @@ def parse_short_read(short_read: dict) -> dict:
         except ValueError:
             short_read["target_insert_size"] = "NA"
 
-
-
     parsed_short_read = remove_na(datum=short_read)
     return parsed_short_read
 
 def get_experiment(experiment_id: str) -> Experiment:
     """Retrieve an experiment instance by its ID or return None if not found."""
+
     try:
         experiment_instance = Experiment.objects.get(experiment_id=experiment_id)
         return experiment_instance
@@ -51,8 +80,18 @@ def get_experiment(experiment_id: str) -> Experiment:
 
 def get_experiment_dna_short_read(experiment_dna_short_read_id: str) -> ExperimentDNAShortRead:
     """Retrieve an experiment instance by its ID or return None if not found."""
+
     try:
         experiment_dna_short_read_instance = ExperimentDNAShortRead.objects.get(experiment_dna_short_read_id=experiment_dna_short_read_id)
         return experiment_dna_short_read_instance
     except ExperimentDNAShortRead.DoesNotExist:
+        return None
+
+def get_aligned_dna_short_read(aligned_dna_short_read_id: str) -> AlignedDNAShortRead:
+    """Retrieve an aligned dna short read instance by its ID or return None if not found."""
+
+    try:
+        experiment_dna_short_read_instance = AlignedDNAShortRead.objects.get(aligned_dna_short_read_id=aligned_dna_short_read_id)
+        return experiment_dna_short_read_instance
+    except AlignedDNAShortRead.DoesNotExist:
         return None

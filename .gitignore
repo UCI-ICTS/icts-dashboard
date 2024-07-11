@@ -7,7 +7,9 @@ server/env*
 server/.secrets
 server/db.sqlite3
 server/env
-
+server/config/fixtures/full_local_data.json
+server/gregor-google-key.json
+server/utilities/anvil**
 #Client Items
 #Client dependencies
 client/node_modules
