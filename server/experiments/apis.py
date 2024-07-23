@@ -8,6 +8,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from experiments.services import (
     AlignedDNAShortReadSerializer,
+    AlignedPacBioSerializer,
     AlignedService,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
@@ -15,13 +16,15 @@ from experiments.services import (
     ExperimentService,
 )
 from experiments.selectors import (
+    get_aligned_pac_bio,
+    get_aligned_dna_short_read,
     get_experiment,
     get_experiment_dna_short_read,
     get_experiment_pac_bio,
-    parse_short_read_aligned,
-    parse_short_read,
-    get_aligned_dna_short_read,
     parse_pac_bio,
+    parse_pac_bio_aligned,
+    parse_short_read,
+    parse_short_read_aligned,
 )
 from rest_framework import status, serializers
 
@@ -107,7 +110,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
                         aligned_data
                     )
                     aligned_valid = aligned_serializer.is_valid()
-                    if aligned_serializer and aligned_short_read_valid:
+                    if aligned_valid and aligned_short_read_valid:
                         short_read_instance = aligned_short_read_serializer.save()
                         response_data.append(
                             response_constructor(
@@ -330,10 +333,10 @@ class CreateOrUpdateAlignedPacBio(APIView):
 
     @swagger_auto_schema(
         operation_id="create_aligned_pac_bio",
-        request_body=ExperimentShortReadSerializer(many=True),
+        request_body=AlignedPacBioSerializer(many=True),
         responses={
-            200: "All submissions of aligned DNA short read were successfull",
-            207: "Some submissions of aligned DNA short read were not successful.",
+            200: "All submissions of aligned PacBio data were successfull",
+            207: "Some submissions of aligned PacBio data were not successful.",
             400: "Bad request",
         },
         tags=["Experiment"],
@@ -345,69 +348,63 @@ class CreateOrUpdateAlignedPacBio(APIView):
         accepted_requests = False
         try:
             for datum in request.data:
-                identifier = datum["aligned_dna_short_read_id"]
+                identifier = datum["aligned_pac_bio_id"]
                 aligned_data = {
-                    "aligned_id": "aligned_dna_short_read" + "." + identifier,
-                    "table_name": "aligned_dna_short_read",
+                    "aligned_id": "aligned_pac_bio" + "." + identifier,
+                    "table_name": "aligned_pac_bio",
                     "id_in_table": identifier,
                     "participant_id": identifier.split("_")[0],
-                    "aligned_file": datum["aligned_dna_short_read_file"],
-                    "aligned_index_file": datum["aligned_dna_short_read_index_file"],
+                    "aligned_file": datum["aligned_pac_bio_file"],
+                    "aligned_index_file": datum["aligned_pac_bio_index_file"],
                 }
 
                 aligned_results = AlignedService.validate_aligned(
                     aligned_data, validator
                 )
-                parsed_short_read_aligned = parse_short_read_aligned(
-                    short_read_aligned=datum
-                )
+                parsed_pac_bio_aligned = parse_pac_bio_aligned(pac_bio_aligned=datum)
                 validator.validate_json(
-                    json_object=parsed_short_read_aligned,
-                    table_name="aligned_dna_short_read",
+                    json_object=parsed_pac_bio_aligned,
+                    table_name="aligned_pac_bio",
                 )
-                short_read_aligned_results = validator.get_validation_results()
+                pac_bio_aligned_results = validator.get_validation_results()
                 if (
-                    short_read_aligned_results["valid"] is True
+                    pac_bio_aligned_results["valid"] is True
                     and aligned_results["valid"] is True
                 ):
-                    existing_aligned_short_read = get_aligned_dna_short_read(
-                        aligned_dna_short_read_id=identifier
+                    existing_aligned_pac_bio = get_aligned_pac_bio(
+                        aligned_pac_bio_id=identifier
                     )
-                    aligned_short_read_serializer = AlignedDNAShortReadSerializer(
-                        existing_aligned_short_read, data=parsed_short_read_aligned
+                    aligned_pac_bio_serializer = AlignedPacBioSerializer(
+                        existing_aligned_pac_bio, data=parsed_pac_bio_aligned
                     )
-                    aligned_short_read_valid = aligned_short_read_serializer.is_valid()
+                    aligned_pac_bio_valid = aligned_pac_bio_serializer.is_valid()
                     aligned_serializer = AlignedService.create_or_update_aligned(
                         aligned_data
                     )
                     aligned_valid = aligned_serializer.is_valid()
-                    if aligned_serializer and aligned_short_read_valid:
-                        short_read_instance = aligned_short_read_serializer.save()
+                    if aligned_valid and aligned_pac_bio_valid:
+                        pac_bio_instance = aligned_pac_bio_serializer.save()
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
                                 status=(
-                                    "UPDATED"
-                                    if existing_aligned_short_read
-                                    else "CREATED"
+                                    "UPDATED" if existing_aligned_pac_bio else "CREATED"
                                 ),
-                                code=200 if existing_aligned_short_read else 201,
+                                code=200 if existing_aligned_pac_bio else 201,
                                 message=(
                                     f"Short read alignement {identifier} updated."
-                                    if existing_aligned_short_read
+                                    if existing_aligned_pac_bio
                                     else f"Short read alignement {identifier} created."
                                 ),
-                                data=AlignedDNAShortReadSerializer(
-                                    short_read_instance
-                                ).data,
+                                data=AlignedPacBioSerializer(pac_bio_instance).data,
                             )
                         )
                         accepted_requests = True
 
                     else:
                         error_data = [
-                            {item: aligned_short_read_serializer.errors[item]}
-                            for item in aligned_short_read_serializer.errors
+                            {item: aligned_pac_bio_serializer.errors[item]}
+                            for item in aligned_pac_bio_serializer.errors
                         ]
                         error_data.extend(
                             {item: aligned_serializer.errors[item]}
@@ -427,7 +424,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
 
                 else:
                     errors = (
-                        short_read_aligned_results["errors"] + aligned_results["errors"]
+                        pac_bio_aligned_results["errors"] + aligned_results["errors"]
                     )
                     response_data.append(
                         response_constructor(
@@ -455,7 +452,19 @@ class CreateOrUpdateAlignedPacBio(APIView):
 
 
 class CreateOrUpdateExperimentPacBio(APIView):
-    """ """
+    """
+    API view to create or update PacBio experiments.
+
+    This view handles the POST request to create or update multiple PacBio experiments.
+    It validates each experiment's data and constructs a response indicating the status
+    of each operation.
+
+    Args:
+        request (Request): The request object containing the data to process.
+
+    Returns:
+        Response: The response object containing the status and data of the operations.
+    """
 
     @swagger_auto_schema(
         operation_id="create_pac_bio",
