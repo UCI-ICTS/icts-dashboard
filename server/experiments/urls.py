@@ -8,6 +8,8 @@ from experiments.apis import (
     CreateOrUpdateAlignedShortRead,
     CreateOrUpdateAlignedPacBio,
     CreateOrUpdateExperimentPacBio,
+    CreateOrUpdateExperimentNanopore,
+    CreateOrUpdateAlignedNanopore,
 )
 
 urlpatterns = [
@@ -17,5 +19,6 @@ urlpatterns = [
     ),
     path("create_aligned_short_read/", CreateOrUpdateAlignedShortRead.as_view()),
     path("create_aligned_pac_bio", CreateOrUpdateAlignedPacBio.as_view()),
-    path("create_pac_bio_experiment", CreateOrUpdateExperimentPacBio.as_view()),
+    path("create_nanopore_experiment", CreateOrUpdateExperimentNanopore.as_view()),
+    path("create_aligned_nanopore", CreateOrUpdateAlignedNanopore.as_view()),
 ]

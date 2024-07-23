@@ -8,19 +8,25 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from experiments.services import (
     AlignedDNAShortReadSerializer,
+    AlignedNanoporeSerializer,
     AlignedPacBioSerializer,
     AlignedService,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
+    ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
     ExperimentService,
 )
 from experiments.selectors import (
     get_aligned_pac_bio,
     get_aligned_dna_short_read,
+    get_aligned_nanopore,
     get_experiment,
     get_experiment_dna_short_read,
+    get_experiment_nanopore,
     get_experiment_pac_bio,
+    parse_nanopore,
+    parse_nanopore_aligned,
     parse_pac_bio,
     parse_pac_bio_aligned,
     parse_short_read,
@@ -329,7 +335,27 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
 
 
 class CreateOrUpdateAlignedPacBio(APIView):
-    """Create or Update Aligned PacBio"""
+    """Create or Update Aligned PacBio
+
+    API view to create or update aligned PacBio records.
+
+    This view handles the submission of one or more PacBio entries,
+    performing validation and either creating new records or updating existing ones.
+    It integrates detailed validation and response formatting to ensure data integrity
+    and provide clear feedback to the client.
+
+    Iterates over the provided data, validating and processing each aligned DNA short read.
+    Valid entries are either updated or created in the database, and responses are
+    compiled to provide detailed feedback on the outcome of each entry.
+
+    Args:
+        request (Request): The request object containing the aligned DNA short read data.
+
+    Returns:
+        Response: A Response object containing the status code and a list of results for
+        each processed entry indicating whether it was successfully created or updated,
+        or if there were any errors.
+    """
 
     @swagger_auto_schema(
         operation_id="create_aligned_pac_bio",
@@ -553,6 +579,281 @@ class CreateOrUpdateExperimentPacBio(APIView):
 
                 else:
                     errors = pac_bio_results["errors"] + experiment_results["errors"]
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateAlignedNanopore(APIView):
+    """Create or Update Aligned Nanopore
+
+    API view to create or update aligned Nanopore records.
+
+    This view handles the submission of one or more Nanopore entries,
+    performing validation and either creating new records or updating existing ones.
+    It integrates detailed validation and response formatting to ensure data integrity
+    and provide clear feedback to the client.
+
+    Iterates over the provided data, validating and processing each aligned DNA short read.
+    Valid entries are either updated or created in the database, and responses are
+    compiled to provide detailed feedback on the outcome of each entry.
+
+    Args:
+        request (Request): The request object containing the aligned DNA short read data.
+
+    Returns:
+        Response: A Response object containing the status code and a list of results for
+        each processed entry indicating whether it was successfully created or updated,
+        or if there were any errors.
+    """
+
+    @swagger_auto_schema(
+        operation_id="create_aligned_nanopore",
+        request_body=AlignedNanoporeSerializer(many=True),
+        responses={
+            200: "All submissions of aligned Nanopore data were successfull",
+            207: "Some submissions of aligned Nanopore data were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["aligned_nanopore_id"]
+                aligned_data = {
+                    "aligned_id": "aligned_nanopore" + "." + identifier,
+                    "table_name": "aligned_nanopore",
+                    "id_in_table": identifier,
+                    "participant_id": identifier.split("_")[0],
+                    "aligned_file": datum["aligned_nanopore_file"],
+                    "aligned_index_file": datum["aligned_nanopore_index_file"],
+                }
+
+                aligned_results = AlignedService.validate_aligned(
+                    aligned_data, validator
+                )
+                parsed_nanopore_aligned = parse_nanopore_aligned(nanopore_aligned=datum)
+                validator.validate_json(
+                    json_object=parsed_nanopore_aligned,
+                    table_name="aligned_nanopore",
+                )
+                nanopore_aligned_results = validator.get_validation_results()
+                if (
+                    nanopore_aligned_results["valid"] is True
+                    and aligned_results["valid"] is True
+                ):
+                    existing_aligned_nanopore = get_aligned_nanopore(
+                        aligned_nanopore_id=identifier
+                    )
+
+                    aligned_nanopore_serializer = AlignedNanoporeSerializer(
+                        existing_aligned_nanopore, data=parsed_nanopore_aligned
+                    )
+                    aligned_pac_bio_valid = aligned_nanopore_serializer.is_valid()
+                    aligned_serializer = AlignedService.create_or_update_aligned(
+                        aligned_data
+                    )
+                    aligned_valid = aligned_serializer.is_valid()
+                    if aligned_valid and aligned_pac_bio_valid:
+                        nanpore_instance = aligned_nanopore_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status=(
+                                    "UPDATED"
+                                    if existing_aligned_nanopore
+                                    else "CREATED"
+                                ),
+                                code=200 if existing_aligned_nanopore else 201,
+                                message=(
+                                    f"Nanopore alignement {identifier} updated."
+                                    if existing_aligned_nanopore
+                                    else f"Nanopore alignement {identifier} created."
+                                ),
+                                data=AlignedNanoporeSerializer(nanpore_instance).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: aligned_nanopore_serializer.errors[item]}
+                            for item in aligned_nanopore_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: aligned_serializer.errors[item]}
+                            for item in aligned_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = (
+                        nanopore_aligned_results["errors"] + aligned_results["errors"]
+                    )
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateExperimentNanopore(APIView):
+    """API view to create or update Nanopore experiments.
+
+    This view handles the POST request to create or update multiple Nanopore experiments.
+    It validates each experiment's data and constructs a response indicating the status
+    of each operation.
+
+    Args:
+        request (Request): The request object containing the data to process.
+
+    Returns:
+        Response: The response object containing the status and data of the operations.
+    """
+
+    @swagger_auto_schema(
+        operation_id="create_nanopoer",
+        request_body=ExperimentNanoporeSerializer(many=True),
+        responses={
+            200: "All submissions of Nanopore experiments were successfull",
+            207: "Some submissions of Nanopore experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["experiment_nanopore_id"]
+                experiment_data = {
+                    "experiment_id": "experiment_nanopore" + "." + identifier,
+                    "table_name": "experiment_nanopore",
+                    "id_in_table": identifier,
+                    "participant_id": identifier.split("_")[0],
+                }
+                experiment_results = ExperimentService.validate_experiment(
+                    experiment_data, validator
+                )
+                parsed_nanopore = parse_nanopore(nanopore=datum)
+                validator.validate_json(
+                    json_object=parsed_nanopore, table_name="experiment_nanopore"
+                )
+                nanopore_results = validator.get_validation_results()
+
+                if (
+                    nanopore_results["valid"] is True
+                    and experiment_results["valid"] is True
+                ):
+                    existing_nanopore = get_experiment_nanopore(
+                        experiment_nanopore_id=identifier
+                    )
+                    nanopore_serializer = ExperimentNanoporeSerializer(
+                        existing_nanopore, data=parsed_nanopore
+                    )
+                    experiment_serializer = (
+                        ExperimentService.create_or_update_experiment(experiment_data)
+                    )
+                    nanopore_valid = nanopore_serializer.is_valid()
+                    experiment_valid = experiment_serializer.is_valid()
+                    if experiment_valid and nanopore_valid:
+                        nanopore_instance = nanopore_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="UPDATED" if existing_nanopore else "CREATED",
+                                code=200 if existing_nanopore else 201,
+                                message=(
+                                    f"Nanopore experiment {identifier} updated."
+                                    if existing_nanopore
+                                    else f"Nanopore experiment {identifier} created."
+                                ),
+                                data=ExperimentNanoporeSerializer(
+                                    nanopore_instance
+                                ).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: nanopore_serializer.errors[item]}
+                            for item in nanopore_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: experiment_serializer.errors[item]}
+                            for item in experiment_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = nanopore_results["errors"] + experiment_results["errors"]
                     response_data.append(
                         response_constructor(
                             identifier=identifier,

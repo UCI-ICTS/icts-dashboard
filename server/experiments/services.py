@@ -6,11 +6,35 @@ from rest_framework import serializers
 from experiments.models import (
     Aligned,
     AlignedDNAShortRead,
+    AlignedNanopore,
     AlignedPacBio,
     Experiment,
     ExperimentDNAShortRead,
+    ExperimentNanopore,
     ExperimentPacBio,
 )
+
+
+class ExperimentNanoporeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperimentNanopore
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new ExperimentNanopore instance using the validated data"""
+
+        experiment_nanopore_id = validated_data.get("experiment_nanopore_id")
+        experiment_nanopre_instance, created = ExperimentNanopore.objects.get_or_create(
+            experiment_nanopore_id=experiment_nanopore_id, defaults=validated_data
+        )
+        return experiment_nanopre_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
 
 
 class ExperimentPacBioSerializer(serializers.ModelSerializer):
@@ -20,7 +44,7 @@ class ExperimentPacBioSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new ExperimentPacBio instance using the validated data"""
-        print("pacbio create")
+
         experiment_pac_bio_id = validated_data.get("experiment_pac_bio_id")
         experiment_pac_bio, created = ExperimentPacBio.objects.get_or_create(
             experiment_pac_bio_id=experiment_pac_bio_id, defaults=validated_data
@@ -29,7 +53,7 @@ class ExperimentPacBioSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data"""
-        print("pacbio updated")
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         return instance
@@ -152,6 +176,12 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
 class AlignedPacBioSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedPacBio
+        fields = "__all__"
+
+
+class AlignedNanoporeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedNanopore
         fields = "__all__"
 
 

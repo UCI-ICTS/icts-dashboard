@@ -9,6 +9,8 @@ from experiments.models import (
     ExperimentDNAShortRead,
     AlignedPacBio,
     ExperimentPacBio,
+    AlignedNanopore,
+    ExperimentNanopore,
 )
 
 
@@ -36,9 +38,19 @@ class ExperimentPacBioAdmin(admin.ModelAdmin):
     list_display = ["experiment_pac_bio_id"]
 
 
+class AlignedNanoporeAdmin(admin.ModelAdmin):
+    list_display = ["aligned_nanopore_id"]
+
+
+class ExperimentNanoporeAdmin(admin.ModelAdmin):
+    list_display = ["experiment_nanopore_id"]
+
+
 admin.site.register(Aligned, AlignedAdmin)
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(AlignedDNAShortRead, AlignedDNAShortReadAdmin)
 admin.site.register(ExperimentDNAShortRead, ExperimentDNAShortReadAdmin)
 admin.site.register(AlignedPacBio, AlignedPacBioAdmin)
 admin.site.register(ExperimentPacBio, ExperimentPacBioAdmin)
+admin.site.register(AlignedNanopore, AlignedNanoporeAdmin)
+admin.site.register(ExperimentNanopore, ExperimentNanoporeAdmin)
