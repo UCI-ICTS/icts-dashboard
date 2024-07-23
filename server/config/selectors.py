@@ -81,6 +81,7 @@ class TableValidator:
 
         return {"valid": self.valid, "errors": error_data}
 
+
 def remove_na(datum: dict) -> dict:
     """Remove NA
     Remove `NA` from submissions
@@ -89,6 +90,7 @@ def remove_na(datum: dict) -> dict:
     parsed_datum = {k: v for k, v in datum.items() if v != "NA"}
 
     return parsed_datum
+
 
 def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
     """Determine Response Status
@@ -160,6 +162,7 @@ def response_constructor(
 
     return response_object
 
+
 def validate_cloud_url(url):
     """
     Validates that a given URL is correctly formatted according to the standards
@@ -188,5 +191,3 @@ def validate_cloud_url(url):
         prepared_request.prepare_url(url, None)
     except Exception as exc:
         return ValidationError(f"{url} is not a valid URL. Error: {str(exc)}")
-
-    

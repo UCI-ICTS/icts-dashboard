@@ -11,20 +11,25 @@ from experiments.services import (
     AlignedService,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
-    ExperimentService
+    ExperimentPacBioSerializer,
+    ExperimentService,
 )
 from experiments.selectors import (
     get_experiment,
     get_experiment_dna_short_read,
+    get_experiment_pac_bio,
     parse_short_read_aligned,
     parse_short_read,
-    get_aligned_dna_short_read
+    get_aligned_dna_short_read,
+    parse_pac_bio,
 )
 from rest_framework import status, serializers
+
 # from rest_framework.authtoken.models import Token
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 
 class CreateOrUpdateAlignedShortRead(APIView):
     """Create or Update Aligned DNA Short Read Records
@@ -51,7 +56,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
 
     @swagger_auto_schema(
         operation_id="create_aligned_short_read",
-        request_body=ExperimentShortReadSerializer(many=True),
+        request_body=AlignedDNAShortReadSerializer(many=True),
         responses={
             200: "All submissions of aligned DNA short read were successfull",
             207: "Some submissions of aligned DNA short read were not successful.",
@@ -59,7 +64,6 @@ class CreateOrUpdateAlignedShortRead(APIView):
         },
         tags=["Experiment"],
     )
-
     def post(self, request):
         validator = TableValidator()
         response_data = []
@@ -74,36 +78,54 @@ class CreateOrUpdateAlignedShortRead(APIView):
                     "id_in_table": identifier,
                     "participant_id": identifier.split("_")[0],
                     "aligned_file": datum["aligned_dna_short_read_file"],
-                    "aligned_index_file": datum["aligned_dna_short_read_index_file"]
+                    "aligned_index_file": datum["aligned_dna_short_read_index_file"],
                 }
-                
-                aligned_results = AlignedService.validate_aligned(aligned_data, validator)
-                parsed_short_read_aligned = parse_short_read_aligned(short_read_aligned=datum)
+
+                aligned_results = AlignedService.validate_aligned(
+                    aligned_data, validator
+                )
+                parsed_short_read_aligned = parse_short_read_aligned(
+                    short_read_aligned=datum
+                )
                 validator.validate_json(
-                    json_object=parsed_short_read_aligned, table_name="aligned_dna_short_read"
+                    json_object=parsed_short_read_aligned,
+                    table_name="aligned_dna_short_read",
                 )
                 short_read_aligned_results = validator.get_validation_results()
-                if short_read_aligned_results["valid"] is True and aligned_results["valid"] is True:
-                    existing_aligned_short_read = get_aligned_dna_short_read(aligned_dna_short_read_id=identifier)
+                if (
+                    short_read_aligned_results["valid"] is True
+                    and aligned_results["valid"] is True
+                ):
+                    existing_aligned_short_read = get_aligned_dna_short_read(
+                        aligned_dna_short_read_id=identifier
+                    )
                     aligned_short_read_serializer = AlignedDNAShortReadSerializer(
                         existing_aligned_short_read, data=parsed_short_read_aligned
                     )
                     aligned_short_read_valid = aligned_short_read_serializer.is_valid()
-                    aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
+                    aligned_serializer = AlignedService.create_or_update_aligned(
+                        aligned_data
+                    )
                     aligned_valid = aligned_serializer.is_valid()
                     if aligned_serializer and aligned_short_read_valid:
                         short_read_instance = aligned_short_read_serializer.save()
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_aligned_short_read else "CREATED",
+                                status=(
+                                    "UPDATED"
+                                    if existing_aligned_short_read
+                                    else "CREATED"
+                                ),
                                 code=200 if existing_aligned_short_read else 201,
                                 message=(
                                     f"Short read alignement {identifier} updated."
                                     if existing_aligned_short_read
                                     else f"Short read alignement {identifier} created."
                                 ),
-                                data=AlignedDNAShortReadSerializer(short_read_instance).data,
+                                data=AlignedDNAShortReadSerializer(
+                                    short_read_instance
+                                ).data,
                             )
                         )
                         accepted_requests = True
@@ -130,7 +152,9 @@ class CreateOrUpdateAlignedShortRead(APIView):
                         continue
 
                 else:
-                    errors = short_read_aligned_results["errors"] + aligned_results["errors"]
+                    errors = (
+                        short_read_aligned_results["errors"] + aligned_results["errors"]
+                    )
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
@@ -154,6 +178,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
 
 class CreateOrUpdateExperimentShortReadApi(APIView):
     """Creating or Updating DNA Short Read Experiment
@@ -206,21 +231,31 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                     "experiment_id": "experiment_dna_short_read" + "." + identifier,
                     "table_name": "experiment_dna_short_read",
                     "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0]
+                    "participant_id": identifier.split("_")[0],
                 }
-                
-                experiment_results = experiment_results = ExperimentService.validate_experiment(experiment_data, validator)
+
+                experiment_results = ExperimentService.validate_experiment(
+                    experiment_data, validator
+                )
                 parsed_short_read = parse_short_read(short_read=datum)
                 validator.validate_json(
-                    json_object=parsed_short_read, table_name="experiment_dna_short_read"
+                    json_object=parsed_short_read,
+                    table_name="experiment_dna_short_read",
                 )
                 short_read_results = validator.get_validation_results()
-                if short_read_results["valid"] is True and experiment_results["valid"] is True:
-                    existing_short_read = get_experiment_dna_short_read(experiment_dna_short_read_id=identifier)
+                if (
+                    short_read_results["valid"] is True
+                    and experiment_results["valid"] is True
+                ):
+                    existing_short_read = get_experiment_dna_short_read(
+                        experiment_dna_short_read_id=identifier
+                    )
                     short_read_serializer = ExperimentShortReadSerializer(
                         existing_short_read, data=parsed_short_read
                     )
-                    experiment_serializer = ExperimentService.create_or_update_experiment(experiment_data)
+                    experiment_serializer = (
+                        ExperimentService.create_or_update_experiment(experiment_data)
+                    )
                     short_read_valid = short_read_serializer.is_valid()
                     experiment_valid = experiment_serializer.is_valid()
                     if experiment_valid and short_read_valid:
@@ -235,7 +270,9 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                                     if existing_short_read
                                     else f"Short read experiment {identifier} created."
                                 ),
-                                data=ExperimentShortReadSerializer(short_read_instance).data,
+                                data=ExperimentShortReadSerializer(
+                                    short_read_instance
+                                ).data,
                             )
                         )
                         accepted_requests = True
@@ -288,6 +325,250 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
+class CreateOrUpdateAlignedPacBio(APIView):
+    """Create or Update Aligned PacBio"""
+
+    @swagger_auto_schema(
+        operation_id="create_aligned_pac_bio",
+        request_body=ExperimentShortReadSerializer(many=True),
+        responses={
+            200: "All submissions of aligned DNA short read were successfull",
+            207: "Some submissions of aligned DNA short read were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["aligned_dna_short_read_id"]
+                aligned_data = {
+                    "aligned_id": "aligned_dna_short_read" + "." + identifier,
+                    "table_name": "aligned_dna_short_read",
+                    "id_in_table": identifier,
+                    "participant_id": identifier.split("_")[0],
+                    "aligned_file": datum["aligned_dna_short_read_file"],
+                    "aligned_index_file": datum["aligned_dna_short_read_index_file"],
+                }
+
+                aligned_results = AlignedService.validate_aligned(
+                    aligned_data, validator
+                )
+                parsed_short_read_aligned = parse_short_read_aligned(
+                    short_read_aligned=datum
+                )
+                validator.validate_json(
+                    json_object=parsed_short_read_aligned,
+                    table_name="aligned_dna_short_read",
+                )
+                short_read_aligned_results = validator.get_validation_results()
+                if (
+                    short_read_aligned_results["valid"] is True
+                    and aligned_results["valid"] is True
+                ):
+                    existing_aligned_short_read = get_aligned_dna_short_read(
+                        aligned_dna_short_read_id=identifier
+                    )
+                    aligned_short_read_serializer = AlignedDNAShortReadSerializer(
+                        existing_aligned_short_read, data=parsed_short_read_aligned
+                    )
+                    aligned_short_read_valid = aligned_short_read_serializer.is_valid()
+                    aligned_serializer = AlignedService.create_or_update_aligned(
+                        aligned_data
+                    )
+                    aligned_valid = aligned_serializer.is_valid()
+                    if aligned_serializer and aligned_short_read_valid:
+                        short_read_instance = aligned_short_read_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status=(
+                                    "UPDATED"
+                                    if existing_aligned_short_read
+                                    else "CREATED"
+                                ),
+                                code=200 if existing_aligned_short_read else 201,
+                                message=(
+                                    f"Short read alignement {identifier} updated."
+                                    if existing_aligned_short_read
+                                    else f"Short read alignement {identifier} created."
+                                ),
+                                data=AlignedDNAShortReadSerializer(
+                                    short_read_instance
+                                ).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: aligned_short_read_serializer.errors[item]}
+                            for item in aligned_short_read_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: aligned_serializer.errors[item]}
+                            for item in aligned_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = (
+                        short_read_aligned_results["errors"] + aligned_results["errors"]
+                    )
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateExperimentPacBio(APIView):
+    """ """
+
+    @swagger_auto_schema(
+        operation_id="create_pac_bio",
+        request_body=ExperimentShortReadSerializer(many=True),
+        responses={
+            200: "All submissions of experiments were successfull",
+            207: "Some submissions of experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["experiment_pac_bio_id"]
+                experiment_data = {
+                    "experiment_id": "experiment_pac_bio" + "." + identifier,
+                    "table_name": "experiment_pac_bio",
+                    "id_in_table": identifier,
+                    "participant_id": identifier.split("_")[0],
+                }
+                experiment_results = ExperimentService.validate_experiment(
+                    experiment_data, validator
+                )
+                parsed_pac_bio = parse_pac_bio(pac_bio_datum=datum)
+                validator.validate_json(
+                    json_object=parsed_pac_bio, table_name="experiment_pac_bio"
+                )
+                pac_bio_results = validator.get_validation_results()
+                if (
+                    pac_bio_results["valid"] is True
+                    and experiment_results["valid"] is True
+                ):
+                    existing_pac_bio = get_experiment_pac_bio(
+                        experiment_pac_bio_id=identifier
+                    )
+                    pac_bio_serializer = ExperimentPacBioSerializer(
+                        existing_pac_bio, data=parsed_pac_bio
+                    )
+                    experiment_serializer = (
+                        ExperimentService.create_or_update_experiment(experiment_data)
+                    )
+                    pac_bio_valid = pac_bio_serializer.is_valid()
+                    experiment_valid = experiment_serializer.is_valid()
+                    if experiment_valid and pac_bio_valid:
+                        pac_bio_instance = pac_bio_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="UPDATED" if existing_pac_bio else "CREATED",
+                                code=200 if existing_pac_bio else 201,
+                                message=(
+                                    f"PacBio experiment {identifier} updated."
+                                    if existing_pac_bio
+                                    else f"PacBio experiment {identifier} created."
+                                ),
+                                data=ExperimentPacBioSerializer(pac_bio_instance).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: pac_bio_serializer.errors[item]}
+                            for item in pac_bio_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: experiment_serializer.errors[item]}
+                            for item in experiment_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = pac_bio_results["errors"] + experiment_results["errors"]
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
 class CreateOrUpdateExperimentApi(APIView):
     """"""
 
@@ -310,15 +591,11 @@ class CreateOrUpdateExperimentApi(APIView):
             for datum in request.data:
                 identifier = datum["experiment_id"]
                 # parsed_phenotype = parse_phenotype(phenotype=datum)
-                validator.validate_json(
-                    json_object=datum, table_name="experiment"
-                )
+                validator.validate_json(json_object=datum, table_name="experiment")
                 results = validator.get_validation_results()
                 if results["valid"] is True:
                     existing_experiment = get_experiment(experiment_id=identifier)
-                    serializer = ExperimentSerializer(
-                        existing_experiment, data=datum
-                    )
+                    serializer = ExperimentSerializer(existing_experiment, data=datum)
 
                     if serializer.is_valid():
                         experiment_instance = serializer.save()

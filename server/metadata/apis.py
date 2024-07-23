@@ -10,7 +10,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from config.selectors import TableValidator, response_constructor, response_status, remove_na
+from config.selectors import (
+    TableValidator,
+    response_constructor,
+    response_status,
+    remove_na,
+)
 from metadata.models import Participant, Family, Analyte
 from metadata.services import (
     AnalyteSerializer,
@@ -29,6 +34,7 @@ from metadata.selectors import (
 
 class GetMetadataAPI(APIView):
     """[WIP] Placeholder: Does Not Work"""
+
     def get(self, request):
         print(request)
         return_values = [
@@ -377,8 +383,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
 
 
 class CreateOrUpdateAnalyte(APIView):
-    """
-    """
+    """ """
 
     @swagger_auto_schema(
         operation_id="create_analyte",
@@ -399,13 +404,17 @@ class CreateOrUpdateAnalyte(APIView):
             for datum in request.data:
                 identifier = datum["analyte_id"]
                 parsed_analyte = remove_na(datum=datum)
-                validator.validate_json(json_object=parsed_analyte, table_name="analyte")
-                
+                validator.validate_json(
+                    json_object=parsed_analyte, table_name="analyte"
+                )
+
                 results = validator.get_validation_results()
-                
+
                 if results["valid"] is True:
                     analyte_instance = get_analyte(analyte_id=identifier)
-                    serializer = AnalyteSerializer(analyte_instance, data=parsed_analyte)
+                    serializer = AnalyteSerializer(
+                        analyte_instance, data=parsed_analyte
+                    )
 
                     if serializer.is_valid():
                         analyte_instance = serializer.save()
