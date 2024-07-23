@@ -148,17 +148,11 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
         model = AlignedDNAShortRead
         fields = "__all__"
 
-    # TODO: determine if this is needed.
-    # def validate(self, data):
-    #     instance = AlignedDNAShortRead(**data)
-    #     if (
-    #         not instance.aligned_dna_short_read_set.exists()
-    #         and not instance.called_variants_dna_short_read.exists()
-    #     ):
-    #         raise serializers.ValidationError(
-    #             "Either aligned_dna_short_read_set or called_variants_dna_short_read is required."
-    #         )
-    #     return data
+
+class AlignedPacBioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedPacBio
+        fields = "__all__"
 
 
 class AlignedService:

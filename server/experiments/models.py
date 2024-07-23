@@ -772,16 +772,21 @@ class AlignedPacBio(models.Model):
         primary_key=True,
         help_text="identifier for aligned_short_read (primary key)",
     )
-    experiment_pac_bio = models.ForeignKey(
+    experiment_pac_bio_id = models.ForeignKey(
         "ExperimentPacBio",
+        to_field="experiment_pac_bio_id",
         on_delete=models.CASCADE,
         help_text="identifier for experiment",
     )
-    aligned_pac_bio_file = models.URLField(
-        help_text="name and path of file with aligned reads"
+    aligned_pac_bio_file = models.CharField(
+        max_length=1024,
+        validators=[validate_cloud_url],
+        help_text="name and path of file with aligned reads",
     )
-    aligned_pac_bio_index_file = models.URLField(
-        help_text="name and path of index file corresponding to aligned reads file"
+    aligned_pac_bio_index_file = models.CharField(
+        max_length=1024,
+        validators=[validate_cloud_url],
+        help_text="name and path of index file corresponding to aligned reads file",
     )
     md5sum = models.CharField(
         max_length=32, unique=True, help_text="md5 checksum for file"
@@ -803,39 +808,59 @@ class AlignedPacBio(models.Model):
         max_length=255, help_text="Software including version number used for alignment"
     )
     analysis_details = models.TextField(
-        help_text="brief description of the analysis pipeline used for producing the file"
+        blank=True,
+        null=True,
+        help_text="brief description of the analysis pipeline used for producing the file",
     )
     mean_coverage = models.FloatField(
-        help_text="Mean coverage of either the genome or the targeted regions"
+        blank=True,
+        null=True,
+        help_text="Mean coverage of either the genome or the targeted regions",
     )
     genome_coverage = models.IntegerField(
-        help_text="e.g. ≥90% at 10x or 20x; per consortium decision"
+        blank=True,
+        null=True,
+        help_text="e.g. ≥90% at 10x or 20x; per consortium decision",
     )
     contamination = models.FloatField(
-        help_text="Contamination level estimate., e.g. <1% (display raw fraction not percent)"
+        blank=True,
+        null=True,
+        help_text="Contamination level estimate., e.g. <1% (display raw fraction not percent)",
     )
     sex_concordance = models.BooleanField(
-        help_text="Comparison between reported sex vs genotype sex"
+        blank=True,
+        null=True,
+        help_text="Comparison between reported sex vs genotype sex",
     )
-    num_reads = models.IntegerField(help_text="Total reads (before/ignoring alignment)")
+    num_reads = models.IntegerField(
+        blank=True, null=True, help_text="Total reads (before/ignoring alignment)"
+    )
     num_bases = models.IntegerField(
-        help_text="Number of bases (before/ignoring alignment)"
+        blank=True, null=True, help_text="Number of bases (before/ignoring alignment)"
     )
     read_length_mean = models.IntegerField(
-        help_text="Mean length of all reads (before/ignoring alignment)"
+        blank=True,
+        null=True,
+        help_text="Mean length of all reads (before/ignoring alignment)",
     )
-    num_aligned_reads = models.IntegerField(help_text="Total aligned reads")
+    num_aligned_reads = models.IntegerField(
+        blank=True, null=True, help_text="Total aligned reads"
+    )
     num_aligned_bases = models.IntegerField(
-        help_text="Number of bases in aligned reads"
+        blank=True, null=True, help_text="Number of bases in aligned reads"
     )
     aligned_read_length_mean = models.IntegerField(
-        help_text="Mean length of aligned reads"
+        blank=True, null=True, help_text="Mean length of aligned reads"
     )
     read_error_rate = models.FloatField(
-        help_text="Mean empirical per-base error rate of aligned reads"
+        blank=True,
+        null=True,
+        help_text="Mean empirical per-base error rate of aligned reads",
     )
     mapped_reads_pct = models.FloatField(
-        help_text="Number between 1 and 100, representing the percentage of mapped reads"
+        blank=True,
+        null=True,
+        help_text="Number between 1 and 100, representing the percentage of mapped reads",
     )
     methylation_called = models.BooleanField(
         help_text="Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags"

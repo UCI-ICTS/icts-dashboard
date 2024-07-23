@@ -6,6 +6,7 @@
 
 from experiments.models import (
     AlignedDNAShortRead,
+    AlignedPacBio,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentPacBio,
@@ -77,6 +78,43 @@ def parse_short_read(short_read: dict) -> dict:
     return parsed_short_read
 
 
+def parse_pac_bio_aligned(pac_bio_aligned: dict) -> dict:
+    """
+    Parses and processes the short_read_aligned dictionary to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - short_read_aligned (dict): A dictionary containing short_read data.
+
+    Returns:
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
+      fields are properly formatted.
+
+    """
+
+    if (
+        "methylation_called" in pac_bio_aligned
+        and pac_bio_aligned["methylation_called"] != "NA"
+    ):
+        if pac_bio_aligned["methylation_called"] == "TRUE":
+            try:
+                pac_bio_aligned["methylation_called"] = True
+            except ValueError:
+                pac_bio_aligned["methylation_called"] = "NA"
+
+        if pac_bio_aligned["methylation_called"] == "FALSE":
+            try:
+                pac_bio_aligned["methylation_called"] = False
+            except ValueError:
+                pac_bio_aligned["methylation_called"] = "NA"
+
+    parsed_pac_bio_aligned = remove_na(datum=pac_bio_aligned)
+
+    return parsed_pac_bio_aligned
+
+
 def parse_pac_bio(pac_bio_datum: dict) -> dict:
     """
     Parses and processes the pac_bio to format and clean specific fields.
@@ -104,14 +142,8 @@ def parse_pac_bio(pac_bio_datum: dict) -> dict:
                 pac_bio_datum["was_barcoded"] = False
             except ValueError:
                 pac_bio_datum["was_barcoded"] = "NA"
-    # if "target_insert_size" in short_read and short_read["target_insert_size"] != "NA":
-    #     try:
-    #         short_read["target_insert_size"] = int(short_read["read_length"])
-    #     except ValueError:
-    #         short_read["target_insert_size"] = "NA"
 
     parsed_pac_bio = remove_na(datum=pac_bio_datum)
-    # import pdb; pdb.set_trace()
     return parsed_pac_bio
 
 
@@ -152,12 +184,24 @@ def get_experiment_pac_bio(experiment_pac_bio_id: str) -> ExperimentPacBio:
 
 
 def get_aligned_dna_short_read(aligned_dna_short_read_id: str) -> AlignedDNAShortRead:
-    """Retrieve an aligned dna short read instance by its ID or return None if not found."""
+    """Retrieve an aligned AlignedDNAShortRead instance by its ID or return None if not found."""
 
     try:
-        experiment_dna_short_read_instance = AlignedDNAShortRead.objects.get(
+        get_aligned_dna_short_read_instance = AlignedDNAShortRead.objects.get(
             aligned_dna_short_read_id=aligned_dna_short_read_id
         )
-        return experiment_dna_short_read_instance
+        return get_aligned_dna_short_read_instance
     except AlignedDNAShortRead.DoesNotExist:
+        return None
+
+
+def get_aligned_pac_bio(aligned_pac_bio_id: str) -> AlignedPacBio:
+    """Retrieve an AlignedPacBio instance by its ID or return None if not found."""
+
+    try:
+        aligned_pac_bio_instance = AlignedPacBio.objects.get(
+            aligned_pac_bio_id=aligned_pac_bio_id
+        )
+        return aligned_pac_bio_instance
+    except AlignedPacBio.DoesNotExist:
         return None
