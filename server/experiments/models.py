@@ -436,8 +436,9 @@ class ExperimentNanopore(models.Model):
         primary_key=True,
         help_text="Identifier for experiment_nanopore (primary key).",
     )
-    analyte = models.ForeignKey(
+    analyte_id = models.ForeignKey(
         Analyte,
+        to_field="analyte_id",
         on_delete=models.CASCADE,
         help_text="Identifier for the analyte used in the experiment.",
     )
@@ -458,16 +459,22 @@ class ExperimentNanopore(models.Model):
         help_text="Library prep kit used.",
     )
     fragmentation_method = models.TextField(
-        help_text="Method used for shearing/fragmentation."
+        blank=True, null=True, help_text="Method used for shearing/fragmentation."
     )
     experiment_type = models.CharField(
         max_length=255,
         choices=[("targeted", "targeted"), ("genome", "genome")],
         help_text="Type of experiment.",
     )
-    targeted_regions_method = models.TextField(help_text="Capture method used.")
-    targeted_region_bed_file = models.URLField(
-        help_text="Name and path of bed file uploaded to workspace."
+    targeted_regions_method = models.TextField(
+        blank=True, null=True, help_text="Capture method used."
+    )
+    targeted_region_bed_file = models.CharField(
+        max_length=1024,
+        blank=True,
+        null=True,
+        validators=[validate_cloud_url],
+        help_text="Name and path of bed file uploaded to workspace.",
     )
     date_data_generation = models.DateField(help_text="Date of data generation.")
     sequencing_platform = models.CharField(
@@ -512,17 +519,22 @@ class AlignedNanopore(models.Model):
         primary_key=True,
         help_text="Identifier for aligned_nanopore (primary key).",
     )
-    experiment_nanopore = models.ForeignKey(
+    experiment_nanopore_id = models.ForeignKey(
         "ExperimentNanopore",
+        to_field="experiment_nanopore_id",
         on_delete=models.CASCADE,
         help_text="Identifier for experiment, referencing the experiment_nanopore_id from the experiment_nanopore table.",
     )
-    aligned_nanopore_file = models.URLField(
+    aligned_nanopore_file = models.CharField(
         unique=True,
+        max_length=1024,
+        validators=[validate_cloud_url],
         help_text="Name and path of file with aligned reads. This must be a unique path.",
     )
-    aligned_nanopore_index_file = models.URLField(
+    aligned_nanopore_index_file = models.CharField(
         unique=True,
+        max_length=1024,
+        validators=[validate_cloud_url],
         help_text="Name and path of index file corresponding to aligned reads file. This must be a unique path.",
     )
     md5sum = models.CharField(
@@ -548,45 +560,67 @@ class AlignedNanopore(models.Model):
         help_text="Software including version number used for alignment.",
     )
     analysis_details = models.TextField(
-        help_text="Brief description of the analysis pipeline used for producing the file."
+        blank=True,
+        null=True,
+        help_text="Brief description of the analysis pipeline used for producing the file.",
     )
     mean_coverage = models.FloatField(
-        help_text="Mean coverage of either the genome or the targeted regions."
+        blank=True,
+        null=True,
+        help_text="Mean coverage of either the genome or the targeted regions.",
     )
     genome_coverage = models.IntegerField(
-        help_text="Percentage of the genome covered at a certain depth (e.g., >=90% at 10x or 20x)."
+        blank=True,
+        null=True,
+        help_text="Percentage of the genome covered at a certain depth (e.g., >=90% at 10x or 20x).",
     )
     contamination = models.FloatField(
-        help_text="Contamination level estimate, e.g., <1% (display raw fraction not percent)."
+        blank=True,
+        null=True,
+        help_text="Contamination level estimate, e.g., <1% (display raw fraction not percent).",
     )
     sex_concordance = models.BooleanField(
-        help_text="Comparison between reported sex vs genotype sex."
+        blank=True,
+        null=True,
+        help_text="Comparison between reported sex vs genotype sex.",
     )
-    num_reads = models.IntegerField(help_text="Total reads before ignoring alignment.")
+    num_reads = models.IntegerField(
+        blank=True, null=True, help_text="Total reads before ignoring alignment."
+    )
     num_bases = models.IntegerField(
-        help_text="Number of bases before ignoring alignment."
+        blank=True, null=True, help_text="Number of bases before ignoring alignment."
     )
     read_length_mean = models.IntegerField(
-        help_text="Mean length of all reads before ignoring alignment."
+        blank=True,
+        null=True,
+        help_text="Mean length of all reads before ignoring alignment.",
     )
-    num_aligned_reads = models.IntegerField(help_text="Total aligned reads.")
+    num_aligned_reads = models.IntegerField(
+        blank=True, null=True, help_text="Total aligned reads."
+    )
     num_aligned_bases = models.IntegerField(
-        help_text="Number of bases in aligned reads."
+        blank=True, null=True, help_text="Number of bases in aligned reads."
     )
     aligned_read_length_mean = models.IntegerField(
-        help_text="Mean length of aligned reads."
+        blank=True, null=True, help_text="Mean length of aligned reads."
     )
     read_error_rate = models.FloatField(
-        help_text="Mean empirical per-base error rate of aligned reads."
+        blank=True,
+        null=True,
+        help_text="Mean empirical per-base error rate of aligned reads.",
     )
     mapped_reads_pct = models.FloatField(
-        help_text="Number between 1 and 100, representing the percentage of reads that mapped to the reference."
+        blank=True,
+        null=True,
+        help_text="Number between 1 and 100, representing the percentage of reads that mapped to the reference.",
     )
     methylation_called = models.BooleanField(
         help_text="Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags."
     )
     quality_issues = models.TextField(
-        help_text="Describe if there are any QC issues that would be important to note."
+        blank=True,
+        null=True,
+        help_text="Describe if there are any QC issues that would be important to note.",
     )
 
     def __str__(self):
