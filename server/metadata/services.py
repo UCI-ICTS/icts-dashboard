@@ -14,6 +14,7 @@ from metadata.models import (
 )
 from metadata.selectors import get_participant
 
+
 class AnalyteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Analyte

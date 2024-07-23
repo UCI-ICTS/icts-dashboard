@@ -596,7 +596,7 @@ class Analyte(models.Model):
     analyte_processing_details = models.TextField(
         null=True,
         blank=True,
-        help_text="Details about how the analyte or original biosample was extracted or processed"
+        help_text="Details about how the analyte or original biosample was extracted or processed",
     )
     primary_biosample = models.CharField(
         max_length=100,
@@ -643,42 +643,40 @@ class Analyte(models.Model):
     age_at_collection = models.FloatField(
         blank=True,
         null=True,
-        help_text="Age of participant in years at biosample collection"
+        help_text="Age of participant in years at biosample collection",
     )
     participant_drugs_intake = models.TextField(
         blank=True,
         null=True,
-        help_text="The list of drugs patient is on, at the time of sample collection. Helpful during analysis of metabolomics and immune assays"
+        help_text="The list of drugs patient is on, at the time of sample collection. Helpful during analysis of metabolomics and immune assays",
     )
     participant_special_diet = models.TextField(
         blank=True,
         null=True,
-        help_text="If the patient was fasting, when the sample was collected. Relevant when analyzing metabolomics data"
+        help_text="If the patient was fasting, when the sample was collected. Relevant when analyzing metabolomics data",
     )
     hours_since_last_meal = models.FloatField(
         null=True,
         blank=True,
-        help_text="Hours since last meal, relevant when analyzing metabolomics data"
+        help_text="Hours since last meal, relevant when analyzing metabolomics data",
     )
     passage_number = models.IntegerField(
         blank=True,
         null=True,
-        help_text="Passage number is relevant for fibroblast cultures and possibly iPSC."
+        help_text="Passage number is relevant for fibroblast cultures and possibly iPSC.",
     )
     time_to_freeze = models.FloatField(
         blank=True,
         null=True,
-        help_text="Time (in hours) from collection to freezing the sample. Delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation)."
+        help_text="Time (in hours) from collection to freezing the sample. Delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation).",
     )
     sample_transformation_detail = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Details regarding sample transformation"
+        blank=True, null=True, help_text="Details regarding sample transformation"
     )
     quality_issues = models.TextField(
         blank=True,
         null=True,
-        help_text="Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+        help_text="Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note",
     )
 
     def __str__(self):

@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from metadata.models import Analyte, Participant, VariantType
 from config.selectors import validate_cloud_url
 
+
 class Experiment(models.Model):
     EXPERIMENT_TYPES = [
         ("experiment_dna_short_read", "DNA Short Read"),
@@ -157,15 +158,13 @@ class AlignedDNAShortRead(models.Model):
         "ExperimentDNAShortRead",
         on_delete=models.CASCADE,
         to_field="experiment_dna_short_read_id",
-        db_column="experiment_dna_short_read_id"
+        db_column="experiment_dna_short_read_id",
     )
     aligned_dna_short_read_file = models.CharField(
-        max_length=1024,
-        validators=[validate_cloud_url]
+        max_length=1024, validators=[validate_cloud_url]
     )
     aligned_dna_short_read_index_file = models.CharField(
-        max_length=1024,
-        validators=[validate_cloud_url]
+        max_length=1024, validators=[validate_cloud_url]
     )
     md5sum = models.CharField(max_length=32, unique=True)
     reference_assembly = models.CharField(
@@ -655,8 +654,9 @@ class ExperimentPacBio(models.Model):
         primary_key=True,
         help_text="identifier for experiment_short_read (primary key)",
     )
-    analyte = models.ForeignKey(
+    analyte_id = models.ForeignKey(
         Analyte,
+        to_field="analyte_id",
         on_delete=models.CASCADE,
         help_text="Analyte identifier linked to the ExperimentPacBio",
     )
