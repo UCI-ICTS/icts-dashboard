@@ -55,7 +55,7 @@ class AlignedRNAShortReadAdmin(admin.ModelAdmin):
 
 
 class ExperimentRNAShortReadAdmin(admin.ModelAdmin):
-     list_display = ["experiment_rna_short_read_id"]
+    list_display = ["experiment_rna_short_read_id"]
 
 
 admin.site.register(LibraryPrepType)

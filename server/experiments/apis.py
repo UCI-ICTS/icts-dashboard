@@ -958,9 +958,7 @@ class CreateOrUpdateAlignedRna(APIView):
                             response_constructor(
                                 identifier=identifier,
                                 status=(
-                                    "UPDATED"
-                                    if existing_aligned_rna
-                                    else "CREATED"
+                                    "UPDATED" if existing_aligned_rna else "CREATED"
                                 ),
                                 code=200 if existing_aligned_rna else 201,
                                 message=(
@@ -995,9 +993,7 @@ class CreateOrUpdateAlignedRna(APIView):
                         continue
 
                 else:
-                    errors = (
-                        rna_aligned_results["errors"] + aligned_results["errors"]
-                    )
+                    errors = rna_aligned_results["errors"] + aligned_results["errors"]
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
@@ -1064,13 +1060,8 @@ class CreateOrUpdateExperimentRna(APIView):
                 )
                 rna_results = validator.get_validation_results()
 
-                if (
-                    rna_results["valid"] is True
-                    and experiment_results["valid"] is True
-                ):
-                    existing_rna = get_experiment_rna(
-                        experiment_rna=identifier
-                    )
+                if rna_results["valid"] is True and experiment_results["valid"] is True:
+                    existing_rna = get_experiment_rna(experiment_rna=identifier)
                     rna_serializer = ExperimentRnaSerializer(
                         existing_rna, data=parsed_rna
                     )
@@ -1091,9 +1082,7 @@ class CreateOrUpdateExperimentRna(APIView):
                                     if existing_rna
                                     else f"Short read RNA experiment {identifier} created."
                                 ),
-                                data=ExperimentRnaSerializer(
-                                    rna_instance
-                                ).data,
+                                data=ExperimentRnaSerializer(rna_instance).data,
                             )
                         )
                         accepted_requests = True
