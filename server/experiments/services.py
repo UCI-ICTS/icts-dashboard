@@ -8,11 +8,79 @@ from experiments.models import (
     AlignedDNAShortRead,
     AlignedNanopore,
     AlignedPacBio,
+    AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
+    ExperimentRNAShortRead,
+    LibraryPrepType,
+    ExperimentType,
 )
+
+
+from rest_framework import serializers
+from .models import ExperimentRNAShortRead, LibraryPrepType, ExperimentType
+
+class LibraryPrepTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LibraryPrepType
+        fields = ['name']
+
+class ExperimentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperimentType
+        fields = ['name']
+
+class ExperimentRnaSerializer(serializers.ModelSerializer):
+    library_prep_type = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=LibraryPrepType.objects.all()
+    )
+    
+    experiment_type = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=ExperimentType.objects.all()
+    )
+
+    class Meta:
+        model = ExperimentRNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new ExperimentRNAShortRead instance using the validated data and set the many-to-many relationships"""
+
+        library_prep_types_data = validated_data.pop('library_prep_type')
+        experiment_types_data = validated_data.pop('experiment_type')
+        
+        experiment_rna_short_read_id = validated_data.get("experiment_rna_short_read_id")
+        experiment_rna_instance, created = ExperimentRNAShortRead.objects.get_or_create(
+            experiment_rna_short_read_id=experiment_rna_short_read_id, defaults=validated_data
+        )
+
+        experiment_rna_instance.library_prep_type.set(library_prep_types_data)
+        experiment_rna_instance.experiment_type.set(experiment_types_data)
+
+        return experiment_rna_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        library_prep_types_data = validated_data.pop('library_prep_type', None)
+        experiment_types_data = validated_data.pop('experiment_type', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+
+        if library_prep_types_data is not None:
+            instance.library_prep_type.set(library_prep_types_data)
+        if experiment_types_data is not None:
+            instance.experiment_type.set(experiment_types_data)
+
+        return instance
 
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
@@ -182,6 +250,12 @@ class AlignedPacBioSerializer(serializers.ModelSerializer):
 class AlignedNanoporeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedNanopore
+        fields = "__all__"
+
+
+class AlignedRnaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedRNAShortRead
         fields = "__all__"
 
 
