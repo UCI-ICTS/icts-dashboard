@@ -241,9 +241,11 @@ def parse_rna_aligned(rna_aligned: dict) -> dict:
     experiment_rna_short_read_id = rna_aligned.get("experiment_rna_short_read_id")
     try:
         # Fetch the Experiment RNA along with the related Analyte and Participant in a single query
-        experiment_rna = ExperimentRNAShortRead.objects.select_related('analyte_id__participant_id').get(experiment_rna_short_read_id=experiment_rna_short_read_id)
+        experiment_rna = ExperimentRNAShortRead.objects.select_related(
+            "analyte_id__participant_id"
+        ).get(experiment_rna_short_read_id=experiment_rna_short_read_id)
         participant_id = experiment_rna.analyte_id.participant_id.participant_id
-    
+
     except ExperimentRNAShortRead.DoesNotExist:
         participant_id = "NA"
     except Analyte.DoesNotExist:
@@ -279,7 +281,7 @@ def parse_rna(rna_datum: dict) -> dict:
     - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
       fields are properly formatted.
     """
-    
+
     identifier = rna_datum["experiment_rna_short_read_id"]
     participant_id = get_analyte(rna_datum["analyte_id"]).participant_id.participant_id
 
@@ -291,8 +293,8 @@ def parse_rna(rna_datum: dict) -> dict:
     }
 
     for key, value in rna_datum.items():
-        if isinstance(value, str) and '|' in value:
-            rna_datum[key] = value.split('|')
+        if isinstance(value, str) and "|" in value:
+            rna_datum[key] = value.split("|")
         if key in ["read_length", "RIN", "total_reads"]:
             try:
                 rna_datum[key] = int(rna_datum[key])

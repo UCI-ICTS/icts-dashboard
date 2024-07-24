@@ -247,6 +247,7 @@ class CalledVariantsDNAShortRead(models.Model):
     def __str__(self):
         return self.called_variants_dna_short_read_id
 
+
 class LibraryPrepType(models.Model):
     name = models.CharField(max_length=255, unique=True)
     display_name = models.CharField(max_length=255)
@@ -285,7 +286,7 @@ class ExperimentRNAShortRead(models.Model):
     )
     library_prep_type = models.ManyToManyField(
         "LibraryPrepType",
-        blank= True,
+        blank=True,
         help_text="Type of library prep used.",
     )
     experiment_type = models.ManyToManyField(
@@ -396,8 +397,7 @@ class AlignedRNAShortRead(models.Model):
         help_text="URI for reference assembly file."
     )
     reference_assembly_details = models.TextField(
-        blank=True, null=True,
-        help_text="Details about the reference assembly used."
+        blank=True, null=True, help_text="Details about the reference assembly used."
     )
     gene_annotation = models.CharField(
         max_length=255, help_text="Annotation file used for alignment."
@@ -410,32 +410,31 @@ class AlignedRNAShortRead(models.Model):
         help_text="Software including version number used for alignment.",
     )
     alignment_log_file = models.CharField(
-        max_length=255, blank=True, null=True,
+        max_length=255,
+        blank=True,
+        null=True,
         help_text="Path of (log) file with all parameters for alignment software.",
     )
     alignment_postprocessing = models.TextField(
-        blank=True, null=True,
-        help_text="Post processing applied to alignment."
+        blank=True, null=True, help_text="Post processing applied to alignment."
     )
     mean_coverage = models.FloatField(
         null=True,
-        help_text="Mean coverage of either the genome or the targeted regions."
+        help_text="Mean coverage of either the genome or the targeted regions.",
     )
     percent_uniquely_aligned = models.FloatField(
-        null=True,
-        help_text="Percentage of reads that aligned to just one place."
+        null=True, help_text="Percentage of reads that aligned to just one place."
     )
     percent_multimapped = models.FloatField(
-        null=True,
-        help_text="Percentage of reads that aligned to multiple places."
+        null=True, help_text="Percentage of reads that aligned to multiple places."
     )
     percent_unaligned = models.FloatField(
-        null=True,
-        help_text="Percentage of reads that didn't align."
+        null=True, help_text="Percentage of reads that didn't align."
     )
     quality_issues = models.TextField(
-        blank=True, null=True,
-        help_text="Any QC issues that would be important to note."
+        blank=True,
+        null=True,
+        help_text="Any QC issues that would be important to note.",
     )
 
     def __str__(self):
