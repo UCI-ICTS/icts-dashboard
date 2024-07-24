@@ -21,13 +21,29 @@
         "description": "Library prep kit used."
       },
       "library_prep_type": {
-        "type": "string",
-        "enum": ["stranded poly-A pulldown", "stranded total RNA", "rRNA depletion", "globin depletion"],
-        "description": "Type of library prep."
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "stranded poly-A pulldown",
+              "stranded total RNA",
+              "rRNA depletion",
+              "globin depletion"
+            ]
+          },
+          "description": "Types of library prep."
       },
       "experiment_type": {
-        "type": "string",
-        "enum": ["single-end", "paired-end", "targeted", "untargeted"],
+        "type": "array",
+        "items":  {
+          "type": "string",
+          "enum": [
+            "single-end",
+            "paired-end",
+            "targeted",
+            "untargeted"
+          ]
+        },
         "description": "Type of experiment."
       },
       "read_length": {
@@ -107,8 +123,7 @@
       "read_length",
       "single_or_paired_ends",
       "sequencing_platform",
-      "within_site_batch_name",
-      "date_data_generation"
+      "within_site_batch_name"
     ]
   }
   

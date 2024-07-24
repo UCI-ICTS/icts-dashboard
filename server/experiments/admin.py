@@ -11,6 +11,10 @@ from experiments.models import (
     ExperimentPacBio,
     AlignedNanopore,
     ExperimentNanopore,
+    AlignedRNAShortRead,
+    ExperimentRNAShortRead,
+    ExperimentType,
+    LibraryPrepType,
 )
 
 
@@ -46,6 +50,16 @@ class ExperimentNanoporeAdmin(admin.ModelAdmin):
     list_display = ["experiment_nanopore_id"]
 
 
+class AlignedRNAShortReadAdmin(admin.ModelAdmin):
+    list_display = ["aligned_rna_short_read_id"]
+
+
+class ExperimentRNAShortReadAdmin(admin.ModelAdmin):
+     list_display = ["experiment_rna_short_read_id"]
+
+
+admin.site.register(LibraryPrepType)
+admin.site.register(ExperimentType)
 admin.site.register(Aligned, AlignedAdmin)
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(AlignedDNAShortRead, AlignedDNAShortReadAdmin)
@@ -54,3 +68,5 @@ admin.site.register(AlignedPacBio, AlignedPacBioAdmin)
 admin.site.register(ExperimentPacBio, ExperimentPacBioAdmin)
 admin.site.register(AlignedNanopore, AlignedNanoporeAdmin)
 admin.site.register(ExperimentNanopore, ExperimentNanoporeAdmin)
+admin.site.register(AlignedRNAShortRead, AlignedRNAShortReadAdmin)
+admin.site.register(ExperimentRNAShortRead, ExperimentRNAShortReadAdmin)

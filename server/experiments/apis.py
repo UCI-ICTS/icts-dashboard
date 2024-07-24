@@ -10,25 +10,31 @@ from experiments.services import (
     AlignedDNAShortReadSerializer,
     AlignedNanoporeSerializer,
     AlignedPacBioSerializer,
+    AlignedRnaSerializer,
     AlignedService,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
+    ExperimentRnaSerializer,
     ExperimentService,
 )
 from experiments.selectors import (
     get_aligned_pac_bio,
     get_aligned_dna_short_read,
     get_aligned_nanopore,
+    get_aligned_rna,
     get_experiment,
     get_experiment_dna_short_read,
     get_experiment_nanopore,
     get_experiment_pac_bio,
+    get_experiment_rna,
     parse_nanopore,
+    parse_rna,
     parse_nanopore_aligned,
     parse_pac_bio,
     parse_pac_bio_aligned,
+    parse_rna_aligned,
     parse_short_read,
     parse_short_read_aligned,
 )
@@ -494,7 +500,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
 
     @swagger_auto_schema(
         operation_id="create_pac_bio",
-        request_body=ExperimentShortReadSerializer(many=True),
+        request_body=ExperimentPacBioSerializer(many=True),
         responses={
             200: "All submissions of experiments were successfull",
             207: "Some submissions of experiments were not successful.",
@@ -854,6 +860,267 @@ class CreateOrUpdateExperimentNanopore(APIView):
 
                 else:
                     errors = nanopore_results["errors"] + experiment_results["errors"]
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateAlignedRna(APIView):
+    """Create or Update Aligned RNA
+
+    API view to create or update aligned RNA records.
+
+    This view handles the submission of one or more RNA entries,
+    performing validation and either creating new records or updating existing ones.
+    It integrates detailed validation and response formatting to ensure data integrity
+    and provide clear feedback to the client.
+
+    Iterates over the provided data, validating and processing each aligned DNA short read.
+    Valid entries are either updated or created in the database, and responses are
+    compiled to provide detailed feedback on the outcome of each entry.
+
+    Args:
+        request (Request): The request object containing the aligned RNA short read data.
+
+    Returns:
+        Response: A Response object containing the status code and a list of results for
+        each processed entry indicating whether it was successfully created or updated,
+        or if there were any errors.
+    """
+
+    @swagger_auto_schema(
+        operation_id="create_aligned_rna",
+        request_body=AlignedRnaSerializer(many=True),
+        responses={
+            200: "All submissions of aligned Nanopore data were successfull",
+            207: "Some submissions of aligned Nanopore data were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["aligned_rna_short_read_id"]
+                parsed_rna_aligned, aligned_data = parse_rna_aligned(rna_aligned=datum)
+                aligned_results = AlignedService.validate_aligned(
+                    aligned_data, validator
+                )
+                validator.validate_json(
+                    json_object=parsed_rna_aligned,
+                    table_name="aligned_rna_short_read",
+                )
+                rna_aligned_results = validator.get_validation_results()
+
+                if (
+                    rna_aligned_results["valid"] is True
+                    and aligned_results["valid"] is True
+                ):
+                    existing_aligned_rna = get_aligned_rna(
+                        aligned_rna_short_read_id=identifier
+                    )
+
+                    aligned_rna_serializer = AlignedRnaSerializer(
+                        existing_aligned_rna, data=parsed_rna_aligned
+                    )
+                    aligned_rna_valid = aligned_rna_serializer.is_valid()
+                    aligned_serializer = AlignedService.create_or_update_aligned(
+                        aligned_data
+                    )
+                    aligned_valid = aligned_serializer.is_valid()
+                    if aligned_valid and aligned_rna_valid:
+                        rna_instance = aligned_rna_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status=(
+                                    "UPDATED"
+                                    if existing_aligned_rna
+                                    else "CREATED"
+                                ),
+                                code=200 if existing_aligned_rna else 201,
+                                message=(
+                                    f"Nanopore alignement {identifier} updated."
+                                    if existing_aligned_rna
+                                    else f"Nanopore alignement {identifier} created."
+                                ),
+                                data=AlignedRnaSerializer(rna_instance).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: aligned_rna_serializer.errors[item]}
+                            for item in aligned_rna_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: aligned_serializer.errors[item]}
+                            for item in aligned_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = (
+                        rna_aligned_results["errors"] + aligned_results["errors"]
+                    )
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=errors,
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateExperimentRna(APIView):
+    """API view to create or update short read RNA experiments.
+
+    This view handles the POST request to create or update multiple short read RNA experiments.
+    It validates each experiment's data and constructs a response indicating the status
+    of each operation.
+
+    Args:
+        request (Request): The request object containing the data to process.
+
+    Returns:
+        Response: The response object containing the status and data of the operations.
+    """
+
+    @swagger_auto_schema(
+        operation_id="create_short_rna",
+        request_body=ExperimentRnaSerializer(many=True),
+        responses={
+            200: "All submissions of RNA experiments were successfull",
+            207: "Some submissions of RNA experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["experiment_rna_short_read_id"]
+                parsed_rna, experiment_data = parse_rna(rna_datum=datum)
+                experiment_results = ExperimentService.validate_experiment(
+                    experiment_data, validator
+                )
+                validator.validate_json(
+                    json_object=parsed_rna, table_name="experiment_rna_short_read"
+                )
+                rna_results = validator.get_validation_results()
+
+                if (
+                    rna_results["valid"] is True
+                    and experiment_results["valid"] is True
+                ):
+                    existing_rna = get_experiment_rna(
+                        experiment_rna=identifier
+                    )
+                    rna_serializer = ExperimentRnaSerializer(
+                        existing_rna, data=parsed_rna
+                    )
+                    experiment_serializer = (
+                        ExperimentService.create_or_update_experiment(experiment_data)
+                    )
+                    rna_valid = rna_serializer.is_valid()
+                    experiment_valid = experiment_serializer.is_valid()
+                    if experiment_valid and rna_valid:
+                        rna_instance = rna_serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="UPDATED" if existing_rna else "CREATED",
+                                code=200 if existing_rna else 201,
+                                message=(
+                                    f"Short read RNA experiment {identifier} updated."
+                                    if existing_rna
+                                    else f"Short read RNA experiment {identifier} created."
+                                ),
+                                data=ExperimentRnaSerializer(
+                                    rna_instance
+                                ).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: rna_serializer.errors[item]}
+                            for item in rna_serializer.errors
+                        ]
+                        error_data.extend(
+                            {item: experiment_serializer.errors[item]}
+                            for item in experiment_serializer.errors
+                        )
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    errors = rna_results["errors"] + experiment_results["errors"]
                     response_data.append(
                         response_constructor(
                             identifier=identifier,

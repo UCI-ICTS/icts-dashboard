@@ -4,17 +4,20 @@
 """Experiments Selectors
 """
 
+from config.selectors import remove_na
 from experiments.models import (
     AlignedDNAShortRead,
     AlignedPacBio,
     AlignedNanopore,
+    AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
+    ExperimentRNAShortRead,
 )
-
-from config.selectors import remove_na
+from metadata.selectors import get_analyte
+from metadata.models import Analyte, Participant
 
 
 def parse_short_read_aligned(short_read_aligned: dict) -> dict:
@@ -218,6 +221,88 @@ def parse_nanopore(nanopore: dict) -> dict:
     return parsed_nanopore
 
 
+def parse_rna_aligned(rna_aligned: dict) -> dict:
+    """
+    Parses and processes the nanopore_aligned dictionary to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - nanopore_aligned (dict): A dictionary containing nanopore data.
+
+    Returns:
+    - dict: A dictionary with the processed nanopore data. Fields with 'NA' values are excluded, and lists or numeric
+      fields are properly formatted.
+
+    """
+
+    identifier = rna_aligned.get("aligned_rna_short_read_id")
+    experiment_rna_short_read_id = rna_aligned.get("experiment_rna_short_read_id")
+    try:
+        # Fetch the Experiment RNA along with the related Analyte and Participant in a single query
+        experiment_rna = ExperimentRNAShortRead.objects.select_related('analyte_id__participant_id').get(experiment_rna_short_read_id=experiment_rna_short_read_id)
+        participant_id = experiment_rna.analyte_id.participant_id.participant_id
+    
+    except ExperimentRNAShortRead.DoesNotExist:
+        participant_id = "NA"
+    except Analyte.DoesNotExist:
+        participant_id = "NA"
+    except Participant.DoesNotExist:
+        participant_id = "NA"
+
+    aligned_data = {
+        "aligned_id": "aligned_rna_short_read" + "." + identifier,
+        "table_name": "aligned_rna_short_read",
+        "id_in_table": identifier,
+        "participant_id": participant_id,
+        "aligned_file": rna_aligned["aligned_rna_short_read_file"],
+        "aligned_index_file": rna_aligned["aligned_rna_short_read_index_file"],
+    }
+
+    parsed_rna_aligned = remove_na(datum=rna_aligned)
+
+    return parsed_rna_aligned, aligned_data
+
+
+def parse_rna(rna_datum: dict) -> dict:
+    """
+    Parses and processes the rna record to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - rna_datum (dict): A dictionary containing rna data.
+
+    Returns:
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
+      fields are properly formatted.
+    """
+    
+    identifier = rna_datum["experiment_rna_short_read_id"]
+    participant_id = get_analyte(rna_datum["analyte_id"]).participant_id.participant_id
+
+    experiment_data = {
+        "experiment_id": "experiment_rna_short_read" + "." + identifier,
+        "table_name": "experiment_rna_short_read",
+        "id_in_table": identifier,
+        "participant_id": participant_id,
+    }
+
+    for key, value in rna_datum.items():
+        if isinstance(value, str) and '|' in value:
+            rna_datum[key] = value.split('|')
+        if key in ["read_length", "RIN", "total_reads"]:
+            try:
+                rna_datum[key] = int(rna_datum[key])
+            except ValueError:
+                rna_datum[key] = "NA"
+
+    parsed_rna = remove_na(datum=rna_datum)
+    return parsed_rna, experiment_data
+
+
 def get_experiment(experiment_id: str) -> Experiment:
     """Retrieve an experiment instance by its ID or return None if not found."""
 
@@ -251,6 +336,30 @@ def get_experiment_pac_bio(experiment_pac_bio_id: str) -> ExperimentPacBio:
         )
         return experiment_pac_bio_instance
     except ExperimentPacBio.DoesNotExist:
+        return None
+
+
+def get_experiment_nanopore(experiment_nanopore_id: str) -> ExperimentNanopore:
+    """Retrieve an ExperimentNanopore instance by its ID or return None if not found."""
+
+    try:
+        experiment_nanopore_instance = ExperimentNanopore.objects.get(
+            experiment_nanopore_id=experiment_nanopore_id
+        )
+        return experiment_nanopore_instance
+    except ExperimentNanopore.DoesNotExist:
+        return None
+
+
+def get_experiment_rna(experiment_rna: str) -> ExperimentRNAShortRead:
+    """Retrieve an ExperimentRNAShortRead instance by its ID or return None if not found."""
+
+    try:
+        experiment_rna_instance = ExperimentRNAShortRead.objects.get(
+            experiment_rna_short_read_id=experiment_rna
+        )
+        return experiment_rna_instance
+    except ExperimentRNAShortRead.DoesNotExist:
         return None
 
 
@@ -290,13 +399,13 @@ def get_aligned_nanopore(aligned_nanopore_id: str) -> AlignedNanopore:
         return None
 
 
-def get_experiment_nanopore(experiment_nanopore_id: str) -> ExperimentNanopore:
-    """Retrieve an ExperimentNanopore instance by its ID or return None if not found."""
+def get_aligned_rna(aligned_rna_short_read_id: str) -> AlignedNanopore:
+    """Retrieve an AlignedRNAShortRead instance by its ID or return None if not found."""
 
     try:
-        experiment_nanopore_instance = ExperimentNanopore.objects.get(
-            experiment_nanopore_id=experiment_nanopore_id
+        aligned_rna_instance = AlignedRNAShortRead.objects.get(
+            aligned_rna_short_read_id=aligned_rna_short_read_id
         )
-        return experiment_nanopore_instance
-    except ExperimentNanopore.DoesNotExist:
+        return aligned_rna_instance
+    except AlignedRNAShortRead.DoesNotExist:
         return None

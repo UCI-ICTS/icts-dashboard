@@ -247,6 +247,21 @@ class CalledVariantsDNAShortRead(models.Model):
     def __str__(self):
         return self.called_variants_dna_short_read_id
 
+class LibraryPrepType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    display_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.display_name
+
+
+class ExperimentType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    display_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.display_name
+
 
 class ExperimentRNAShortRead(models.Model):
     experiment_rna_short_read_id = models.CharField(
@@ -254,7 +269,7 @@ class ExperimentRNAShortRead(models.Model):
         primary_key=True,
         help_text="Identifier for experiment_rna_short_read (primary key).",
     )
-    analyte = models.ForeignKey(
+    analyte_id = models.ForeignKey(
         Analyte,
         on_delete=models.CASCADE,
         help_text="Reference to the analyte ID from which this experiment derives.",
@@ -268,24 +283,13 @@ class ExperimentRNAShortRead(models.Model):
         blank=True,
         help_text="Library prep kit used, can be missing if RC receives external data.",
     )
-    library_prep_type = models.CharField(
-        max_length=255,
-        choices=[
-            ("stranded poly-A pulldown", "Stranded Poly-A Pulldown"),
-            ("stranded total RNA", "Stranded Total RNA"),
-            ("rRNA depletion", "rRNA Depletion"),
-            ("globin depletion", "Globin Depletion"),
-        ],
+    library_prep_type = models.ManyToManyField(
+        "LibraryPrepType",
+        blank= True,
         help_text="Type of library prep used.",
     )
-    experiment_type = models.CharField(
-        max_length=255,
-        choices=[
-            ("single-end", "Single-End"),
-            ("paired-end", "Paired-End"),
-            ("targeted", "Targeted"),
-            ("untargeted", "Untargeted"),
-        ],
+    experiment_type = models.ManyToManyField(
+        "ExperimentType",
         help_text="Type of RNA sequencing experiment.",
     )
     read_length = models.IntegerField(
@@ -358,8 +362,9 @@ class AlignedRNAShortRead(models.Model):
         primary_key=True,
         help_text="Identifier for aligned_short_read (primary key).",
     )
-    experiment_rna_short_read = models.ForeignKey(
+    experiment_rna_short_read_id = models.ForeignKey(
         "ExperimentRNAShortRead",
+        to_field="experiment_rna_short_read_id",
         on_delete=models.CASCADE,
         help_text="Identifier for experiment.",
     )
@@ -391,6 +396,7 @@ class AlignedRNAShortRead(models.Model):
         help_text="URI for reference assembly file."
     )
     reference_assembly_details = models.TextField(
+        blank=True, null=True,
         help_text="Details about the reference assembly used."
     )
     gene_annotation = models.CharField(
@@ -404,25 +410,31 @@ class AlignedRNAShortRead(models.Model):
         help_text="Software including version number used for alignment.",
     )
     alignment_log_file = models.CharField(
-        max_length=255,
+        max_length=255, blank=True, null=True,
         help_text="Path of (log) file with all parameters for alignment software.",
     )
     alignment_postprocessing = models.TextField(
+        blank=True, null=True,
         help_text="Post processing applied to alignment."
     )
     mean_coverage = models.FloatField(
+        null=True,
         help_text="Mean coverage of either the genome or the targeted regions."
     )
     percent_uniquely_aligned = models.FloatField(
+        null=True,
         help_text="Percentage of reads that aligned to just one place."
     )
     percent_multimapped = models.FloatField(
+        null=True,
         help_text="Percentage of reads that aligned to multiple places."
     )
     percent_unaligned = models.FloatField(
+        null=True,
         help_text="Percentage of reads that didn't align."
     )
     quality_issues = models.TextField(
+        blank=True, null=True,
         help_text="Any QC issues that would be important to note."
     )
 

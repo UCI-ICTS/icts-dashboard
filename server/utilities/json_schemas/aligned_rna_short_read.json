@@ -86,11 +86,7 @@
       "md5sum",
       "reference_assembly",
       "gene_annotation",
-      "alignment_software",
-      "mean_coverage",
-      "percent_uniquely_aligned",
-      "percent_multimapped",
-      "percent_unaligned"
+      "alignment_software"
     ]
   }
   
