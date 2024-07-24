@@ -21,25 +21,29 @@ class InternalProjectId(models.Model):
 
 
 class VariantType(models.TextChoices):
-    SNV = "SNV", "Single Nucleotide Variant"
-    INDEL = "INDEL", "Insertion/Deletion"
+    SNVINDEL = "SNV/INDEL", "Single Nucleotide Variant or Insertion/Deletion"
     SV = "SV", "Structural Variant"
-    CNV = "CNV", "Copy Number Variant"
     RE = "RE", "Repeat Expansion"
-    MEI = "MEI", "Mobile Element Insertion"
-    STR = "STR", "Short Tandem Repeat"
 
 
 class Zygosity(models.TextChoices):
     HOMOZYGOUS = "Homozygous", "Homozygous"
     HETEROZYGOUS = "Heterozygous", "Heterozygous"
     HEMIZYGOUS = "Hemizygous", "Hemizygous"
+    HETEROPLASMY = "Heteroplasmy", "Heteroplasmy"
+    HOMOPLASMY = "Homoplasmy", "Homoplasmy"
+    MOSAIC = "Mosaic", "Mosaic"
+    UNKNOWN = "Unknown", "Unknown"
 
 
 class VariantInheritance(models.TextChoices):
-    DE_NOVO = "De Novo", "De Novo"
-    INHERITED = "Inherited", "Inherited"
-    UNKNOWN = "Unknown", "Unknown"
+    DE_NOVO = "de novo", "De Novo"
+    MATERNAL = "maternal", "Maternal"
+    PATERNAL = "paternal", "Paternal"
+    BIPARENTAL = "biparental", "Biparental"
+    NONMATERNAL = "nonmaternal", "Nonmaternal"
+    NONPATERNAL = "nonpaternal", "Nonpaternal"
+    UNKNOWN = "unknown", "Unknown"
 
 
 class GeneDiseaseValidity(models.TextChoices):
@@ -48,8 +52,31 @@ class GeneDiseaseValidity(models.TextChoices):
 
 
 class DiscoveryMethod(models.TextChoices):
-    SEQUENCING = "Sequencing", "Sequencing"
-    GWAS = "GWAS", "Genome Wide Association Study"
+    SR_ES = "SR-ES", "Short Read Exome Sequencing"
+    SR_GS = "SR-GS", "Short Read Genome Sequencing"
+    LR_GS = "LR-GS", "Long Read Genome Sequencing"
+    SNP_ARRAY = "SNP array", "SNP Array"
+    OPTICAL_MAPPING = "Optical mapping", "Optical Mapping"
+    KARYOTYPE = "Karyotype", "Karyotype"
+    SR_RNA_SEQ = "SR RNA-seq", "Short Read RNA Sequencing"
+    LR_RNA_SEQ = "LR RNA-seq", "Long Read RNA Sequencing"
+    SR_ES_REANALYSIS = "SR-ES-reanalysis", "Short Read Exome Sequencing Reanalysis"
+    SR_GS_REANALYSIS = "SR-GS-reanalysis", "Short Read Genome Sequencing Reanalysis"
+    LR_GS_REANALYSIS = "LR-GS-reanalysis", "Long Read Genome Sequencing Reanalysis"
+    SNP_ARRAY_REANALYSIS = "SNP array-reanalysis", "SNP Array Reanalysis"
+    OPTICAL_MAPPING_REANALYSIS = (
+        "Optical mapping-reanalysis",
+        "Optical Mapping Reanalysis",
+    )
+    KARYOTYPE_REANALYSIS = "Karyotype-reanalysis", "Karyotype Reanalysis"
+    SR_RNA_SEQ_REANALYSIS = (
+        "SR RNA-seq-reanalysis",
+        "Short Read RNA Sequencing Reanalysis",
+    )
+    LR_RNA_SEQ_REANALYSIS = (
+        "LR RNA-seq-reanalysis",
+        "Long Read RNA Sequencing Reanalysis",
+    )
 
 
 class GregorCenter(models.TextChoices):
@@ -458,6 +485,8 @@ class GeneticFindings(models.Model):
     )
     gene_of_interest = models.CharField(
         max_length=255,
+        blank=True,
+        null=True,
         help_text="HGNC approved symbol of the known or candidate gene(s)",
     )
     transcript = models.CharField(
@@ -525,6 +554,8 @@ class GeneticFindings(models.Model):
     )
     gene_disease_validity = models.CharField(
         max_length=50,
+        blank=True,
+        null=True,
         choices=GeneDiseaseValidity.choices,
         help_text="Validity assessment of the gene-disease relationship",
     )
@@ -541,9 +572,9 @@ class GeneticFindings(models.Model):
         blank=True,
         help_text="Contribution of variant-linked condition to participant's phenotype",
     )
-    partial_contribution_explained = models.ManyToManyField(
-        Phenotype,
+    partial_contribution_explained = models.JSONField(
         blank=True,
+        default=list,
         help_text="Specific phenotypes explained by the condition associated with this variant/gene in cases of partial contribution",
     )
     additional_family_members_with_variant = models.ManyToManyField(
@@ -554,6 +585,7 @@ class GeneticFindings(models.Model):
     )
     method_of_discovery = models.CharField(
         max_length=50,
+        blank=True,
         choices=DiscoveryMethod.choices,
         help_text="The method/assay(s) used to identify the candidate",
     )
