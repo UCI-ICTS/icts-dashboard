@@ -19,6 +19,7 @@ from config.selectors import (
 from metadata.models import Participant, Family, Analyte
 from metadata.services import (
     AnalyteSerializer,
+    GeneticFindingsSerializer,
     ParticipantSerializer,
     FamilySerializer,
     PhenotypeSerializer,
@@ -26,9 +27,11 @@ from metadata.services import (
 )
 from metadata.selectors import (
     parse_participant,
+    parse_geneti_findings,
     get_family,
     get_phenotype,
     get_analyte,
+    get_genetic_findings,
 )
 
 
@@ -429,6 +432,105 @@ class CreateOrUpdateAnalyte(APIView):
                                     else f"Analyte {identifier} created."
                                 ),
                                 data=AnalyteSerializer(analyte_instance).data,
+                            )
+                        )
+                        accepted_requests = True
+
+                    else:
+                        error_data = [
+                            {item: serializer.errors[item]}
+                            for item in serializer.errors
+                        ]
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status="BAD REQUEST",
+                                code=400,
+                                data=error_data,
+                            )
+                        )
+                        rejected_requests = True
+                        continue
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            status="BAD REQUEST",
+                            code=400,
+                            data=results["errors"],
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+
+            status_code = response_status(accepted_requests, rejected_requests)
+
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(
+                0,
+                response_constructor(
+                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                ),
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateOrUpdateGeneticFindings(APIView):
+    """ """
+
+    @swagger_auto_schema(
+        operation_id="create_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
+        responses={
+            200: "All submissions of genetic findings were successfull",
+            207: "Some submissions of genetic findings were not successful.",
+            400: "Bad request",
+        },
+        tags=["Genetic Findings"],
+    )
+    def post(self, request):
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for datum in request.data:
+                identifier = datum["genetic_findings_id"]
+                parsed_geneti_findings = parse_geneti_findings(genetic_findings=datum)
+                validator.validate_json(
+                    json_object=parsed_geneti_findings, table_name="genetic_findings"
+                )
+
+                results = validator.get_validation_results()
+                if results["valid"] is True:
+                    genetic_findings_instance = get_genetic_findings(
+                        genetic_findings_id=identifier
+                    )
+                    serializer = GeneticFindingsSerializer(
+                        genetic_findings_instance, data=parsed_geneti_findings
+                    )
+                    if serializer.is_valid():
+                        genetic_findings_instance = serializer.save()
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                status=(
+                                    "UPDATED"
+                                    if genetic_findings_instance
+                                    else "CREATED"
+                                ),
+                                code=200 if genetic_findings_instance else 201,
+                                message=(
+                                    f"Genetic Findings {identifier} updated."
+                                    if genetic_findings_instance
+                                    else f"Genetic Findings {identifier} created."
+                                ),
+                                data=GeneticFindingsSerializer(
+                                    genetic_findings_instance
+                                ).data,
                             )
                         )
                         accepted_requests = True

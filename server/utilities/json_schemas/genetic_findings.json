@@ -18,7 +18,7 @@
         },
         "variant_type": {
             "type": "string",
-            "enum": ["SNP", "INDEL", "CNV", "SV"],
+            "enum": ["SNV/INDEL", "RE", "SV"],
             "description": "Type of genetic variant."
         },
         "sv_type": {
@@ -84,7 +84,7 @@
         },
         "zygosity": {
             "type": "string",
-            "enum": ["Homozygous", "Heterozygous", "Hemizygous"],
+            "enum": ["Heterozygous", "Homozygous", "Hemizygous", "Heteroplasmy", "Homoplasmy", "Mosaic", "Unknown"],
             "description": "Zygosity of the variant."
         },
         "allele_balance_or_heteroplasmy_percentage": {
@@ -93,7 +93,7 @@
         },
         "variant_inheritance": {
             "type": "string",
-            "enum": ["De Novo", "Inherited", "Unknown"],
+            "enum": ["de novo", "maternal", "paternal", "biparental", "nonmaternal", "nonpaternal", "unknown"],
             "description": "Detection of variant in parents."
         },
         "linked_variant": {
@@ -175,17 +175,27 @@
         "pos",
         "ref",
         "alt",
-        "gene_of_interest",
         "transcript",
         "hgvsc",
-        "hgvsp",
-        "hgvs",
-        "zygosity",
         "variant_inheritance",
-        "gene_known_for_phenotype",
-        "known_condition_name",
-        "condition_id",
-        "GREGoR_variant_classification",
-        "gene_disease_validity"
+        "gene_known_for_phenotype"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": { "gene_known_for_phenotype": { "const": "Known" } }
+            },
+            "then": {
+                "required": ["known_condition_name", "condition_id"]
+            }
+        },
+        {
+            "if": {
+                "properties": { "phenotype_contribution": { "const": "Partial" } }
+            },
+            "then": {
+                "required": ["partial_contribution_explained"]
+            }
+        }
     ]
 }

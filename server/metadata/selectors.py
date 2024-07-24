@@ -4,7 +4,7 @@
 """Metadata Selectors
 """
 
-from metadata.models import Family, Phenotype, Analyte, Participant
+from metadata.models import Family, Phenotype, Analyte, Participant, GeneticFindings
 from config.selectors import remove_na
 
 
@@ -14,6 +14,17 @@ def get_analyte(analyte_id: str) -> Family:
         analyte_instance = Analyte.objects.get(analyte_id=analyte_id)
         return analyte_instance
     except Analyte.DoesNotExist:
+        return None
+
+
+def get_genetic_findings(genetic_findings_id: str) -> GeneticFindings:
+    """Retrieve a GeneticFindings instance by its ID or return None if not found."""
+    try:
+        get_genetic_findings_instance = GeneticFindings.objects.get(
+            genetic_findings_id=genetic_findings_id
+        )
+        return get_genetic_findings_instance
+    except GeneticFindings.DoesNotExist:
         return None
 
 
@@ -42,6 +53,34 @@ def get_participant(participant_id: str) -> Participant:
         return participant_instance
     except Participant.DoesNotExist:
         return None
+
+
+def parse_geneti_findings(genetic_findings: str) -> dict:
+    """"""
+    for key, value in genetic_findings.items():
+        if isinstance(value, str) and "|" in value:
+            genetic_findings[key] = value.split("|")
+        if key == "pos" and genetic_findings[key] != "NA":
+            try:
+                genetic_findings["pos"] = float(genetic_findings["pos"])
+            except ValueError:
+                genetic_findings["pos"] = "NA"
+        if (
+            key == "allele_balance_or_heteroplasmy_percentage"
+            and genetic_findings[key] != "NA"
+        ):
+            try:
+                genetic_findings[key] = int(genetic_findings[key])
+            except ValueError:
+                genetic_findings[key] = "NA"
+        if (
+            key == "partial_contribution_explained"
+            and type(genetic_findings[key]) == str
+        ):
+            genetic_findings[key] = [value]
+
+    parsed_geneti_findings = remove_na(datum=genetic_findings)
+    return parsed_geneti_findings
 
 
 def parse_participant(participant: dict) -> dict:

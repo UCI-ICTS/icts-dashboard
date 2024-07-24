@@ -8,6 +8,7 @@ click==8.1.7
 coverage==7.5.3
 Django==5.0.1
 django-cors-headers==4.3.1
+django-extensions==3.2.3
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 drf-yasg==1.21.7
@@ -29,6 +30,7 @@ pathspec==0.12.1
 platformdirs==4.2.2
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
+pygraphviz==1.13
 PyJWT==2.8.0
 pyparsing==3.1.2
 pytz==2023.3.post1

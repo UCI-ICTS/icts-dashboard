@@ -5,6 +5,7 @@ from django.db import transaction, IntegrityError
 from rest_framework import serializers
 from metadata.models import (
     Analyte,
+    GeneticFindings,
     Participant,
     Family,
     Phenotype,
@@ -13,6 +14,23 @@ from metadata.models import (
     TwinId,
 )
 from metadata.selectors import get_participant
+
+
+class GeneticFindingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GeneticFindings
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new GeneticFindings instance using the validated data"""
+        genetic_findings_instance = GeneticFindings.objects.create(**validated_data)
+        return genetic_findings_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data"""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
 
 
 class AnalyteSerializer(serializers.ModelSerializer):

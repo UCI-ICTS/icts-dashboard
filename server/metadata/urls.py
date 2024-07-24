@@ -4,6 +4,7 @@
 from django.urls import path
 from metadata.apis import (
     GetMetadataAPI,
+    CreateOrUpdateGeneticFindings,
     CreateParticipantAPI,
     CreateOrUpdateAnalyte,
     CreateOrUpdateFamilyApi,
@@ -16,4 +17,5 @@ urlpatterns = [
     path("create_families/", CreateOrUpdateFamilyApi.as_view()),
     path("create_phenotype/", CreateOrUpdatePhenotypeApi.as_view()),
     path("create_analyte/", CreateOrUpdateAnalyte.as_view()),
+    path("create_genetic_findings/", CreateOrUpdateGeneticFindings.as_view()),
 ]
