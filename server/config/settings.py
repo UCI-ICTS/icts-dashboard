@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "drf_yasg",
     "rest_framework",
+    "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
@@ -154,6 +155,7 @@ CORS_ALLOWED_ORIGINS = [
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
