@@ -131,7 +131,7 @@ class CreateParticipantAPI(APIView):
                             response_data.append(
                                 response_constructor(
                                     identifier=identifier,
-                                    status="SUCCESS",
+                                   request_status="SUCCESS",
                                     code=200,
                                     message=f"Participant {identifier} created.",
                                     data=participant_data,
@@ -143,7 +143,7 @@ class CreateParticipantAPI(APIView):
                             response_data.append(
                                 response_constructor(
                                     identifier=identifier,
-                                    status="BAD REQUEST",
+                                   request_status="BAD REQUEST",
                                     code=400,
                                     data=str(error),
                                 )
@@ -158,7 +158,7 @@ class CreateParticipantAPI(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -170,7 +170,7 @@ class CreateParticipantAPI(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -227,7 +227,7 @@ class CreateOrUpdateFamilyApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if family_instance else "CREATED",
+                               request_status="UPDATED" if family_instance else "CREATED",
                                 code=200 if family_instance else 201,
                                 message=(
                                     f"Family {identifier} updated."
@@ -247,7 +247,7 @@ class CreateOrUpdateFamilyApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -259,7 +259,7 @@ class CreateOrUpdateFamilyApi(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -275,7 +275,7 @@ class CreateOrUpdateFamilyApi(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -331,7 +331,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_phenotype else "CREATED",
+                               request_status="UPDATED" if existing_phenotype else "CREATED",
                                 code=201 if existing_phenotype else 200,
                                 message=(
                                     f"Phenotype {identifier} updated."
@@ -351,7 +351,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -363,7 +363,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -379,7 +379,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -424,7 +424,7 @@ class CreateOrUpdateAnalyte(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if analyte_instance else "CREATED",
+                               request_status="UPDATED" if analyte_instance else "CREATED",
                                 code=200 if analyte_instance else 201,
                                 message=(
                                     f"Analyte {identifier} updated."
@@ -444,7 +444,7 @@ class CreateOrUpdateAnalyte(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -456,7 +456,7 @@ class CreateOrUpdateAnalyte(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -472,7 +472,7 @@ class CreateOrUpdateAnalyte(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -517,7 +517,7 @@ class CreateOrUpdateGeneticFindings(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status=(
+                               request_status=(
                                     "UPDATED"
                                     if genetic_findings_instance
                                     else "CREATED"
@@ -543,7 +543,7 @@ class CreateOrUpdateGeneticFindings(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -555,7 +555,7 @@ class CreateOrUpdateGeneticFindings(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -571,7 +571,7 @@ class CreateOrUpdateGeneticFindings(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)

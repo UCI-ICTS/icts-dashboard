@@ -127,7 +127,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status=(
+                                request_status=(
                                     "UPDATED"
                                     if existing_aligned_short_read
                                     else "CREATED"
@@ -158,7 +158,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                                request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -173,7 +173,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -189,7 +189,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -278,7 +278,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_short_read else "CREATED",
+                               request_status="UPDATED" if existing_short_read else "CREATED",
                                 code=200 if existing_short_read else 201,
                                 message=(
                                     f"Short read experiment {identifier} updated."
@@ -305,7 +305,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -318,7 +318,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -334,7 +334,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -419,7 +419,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status=(
+                               request_status=(
                                     "UPDATED" if existing_aligned_pac_bio else "CREATED"
                                 ),
                                 code=200 if existing_aligned_pac_bio else 201,
@@ -446,7 +446,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -461,7 +461,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -477,7 +477,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -550,7 +550,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_pac_bio else "CREATED",
+                               request_status="UPDATED" if existing_pac_bio else "CREATED",
                                 code=200 if existing_pac_bio else 201,
                                 message=(
                                     f"PacBio experiment {identifier} updated."
@@ -575,7 +575,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -588,7 +588,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -604,7 +604,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -690,7 +690,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status=(
+                               request_status=(
                                     "UPDATED"
                                     if existing_aligned_nanopore
                                     else "CREATED"
@@ -719,7 +719,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -734,7 +734,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -750,7 +750,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -823,7 +823,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_nanopore else "CREATED",
+                               request_status="UPDATED" if existing_nanopore else "CREATED",
                                 code=200 if existing_nanopore else 201,
                                 message=(
                                     f"Nanopore experiment {identifier} updated."
@@ -850,7 +850,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -863,7 +863,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -879,7 +879,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -957,7 +957,7 @@ class CreateOrUpdateAlignedRna(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status=(
+                               request_status=(
                                     "UPDATED" if existing_aligned_rna else "CREATED"
                                 ),
                                 code=200 if existing_aligned_rna else 201,
@@ -984,7 +984,7 @@ class CreateOrUpdateAlignedRna(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -997,7 +997,7 @@ class CreateOrUpdateAlignedRna(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -1013,7 +1013,7 @@ class CreateOrUpdateAlignedRna(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -1075,7 +1075,7 @@ class CreateOrUpdateExperimentRna(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_rna else "CREATED",
+                               request_status="UPDATED" if existing_rna else "CREATED",
                                 code=200 if existing_rna else 201,
                                 message=(
                                     f"Short read RNA experiment {identifier} updated."
@@ -1100,7 +1100,7 @@ class CreateOrUpdateExperimentRna(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -1113,7 +1113,7 @@ class CreateOrUpdateExperimentRna(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=errors,
                         )
@@ -1129,7 +1129,7 @@ class CreateOrUpdateExperimentRna(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -1168,7 +1168,7 @@ class CreateOrUpdateExperimentApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="UPDATED" if existing_experiment else "CREATED",
+                               request_status="UPDATED" if existing_experiment else "CREATED",
                                 code=201 if existing_experiment else 200,
                                 message=(
                                     f"Phenotype {identifier} updated."
@@ -1188,7 +1188,7 @@ class CreateOrUpdateExperimentApi(APIView):
                         response_data.append(
                             response_constructor(
                                 identifier=identifier,
-                                status="BAD REQUEST",
+                               request_status="BAD REQUEST",
                                 code=400,
                                 data=error_data,
                             )
@@ -1200,7 +1200,7 @@ class CreateOrUpdateExperimentApi(APIView):
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
-                            status="BAD REQUEST",
+                           request_status="BAD REQUEST",
                             code=400,
                             data=results["errors"],
                         )
@@ -1216,7 +1216,7 @@ class CreateOrUpdateExperimentApi(APIView):
             response_data.insert(
                 0,
                 response_constructor(
-                    identifier=identifier, status="ERROR", code=500, message=str(error)
+                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
                 ),
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
