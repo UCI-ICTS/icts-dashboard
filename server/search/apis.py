@@ -5,6 +5,7 @@ import json
 from django.apps import apps
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from itertools import chain
@@ -12,6 +13,24 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from search.selectors import get_anvil_tables
+
+
+class DounlaodTablesAPI(APIView):
+    """Test table generation."""
+    
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        zip_buffer = get_anvil_tables()
+
+        response = HttpResponse(zip_buffer, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="data.zip"'
+
+        return response
+
+
 
 
 class TestConnection(APIView):
@@ -69,7 +88,7 @@ class SearchTablesAPI(APIView):
             model = apps.get_model("metadata", model_name)
         except LookupError:
             return Response(
-                {"error": "Model not found."},request_status=status.HTTP_404_NOT_FOUND
+                {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
         query_params = request.query_params

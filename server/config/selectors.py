@@ -11,6 +11,11 @@ from rest_framework import status
 from requests.models import PreparedRequest
 import requests.exceptions
 
+
+import csv
+from io import StringIO, BytesIO
+import zipfile
+
 """DB Level Services
 
     This module contains service functions that apply to the entire Database.
@@ -191,3 +196,24 @@ def validate_cloud_url(url):
         prepared_request.prepare_url(url, None)
     except Exception as exc:
         return ValidationError(f"{url} is not a valid URL. Error: {str(exc)}")
+
+def generate_tsv(data):
+    output = StringIO()
+    writer = csv.writer(output, delimiter='\t')
+    if data:
+        # Write the header row
+        writer.writerow(data[0].keys())
+        # Write the data rows
+        for row in data:
+            writer.writerow(row.values())
+    tsv_content = output.getvalue()
+    output.close()
+    return tsv_content
+
+def generate_zip(files):
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+        for file_name, content in files.items():
+            zip_file.writestr(file_name, content)
+    zip_buffer.seek(0)
+    return zip_buffer
