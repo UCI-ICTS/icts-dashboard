@@ -124,7 +124,7 @@ def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
 
 
 def response_constructor(
-    identifier: str, status: str, code: str, message: str = None, data: dict = None
+    identifier: str, request_status: str, code: str, message: str = None, data: dict = None
 ) -> dict:
     """Constructs a structured response dictionary.
 
@@ -151,7 +151,7 @@ def response_constructor(
 
     response_object = {
         "identifier": identifier,
-        "request_status": status,
+        "request_status": request_status,
         "status_code": code,
     }
 

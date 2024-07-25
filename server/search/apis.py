@@ -69,7 +69,7 @@ class SearchTablesAPI(APIView):
             model = apps.get_model("metadata", model_name)
         except LookupError:
             return Response(
-                {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
+                {"error": "Model not found."},request_status=status.HTTP_404_NOT_FOUND
             )
 
         query_params = request.query_params
