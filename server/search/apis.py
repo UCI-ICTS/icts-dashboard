@@ -10,19 +10,19 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from itertools import chain
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from search.selectors import get_anvil_tables
 
 
 class DounlaodTablesAPI(APIView):
-    """Test table generation."""
-    
-    permission_classes = [AllowAny]
+    """AnVIL upload table generation."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-
         zip_buffer = get_anvil_tables()
 
         response = HttpResponse(zip_buffer, content_type='application/zip')
