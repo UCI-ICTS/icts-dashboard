@@ -95,7 +95,7 @@ class FamilySerializer(serializers.ModelSerializer):
         return instance
 
 
-class ParticipantSerializer(serializers.ModelSerializer):
+class ParticipantInputSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
         help_text="List of prior testing entries",

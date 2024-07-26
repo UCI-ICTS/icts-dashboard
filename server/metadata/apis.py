@@ -20,7 +20,7 @@ from metadata.models import Participant, Family, Analyte
 from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
-    ParticipantSerializer,
+    ParticipantInputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
     get_or_create_sub_models,
@@ -68,6 +68,26 @@ class GetMetadataAPI(APIView):
         return Response(status=status.HTTP_200_OK, data=all)
 
 
+class GetAllParticipantAPI(APIView):
+    """"""
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(
+        operation_id="get_participants",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Participant"],
+    )
+
+    def get(self, request):
+        participant_list = Participant.objects.all()
+        serialized_participants = ParticipantInputSerializer(participant_list, many=True)
+        return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
+
+
 class CreateParticipantAPI(APIView):
     """
     API endpoint for creating Participant entries in the database. [Bulk Enabled]
@@ -94,7 +114,7 @@ class CreateParticipantAPI(APIView):
 
     @swagger_auto_schema(
         operation_id="create_participants",
-        request_body=ParticipantSerializer(many=True),
+        request_body=ParticipantInputSerializer(many=True),
         responses={
             200: "All submissions successfull",
             207: "Some submissions of participants were not successful.",
@@ -117,14 +137,14 @@ class CreateParticipantAPI(APIView):
 
                 if results["valid"] is True:
                     datum = get_or_create_sub_models(datum=datum)
-                    serializer = ParticipantSerializer(data=datum)
+                    serializer = ParticipantInputSerializer(data=datum)
 
                     if serializer.is_valid():
                         try:
                             participant_instance = serializer.create(
                                 validated_data=serializer.validated_data
                             )
-                            participant_data = ParticipantSerializer(
+                            participant_data = ParticipantInputSerializer(
                                 participant_instance
                             ).data
 

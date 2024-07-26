@@ -9,6 +9,7 @@ from metadata.apis import (
     CreateOrUpdateAnalyte,
     CreateOrUpdateFamilyApi,
     CreateOrUpdatePhenotypeApi,
+    GetAllParticipantAPI
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("create_phenotype/", CreateOrUpdatePhenotypeApi.as_view()),
     path("create_analyte/", CreateOrUpdateAnalyte.as_view()),
     path("create_genetic_findings/", CreateOrUpdateGeneticFindings.as_view()),
+    path("get_all_participants/", GetAllParticipantAPI.as_view())
 ]
