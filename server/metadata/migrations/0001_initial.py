@@ -360,7 +360,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "pmid_ids",
+                    "pmid_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="Case specific PubMed ID if applicable",

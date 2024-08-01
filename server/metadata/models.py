@@ -256,7 +256,7 @@ class Participant(models.Model):
         help_text="Text description of any genetic testing for individual "
         "conducted prior to enrollment",
     )
-    pmid_ids = models.ManyToManyField(
+    pmid_id = models.ManyToManyField(
         "PmidId",
         related_name="participants",
         blank=True,
@@ -357,7 +357,7 @@ class Participant(models.Model):
     def __str__(self):
         return str(self.participant_id)
 
-    def get_pmid_ids(self):
+    def get_pmid_id(self):
         """Returns a list of primary key IDs for associated PmidIds."""
         return list(self.pmid_id.values_list("id", flat=True))
 

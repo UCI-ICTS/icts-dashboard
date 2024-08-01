@@ -115,7 +115,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         help_text="An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
     )
 
-    pmid_ids = serializers.ListField(
+    pmid_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
@@ -135,7 +135,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         internal_project_ids = validated_data.pop("internal_project_ids", [])
-        pmid_ids = validated_data.pop("pmid_ids", [])
+        pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
 
         try:
@@ -148,8 +148,8 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
                         internal_project_ids,
                         "internal_project_ids",
                     )
-                if pmid_ids:
-                    self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
+                if pmid_id:
+                    self._set_relationship(participant, PmidId, pmid_id, "pmid_id")
                 if twin_id:
                     self._set_relationship(participant, TwinId, twin_id, "twin_id")
                 participant.save()
@@ -160,7 +160,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         internal_project_ids = validated_data.pop("internal_project_ids", [])
-        pmid_ids = validated_data.pop("pmid_ids", [])
+        pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
 
         with transaction.atomic():
@@ -168,7 +168,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
             instance.save()
             self._set_relationship(instance, InternalProjectId, internal_project_ids)
-            self._set_relationship(instance, PmidId, pmid_ids)
+            self._set_relationship(instance, PmidId, pmid_id)
             self._set_relationship(instance, TwinId, twin_id)
 
         return instance
