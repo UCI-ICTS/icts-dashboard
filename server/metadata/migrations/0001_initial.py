@@ -369,7 +369,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "twin_ids",
+                    "twin_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="participant_id for twins, triplets, etc; 0 if not available",

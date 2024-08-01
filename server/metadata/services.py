@@ -122,7 +122,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         help_text="Case specific PubMed IDs if applicable",
     )
 
-    twin_ids = serializers.ListField(
+    twin_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
@@ -136,7 +136,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         internal_project_ids = validated_data.pop("internal_project_ids", [])
         pmid_ids = validated_data.pop("pmid_ids", [])
-        twin_ids = validated_data.pop("twin_ids", [])
+        twin_id = validated_data.pop("twin_id", [])
 
         try:
             with transaction.atomic():
@@ -150,8 +150,8 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
                     )
                 if pmid_ids:
                     self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
-                if twin_ids:
-                    self._set_relationship(participant, TwinId, twin_ids, "twin_ids")
+                if twin_id:
+                    self._set_relationship(participant, TwinId, twin_id, "twin_id")
                 participant.save()
         except IntegrityError as error:
             raise serializers.ValidationError(error)
@@ -161,7 +161,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         internal_project_ids = validated_data.pop("internal_project_ids", [])
         pmid_ids = validated_data.pop("pmid_ids", [])
-        twin_ids = validated_data.pop("twin_ids", [])
+        twin_id = validated_data.pop("twin_id", [])
 
         with transaction.atomic():
             for attr, value in validated_data.items():
@@ -169,7 +169,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
             instance.save()
             self._set_relationship(instance, InternalProjectId, internal_project_ids)
             self._set_relationship(instance, PmidId, pmid_ids)
-            self._set_relationship(instance, TwinId, twin_ids)
+            self._set_relationship(instance, TwinId, twin_id)
 
         return instance
 
@@ -199,5 +199,4 @@ def get_or_create_sub_models(datum):
             if datum.get(key):
                 obj, created = model.objects.get_or_create(**{field_name: datum[key]})
                 datum[key] = obj.pk
-
     return datum
