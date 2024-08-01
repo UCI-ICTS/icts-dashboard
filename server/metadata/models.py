@@ -280,7 +280,7 @@ class Participant(models.Model):
         default="0",
         help_text="participant_id for mother; 0 if not available",
     )
-    twin_ids = models.ManyToManyField(
+    twin_id = models.ManyToManyField(
         TwinId,
         related_name="participants",
         blank=True,
