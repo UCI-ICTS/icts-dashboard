@@ -21,6 +21,7 @@ from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
     ParticipantInputSerializer,
+    ParticipantOutputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
     get_or_create_sub_models,
@@ -84,7 +85,7 @@ class GetAllParticipantAPI(APIView):
 
     def get(self, request):
         participant_list = Participant.objects.all()
-        serialized_participants = ParticipantInputSerializer(participant_list, many=True)
+        serialized_participants = ParticipantOutputSerializer(participant_list, many=True)
         return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
 
 

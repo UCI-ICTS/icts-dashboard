@@ -95,6 +95,12 @@ class FamilySerializer(serializers.ModelSerializer):
         return instance
 
 
+class ParticipantOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participant
+        fields = "__all__"
+
+
 class ParticipantInputSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
