@@ -95,28 +95,34 @@ class FamilySerializer(serializers.ModelSerializer):
         return instance
 
 
-class ParticipantSerializer(serializers.ModelSerializer):
+class ParticipantOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participant
+        fields = "__all__"
+
+
+class ParticipantInputSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
         help_text="List of prior testing entries",
         required=False,
     )
 
-    internal_project_ids = serializers.ListField(
+    internal_project_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
         help_text="An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
     )
 
-    pmid_ids = serializers.ListField(
+    pmid_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
         help_text="Case specific PubMed IDs if applicable",
     )
 
-    twin_ids = serializers.ListField(
+    twin_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
@@ -128,24 +134,24 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        internal_project_ids = validated_data.pop("internal_project_ids", [])
-        pmid_ids = validated_data.pop("pmid_ids", [])
-        twin_ids = validated_data.pop("twin_ids", [])
+        internal_project_id = validated_data.pop("internal_project_id", [])
+        pmid_id = validated_data.pop("pmid_id", [])
+        twin_id = validated_data.pop("twin_id", [])
 
         try:
             with transaction.atomic():
                 participant = Participant.objects.create(**validated_data)
-                if internal_project_ids:
+                if internal_project_id:
                     self._set_relationship(
                         participant,
                         InternalProjectId,
-                        internal_project_ids,
-                        "internal_project_ids",
+                        internal_project_id,
+                        "internal_project_id",
                     )
-                if pmid_ids:
-                    self._set_relationship(participant, PmidId, pmid_ids, "pmid_ids")
-                if twin_ids:
-                    self._set_relationship(participant, TwinId, twin_ids, "twin_ids")
+                if pmid_id:
+                    self._set_relationship(participant, PmidId, pmid_id, "pmid_id")
+                if twin_id:
+                    self._set_relationship(participant, TwinId, twin_id, "twin_id")
                 participant.save()
         except IntegrityError as error:
             raise serializers.ValidationError(error)
@@ -153,17 +159,18 @@ class ParticipantSerializer(serializers.ModelSerializer):
         return participant
 
     def update(self, instance, validated_data):
-        internal_project_ids = validated_data.pop("internal_project_ids", [])
-        pmid_ids = validated_data.pop("pmid_ids", [])
-        twin_ids = validated_data.pop("twin_ids", [])
+        import pdb; pdb.set_trace
+        internal_project_id = validated_data.pop("internal_project_id", [])
+        pmid_id = validated_data.pop("pmid_id", [])
+        twin_id = validated_data.pop("twin_id", [])
 
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            self._set_relationship(instance, InternalProjectId, internal_project_ids)
-            self._set_relationship(instance, PmidId, pmid_ids)
-            self._set_relationship(instance, TwinId, twin_ids)
+            self._set_relationship(instance, InternalProjectId, internal_project_id, "internal_project_id")
+            self._set_relationship(instance, PmidId, pmid_id, "pmid_id")
+            self._set_relationship(instance, TwinId, twin_id, "twin_id")
 
         return instance
 
@@ -193,5 +200,4 @@ def get_or_create_sub_models(datum):
             if datum.get(key):
                 obj, created = model.objects.get_or_create(**{field_name: datum[key]})
                 datum[key] = obj.pk
-
     return datum

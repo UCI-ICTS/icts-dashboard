@@ -8,7 +8,7 @@ server/env*
 server/.secrets
 server/db.sqlite3
 server/env
-server/config/fixtures/full_local_data.json
+server/config/fixtures/local_data.json
 server/gregor-google-key.json
 server/utilities/anvil**
 server/static*
@@ -33,3 +33,5 @@ client/.env.production.local
 client/npm-debug.log*
 client/yarn-debug.log*
 client/yarn-error.log*
+
+server/config/fixtures/full_local_data.json

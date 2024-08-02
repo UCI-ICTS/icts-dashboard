@@ -19,7 +19,7 @@ serializer_mapping ={
     "alignednanopore":"AlignedNanoporeSerializer",
     "experimentpacbio" : "ExperimentPacBioSerializer",
     'family':"FamilySerializer",
-    'participant':"ParticipantSerializer",
+    'participant':"ParticipantInputSerializer",
     'phenotype': "PhenotypeSerializer",
     'geneticfindings' : "GeneticFindingsSerializer",
     'analyte': "AnalyteSerializer"
