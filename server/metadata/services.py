@@ -108,7 +108,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    internal_project_ids = serializers.ListField(
+    internal_project_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
@@ -134,19 +134,19 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        internal_project_ids = validated_data.pop("internal_project_ids", [])
+        internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
 
         try:
             with transaction.atomic():
                 participant = Participant.objects.create(**validated_data)
-                if internal_project_ids:
+                if internal_project_id:
                     self._set_relationship(
                         participant,
                         InternalProjectId,
-                        internal_project_ids,
-                        "internal_project_ids",
+                        internal_project_id,
+                        "internal_project_id",
                     )
                 if pmid_id:
                     self._set_relationship(participant, PmidId, pmid_id, "pmid_id")
@@ -159,7 +159,8 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         return participant
 
     def update(self, instance, validated_data):
-        internal_project_ids = validated_data.pop("internal_project_ids", [])
+        import pdb; pdb.set_trace
+        internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
 
@@ -167,9 +168,9 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            self._set_relationship(instance, InternalProjectId, internal_project_ids)
-            self._set_relationship(instance, PmidId, pmid_id)
-            self._set_relationship(instance, TwinId, twin_id)
+            self._set_relationship(instance, InternalProjectId, internal_project_id, "internal_project_id")
+            self._set_relationship(instance, PmidId, pmid_id, "pmid_id")
+            self._set_relationship(instance, TwinId, twin_id, "twin_id")
 
         return instance
 

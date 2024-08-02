@@ -224,7 +224,7 @@ class Participant(models.Model):
         max_length=255,
         help_text="Subject/Participant Identifier (primary key)",
     )
-    internal_project_ids = models.ManyToManyField(
+    internal_project_id = models.ManyToManyField(
         InternalProjectId,
         related_name="participants",
         blank=True,

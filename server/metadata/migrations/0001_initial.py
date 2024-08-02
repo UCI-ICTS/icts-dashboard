@@ -351,7 +351,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "internal_project_ids",
+                    "internal_project_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="An identifier used by GREGoR research centers to identifya set of participants for their internal tracking",
