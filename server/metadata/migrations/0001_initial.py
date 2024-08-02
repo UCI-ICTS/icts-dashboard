@@ -351,7 +351,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "internal_project_ids",
+                    "internal_project_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="An identifier used by GREGoR research centers to identifya set of participants for their internal tracking",
@@ -360,7 +360,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "pmid_ids",
+                    "pmid_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="Case specific PubMed ID if applicable",
@@ -369,7 +369,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "twin_ids",
+                    "twin_id",
                     models.ManyToManyField(
                         blank=True,
                         help_text="participant_id for twins, triplets, etc; 0 if not available",

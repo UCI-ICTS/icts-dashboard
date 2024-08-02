@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 # config/services.py
 
+import csv
 import os
-import re
+from io import StringIO, BytesIO
+import zipfile
 import jsonref
 import jsonschema
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from requests.models import PreparedRequest
-import requests.exceptions
 
-
-import csv
-from io import StringIO, BytesIO
-import zipfile
 
 """DB Level Services
 
@@ -217,3 +214,19 @@ def generate_zip(files):
             zip_file.writestr(file_name, content)
     zip_buffer.seek(0)
     return zip_buffer
+
+def compare_data(old_data:dict, new_data:dict) -> dict:
+    changes = {}
+    for attr, value in new_data.items():
+        try:
+            if old_data[attr] != value and old_data[attr] != str(value):
+                print(f"{attr}: {old_data[attr]} to {value}")
+                changes[attr] = f"{old_data[attr]} to {value}"
+        except KeyError as error:
+            print("ERROR: ", error)
+            changes[attr] = f"NA to {value}"
+        except Exception as excp:
+            error = str(excp)
+            changes[attr] = f"Error with {attr}: {error}"
+
+    return changes

@@ -15,12 +15,14 @@ from config.selectors import (
     response_constructor,
     response_status,
     remove_na,
+    compare_data,
 )
 from metadata.models import Participant, Family, Analyte
 from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
-    ParticipantSerializer,
+    ParticipantInputSerializer,
+    ParticipantOutputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
     get_or_create_sub_models,
@@ -68,6 +70,139 @@ class GetMetadataAPI(APIView):
         return Response(status=status.HTTP_200_OK, data=all)
 
 
+class GetAllParticipantAPI(APIView):
+    """"""
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(
+        operation_id="get_participants",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Participant"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            participant_list = Participant.objects.get()[:10]
+            serialized_participants = ParticipantOutputSerializer(participant_list, many=True)
+            return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class UpdateParticipantAPI(APIView):
+    """"""
+
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(
+        operation_id="update_participants",
+        request_body=ParticipantInputSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Participant"],
+    )
+    def post(self, request):
+        participant_ids = [datum["participant_id"] for datum in request.data]
+        participants = Participant.objects.in_bulk(participant_ids)
+        validator = TableValidator()
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+        try:
+            for index, datum in enumerate(request.data):
+                identifier = datum["participant_id"]
+                participant_instance = participants.get(identifier)
+                if participant_instance is None:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            message=f"Participant {identifier} not found."
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+                datum = parse_participant(participant=datum)
+                validator.validate_json(json_object=datum, table_name="participant")
+                results = validator.get_validation_results()
+                if results["valid"]:
+                    old_data=ParticipantOutputSerializer(participant_instance).data
+                    changes = compare_data(
+                        old_data=old_data,
+                        new_data=datum
+                    )
+                    if not changes:
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                request_status="SUCCESS",
+                                code=200,
+                                message=f"Participant {identifier} had no changes.",
+                                data={
+                                    'participant_update': None,
+                                    'updated_instance':old_data
+                                }
+                            )
+                        )
+                        accepted_requests = True
+                        continue                        
+                    datum = get_or_create_sub_models(datum=datum)
+                    serializer = ParticipantInputSerializer(participant_instance, data=datum)
+                    if serializer.is_valid():
+                        updated_instance = serializer.save()
+                        participant_data = {
+                            'participant_update': changes,
+                            'updated_instance': ParticipantOutputSerializer(updated_instance).data
+                        }
+
+                        response_data.append(
+                            response_constructor(
+                                identifier=identifier,
+                                request_status="SUCCESS",
+                                code=200,
+                                message=f"Participant {identifier} updated.",
+                                data=participant_data,
+                            )
+                        )
+                        accepted_requests = True
+                        continue
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                           request_status="BAD REQUEST",
+                            code=400,
+                            data=results["errors"],
+                        )
+                    )
+                    rejected_requests = True
+                    continue
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=identifier,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+       
 class CreateParticipantAPI(APIView):
     """
     API endpoint for creating Participant entries in the database. [Bulk Enabled]
@@ -94,7 +229,7 @@ class CreateParticipantAPI(APIView):
 
     @swagger_auto_schema(
         operation_id="create_participants",
-        request_body=ParticipantSerializer(many=True),
+        request_body=ParticipantInputSerializer(many=True),
         responses={
             200: "All submissions successfull",
             207: "Some submissions of participants were not successful.",
@@ -117,14 +252,14 @@ class CreateParticipantAPI(APIView):
 
                 if results["valid"] is True:
                     datum = get_or_create_sub_models(datum=datum)
-                    serializer = ParticipantSerializer(data=datum)
+                    serializer = ParticipantInputSerializer(data=datum)
 
                     if serializer.is_valid():
                         try:
                             participant_instance = serializer.create(
                                 validated_data=serializer.validated_data
                             )
-                            participant_data = ParticipantSerializer(
+                            participant_data = ParticipantInputSerializer(
                                 participant_instance
                             ).data
 
