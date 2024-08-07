@@ -109,10 +109,13 @@ def parse_participant(participant: dict) -> dict:
             participant["twin_id"] = participant["twin_id"].split("|")
         except ValueError:
             participant["twin_id"] = "NA"
+        except AttributeError:
+            participant["twin_id"] = "NA"
 
     if (
         "internal_project_id" in participant
         and participant["internal_project_id"] != "NA"
+        and participant["internal_project_id"] != ""
     ):
         try:
             participant["internal_project_id"] = participant[
@@ -121,7 +124,7 @@ def parse_participant(participant: dict) -> dict:
         except ValueError:
             participant["internal_project_id"] = "NA"
 
-    if "prior_testing" in participant and participant["prior_testing"] != "NA":
+    if "prior_testing" in participant and participant["prior_testing"] != "NA" and participant["prior_testing"] != "":
         try:
             participant["prior_testing"] = [participant["prior_testing"]]
         except ValueError:

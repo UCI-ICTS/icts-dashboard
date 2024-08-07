@@ -106,6 +106,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         help_text="List of prior testing entries",
         required=False,
+        allow_empty=True
     )
 
     internal_project_id = serializers.ListField(
@@ -159,11 +160,11 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         return participant
 
     def update(self, instance, validated_data):
-        import pdb; pdb.set_trace
+        
         internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
-
+        print("triggered")
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
