@@ -89,7 +89,7 @@ def remove_na(datum: dict) -> dict:
     Remove `NA` from submissions
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v != "NA"}
+    parsed_datum = {k: v for k, v in datum.items() if v != "NA" and v != ""}
 
     return parsed_datum
 
@@ -112,6 +112,9 @@ def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
         - status.HTTP_207_MULTI_STATUS (207) if there is a mix of accepted and rejected requests.
         - status.HTTP_200_OK (200) if all requests are accepted.
     """
+
+    if accepted_requests is False and rejected_requests == False:
+        status_code = status.HTTP_400_BAD_REQUEST
 
     if accepted_requests is False and rejected_requests == True:
         status_code = status.HTTP_400_BAD_REQUEST
