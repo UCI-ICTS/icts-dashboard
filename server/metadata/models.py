@@ -253,6 +253,7 @@ class Participant(models.Model):
     )
     prior_testing = models.TextField(
         blank=True,
+        null=True,
         help_text="Text description of any genetic testing for individual "
         "conducted prior to enrollment",
     )
