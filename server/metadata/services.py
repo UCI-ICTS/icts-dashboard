@@ -13,7 +13,8 @@ from metadata.models import (
     PmidId,
     TwinId,
 )
-from metadata.selectors import get_participant
+
+from submodels.models import ReportedRace
 
 
 class GeneticFindingsSerializer(serializers.ModelSerializer):
@@ -130,6 +131,13 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         help_text="Participant IDs for twins, triplets, etc.",
     )
 
+    reported_race = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+        required=False,
+        help_text="Participant IDs for twins, triplets, etc.",
+    )
+
     class Meta:
         model = Participant
         fields = "__all__"
@@ -138,6 +146,8 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
+        reported_race = validated_data.pop("reported_race", [])
+        print(reported_race)
 
         try:
             with transaction.atomic():
@@ -153,6 +163,8 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
                     self._set_relationship(participant, PmidId, pmid_id, "pmid_id")
                 if twin_id:
                     self._set_relationship(participant, TwinId, twin_id, "twin_id")
+                if reported_race:
+                    self._set_relationship(participant, ReportedRace, reported_race, "reported_race")
                 participant.save()
         except IntegrityError as error:
             raise serializers.ValidationError(error)
@@ -189,7 +201,6 @@ def get_or_create_sub_models(datum):
         "pmid_id": (PmidId, "pmid_id"),
         "twin_id": (TwinId, "twin_id"),
     }
-
     for key, (model, field_name) in mapping.items():
         if isinstance(datum.get(key), list):  # Handles list fields differently
             objects = []

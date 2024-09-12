@@ -91,7 +91,11 @@
         "description": "Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype"
       },
       "reported_race": {
-        "type": "string",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or Other Pacific Islander", "Middle Eastern or North African", "White"]
+        },  
         "description": "Self/submitter-reported race (OMB categories)"
       },
       "reported_ethnicity": {
@@ -112,7 +116,10 @@
         "enum": ["Affected", "Unaffected", "Possibly affected", "Unknown"]
       },
       "phenotype_description": {
-        "type": "string",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
         "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband."
       },
       "age_at_enrollment": {

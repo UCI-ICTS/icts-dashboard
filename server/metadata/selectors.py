@@ -5,7 +5,7 @@
 """
 
 from metadata.models import Family, Phenotype, Analyte, Participant, GeneticFindings
-from config.selectors import remove_na
+from config.selectors import remove_na, multi_value_split
 
 
 def get_analyte(analyte_id: str) -> Family:
@@ -83,7 +83,7 @@ def parse_geneti_findings(genetic_findings: str) -> dict:
     return parsed_geneti_findings
 
 
-def parse_participant(participant: dict) -> dict:
+def participant_parser(participant: dict) -> dict:
     """
     Parses and processes the participant dictionary to format and clean specific fields.
 
@@ -103,32 +103,14 @@ def parse_participant(participant: dict) -> dict:
     - 'prior_testing': Converts the string to a list containing the original string if not 'NA'.
     - 'age_at_last_observation' and 'age_at_enrollment': Converts the string to a float. Sets to 0 if conversion fails.
     """
-
-    if "twin_id" in participant and participant["twin_id"] != "NA":
-        try:
-            participant["twin_id"] = participant["twin_id"].split("|")
-        except ValueError:
-            participant["twin_id"] = "NA"
-        except AttributeError:
-            participant["twin_id"] = "NA"
-
-    if (
-        "internal_project_id" in participant
-        and participant["internal_project_id"] != "NA"
-        and participant["internal_project_id"] != ""
-    ):
-        try:
-            participant["internal_project_id"] = participant[
-                "internal_project_id"
-            ].split("|")
-        except ValueError:
-            participant["internal_project_id"] = "NA"
-
-    if "prior_testing" in participant and participant["prior_testing"] != "NA" and participant["prior_testing"] != "":
-        try:
-            participant["prior_testing"] = [participant["prior_testing"]]
-        except ValueError:
-            participant["prior_testing"] = "NA"
+    
+    multi_value = [
+        "pmid_id",
+        "twin_id",
+        "internal_project_id", "prior_testing",
+        "phenotype_description",
+        "reported_race"
+    ]
     try:
         participant["age_at_last_observation"] = float(
             participant["age_at_last_observation"]
@@ -140,7 +122,16 @@ def parse_participant(participant: dict) -> dict:
         participant["age_at_enrollment"] = float(participant["age_at_enrollment"])
     except ValueError:
         participant["age_at_enrollment"] = 0
+    split_participant = multi_value_split(participant)
 
-    parsed_participant = remove_na(datum=participant)
+    for key in multi_value:
+        try:
+            if not isinstance(split_participant[key], list):
+                split_participant[key] = [split_participant[key]]
+        except Exception as error:
+            oops = error
+            split_participant[key] = [oops]
+
+    parsed_participant = remove_na(datum=split_participant)
 
     return parsed_participant

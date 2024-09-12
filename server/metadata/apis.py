@@ -28,7 +28,7 @@ from metadata.services import (
     get_or_create_sub_models,
 )
 from metadata.selectors import (
-    parse_participant,
+    participant_parser,
     parse_geneti_findings,
     get_family,
     get_phenotype,
@@ -87,7 +87,7 @@ class GetAllParticipantAPI(APIView):
     def get(self, request):
         response_data = []
         try:
-            participant_list = Participant.objects.get()[:10]
+            participant_list = Participant.objects.all()
             serialized_participants = ParticipantOutputSerializer(participant_list, many=True)
             return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
         except Exception as error:
@@ -133,7 +133,7 @@ class UpdateParticipantAPI(APIView):
                     )
                     rejected_requests = True
                     continue
-                datum = parse_participant(participant=datum)
+                datum = participant_parser(participant=datum)
                 validator.validate_json(json_object=datum, table_name="participant")
                 results = validator.get_validation_results()
                 if results["valid"]:
@@ -246,20 +246,19 @@ class CreateParticipantAPI(APIView):
         try:
             for index, datum in enumerate(request.data):
                 identifier = datum["participant_id"]
-                datum = parse_participant(participant=datum)
-                validator.validate_json(json_object=datum, table_name="participant")
+                parsed_participant = participant_parser(participant=datum)
+                validator.validate_json(json_object=parsed_participant, table_name="participant")
                 results = validator.get_validation_results()
-
                 if results["valid"] is True:
-                    datum = get_or_create_sub_models(datum=datum)
-                    serializer = ParticipantInputSerializer(data=datum)
-
+                    print("valid JSON", parsed_participant['reported_race'])
+                    parsed_participant = get_or_create_sub_models(datum=parsed_participant)
+                    serializer = ParticipantInputSerializer(data=parsed_participant)
                     if serializer.is_valid():
                         try:
                             participant_instance = serializer.create(
                                 validated_data=serializer.validated_data
                             )
-                            participant_data = ParticipantInputSerializer(
+                            participant_data = ParticipantOutputSerializer(
                                 participant_instance
                             ).data
 
