@@ -15,10 +15,15 @@ schema_view = get_schema_view(
     openapi.Info(
         title="GREGoRDB API",
         default_version=VERSION,
-        description="Test description",
+        description=(
+            "This API documentation describes the ways in which one can access " \
+            "the UCI-GREGoR Dashboard database. This database stores metadata "\
+            "entries based on the GREGoR data model, provide entry retrival by " \
+            " using the search APIs, and also output AnVIL-ready submissions."
+        ),
         terms_of_service="terms_of_service",
-        contact=openapi.Contact(email="contact"),
-        license=openapi.License(name="license"),
+        contact=openapi.Contact(email="charles.hadley.king@gmail.com"),
+        license=openapi.License(name="MIT", url="https://github.com/UCI-GREGoR/GREGor_dashboard/blob/main/LICENSE"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
