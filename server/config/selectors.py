@@ -89,9 +89,34 @@ def remove_na(datum: dict) -> dict:
     Remove `NA` from submissions
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v != "NA" and v != ""}
+    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"])}
 
     return parsed_datum
+
+def multi_value_split(datum: dict) -> dict:
+    """Multi valu split
+    """
+    split_datum = {}
+
+    for k, v in datum.items():
+        if type(v) is str:
+            if '|' in v:
+                try:
+                    split_datum[k] = [item.strip() for item in v.split('|')]
+                except TypeError:
+                    split_datum[k] = v
+                except AttributeError:
+                    pass
+                except Exception as oops:
+                    error = oops
+                    print(error, k, v)
+            else:
+                split_datum[k] = v.strip()
+        else:
+                split_datum[k] = v
+
+    return split_datum
+
 
 
 def response_status(accepted_requests: bool, rejected_requests: bool) -> status:

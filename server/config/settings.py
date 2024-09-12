@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
+    "submodels"
 ]
 
 MIDDLEWARE = [

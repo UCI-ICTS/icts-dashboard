@@ -6,18 +6,7 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-
-class InternalProjectId(models.Model):
-    internal_project_id = models.CharField(
-        max_length=255,
-        primary_key=True,
-        help_text="An identifier used by GREGoR research centers to identify "
-        "a set of participants for their internal tracking",
-    )
-
-    def __str__(self):
-        return self.internal_project_id
+from submodels.models import ReportedRace, InternalProjectId
 
 
 class VariantType(models.TextChoices):
@@ -191,17 +180,6 @@ class BiologicalSex(models.TextChoices):
     UNKNOWN = "Unknown", _("UNKNOWN")
 
 
-class ReportedRace(models.TextChoices):
-    NATIVE_AMERICAN = "American Indian or Alaska Native", _("NATIVE_AMERICAN")
-    ASIAN = "Asian", _("ASIAN")
-    BLACK = "Black or African American", _("BLACK")
-    PACIFIC_ISLANDER = "Native Hawaiian or Other Pacific Islander", _(
-        "PACIFIC_ISLANDER"
-    )
-    MIDDLE_EASTERN = "Middle Eastern or North African", _("MIDDLE_EASTERN")
-    WHITE = "White", _("WHITE")
-
-
 class ReportedEthnicity(models.TextChoices):
     HISPANIC = "Hispanic or Latino", _(
         "HISPANIC",
@@ -209,12 +187,12 @@ class ReportedEthnicity(models.TextChoices):
     NON_HISPANIC = "Not Hispanic or Latino", _("NON_HISPANIC")
 
 
-class PhenotypeDescription(models.Model):
-    phenotype_description = models.CharField(
-        max_length=255,
-        primary_key=True,
-        help_text="For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
-    )
+# class PhenotypeDescription(models.Model):
+#     phenotype_description = models.CharField(
+#         max_length=255,
+#         primary_key=True,
+#         help_text="For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
+#     )
 
 
 class Participant(models.Model):
@@ -307,10 +285,10 @@ class Participant(models.Model):
         blank=True,
         help_text="Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype",
     )
-    reported_race = models.CharField(
-        max_length=255,
+    reported_race = models.ManyToManyField(
+        ReportedRace,
         blank=True,
-        help_text="Self/submitter-reported race (OMB categories",
+        help_text="Self/submitter-reported race (OMB categories)",
     )
     reported_ethnicity = models.CharField(
         null=True,
@@ -333,7 +311,8 @@ class Participant(models.Model):
         blank=True,
         help_text="Indicate affected status of individual (overall with respect to primary phenotype in the family). Note: Affected participants must have entry in phenotype table.",
     )
-    phenotype_description = models.TextField(
+    phenotype_description = models.JSONField(
+        default=list,
         blank=True,
         help_text="human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband.",
     )
