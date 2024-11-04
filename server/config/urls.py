@@ -13,12 +13,12 @@ VERSION = settings.VERSION
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="GREGoRDB API",
+        title="UCI-GREGoR Dashboard database API",
         default_version=VERSION,
         description=(
             "This API documentation describes the ways in which one can access " \
             "the UCI-GREGoR Dashboard database. This database stores metadata "\
-            "entries based on the GREGoR data model, provide entry retrival by " \
+            "entries based on the GREGoR data model, provide entry retrieval by " \
             " using the search APIs, and also output AnVIL-ready submissions."
         ),
         terms_of_service="terms_of_service",
