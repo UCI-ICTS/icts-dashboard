@@ -1059,7 +1059,6 @@ class CreateOrUpdateExperimentRna(APIView):
                     json_object=parsed_rna, table_name="experiment_rna_short_read"
                 )
                 rna_results = validator.get_validation_results()
-
                 if rna_results["valid"] is True and experiment_results["valid"] is True:
                     existing_rna = get_experiment_rna(experiment_rna=identifier)
                     rna_serializer = ExperimentRnaSerializer(
@@ -1069,6 +1068,7 @@ class CreateOrUpdateExperimentRna(APIView):
                         ExperimentService.create_or_update_experiment(experiment_data)
                     )
                     rna_valid = rna_serializer.is_valid()
+
                     experiment_valid = experiment_serializer.is_valid()
                     if experiment_valid and rna_valid:
                         rna_instance = rna_serializer.save()
