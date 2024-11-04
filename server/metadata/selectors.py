@@ -77,6 +77,7 @@ def parse_geneti_findings(genetic_findings: str) -> dict:
             key == "partial_contribution_explained"
             and type(genetic_findings[key]) == str
         ):
+            if 
             genetic_findings[key] = [value]
 
     parsed_geneti_findings = remove_na(datum=genetic_findings)

@@ -1,0 +1,140 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$5Zume6W5yJ6mG65dA4dDlK$vXsTd6lIx7VcS6tHvAaXszPsmLkSbwO3PjW1zJOuMjQ=",
+            "last_login": "2024-08-02T14:37:16.520Z",
+            "is_superuser": true,
+            "username": "wheel",
+            "first_name": "",
+            "last_name": "",
+            "email": "wheel@wheel.tst",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2024-05-14T18:21:45.897Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "authtoken.token",
+        "pk": "c779f2d087664915bb4e6b62ed4d0aba933be1e6",
+        "fields": {
+            "user": 2,
+            "created": "2024-08-13T19:22:25.584Z"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 1,
+        "fields": {
+            "name": "NATIVE_AMERICAN",
+            "description": "American Indian or Alaska Native"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 2,
+        "fields": {
+            "name": "ASIAN",
+            "description": "Asian"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 3,
+        "fields": {
+            "name": "BLACK",
+            "description": "Black or African American"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 4,
+        "fields": {
+            "name": "PACIFIC_ISLANDER",
+            "description": "Native Hawaiian or Other Pacific Islander"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 5,
+        "fields": {
+            "name": "MIDDLE_EASTERN",
+            "description": "Middle Eastern or North African"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": 6,
+        "fields": {
+            "name": "WHITE",
+            "description": "White"
+        }
+    },
+    {
+        "model": "experiments.experimenttype",
+        "pk": 1,
+        "fields": {
+            "name": "single-end",
+            "display_name": "single-end"
+        }
+    },
+    {
+        "model": "experiments.experimenttype",
+        "pk": 2,
+        "fields": {
+            "name": "paired-end",
+            "display_name": "paired-end"
+        }
+    },
+    {
+        "model": "experiments.experimenttype",
+        "pk": 3,
+        "fields": {
+            "name": "targeted",
+            "display_name": "targeted"
+        }
+    },
+    {
+        "model": "experiments.experimenttype",
+        "pk": 4,
+        "fields": {
+            "name": "untargeted",
+            "display_name": "untargeted"
+        }
+    },
+    {
+        "model": "experiments.librarypreptype",
+        "pk": 1,
+        "fields": {
+            "name": "stranded poly-A pulldown",
+            "display_name": "stranded poly-A pulldown"
+        }
+    },
+    {
+        "model": "experiments.librarypreptype",
+        "pk": 2,
+        "fields": {
+            "name": "stranded total RNA",
+            "display_name": "stranded total RNA"
+        }
+    },
+    {
+        "model": "experiments.librarypreptype",
+        "pk": 3,
+        "fields": {
+            "name": "rRNA depletion",
+            "display_name": "rRNA depletion"
+        }
+    },
+    {
+        "model": "experiments.librarypreptype",
+        "pk": 4,
+        "fields": {
+            "name": "globin depletion",
+            "display_name": "globin depletion"
+        }
+    }
+]

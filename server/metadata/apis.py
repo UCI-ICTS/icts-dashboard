@@ -250,7 +250,8 @@ class CreateParticipantAPI(APIView):
                 validator.validate_json(json_object=parsed_participant, table_name="participant")
                 results = validator.get_validation_results()
                 if results["valid"] is True:
-                    print("valid JSON", parsed_participant['reported_race'])
+                    # import pdb; pdb.set_trace()
+                    # print("valid JSON", parsed_participant['reported_race'])
                     parsed_participant = get_or_create_sub_models(datum=parsed_participant)
                     serializer = ParticipantInputSerializer(data=parsed_participant)
                     if serializer.is_valid():
@@ -639,6 +640,7 @@ class CreateOrUpdateGeneticFindings(APIView):
                 )
 
                 results = validator.get_validation_results()
+                import pdb; pdb.set_trace()
                 if results["valid"] is True:
                     genetic_findings_instance = get_genetic_findings(
                         genetic_findings_id=identifier
