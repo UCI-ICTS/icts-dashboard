@@ -250,11 +250,10 @@ class CreateParticipantAPI(APIView):
                 validator.validate_json(json_object=parsed_participant, table_name="participant")
                 results = validator.get_validation_results()
                 if results["valid"] is True:
-                    # import pdb; pdb.set_trace()
-                    # print("valid JSON", parsed_participant['reported_race'])
                     parsed_participant = get_or_create_sub_models(datum=parsed_participant)
                     serializer = ParticipantInputSerializer(data=parsed_participant)
                     if serializer.is_valid():
+                        
                         try:
                             participant_instance = serializer.create(
                                 validated_data=serializer.validated_data

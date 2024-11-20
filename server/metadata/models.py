@@ -287,6 +287,7 @@ class Participant(models.Model):
     )
     reported_race = models.ManyToManyField(
         ReportedRace,
+        related_name="participants",
         blank=True,
         help_text="Self/submitter-reported race (OMB categories)",
     )
