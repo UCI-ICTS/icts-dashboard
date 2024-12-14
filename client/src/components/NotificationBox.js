@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react"
 import { Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core"
 import { useDispatch, useSelector } from "react-redux";
@@ -12,9 +13,9 @@ export default function NotificationBox() {
     dispatch(clearMessage());
     setOpen(false);
   }
-
+  
   useEffect(() => {
-    if (!message === "") {
+    if (message !== "") {
       setOpen(true);
     }
   }, [message])

@@ -4,6 +4,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   jsonData: null,
+  participnats: null, 
 };
 
 export const dataSlice = createSlice({
@@ -19,6 +20,10 @@ export const dataSlice = createSlice({
       .addCase(submitParticipant.fulfilled, (state, action) => {
         console.log(action.payload)
         state.jsonData = action.payload;
+      })
+      .addCase(getAllParticipants.fulfilled, (state, action) => {
+        console.log(action.payload)
+        state.participnats = action.payload;
       })
   }
 });
@@ -36,5 +41,19 @@ export const submitParticipant = createAsyncThunk(
     }
   }
 )
+
+export const getAllParticipants = createAsyncThunk(
+  "getAllParticipants",
+  async ({}, thunkAPI) => {
+    try {
+      console.log("slice get participants")
+      const response = await dataService.getAllParticipants();
+      return response.data
+    } catch(error) {
+      console.log("hadley",error)
+    }
+  }
+)
+
 export const { setJsonData } = dataSlice.actions;
 export const dataReducer = dataSlice.reducer;

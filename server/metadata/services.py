@@ -147,7 +147,6 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
         reported_race = validated_data.pop("reported_race", [])
-        print(reported_race)
 
         try:
             with transaction.atomic():
@@ -172,11 +171,11 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         return participant
 
     def update(self, instance, validated_data):
-        
         internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
-        print("triggered")
+        reported_race = validated_data.pop("reported_race", [])
+
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
@@ -184,13 +183,22 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
             self._set_relationship(instance, InternalProjectId, internal_project_id, "internal_project_id")
             self._set_relationship(instance, PmidId, pmid_id, "pmid_id")
             self._set_relationship(instance, TwinId, twin_id, "twin_id")
+            self._set_relationship(instance, ReportedRace, reported_race, "reported_race")
 
         return instance
 
     def _set_relationship(self, instance, model, ids, related_name):
         # Setting ManyToMany relations
-        manager = getattr(instance, related_name)
-        manager.set(model.objects.filter(pk__in=ids))
+        print(instance, model, ids, related_name)  # Debugging
+        try:
+            manager = getattr(instance, related_name)
+            if model == ReportedRace:  # Special handling for ReportedRace
+                manager.set(model.objects.filter(description__in=ids))
+            else:
+                manager.set(model.objects.filter(pk__in=ids))
+        except Exception as e:
+            print(f"Error setting relationship: {e}")
+            raise
 
 
 def get_or_create_sub_models(datum):

@@ -6,7 +6,7 @@ import { submitParticipant } from '../slices/dataSlice';
 
 export const TableForm = () => {
   const dispatch = useDispatch();
-  const tableData = useSelector(state => state.data['jsonData']);
+  const tableData = useSelector(state => state.data['participants']);
   const initialValues = { rows: tableData };
   const participant_head = ['participant_id', 'internal_project_id', 'gregor_center', 'consent_code', 'recontactable', 'pmid_id', 'family_id', 'paternal_id', 'maternal_id', 'twin_id', 'proband_relationship', 'proband_relationship_detail', 'sex', 'sex_detail', 'reported_race', 'reported_ethnicity', 'ancestry_detail', 'age_at_last_observation', 'affected_status', 'phenotype_description', 'age_at_enrollment', 'prior_testing', 'case_level_result', 'updated_at', 'phenotype_id', 'solve_status', 'missing_variant_case', 'missing_variant_details']
   

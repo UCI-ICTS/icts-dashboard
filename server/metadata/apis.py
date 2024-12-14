@@ -6,8 +6,8 @@ from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, serializers
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from config.selectors import (
@@ -72,8 +72,8 @@ class GetMetadataAPI(APIView):
 
 class GetAllParticipantAPI(APIView):
     """"""
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="get_participants",
@@ -250,11 +250,10 @@ class CreateParticipantAPI(APIView):
                 validator.validate_json(json_object=parsed_participant, table_name="participant")
                 results = validator.get_validation_results()
                 if results["valid"] is True:
-                    # import pdb; pdb.set_trace()
-                    # print("valid JSON", parsed_participant['reported_race'])
                     parsed_participant = get_or_create_sub_models(datum=parsed_participant)
                     serializer = ParticipantInputSerializer(data=parsed_participant)
                     if serializer.is_valid():
+                        
                         try:
                             participant_instance = serializer.create(
                                 validated_data=serializer.validated_data

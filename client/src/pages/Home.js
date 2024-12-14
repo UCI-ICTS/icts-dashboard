@@ -8,8 +8,8 @@ import { Uploader } from "../components/Uploader";
 const HomePage = () => {
     return (
       <Container >
-        <Uploader/>
-        {/* <Grid item xs={12} sm={12} lg={12} xl={12} >
+        {/* <Uploader/> */}
+        <Grid item xs={12} sm={12} lg={12} xl={12} >
         We will leverage UCI Health’s expertise in genetics and genetic counseling to support an eConsult network 
             <Container className="home-margintop" maxWidth={false}>
               <Box>
@@ -35,10 +35,17 @@ const HomePage = () => {
                           linkTo= "/forms/refferal"
                         />
                     </Grid>
+                    <Grid item className="home-grid-item">
+                        <InfoBox
+                          header={"GREGoR Data Tables"}
+                          bodyText={"Access the GREGoR data tables and dashboard"}
+                          linkTo= "/forms/gregor"
+                        />
+                    </Grid>
                 </Grid>
               </Box>
             </Container>
-          </Grid> */}
+          </Grid>
       </Container>
     )
 }

@@ -287,6 +287,7 @@ class Participant(models.Model):
     )
     reported_race = models.ManyToManyField(
         ReportedRace,
+        related_name="participants",
         blank=True,
         help_text="Self/submitter-reported race (OMB categories)",
     )
@@ -689,6 +690,13 @@ class Analyte(models.Model):
         blank=True,
         null=True,
         help_text="Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note",
+    )
+
+    internal_analyte_id = models.CharField(
+        max_length=255,
+        blank=True, 
+        null=True,
+        help_text="UCI identifier for an analyte from a primary biosample source",
     )
 
     def __str__(self):
