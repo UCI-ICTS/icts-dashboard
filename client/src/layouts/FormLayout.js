@@ -9,7 +9,7 @@ const FormLayout = () => {
 
   return (
     <div className="outlet-root">
-      <NavBar />
+      {/* <NavBar /> */}
       <div className="outlet-container">
         <div className="outlet-main-content">
           <Outlet />

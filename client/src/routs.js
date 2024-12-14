@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/Home";
 import Login from "./pages/Login";
 import Refferal from "./pages/Refferal";
+import Gregor from "./pages/Gregor";
 import FormLayout from "./layouts/FormLayout";
 
 
@@ -27,7 +28,8 @@ export default function Router() {
             path: "/forms",
             element: <FormLayout/>,
             children: [
-                { path: "/forms/refferal", element: <Refferal />}
+                { path: "/forms/refferal", element: <Refferal />},
+                { path: "/forms/gregor", element: <Gregor />}
             ]
         },
         {
