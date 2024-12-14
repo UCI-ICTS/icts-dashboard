@@ -191,7 +191,6 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         try:
             manager = getattr(instance, related_name)
             if model == ReportedRace:  # Special handling for ReportedRace
-                import pdb; pdb.set_trace()
                 manager.set(model.objects.filter(description__in=ids))
             else:
                 manager.set(model.objects.filter(pk__in=ids))

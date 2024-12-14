@@ -10,33 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import configparser
-from django.core.management.utils import get_random_secret_key
 import os
-from pathlib import Path
+import configparser
+from datetime import timedelta
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# Reading and populating secrets and instance specific information
 secrets = configparser.ConfigParser()
 secrets.read(BASE_DIR + "/.secrets")
-
 if secrets["DJANGO_KEYS"]["SECRET_KEY"]:
     SECRET_KEY = secrets["DJANGO_KEYS"]["SECRET_KEY"]
 else:
     SECRET_KEY = get_random_secret_key()
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = secrets["SERVER"]["DEBUG"]
-
 ALLOWED_HOSTS = secrets["SERVER"]["ALLOWED_HOSTS"].split(",")
-
 VERSION = secrets["SERVER"]["SERVER_VERSION"]
-
 PUBLIC_HOSTNAME = secrets["SERVER"]["DASHBOARD_URL"]
 
 # Application definition
@@ -54,6 +45,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "authentication",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels"
@@ -154,13 +147,23 @@ CORS_ALLOWED_ORIGINS = [
 
 # https://styria-digital.github.io/django-rest-framework-jwt/
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
+        # "authentication.services.CustomAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=100),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+    "TOKEN_OBTAIN_SERIALIZER": "authentication.services.CustomObtainPairSerializer"
 }
 
 SWAGGER_SETTINGS = {
