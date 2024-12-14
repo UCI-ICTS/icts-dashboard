@@ -147,6 +147,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
         reported_race = validated_data.pop("reported_race", [])
+
         try:
             with transaction.atomic():
                 participant = Participant.objects.create(**validated_data)
@@ -174,6 +175,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         pmid_id = validated_data.pop("pmid_id", [])
         twin_id = validated_data.pop("twin_id", [])
         reported_race = validated_data.pop("reported_race", [])
+
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)

@@ -87,7 +87,7 @@ class GetAllParticipantAPI(APIView):
     def get(self, request):
         response_data = []
         try:
-            participant_list = Participant.objects.all()[:10]
+            participant_list = Participant.objects.all()
             serialized_participants = ParticipantOutputSerializer(participant_list, many=True)
             return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
         except Exception as error:
