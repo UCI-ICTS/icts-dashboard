@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # authentication/services.py
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
@@ -52,14 +51,3 @@ class CustomAuthentication(BaseAuthentication):
         
         # Return the user and the token
         return user, token
-
-class CustomObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        # Add custom claims
-        token['name'] = user.username
-        # ...
-
-        return token
