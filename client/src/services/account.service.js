@@ -8,17 +8,20 @@ const login = async (username, password) => {
     username,
     password,
   });
-  if (response.data.token) {
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    localStorage.setItem("token", JSON.stringify(response.data.token));
-    return response.data;
-    } else {
-      console.log("service error")
-    }
+  return response.data;
   };
 
+  const logout = async (token) => {
+    console.log("service",token)
+    const response = await axios.post(USERSDB + "/api/auth/logout/", {
+      refresh: token
+    });
+    return response.data;
+    };
+  
   const accountService = {
     login,
+    logout,
   };
   
   export default accountService;
