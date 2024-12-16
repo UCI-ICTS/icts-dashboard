@@ -6,7 +6,8 @@ import * as Yup from "yup";
 import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField, Typography } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { login } from "../slices/accountSlice";
-import NotificationBox from "../components/NotificationBox";
+import { CheckBox, RememberMe } from "@mui/icons-material";
+import { removeListener } from "@reduxjs/toolkit";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Login = () => {
   const initialValues = {
     username: "",
     password: "",
+    rememberMe: false,
   };
 
   const validationSchema = Yup.object().shape({
@@ -30,14 +32,13 @@ const Login = () => {
   });
 
   const handleLogin = (formValue) => {
-    const { username, password } = formValue;
+    const { username, password, rememberMe } = formValue;
     setLoading(true);
-    console.log("here")
-    dispatch(login({ username, password }))
+    dispatch(login({ username, password, rememberMe }))
       .unwrap()
       .then(() => {
         navigate("/");
-        global.window.location.reload();
+        // global.window.location.reload();
       })
       .catch(() => {
         setLoading(false);
@@ -60,7 +61,7 @@ const Login = () => {
             <Typography variant="h4">Sign in</Typography>
             <Typography>Sign in using your Portal credentials</Typography>
             <Typography component={Link} to="/register">
-              Don&apos;t have an account? Sign up here
+              Don&apos;t have an account? Request one here.
             </Typography>
           </Grid>
           <br />
@@ -78,7 +79,6 @@ const Login = () => {
                     as={TextField}
                     type="text"
                     label="User Name"
-                    
                     variant="outlined"
                     error={touched.username && Boolean(errors.username)}
                     helperText={touched.username && errors.username}
@@ -91,11 +91,20 @@ const Login = () => {
                     as={TextField}
                     type="password"
                     label="Password"
-                    
                     variant="outlined"
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                   />
+                </Grid>
+                <br/>
+                <Grid item>
+                  <label>
+                  <Field
+                    name="rememberMe"
+                    type="checkbox"
+                    label="rememberMe"
+                    variant="outlined"
+                  />Remember Me</label>
                 </Grid>
                 <br/>
                 <div className="form-group">
@@ -119,7 +128,6 @@ const Login = () => {
             )}
           </Formik>
         </Container>
-        <NotificationBox />
         <Dialog open={open}>
           <DialogContent>
             <DialogTitle>Password Reset</DialogTitle>

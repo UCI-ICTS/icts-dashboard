@@ -14,7 +14,6 @@ import * as Yup from "yup";
 import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField, Typography, Paper } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { login } from "../slices/accountSlice";
-import NotificationBox from "../components/NotificationBox";
 
 const Gregor = () => {
   let navigate = useNavigate();
@@ -53,7 +52,6 @@ const Gregor = () => {
               color="primary"
             >get</Button>
         </Container>
-        <NotificationBox />
       </Box>
     </Container>
     </Paper>
