@@ -7,14 +7,12 @@ from authentication.apis import (
     DecoratedTokenObtainPairView,
     DecoratedTokenRefreshView,
     DecoratedTokenVerifyView,
-    DecoratedTokenBlacklistView
-    
-    
-    
+    DecoratedTokenBlacklistView   
 )
 
 urlpatterns = [
     path("refresh/", DecoratedTokenVerifyView.as_view()),
     path("verify/", DecoratedTokenRefreshView.as_view()),
     path("login/", DecoratedTokenObtainPairView.as_view()),
+    path("logout/", DecoratedTokenBlacklistView.as_view()),
 ]

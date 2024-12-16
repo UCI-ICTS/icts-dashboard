@@ -11,8 +11,6 @@ from rest_framework_simplejwt.views import (
 )
 
 
-
-
 class DecoratedTokenObtainPairView(TokenObtainPairView):
 
     class TokenObtainPairResponseSerializer(serializers.Serializer):
@@ -73,9 +71,6 @@ class DecoratedTokenVerifyView(TokenVerifyView):
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
-
-
-
 
 
 class DecoratedTokenBlacklistView(TokenBlacklistView):
