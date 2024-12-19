@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Outlet } from "react-router-dom";
-import NavBar from "./NavBar";
+import NavBar from "../components/NavBar";
 import NotificationBox from "../components/NotificationBox";
 import "../App.css";
 

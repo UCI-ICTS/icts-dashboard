@@ -2,15 +2,15 @@
 
 import React from "react";
 import { Outlet } from "react-router-dom";
-import NavBar from "./NavBar";
+import FormNavBar from "../components/FormNavBar";
 import "../App.css";
 import NotificationBox from "../components/NotificationBox";
 
 const FormLayout = () => {
-
+  
   return (
     <div className="outlet-root">
-      <NavBar />
+      <FormNavBar />
       <NotificationBox />
       <div className="outlet-container">
         <div className="outlet-main-content">

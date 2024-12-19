@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getAllParticipants } from "../slices/dataSlice";
 import { TableForm } from "../components/TableForm";
-
+import Form from '@rjsf/core';
+import { RJSFSchema } from '@rjsf/utils';
+import validator from '@rjsf/validator-ajv8';
 
 // import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -35,7 +37,23 @@ const Gregor = () => {
   return (
     <Paper>
     <Container>
-Stuff
+      <Box display="flex" flexdirection="column" height="100%" >
+        <Container>
+          <Grid item>
+            <Typography variant="h4">{formType} Form</Typography>
+          </Grid>
+          <br/>
+          <TableForm
+            tableData={tableData}
+          />
+          <Button
+              id="Cancel-resetPassword"
+              onClick={handleGet}
+              variant="outlined"
+              color="primary"
+            >get</Button>
+        </Container>
+      </Box>
     </Container>
     </Paper>
   );
