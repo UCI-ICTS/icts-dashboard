@@ -20,9 +20,9 @@ import { logout } from "../slices/accountSlice";
 
 const pages = [
   { label: 'About', path: '/about' },
-  { label: 'Resources', path: '/resources' },
-  { label: 'FAQ', path: '/faq' },
-  { label: 'News & Events', path: '/news-events' },
+  { label: 'GREGoR', path: '/gregor' },
+  { label: 'UDN', path: '/udn' },
+  { label: 'MIA', path: '/mia' }
 ];
 
 function NavBar() {

@@ -60,11 +60,19 @@ export default function Router() {
             ]
         },
         {
-            path: "/forms",
+            path: "/gregor",
             element: <FormLayout/>,
             children: [
-                { path: "/forms/refferal", element: <Refferal />},
-                { path: "/forms/gregor", element: <Gregor />}
+                { path: "/gregor/forms", element: <Refferal />},
+                { path: "/gregor/", element: <Gregor />}
+            ]
+        },
+        {
+            path: "/udn",
+            element: <FormLayout/>,
+            children: [
+                { path: "/udn/forms", element: <Refferal />},
+                { path: "/udn", element: <Gregor />}
             ]
         },
         {

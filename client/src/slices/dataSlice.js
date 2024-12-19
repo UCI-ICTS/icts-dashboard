@@ -44,10 +44,10 @@ export const submitParticipant = createAsyncThunk(
 
 export const getAllParticipants = createAsyncThunk(
   "getAllParticipants",
-  async ({}, thunkAPI) => {
+  async ({token}, thunkAPI) => {
     try {
       console.log("slice get participants")
-      const response = await dataService.getAllParticipants();
+      const response = await dataService.getAllParticipants(token);
       return response.data
     } catch(error) {
       console.log("hadley",error)

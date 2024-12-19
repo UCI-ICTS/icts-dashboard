@@ -22,13 +22,11 @@ const initialState = user
         .addCase(login.fulfilled, (state, action) => {
           state.loading = false; // Set loading to false when login is fulfilled
           state.isLoggedIn = true;
-          console.log(action.payload)
           const payload = action.payload.data
           const user = jwtDecode(action.payload.data.access)
           user["refresh_token"] = payload.refresh
           user["access_token"] = payload.access
           delete user.token_type
-          console.log(user)
           state.user = user;
           if (action.payload.rememberMe === true) {
             localStorage.setItem("user", JSON.stringify(user));
@@ -95,7 +93,6 @@ export const login = createAsyncThunk(
 export const logout = createAsyncThunk(
   "auth/logout",
   async ({ token }, thunkAPI) => {
-    console.log("slice",token)
     try {
       const data = await AccountService.logout(token);
       return { data };

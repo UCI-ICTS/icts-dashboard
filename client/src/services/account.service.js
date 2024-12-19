@@ -3,7 +3,6 @@ import axios from "axios";
 const USERSDB = process.env.REACT_APP_USERDB;
 
 const login = async (username, password) => {
-  console.log("USERSDB",USERSDB)
   const response = await axios.post(USERSDB + "/api/auth/login/", {
     username,
     password,
@@ -12,7 +11,6 @@ const login = async (username, password) => {
   };
 
   const logout = async (token) => {
-    console.log("service",token)
     const response = await axios.post(USERSDB + "/api/auth/logout/", {
       refresh: token
     });

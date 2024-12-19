@@ -12,11 +12,13 @@ const submitParticipant = async (data) => {
   return response;
 }
 
-const getAllParticipants = async () => {
+const getAllParticipants = async (token) => {
   console.log("participoants service")
+  
   const response = await axios.get("http://localhost:8000/api/metadata/get_all_participants/", {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
     }
   });
   return response;
