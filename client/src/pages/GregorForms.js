@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getAllParticipants } from "../slices/dataSlice";
 import { TableForm } from "../components/TableForm";
+import "../App.css";
 import Form from '@rjsf/core';
 import { RJSFSchema } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
@@ -18,7 +19,7 @@ import { login } from "../slices/accountSlice";
 const Gregor = () => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
-  const tableData = useSelector(state => state.data['participnats']);
+  const tableData = useSelector(state => state.data['participants']);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(false);
 //   const [schema, setSchema] = useState({});
@@ -38,7 +39,7 @@ const Gregor = () => {
     <Paper>
     <Container>
       <Box display="flex" flexdirection="column" height="100%" >
-        <Container>
+        <Container className="table-container">
           <Grid item>
             <Typography variant="h4">{formType} Form</Typography>
           </Grid>
