@@ -15,8 +15,10 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from "../slices/accountSlice";
+import HomeIcon  from "./HomeIcon"
+import UserMenu from './UserMenu';
+import { useDispatch } from 'react-redux';
+import { setTableView } from '../slices/dataSlice';
 
 const pages = [
   { label: 'About', path: '/about' },
@@ -24,51 +26,32 @@ const pages = [
   { label: 'UDN', path: '/udn' },
   { label: 'MIA', path: '/mia' }
 ];
+const tables = [
+  {name:"Participants", schema:"participants", identifier:"participants"},
+  {name:"Family", schema:"family", identifier:"family"},
+  {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings"},
+  {name:"Analyte", schema:"analyte", identifier:"analyte"}
+]
+function FormNavBar() {
 
-function NavBar() {
-  const dispatch = useDispatch();
-  const auth = useSelector((state) => state.account);
   const isMobile = useMediaQuery('(max-width:900px)');
 
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-
+  const dispatch = useDispatch();
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
-  const handleCloseNavMenu = () => setAnchorElNav(null);
-
-  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
-  const handleCloseUserMenu = () => setAnchorElUser(null);
-
-  const handleLogout = () => {
-    const token = auth.user.refresh_token
-    dispatch(logout({token}))
-    // console.log(token)
-
+  const handleCloseNavMenu = (table) => {
+    setAnchorElNav(null)
+    console.log("press", table)
+    dispatch(setTableView(table));
   };
   
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            PMGRC
-          </Typography>
-          {auth.isLoggedIn === true ?(
-            <>{/* Mobile Menu */}
+          <HomeIcon />
+
+          {/* Mobile Menu */}
             {isMobile && (
               <Box sx={{ flexGrow: 1 }}>
                 <IconButton
@@ -77,7 +60,7 @@ function NavBar() {
                   onClick={handleOpenNavMenu}
                   color="inherit"
                 >
-                  <MenuIcon />
+                  <MenuIcon />Menu
                 </IconButton>
                 <Menu
                   anchorEl={anchorElNav}
@@ -86,12 +69,15 @@ function NavBar() {
                   open={Boolean(anchorElNav)}
                   onClose={handleCloseNavMenu}
                 >
-                  {pages.map((page) => (
-                    <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                  <MenuItem key={"home"}>
+                    <Typography textAlign="center">
+                      Home
+                    </Typography>
+                  </MenuItem>
+                  {tables.map((table) => (
+                    <MenuItem key={table.schema} onClick={event => handleCloseNavMenu(table)}>
                       <Typography textAlign="center">
-                        <Link to={page.path} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          {page.label}
-                        </Link>
+                        {table.name}
                       </Typography>
                     </MenuItem>
                   ))}
@@ -101,47 +87,21 @@ function NavBar() {
   
             {/* Desktop Menu */}
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {tables.map((table) => (
                 <Button
-                  key={page.label}
-                  component={Link}
-                  to={page.path}
-                  onClick={handleCloseNavMenu}
+                  key={table.name}
+                  onClick={event => handleCloseNavMenu(table)}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
-                  {page.label}
+                  {table.name}
                 </Button>
               ))}
             </Box>
-  
-            {/* User Menu */}
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={auth?.name || 'User'} src={auth?.avatar || ''} />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                anchorEl={anchorElUser}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                <MenuItem onClick={handleCloseUserMenu}>Profile</MenuItem>
-                <MenuItem onClick={handleCloseUserMenu}>Settings</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </Menu>
-            </Box></>
-            ) : (
-            <>not isLoggedIn</>
-            )
-          }
-          
+          <UserMenu />
         </Toolbar>
       </Container>
     </AppBar>
   );
 }
 
-export default NavBar;
+export default FormNavBar;

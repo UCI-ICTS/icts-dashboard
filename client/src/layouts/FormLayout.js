@@ -3,7 +3,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import FormNavBar from "../components/FormNavBar";
-import "../App.css";
 import NotificationBox from "../components/NotificationBox";
 
 const FormLayout = () => {

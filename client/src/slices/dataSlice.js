@@ -3,8 +3,9 @@ import dataService from "../services/data.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+  tableView: null,
   jsonData: null,
-  participnats: null, 
+  participants: null,
 };
 
 export const dataSlice = createSlice({
@@ -14,6 +15,10 @@ export const dataSlice = createSlice({
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
     },
+    setTableView: (state, action) => {
+      state.tableView = action.payload.identifier;
+      console.log(action.payload)
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -23,7 +28,7 @@ export const dataSlice = createSlice({
       })
       .addCase(getAllParticipants.fulfilled, (state, action) => {
         console.log(action.payload)
-        state.participnats = action.payload;
+        state.participants = action.payload;
       })
   }
 });
@@ -55,5 +60,8 @@ export const getAllParticipants = createAsyncThunk(
   }
 )
 
-export const { setJsonData } = dataSlice.actions;
+export const {
+  setJsonData,
+  setTableView
+} = dataSlice.actions;
 export const dataReducer = dataSlice.reducer;

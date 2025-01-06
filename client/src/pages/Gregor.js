@@ -16,7 +16,7 @@ import { login } from "../slices/accountSlice";
 const Gregor = () => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
-  const tableData = useSelector(state => state.data['participnats']);
+  const tableData = useSelector(state => state.data['participants']);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(false);
 //   const [schema, setSchema] = useState({});
@@ -33,11 +33,15 @@ const Gregor = () => {
   }
   
   return (
-    <Paper>
     <Container>
-Stuff
+      <Button
+        id="Cancel-resetPassword"
+        onClick={handleGet}
+        variant="outlined"
+        color="primary"
+      >get</Button>
+      <TableForm />
     </Container>
-    </Paper>
   );
 };
 

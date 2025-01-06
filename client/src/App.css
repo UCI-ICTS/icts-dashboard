@@ -1,40 +1,44 @@
+/* Variables for Consistency */
+:root {
+  --main-bg-color: rgb(250, 249, 246);
+  --accent-bg-color: rgb(186, 209, 234);
+  --font-bold: bold;
+  --title-font-size: 28px;
+  --subtitle-font-size: 24px;
+  --spacing-small: 10px;
+  --spacing-medium: 50px;
+}
 
 /* Outlet styles */
 .outlet-root {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
-  width: 100%;
   flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .outlet-container {
   display: flex;
-  flex: 1 1 auto;
-  overflow: hidden;
+  flex: 1;
   padding-top: 75px;
+  overflow: hidden;
 }
 
-.outlet-main-content {
-  text-align: center;
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
+.outlet-main-content,
 .outlet-content {
-  flex: 1 1 auto;
+  flex: 1;
   overflow: auto;
+  text-align: center;
 }
 
 /* Homepage Styles */
 .home-root {
-  background-color: rgb(250, 249, 246);
+  background-color: var(--main-bg-color);
+  margin: auto;
   min-height: 100%;
-  margin-top: auto;
-  padding-bottom: 3;
-  padding-top: 3;
-  margin-left: auto;
-  min-width: 275;
+  padding: var(--spacing-small) 0;
+  min-width: 275px;
 }
 
 .home-bullet {
@@ -44,73 +48,63 @@
 }
 
 .home-centered {
-  min-Width: 275;
   text-align: center;
-  margin-Top: 0;
+  min-width: 275px;
 }
 
 .home-heightened {
   min-height: 50px;
 }
 
-.home-intro-title {
-  font-size: 28px !important;
-  font-weight: bold !important;
+.home-title {
+  font-size: var(--title-font-size);
+  font-weight: var(--font-bold);
 }
 
 .home-position {
-  margin-bottom: 12;
+  margin-bottom: var(--spacing-small);
 }
 
-.home-margintop{
-  margin-top: 50px;
+.home-margintop {
+  margin-top: var(--spacing-medium);
 }
 
 .home-colorBackground {
-  background-color: rgb(186, 209, 234);
+  background-color: var(--accent-bg-color);
+}
+
+.home-linkcard,
+.home-supportcard {
+  text-align: center;
+  min-width: 275px;
 }
 
 .home-linkcard {
   height: 250px;
-  min-width: 275;
-  text-align: center;
-  margin-top: 5;
+  margin-top: 5px;
 }
 
 .home-supportcard {
-  text-align: center;
-  margin-bottom: 10;
+  margin-bottom: var(--spacing-small);
   min-height: 460px;
-  min-width: 275;
 }
 
 .home-subtitle {
-  font-size: 24px !important;
+  font-size: var(--subtitle-font-size);
+  font-weight: var(--font-bold);
 }
 
 .home-grid-item {
-  width: 100%; /* default to full width, equivalent to xs=12 */
+  width: 100%;
 }
 
 @media (min-width: 600px) { /* sm breakpoint */
   .home-grid-item {
-    width: 33.3333%; /* equivalent to sm=4 */
+    width: 33.3333%;
   }
 }
 
-@media (min-width: 1200px) { /* lg breakpoint */
-  .home-grid-item {
-    width: 33.3333%; /* lg=4, though this is redundant if it doesn't change from sm */
-  }
-}
-
-@media (min-width: 1536px) { /* xl breakpoint */
-  .home-grid-item {
-    width: 33.3333%; /* xl=4, again redundant here but included for clarity */
-  }
-}
-
-
+/* Animations */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -119,4 +113,3 @@
     transform: rotate(360deg);
   }
 }
-

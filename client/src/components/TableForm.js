@@ -4,16 +4,19 @@ import { Formik, Field, Form, FieldArray, ErrorMessage } from 'formik';
 import { useSelector } from 'react-redux';
 import { submitParticipant } from '../slices/dataSlice';
 
-export const TableForm = ({tableData}) => {
+export const TableForm = () => {
   const dispatch = useDispatch();
-  // const tableData = useSelector(state => state.data['participants']);
+  const thing = useSelector(state => state.data)
+  const tableView = useSelector(state => state.data.tableView);
+  const tableData = useSelector(state => state.data[tableView]);
   const initialValues = { rows: tableData };
-  const participant_head = ['participant_id', 'internal_project_id', 'gregor_center', 'consent_code', 'recontactable', 'pmid_id', 'family_id', 'paternal_id', 'maternal_id', 'twin_id', 'proband_relationship', 'proband_relationship_detail', 'sex', 'sex_detail', 'reported_race', 'reported_ethnicity', 'ancestry_detail', 'age_at_last_observation', 'affected_status', 'phenotype_description', 'age_at_enrollment', 'prior_testing', 'case_level_result', 'updated_at', 'phenotype_id', 'solve_status', 'missing_variant_case', 'missing_variant_details']
-  console.log(tableData)
+  const table_head = ['participant_id', 'internal_project_id', 'gregor_center', 'consent_code', 'recontactable', 'pmid_id', 'family_id', 'paternal_id', 'maternal_id', 'twin_id', 'proband_relationship', 'proband_relationship_detail', 'sex', 'sex_detail', 'reported_race', 'reported_ethnicity', 'ancestry_detail', 'age_at_last_observation', 'affected_status', 'phenotype_description', 'age_at_enrollment', 'prior_testing', 'case_level_result', 'updated_at', 'phenotype_id', 'solve_status', 'missing_variant_case', 'missing_variant_details']
+  console.log(tableView, thing, tableData)
+  
   const convertToJSON = (data) => {
     const data_list = [];
     const actualHeaders = data[0];
-    const participant_valid = participant_head.every(header => actualHeaders.includes(header));
+    const participant_valid = table_head.every(header => actualHeaders.includes(header));
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const line = {};
@@ -54,18 +57,18 @@ export const TableForm = ({tableData}) => {
                 <table>
                   <thead>
                     <tr>
-                      {Object.keys(tableData[0]).map(key => (
-                        <th key={key}>{tableData[0][key]}</th>
+                      {Object.keys(table_head).map(key => (
+                        <th key={key}>{table_head[key]}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {values.rows.map((row, index) => (
-                      (index > 0) ? (
+                      (index >= 0) ? (
                       <tr key={index}>
                         {Object.keys(row).length > 0 ? Object.keys(row).map(key => (
                           <td key={`${key}-${index}`}>
-                            <Field name={`rows[${index}].${key}`} />
+                            <Field name={`rows[${index}].${key}`} value={row[key] || ""} />
                             <ErrorMessage name={`rows[${index}].${key}`} component="div" />
                           </td>
                         )) : (
