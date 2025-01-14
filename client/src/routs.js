@@ -9,7 +9,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/Home";
 import Login from "./pages/Login";
 import Refferal from "./pages/Refferal";
-import Gregor from "./pages/Gregor";
+import GregorTables from "./pages/GregorTables";
 import FormLayout from "./layouts/FormLayout";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
@@ -64,7 +64,7 @@ export default function Router() {
             element: <FormLayout/>,
             children: [
                 { path: "/gregor/forms", element: <Refferal />},
-                { path: "/gregor/", element: <Gregor />}
+                { path: "/gregor/", element: <GregorTables />}
             ]
         },
         {
@@ -72,7 +72,7 @@ export default function Router() {
             element: <FormLayout/>,
             children: [
                 { path: "/udn/forms", element: <Refferal />},
-                { path: "/udn", element: <Gregor />}
+                { path: "/udn", element: <GregorTables />}
             ]
         },
         {

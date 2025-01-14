@@ -28,7 +28,7 @@ const pages = [
 ];
 const tables = [
   {name:"Participants", schema:"participants", identifier:"participants"},
-  {name:"Family", schema:"family", identifier:"family"},
+  {name:"Families", schema:"families", identifier:"families"},
   {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings"},
   {name:"Analyte", schema:"analyte", identifier:"analyte"}
 ]

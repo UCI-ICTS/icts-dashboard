@@ -2,7 +2,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import CSVReader from 'react-csv-reader'
 import { setJsonData, submitParticipant } from '../slices/dataSlice';
-import { TableForm } from './TableForm';
+import TableForm from './TableForm';
 
 export const Uploader = () => {
   const dispatch = useDispatch();
