@@ -1,97 +1,386 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Formik, Field, Form, FieldArray, ErrorMessage } from 'formik';
-import { useSelector } from 'react-redux';
-import { submitParticipant } from '../slices/dataSlice';
+import PropTypes from 'prop-types';
+import "../App.css";
+import { alpha } from '@mui/material/styles';
+import {
+  Box,
+  Button, 
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Paper,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  TableSortLabel,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@material-ui/core";
 
-export const TableForm = () => {
-  const dispatch = useDispatch();
-  const thing = useSelector(state => state.data)
-  const tableView = useSelector(state => state.data.tableView);
-  const tableData = useSelector(state => state.data[tableView]);
-  const initialValues = { rows: tableData };
-  const table_head = ['participant_id', 'internal_project_id', 'gregor_center', 'consent_code', 'recontactable', 'pmid_id', 'family_id', 'paternal_id', 'maternal_id', 'twin_id', 'proband_relationship', 'proband_relationship_detail', 'sex', 'sex_detail', 'reported_race', 'reported_ethnicity', 'ancestry_detail', 'age_at_last_observation', 'affected_status', 'phenotype_description', 'age_at_enrollment', 'prior_testing', 'case_level_result', 'updated_at', 'phenotype_id', 'solve_status', 'missing_variant_case', 'missing_variant_details']
-  console.log(tableView, thing, tableData)
-  
-  const convertToJSON = (data) => {
-    const data_list = [];
-    const actualHeaders = data[0];
-    const participant_valid = table_head.every(header => actualHeaders.includes(header));
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const line = {};
-      actualHeaders.forEach((item, count) => {
-        line[item] = row[count];
-      });
-      data_list.push(line);
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { visuallyHidden } from '@mui/utils';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+
+// Utility function to convert JSON schema to Yup validation schema
+const jsonSchemaToYup = (jsonSchema) => {
+  const yupSchema = {};
+
+  Object.entries(jsonSchema.properties).forEach(([key, value]) => {
+    let validator = Yup.mixed();
+
+    // Add validation based on type
+    if (value.type === 'string') {
+      validator = Yup.string();
+      if (value.minLength) validator = validator.min(value.minLength);
+      if (value.maxLength) validator = validator.max(value.maxLength);
+    } else if (value.type === 'integer') {
+      validator = Yup.number().integer();
+      if (value.minimum) validator = validator.min(value.minimum);
+      if (value.maximum) validator = validator.max(value.maximum);
     }
-    return [data_list, participant_valid];
+
+    // Mark field as required if it's in the "required" list
+    if (jsonSchema.required && jsonSchema.required.includes(key)) {
+      validator = validator.required(`${key} is required`);
+    }
+
+    yupSchema[key] = validator;
+  });
+
+  return Yup.object().shape(yupSchema);
+};
+
+// Generate headCells dynamically from schema
+const generateHeadCells = (schema) => {
+  return schema
+  ? Object.entries(schema.properties).map(([key, value]) => ({
+      id: key,
+      numeric: value.type === 'number', // Set numeric based on type
+      disablePadding: false,
+      label: value.label || key, // Use description or fallback to key
+      description: value.description || key, // Use description or fallback to key
+    }))
+  : [];
+};
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
   }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
 
-    const handleSubmit = (values) => {
-      const [data_list, data_type] = convertToJSON(values.rows)
-      if (data_type === true) {
-        dispatch(submitParticipant({data_list}))
-        console.log(data_list)
-      }
-    };
+function getComparator(order, orderBy) {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
 
-    if (!tableData || tableData.length === 0) {
-      return <div>Loading...</div>;
-    }
+
+function EnhancedTableHead({headCells, ...props}) {
+  const { order, orderBy, numSelected, rowCount, onRequestSort } =
+    props;
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      {({ values }) => (
-        <Form>
-          <FieldArray
-            name="rows"
-            render={arrayHelpers => (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => arrayHelpers.push({})}
-                >
-                  Add Row
-                </button>
-                <table>
-                  <thead>
-                    <tr>
-                      {Object.keys(table_head).map(key => (
-                        <th key={key}>{table_head[key]}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {values.rows.map((row, index) => (
-                      (index >= 0) ? (
-                      <tr key={index}>
-                        {Object.keys(row).length > 0 ? Object.keys(row).map(key => (
-                          <td key={`${key}-${index}`}>
-                            <Field name={`rows[${index}].${key}`} value={row[key] || ""} />
-                            <ErrorMessage name={`rows[${index}].${key}`} component="div" />
-                          </td>
-                        )) : (
-                          <></>
-                        )}
-                        <td>
-                          <button
-                            type="button"
-                            onClick={() => arrayHelpers.remove(index)} // Remove this row
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>) : (<></>)
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          />
-          <button type="submit">Submit</button>
-        </Form>
-      )}
-    </Formik>
+    <TableHead>
+      <TableRow>
+        
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align={headCell.numeric ? 'right' : 'left'}
+            padding={headCell.disablePadding ? 'none' : 'normal'}
+            sortDirection={orderBy === headCell.id ? order : false}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {/* {order === 'desc' ? 'sorted descending' : 'sorted ascending'} */}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
   );
+}
+
+EnhancedTableHead.propTypes = {
+  headCells: PropTypes.array.isRequired,
+  numSelected: PropTypes.number.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
+  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired,
 };
+
+function EnhancedTableToolbar(props) {
+  const { numSelected } = props;
+  return (
+    <Toolbar
+      sx={[
+        {
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+        },
+        numSelected > 0 && {
+          bgcolor: (theme) =>
+            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+        },
+      ]}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          **CHANGE THIS TO SEARCH FEATURES**
+        </Typography>
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Filter list">
+          <IconButton>
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Toolbar>
+  );
+}
+
+EnhancedTableToolbar.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+};
+
+export default function TableForm({rows, schema}) {
+  const headCells = React.useMemo(() => generateHeadCells(schema), [schema]);
+    // Convert JSON Schema to Yup Validation Schema
+  const yupSchema = React.useMemo(() => jsonSchemaToYup(schema), [schema]);
+
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('calories');
+  const [selected, setSelected] = React.useState([]);
+  const [page, setPage] = React.useState(0);
+  const [dense, setDense] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [selectedRow, setSelectedRow] = React.useState(null); // Holds the row data for the dialog
+  const [openDialog, setOpenDialog] = React.useState(false); // Controls dialog visibility
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const handleClick = (row) => {
+   console.log(row)
+   setSelectedRow(row); // Save the clicked row data
+   setOpenDialog(true); // Open the dialog
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    setSelectedRow(null);
+  };
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChangeDense = (event) => {
+    setDense(event.target.checked);
+  };
+
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+  const visibleRows = React.useMemo(
+    () =>
+      rows
+        ? [...rows]
+          .sort(getComparator(order, orderBy))
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        : [],
+    [rows, order, orderBy, page, rowsPerPage],
+  );
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2 }}>
+        <EnhancedTableToolbar numSelected={selected.length} />
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <TableContainer>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby="tableTitle"
+            size={dense ? 'small' : 'medium'}
+          >
+            <EnhancedTableHead
+              headCells={headCells}
+              numSelected={selected.length}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              rowCount={rows.length}
+            />
+            <TableBody>
+              {visibleRows.map((row, index) => {
+                const isItemSelected = selected.includes(row.participant_id);
+                const labelId = `enhanced-table-checkbox-${index}`;
+
+                return (
+                  <TableRow
+                    hover
+                    onClick={() => handleClick(row)}
+                    role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={row.participant_id}
+                    selected={isItemSelected}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                   
+                    {headCells.map((cell) => (
+                      <TableCell key={cell.id} align={cell.numeric ? 'right' : 'left'}>
+                        {row[cell.id] || ""}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: (dense ? 33 : 53) * emptyRows,
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+      </Paper>
+      <FormControlLabel
+        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        label="Dense padding"
+      />
+      {/* Dialog Box */}
+      <Dialog open={openDialog} onClose={handleDialogClose} className="dialog-form-container">
+        <DialogTitle className="dialog-form-title">{schema.title} Details</DialogTitle>
+        <DialogActions className='dialog-form-actions'>
+          <Button onClick={handleDialogClose} color="secondary">
+            Close
+          </Button>
+          <Button type="submit" color="primary">
+            Submit
+          </Button>
+        </DialogActions>
+        <DialogContent className="dialog-form-content">
+          {/* Formik Form */}
+          {selectedRow && (
+            <Formik
+              initialValues={selectedRow}
+              validationSchema={yupSchema}
+              onSubmit={(values) => {
+                console.log('Form Submitted', values);
+                handleDialogClose();
+              }}
+            >
+              {({ values, handleChange, handleBlur, touched, errors }) => (
+                <Form>
+                  {/* Render fields with titles next to TextField and tooltip for description */}
+                  {Object.entries(selectedRow).map(([key, value]) => {
+                    const fieldSchema = schema.properties[key];
+                    return (
+                      <Grid container spacing={2} key={key} alignItems="center">
+                        <Grid item>
+                          <Tooltip title={fieldSchema.description || ''} arrow>
+                            <span style={{ fontWeight: 'bold' }}>
+                              {key}
+                            </span>
+                          </Tooltip>
+                        </Grid>
+                        <Grid item xs>
+                          <TextField
+                            label={key}
+                            name={key}
+                            value={values[key]}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            fullWidth
+                            margin="normal"
+                            error={touched[key] && Boolean(errors[key])}
+                            helperText={touched[key] && errors[key]}
+                          />
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
+
+                </Form>
+              )}
+            </Formik>
+          )}
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
+}

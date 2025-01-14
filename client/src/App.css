@@ -98,6 +98,72 @@
   width: 100%;
 }
 
+/* Style for the dialog form container */
+.dialog-form-container {
+  width: 1200px;
+  justify-content: center; /* Center the buttons */
+  max-width: 100%;
+  padding: 20px;
+}
+
+/* Style for the dialog title */
+.dialog-form-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  padding-bottom: 10px;
+}
+
+/* Style for the dialog content */
+.dialog-form-content {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  max-height: calc(100vh - 200px); /* Prevent the content from overflowing the screen */
+  overflow-y: auto; /* Allows the content to scroll if it's too long */
+}
+
+/* You can also add styles for buttons if needed */
+.dialog-form-actions {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background-color: white; /* Ensure it's not transparent */
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+.dialog-form-actions .MuiButton-root {
+  margin: 5px;
+}
+
+.table-container {
+  width: 100%;
+  max-width: 1000px; /* Adjust to fit the page */
+  margin: 0 auto; /* Center the container */
+  overflow-x: auto; /* Allow horizontal scrolling for smaller screens */
+  border: 1px solid #ddd; /* Optional: Add a border for the box */
+  padding: 16px; /* Add some padding around the table */
+  background-color: #f9f9f9; /* Optional: Add a light background */
+  border-radius: 8px; /* Optional: Rounded corners */
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container th,
+.table-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table-container th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
 @media (min-width: 600px) { /* sm breakpoint */
   .home-grid-item {
     width: 33.3333%;

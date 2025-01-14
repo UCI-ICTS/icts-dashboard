@@ -3,9 +3,12 @@ import dataService from "../services/data.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  tableView: null,
-  jsonData: null,
-  participants: null,
+  tableView: "participants",
+  jsonData: [],
+  participants: [],
+  families: [],
+  genetic_findings: [],
+  status: "idle"
 };
 
 export const dataSlice = createSlice({
@@ -27,8 +30,10 @@ export const dataSlice = createSlice({
         state.jsonData = action.payload;
       })
       .addCase(getAllParticipants.fulfilled, (state, action) => {
-        console.log(action.payload)
-        state.participants = action.payload;
+        console.log("thing", action.payload)
+        state.participants = action.payload.participants;
+        state.families = action.payload.families;
+        state.genetic_findings = action.payload.genetic_findings;
       })
   }
 });
@@ -51,11 +56,10 @@ export const getAllParticipants = createAsyncThunk(
   "getAllParticipants",
   async ({token}, thunkAPI) => {
     try {
-      console.log("slice get participants")
       const response = await dataService.getAllParticipants(token);
       return response.data
     } catch(error) {
-      console.log("hadley",error)
+      console.log("ERROR! ",error)
     }
   }
 )

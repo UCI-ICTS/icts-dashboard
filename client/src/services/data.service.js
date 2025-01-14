@@ -13,8 +13,6 @@ const submitParticipant = async (data) => {
 }
 
 const getAllParticipants = async (token) => {
-  console.log("participoants service")
-  
   const response = await axios.get("http://localhost:8000/api/metadata/get_all_participants/", {
     headers: {
       "Content-Type": "application/json",
