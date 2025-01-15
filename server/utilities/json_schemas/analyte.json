@@ -72,6 +72,11 @@
         "quality_issues": {
             "type": "string",
             "description": "Freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+        },
+        "internal_analyte_id": {
+            "type": "array",
+            "description": "Identifier for an analyte from a primary biosample source (primary key)",
+            "examples": ["Broad_COL_FAM1_1_D1", "Broad_COL_FAM1_1_R1", "GSS_201938-01-021"]
         }
     },
     "required": [

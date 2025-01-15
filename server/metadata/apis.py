@@ -17,7 +17,17 @@ from config.selectors import (
     remove_na,
     compare_data,
 )
-from metadata.models import Participant, Family, Analyte
+
+from experiments.models import Experiment
+from experiments.services import ExperimentSerializer
+
+from metadata.models import (
+    Participant,
+    Family,
+    Analyte,
+    GeneticFindings,
+    Phenotype
+)
 from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
@@ -70,13 +80,13 @@ class GetMetadataAPI(APIView):
         return Response(status=status.HTTP_200_OK, data=all)
 
 
-class GetAllParticipantAPI(APIView):
+class GetAllTablesAPI(APIView):
     """"""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="get_participants",
+        operation_id="get_tables",
         responses={
             200: "Submission successfull",
             400: "Bad request",
@@ -87,9 +97,24 @@ class GetAllParticipantAPI(APIView):
     def get(self, request):
         response_data = []
         try:
-            participant_list = Participant.objects.all()
-            serialized_participants = ParticipantOutputSerializer(participant_list, many=True)
-            return Response(status=status.HTTP_200_OK, data=serialized_participants.data)
+
+            serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
+            serilized_families = FamilySerializer(Family.objects.all(), many=True)
+            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
+            serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
+            serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
+            serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
+
+            serilized_return_data = {
+                'participants': serialized_participants.data,
+                'families': serilized_families.data,
+                'genetic_findings': serilized_genetic_findings.data,
+                'analytes': serialized_analytes.data,
+                'phenotypes': serialized_phenotypes.data,
+                'experiments': serialized_experiments.data
+            }
+
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
         except Exception as error:
             response_data.insert(0, str(error))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -546,7 +571,6 @@ class CreateOrUpdateAnalyte(APIView):
                 )
 
                 results = validator.get_validation_results()
-
                 if results["valid"] is True:
                     analyte_instance = get_analyte(analyte_id=identifier)
                     serializer = AnalyteSerializer(
@@ -639,7 +663,6 @@ class CreateOrUpdateGeneticFindings(APIView):
                 )
 
                 results = validator.get_validation_results()
-                import pdb; pdb.set_trace()
                 if results["valid"] is True:
                     genetic_findings_instance = get_genetic_findings(
                         genetic_findings_id=identifier
