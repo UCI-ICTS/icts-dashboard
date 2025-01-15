@@ -27,10 +27,12 @@ const pages = [
   { label: 'MIA', path: '/mia' }
 ];
 const tables = [
-  {name:"Participants", schema:"participants", identifier:"participants"},
-  {name:"Families", schema:"families", identifier:"families"},
-  {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings"},
-  {name:"Analyte", schema:"analyte", identifier:"analyte"}
+  {name:"Participants", schema:"participants", identifier:"participant_id"},
+  {name:"Families", schema:"families", identifier:"family_id"},
+  {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings_id"},
+  {name:"Analytes", schema:"analytes", identifier:"analyte_id"},
+  {name:"Phenotypes", schema:"phenotypes", identifier:"phenotype_id"},
+  {name:"Experiments", schema:"experiments", identifier:"experiment_id"}
 ]
 function FormNavBar() {
 

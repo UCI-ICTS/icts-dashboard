@@ -2,7 +2,7 @@
 
 import React, { useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllParticipants } from "../slices/dataSlice";
+import { getAllTables } from "../slices/dataSlice";
 import TableForm from "../components/TableForm";
 import "../App.css";
 import {
@@ -18,14 +18,16 @@ import schemas from "../components/schemas.json";
 const Gregor = () => {
   const dispatch = useDispatch();
   const tableView = useSelector(state => state.data['tableView']);
+  const tableName = useSelector(state => state.data['tableName']);
   const tableData = useSelector(state => state.data[tableView]);
+  const rowID = useSelector(state => state.data['tableID']);
   const formType = "Participant"
   const token = useSelector((state) => state.account.user?.access_token)
-  console.log(tableView, tableData)
+  
   // Automatically fetch data if the table is empty
   useEffect(() => {
     if (!tableData || tableData.length === 0) {
-      dispatch(getAllParticipants({ token }));
+      dispatch(getAllTables({ token }));
     }
   }, [dispatch, tableData, token]);
 
@@ -35,12 +37,13 @@ const Gregor = () => {
       <Box display="flex" flexdirection="column" height="100%" >
         <Container className="table-container">
           <Grid item>
-            <Typography variant="h4">{formType} Table</Typography>
+            <Typography variant="h4">{tableName} Table</Typography>
           </Grid>
           <br/>
           <TableForm
             rows={tableData || []}
             schema={schemas[tableView] || { properties: {} }}
+            rowID={rowID || ""}
           />
         </Container>
       </Box>

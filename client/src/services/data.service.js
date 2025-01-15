@@ -12,8 +12,8 @@ const submitParticipant = async (data) => {
   return response;
 }
 
-const getAllParticipants = async (token) => {
-  const response = await axios.get("http://localhost:8000/api/metadata/get_all_participants/", {
+const getAllTables = async (token) => {
+  const response = await axios.get("http://localhost:8000/api/metadata/get_all_tables/", {
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + token
@@ -22,10 +22,21 @@ const getAllParticipants = async (token) => {
   return response;
 }
 
+const updateParticipant = async (data, token) => {
+  const response = await axios.post("http://localhost:8000/api/metadata/update_participants/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
 
 const dataService = {
-    submitParticipant,
-    getAllParticipants
+    updateParticipant,
+    getAllTables
 }
 
   export default dataService;

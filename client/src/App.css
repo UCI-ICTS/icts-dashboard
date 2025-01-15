@@ -101,9 +101,11 @@
 /* Style for the dialog form container */
 .dialog-form-container {
   width: 1200px;
+  border-radius: 8px;
   justify-content: center; /* Center the buttons */
   max-width: 100%;
   padding: 20px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for better visual separation */
 }
 
 /* Style for the dialog title */
@@ -117,7 +119,7 @@
 /* Style for the dialog content */
 .dialog-form-content {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: white;
   border-radius: 8px;
   max-height: calc(100vh - 200px); /* Prevent the content from overflowing the screen */
   overflow-y: auto; /* Allows the content to scroll if it's too long */
@@ -125,15 +127,26 @@
 
 /* You can also add styles for buttons if needed */
 .dialog-form-actions {
+  position: sticky;
+  top: 0; /* Sticks the buttons to the top of the dialog content */
   display: flex;
   justify-content: center;
   padding: 10px;
-  background-color: white; /* Ensure it's not transparent */
-  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+  background-color: white; /* Ensure it's solid and non-transparent */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for better visual separation */
+  z-index: 10; /* Ensures the actions stay above other content */
 }
 
 .dialog-form-actions .MuiButton-root {
   margin: 5px;
+}
+
+.box-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
 }
 
 .table-container {
