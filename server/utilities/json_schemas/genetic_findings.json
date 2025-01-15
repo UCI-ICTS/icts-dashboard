@@ -183,7 +183,8 @@
     "allOf": [
         {
             "if": {
-                "properties": { "gene_known_for_phenotype": { "const": "Known" } }
+                "properties": { "gene_known_for_phenotype": { "const": "Known" } },
+                "required": ["known_condition_name"]
             },
             "then": {
                 "required": ["known_condition_name", "condition_id"]
@@ -191,7 +192,8 @@
         },
         {
             "if": {
-                "properties": { "phenotype_contribution": { "const": "Partial" } }
+                "properties": { "phenotype_contribution": { "const": "Partial" } },
+                "required": ["phenotype_contribution"]
             },
             "then": {
                 "required": ["partial_contribution_explained"]

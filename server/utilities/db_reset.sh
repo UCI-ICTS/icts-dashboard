@@ -4,4 +4,5 @@
 echo "yes" | python manage.py flush
 
 # Load data from fixtures
-python manage.py loaddata config/fixtures/initial.json
+# python manage.py loaddata config/fixtures/initial.json
+python manage.py loaddata config/fixtures/dump.json
