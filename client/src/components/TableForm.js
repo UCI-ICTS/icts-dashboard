@@ -33,6 +33,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateTable } from '../slices/dataSlice';
 
 // Utility function to convert JSON schema to Yup validation schema
 const jsonSchemaToYup = (jsonSchema) => {
@@ -91,7 +93,6 @@ function getComparator(order, orderBy) {
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
-
 
 function EnhancedTableHead({headCells, ...props}) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } =
@@ -194,11 +195,12 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function TableForm({rows, schema}) {
+export default function TableForm({rows, schema, rowID}) {
+  const dispatch = useDispatch();
   const headCells = React.useMemo(() => generateHeadCells(schema), [schema]);
     // Convert JSON Schema to Yup Validation Schema
   const yupSchema = React.useMemo(() => jsonSchemaToYup(schema), [schema]);
-
+  const token = useSelector((state) => state.account.user?.access_token)
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
@@ -207,7 +209,7 @@ export default function TableForm({rows, schema}) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [selectedRow, setSelectedRow] = React.useState(null); // Holds the row data for the dialog
   const [openDialog, setOpenDialog] = React.useState(false); // Controls dialog visibility
-
+  
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -215,7 +217,6 @@ export default function TableForm({rows, schema}) {
   };
 
   const handleClick = (row) => {
-   console.log(row)
    setSelectedRow(row); // Save the clicked row data
    setOpenDialog(true); // Open the dialog
   };
@@ -225,6 +226,17 @@ export default function TableForm({rows, schema}) {
     setSelectedRow(null);
   };
   
+  const handleAddNewRow = () => {
+    // Create an empty row structure based on schema
+    const emptyRow = Object.keys(schema.properties).reduce((acc, key) => {
+      acc[key] = ""; // Set all fields to empty
+      return acc;
+    }, {});
+
+    setSelectedRow(emptyRow); // Open dialog with empty row
+    setOpenDialog(true);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -255,16 +267,26 @@ export default function TableForm({rows, schema}) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        <Box className='box-flex' >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleAddNewRow}
+            style={{ margin: '10px 0' }}
+          >
+            Add Row
+          </Button>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+          <EnhancedTableToolbar numSelected={selected.length} />
+        </Box>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -281,21 +303,13 @@ export default function TableForm({rows, schema}) {
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = selected.includes(row.participant_id);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                   <TableRow
                     hover
                     onClick={() => handleClick(row)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.participant_id}
-                    selected={isItemSelected}
+                    key={row[rowID]}
                     sx={{ cursor: 'pointer' }}
                   >
-                   
                     {headCells.map((cell) => (
                       <TableCell key={cell.id} align={cell.numeric ? 'right' : 'left'}>
                         {row[cell.id] || ""}
@@ -325,27 +339,27 @@ export default function TableForm({rows, schema}) {
       {/* Dialog Box */}
       <Dialog open={openDialog} onClose={handleDialogClose} className="dialog-form-container">
         <DialogTitle className="dialog-form-title">{schema.title} Details</DialogTitle>
-        <DialogActions className='dialog-form-actions'>
-          <Button onClick={handleDialogClose} color="secondary">
-            Close
-          </Button>
-          <Button type="submit" color="primary">
-            Submit
-          </Button>
-        </DialogActions>
         <DialogContent className="dialog-form-content">
-          {/* Formik Form */}
           {selectedRow && (
             <Formik
               initialValues={selectedRow}
               validationSchema={yupSchema}
               onSubmit={(values) => {
-                console.log('Form Submitted', values);
-                handleDialogClose();
+                console.log('Form Submitted', rowID, values);
+                dispatch(updateTable({table:rowID, data: values, token: token}));
+                // handleDialogClose();
               }}
             >
               {({ values, handleChange, handleBlur, touched, errors }) => (
                 <Form>
+                  <DialogActions className="dialog-form-actions">
+                    <Button onClick={handleDialogClose} color="secondary">
+                      Close
+                    </Button>
+                    <Button type="submit" color="primary">
+                      Submit
+                    </Button>
+                  </DialogActions>
                   {/* Render fields with titles next to TextField and tooltip for description */}
                   {Object.entries(selectedRow).map(([key, value]) => {
                     const fieldSchema = schema.properties[key];
@@ -353,16 +367,14 @@ export default function TableForm({rows, schema}) {
                       <Grid container spacing={2} key={key} alignItems="center">
                         <Grid item>
                           <Tooltip title={fieldSchema.description || ''} arrow>
-                            <span style={{ fontWeight: 'bold' }}>
-                              {key}
-                            </span>
+                            <span style={{ fontWeight: 'bold' }}>{key}</span>
                           </Tooltip>
                         </Grid>
                         <Grid item xs>
                           <TextField
                             label={key}
                             name={key}
-                            value={values[key]}
+                            value={values[key] || ''}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             fullWidth
@@ -374,7 +386,6 @@ export default function TableForm({rows, schema}) {
                       </Grid>
                     );
                   })}
-
                 </Form>
               )}
             </Formik>

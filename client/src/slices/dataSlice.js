@@ -4,10 +4,15 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   tableView: "participants",
+  tableID: "participant_id",
+  tableName: "Participants",
   jsonData: [],
   participants: [],
   families: [],
   genetic_findings: [],
+  analytes: [],
+  phenotypes: [],
+  experiments: [],
   status: "idle"
 };
 
@@ -19,7 +24,9 @@ export const dataSlice = createSlice({
       state.jsonData = action.payload;
     },
     setTableView: (state, action) => {
-      state.tableView = action.payload.identifier;
+      state.tableView = action.payload.schema;
+      state.tableID = action.payload.identifier;
+      state.tableName = action.payload.name;
       console.log(action.payload)
     }
   },
@@ -29,11 +36,14 @@ export const dataSlice = createSlice({
         console.log(action.payload)
         state.jsonData = action.payload;
       })
-      .addCase(getAllParticipants.fulfilled, (state, action) => {
+      .addCase(getAllTables.fulfilled, (state, action) => {
         console.log("thing", action.payload)
         state.participants = action.payload.participants;
         state.families = action.payload.families;
         state.genetic_findings = action.payload.genetic_findings;
+        state.analytes = action.payload.analytes;
+        state.phenotypes = action.payload.phenotypes;
+        state.experiments = action.payload.experiments;
       })
   }
 });
@@ -52,14 +62,74 @@ export const submitParticipant = createAsyncThunk(
   }
 )
 
-export const getAllParticipants = createAsyncThunk(
-  "getAllParticipants",
+export const getAllTables = createAsyncThunk(
+  "getAllTables",
   async ({token}, thunkAPI) => {
     try {
-      const response = await dataService.getAllParticipants(token);
+      const response = await dataService.getAllTables(token);
       return response.data
     } catch(error) {
       console.log("ERROR! ",error)
+    }
+  }
+)
+
+export const updateTable = createAsyncThunk(
+  "updateTable",
+  async ({table, data, token}, thunkAPI) => {
+    if (table === "participant_id") {
+      console.log("slice", table, data, token)
+      try {
+        const response = await dataService.updateParticipant(data, token);
+        return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
+    }
+    if (table === "family_id") {
+      console.log("slice", table, data, token)
+      try {
+        // const response = await dataService.updateTable(data, token);
+        // return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
+    }
+    if (table === "genetic_findings_id") {
+      console.log("slice", table, data, token)
+      try {
+        const response = await dataService.updateTable(data, token);
+        return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
+    }
+    if (table === "analyte_id") {
+      console.log("slice", table, data, token)
+      try {
+        // const response = await dataService.updateTable(data, token);
+        // return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
+    }
+    if (table === "phenotype_id") {
+      console.log("slice", table, data, token)
+      try {
+        // const response = await dataService.updateTable(data, token);
+        // return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
+    }
+    if (table === "experiment_id") {
+      console.log("slice", table, data, token)
+      try {
+        // const response = await dataService.updateTable(data, token);
+        // return response.data
+      } catch(error) {
+        console.log("ERROR! ",error)
+      }
     }
   }
 )
