@@ -17,6 +17,7 @@ import { Menu as MenuIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from "../slices/accountSlice";
+import LoginIcon from '@mui/icons-material/Login';
 
 const pages = [
   { label: 'About', path: '/about' },
@@ -41,32 +42,25 @@ function NavBar() {
 
   const handleLogout = () => {
     const token = auth.user.refresh_token
+    handleCloseUserMenu()
     dispatch(logout({token}))
-    // console.log(token)
-
   };
   
   return (
-    <AppBar position="static">
+    <AppBar position="static" className='navbar'>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            PMGRC
-          </Typography>
+          <Tooltip title="Home">
+            <Typography
+              variant="h6"
+              noWrap
+              component={Link}
+              to="/"
+              className="navbar-link"
+            >
+              UCI ITCTS Dashboard
+            </Typography>
+          </Tooltip>
           {auth.isLoggedIn === true ?(
             <>{/* Mobile Menu */}
             {isMobile && (
@@ -100,14 +94,14 @@ function NavBar() {
             )}
   
             {/* Desktop Menu */}
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <Box className="navbar-menu">
               {pages.map((page) => (
                 <Button
                   key={page.label}
                   component={Link}
                   to={page.path}
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  className='navbar-link'
                 >
                   {page.label}
                 </Button>
@@ -116,7 +110,7 @@ function NavBar() {
   
             {/* User Menu */}
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              <Tooltip title="Profiel and settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt={auth?.name || 'User'} src={auth?.avatar || ''} />
                 </IconButton>
@@ -134,7 +128,21 @@ function NavBar() {
               </Menu>
             </Box></>
             ) : (
-            <>not isLoggedIn</>
+            <>
+              <Box className="navbar-right">
+                <Tooltip title="Log In">
+                  <IconButton                   
+                    component={Link}
+                    to={"/login"}
+                    onClick={handleCloseNavMenu}
+                    className='navbar-link'
+                    >
+                      <LoginIcon />
+                      &nbsp;&nbsp;Log In
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </>
             )
           }
           

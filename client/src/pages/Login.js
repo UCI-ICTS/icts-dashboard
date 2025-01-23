@@ -20,7 +20,7 @@ const Login = () => {
   const initialValues = {
     username: "",
     password: "",
-    rememberMe: false,
+    rememberMe: true,
   };
 
   const validationSchema = Yup.object().shape({
@@ -54,14 +54,19 @@ const Login = () => {
   }
 
   return (
-    <Container>
-      <Box display="flex" flexDirection="column" height="100%">
+    <Container maxWidth="sm"> >
+      <Box className="login-box">
         <Container>
           <Grid item>
             <Typography variant="h4">Sign in</Typography>
-            <Typography>Sign in using your Portal credentials</Typography>
-            <Typography component={Link} to="/register">
-              Don&apos;t have an account? Request one here.
+            <Typography>Sign in using your Dashboard credentials</Typography>
+            <Typography >
+              <a
+                href="mailto:support@example.com?subject=Request%20an%20Account&body=Please%20provide%20details%20about%20your%20account%20request."
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                Don&apos;t have an account? Request one here.
+              </a>
             </Typography>
           </Grid>
           <br />
@@ -110,9 +115,8 @@ const Login = () => {
                 <div className="form-group">
                   <Button
                     type="submit"
-                    className="btn btn-primary btn-block"
+                    className="button-confirm"
                     disabled={loading}
-                    color="primary"
                     variant="contained"
                   >
                     {loading && (
@@ -120,9 +124,9 @@ const Login = () => {
                     )}
                     <span>Login</span>
                   </Button>
-                </div>
-                <Button onClick={() => setOpen(true)}>
-                  Forgot password? Reset it here
+                </div>Forgot password?
+                <Button onClick={() => setOpen(true)} className="link">
+                   Reset it here
                 </Button>
               </Form>
             )}

@@ -15,17 +15,10 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import HomeIcon  from "./HomeIcon"
 import UserMenu from './UserMenu';
 import { useDispatch } from 'react-redux';
 import { setTableView } from '../slices/dataSlice';
 
-const pages = [
-  { label: 'About', path: '/about' },
-  { label: 'GREGoR', path: '/gregor' },
-  { label: 'UDN', path: '/udn' },
-  { label: 'MIA', path: '/mia' }
-];
 const tables = [
   {name:"Participants", schema:"participants", identifier:"participant_id"},
   {name:"Families", schema:"families", identifier:"family_id"},
@@ -51,8 +44,17 @@ function FormNavBar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <HomeIcon />
-
+          <Tooltip title="Home">
+            <Typography
+              variant="h6"
+              noWrap
+              component={Link}
+              to="/"
+              className="navbar-link"
+            >
+                UCI ITCTS Dashboard
+            </Typography>
+          </Tooltip>
           {/* Mobile Menu */}
             {isMobile && (
               <Box sx={{ flexGrow: 1 }}>

@@ -9,6 +9,11 @@
   --spacing-medium: 50px;
 }
 
+/* 
+#0064a4 UCI Blue
+#ffd200 UCI Gold
+*/
+
 /* Outlet styles */
 .outlet-root {
   display: flex;
@@ -16,6 +21,9 @@
   height: 100vh;
   width: 100%;
   overflow: hidden;
+  background-image: url('../public/ICTS-background.jpeg'); /* Adjust the path to your image */
+  background-size: cover;
+  background-position: center;
 }
 
 .outlet-container {
@@ -32,6 +40,69 @@
   text-align: center;
 }
 
+/* NavBar Styles */
+.navbar {
+  background-color: #0064a4 !important; /* Change to your preferred color */
+  color: white !important;
+}
+
+.navbar-right {
+  margin-left: auto; /* Pushes the element to the right */
+  display: flex;
+  align-items: center;
+}
+
+.navbar-menu {
+  padding-left: 5%;
+  flex-grow: 1;
+  display: none;
+}
+
+@media (min-width: 900px) { /* Adjust the breakpoint as needed */
+  .navbar-menu {
+    display: flex;
+  }
+}
+
+.navbar .navbar-link {
+  color: white !important;
+  text-decoration: none;
+}
+
+.navbar .navbar-link:hover {
+  color: #ffcc00;
+  text-decoration: underline !important;
+}
+
+.navbar .navbar-link:visited {
+  color: white; /* Keep the default color */
+  text-decoration: none; /* No underline */
+}
+
+.button-confirm {
+  background-color: white; /* UCI Blue */
+  color: white;
+}
+
+.button-confirm {
+  background-color: #0064a4; /* UCI Blue */
+  color: white;
+}
+
+.login-box {
+  background-color: #ffffff; /* White background */
+  opacity: 1; /* Fully opaque */
+  padding: 20px; /* Optional: Add some padding */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+.container-test {
+  border: 2px solid white; /* Black outline */
+  padding: 20px; /* Optional: Add some padding */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
 /* Homepage Styles */
 .home-root {
   background-color: var(--main-bg-color);
@@ -147,6 +218,7 @@
   align-items: center;
   height: 100%;
   padding: 0 16px;
+  margin-bottom: 20px;
 }
 
 .table-container {

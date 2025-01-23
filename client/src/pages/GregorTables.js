@@ -32,7 +32,7 @@ const Gregor = () => {
   }, [dispatch, tableData, token]);
 
   return (
-    <Paper>
+    
     <Container>
       <Box display="flex" flexdirection="column" height="100%" >
         <Container className="table-container">
@@ -48,7 +48,7 @@ const Gregor = () => {
         </Container>
       </Box>
     </Container>
-    </Paper>
+    
   );
 };
 

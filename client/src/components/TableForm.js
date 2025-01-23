@@ -5,12 +5,7 @@ import { alpha } from '@mui/material/styles';
 import {
   Box,
   Button, 
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   FormControlLabel,
-  Grid,
   IconButton,
   Paper,
   Switch,
@@ -22,7 +17,6 @@ import {
   TableRow,
   TablePagination,
   TableSortLabel,
-  TextField,
   Toolbar,
   Tooltip,
   Typography,
@@ -31,39 +25,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateTable } from '../slices/dataSlice';
-
-// Utility function to convert JSON schema to Yup validation schema
-const jsonSchemaToYup = (jsonSchema) => {
-  const yupSchema = {};
-
-  Object.entries(jsonSchema.properties).forEach(([key, value]) => {
-    let validator = Yup.mixed();
-
-    // Add validation based on type
-    if (value.type === 'string') {
-      validator = Yup.string();
-      if (value.minLength) validator = validator.min(value.minLength);
-      if (value.maxLength) validator = validator.max(value.maxLength);
-    } else if (value.type === 'integer') {
-      validator = Yup.number().integer();
-      if (value.minimum) validator = validator.min(value.minimum);
-      if (value.maximum) validator = validator.max(value.maximum);
-    }
-
-    // Mark field as required if it's in the "required" list
-    if (jsonSchema.required && jsonSchema.required.includes(key)) {
-      validator = validator.required(`${key} is required`);
-    }
-
-    yupSchema[key] = validator;
-  });
-
-  return Yup.object().shape(yupSchema);
-};
+import FormDialogue from './FormDialogue';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Generate headCells dynamically from schema
 const generateHeadCells = (schema) => {
@@ -196,17 +160,14 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function TableForm({rows, schema, rowID}) {
-  const dispatch = useDispatch();
   const headCells = React.useMemo(() => generateHeadCells(schema), [schema]);
-    // Convert JSON Schema to Yup Validation Schema
-  const yupSchema = React.useMemo(() => jsonSchemaToYup(schema), [schema]);
-  const token = useSelector((state) => state.account.user?.access_token)
+  const loadStatus = useSelector((state) => state.data.status);
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState(rowID);
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [selectedRow, setSelectedRow] = React.useState(null); // Holds the row data for the dialog
   const [openDialog, setOpenDialog] = React.useState(false); // Controls dialog visibility
   
@@ -242,8 +203,13 @@ export default function TableForm({rows, schema, rowID}) {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    const value = parseInt(event.target.value, 10);
+    setRowsPerPage(value);
     setPage(0);
+    // If "All" is selected, show all rows
+    if (value === -1) {
+      setPage(0);
+    }
   };
 
   const handleChangeDense = (event) => {
@@ -259,7 +225,10 @@ export default function TableForm({rows, schema, rowID}) {
       rows
         ? [...rows]
           .sort(getComparator(order, orderBy))
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .slice(
+            page * (rowsPerPage === -1 ? rows.length : rowsPerPage), 
+            rowsPerPage === -1 ? rows.length : page * rowsPerPage + rowsPerPage
+          )
         : [],
     [rows, order, orderBy, page, rowsPerPage],
   );
@@ -273,11 +242,12 @@ export default function TableForm({rows, schema, rowID}) {
             color="primary"
             onClick={handleAddNewRow}
             style={{ margin: '10px 0' }}
+            disabled={visibleRows === 0}
           >
             Add Row
           </Button>
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}
             component="div"
             count={rows.length}
             rowsPerPage={rowsPerPage}
@@ -288,7 +258,12 @@ export default function TableForm({rows, schema, rowID}) {
           <EnhancedTableToolbar numSelected={selected.length} />
         </Box>
         <TableContainer>
-          <Table
+          {loadStatus === "loading" ? (
+            <Box className='box-flex'>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
@@ -329,6 +304,7 @@ export default function TableForm({rows, schema, rowID}) {
               )}
             </TableBody>
           </Table>
+          )}
         </TableContainer>
 
       </Paper>
@@ -336,62 +312,13 @@ export default function TableForm({rows, schema, rowID}) {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      {/* Dialog Box */}
-      <Dialog open={openDialog} onClose={handleDialogClose} className="dialog-form-container">
-        <DialogTitle className="dialog-form-title">{schema.title} Details</DialogTitle>
-        <DialogContent className="dialog-form-content">
-          {selectedRow && (
-            <Formik
-              initialValues={selectedRow}
-              validationSchema={yupSchema}
-              onSubmit={(values) => {
-                console.log('Form Submitted', rowID, values);
-                dispatch(updateTable({table:rowID, data: values, token: token}));
-                // handleDialogClose();
-              }}
-            >
-              {({ values, handleChange, handleBlur, touched, errors }) => (
-                <Form>
-                  <DialogActions className="dialog-form-actions">
-                    <Button onClick={handleDialogClose} color="secondary">
-                      Close
-                    </Button>
-                    <Button type="submit" color="primary">
-                      Submit
-                    </Button>
-                  </DialogActions>
-                  {/* Render fields with titles next to TextField and tooltip for description */}
-                  {Object.entries(selectedRow).map(([key, value]) => {
-                    const fieldSchema = schema.properties[key];
-                    return (
-                      <Grid container spacing={2} key={key} alignItems="center">
-                        <Grid item>
-                          <Tooltip title={fieldSchema.description || ''} arrow>
-                            <span style={{ fontWeight: 'bold' }}>{key}</span>
-                          </Tooltip>
-                        </Grid>
-                        <Grid item xs>
-                          <TextField
-                            label={key}
-                            name={key}
-                            value={values[key] || ''}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={touched[key] && Boolean(errors[key])}
-                            helperText={touched[key] && errors[key]}
-                          />
-                        </Grid>
-                      </Grid>
-                    );
-                  })}
-                </Form>
-              )}
-            </Formik>
-          )}
-        </DialogContent>
-      </Dialog>
+      <FormDialogue
+        open={openDialog}
+        onClose={handleDialogClose}
+        schema={schema} // Ensure schema includes the 'title' property
+        selectedRow={selectedRow}
+        rowID={rowID}
+      />
     </Box>
   );
 }
