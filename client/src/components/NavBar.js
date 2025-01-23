@@ -20,7 +20,6 @@ import { logout } from "../slices/accountSlice";
 import LoginIcon from '@mui/icons-material/Login';
 
 const pages = [
-  { label: 'About', path: '/about' },
   { label: 'GREGoR', path: '/gregor' },
   { label: 'UDN', path: '/udn' },
   { label: 'MIA', path: '/mia' }

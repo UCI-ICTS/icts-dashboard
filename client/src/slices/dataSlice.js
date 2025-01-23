@@ -1,6 +1,6 @@
 // slices/dataSlice.js
 import dataService from "../services/data.service";
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { combineSlices, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { setMessage } from "./messageSlice";
 import { useSelector } from "react-redux";
 
@@ -54,8 +54,21 @@ export const dataSlice = createSlice({
         state.status = "idle";
       })
       .addCase(updateTable.fulfilled, (state, action) => {
-        console.log(action.payload)
-        state.jsonData = action.payload;
+        if (action.payload.table === 'participant_id') {
+          const participant = action.payload.response[0].data.updated_instance
+          const identifier = participant[action.payload.table]
+          const updatedParticipant = state.participants.find(p => p.participant_id === identifier);
+          if (updatedParticipant) {
+            Object.assign(updatedParticipant, participant)
+          }
+        }
+        state.status = "idle";
+      })
+      .addCase(updateTable.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(updateTable.rejected, (state, action) => {
+        state.status = "rejected";
       })
   }
 });
@@ -91,13 +104,18 @@ export const updateTable = createAsyncThunk(
   "updateTable",
   async ({table, data, token}, thunkAPI) => {
     if (table === "participant_id") {
-      console.log("slice", table, data, token)
+      console.log("slice", table)
       try {
         const response = await dataService.updateParticipant(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        return response.data
+        const payload = {response: response.data, table}
+        if (response.data[0].message.includes("had no changes.")) {
+          thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} had no changes`));
+          return 0
+        }
+        thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} updated successfuly`));
+        return payload
       } catch(error) {
-        console.log("ERROR! ",error)
+        console.log("ERROR! ",error.response)
         return thunkAPI.rejectWithValue(error.response.data);
       }
     }

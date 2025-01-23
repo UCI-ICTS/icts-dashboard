@@ -14,15 +14,25 @@ import {
   Paper
 } from "@material-ui/core";
 import schemas from "../components/schemas.json";
+import { setTableView } from '../slices/dataSlice';
+
+const tables = [
+  {name:"Participants", schema:"participants", identifier:"participant_id"},
+  {name:"Families", schema:"families", identifier:"family_id"},
+  {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings_id"},
+  {name:"Analytes", schema:"analytes", identifier:"analyte_id"},
+  {name:"Phenotypes", schema:"phenotypes", identifier:"phenotype_id"},
+  {name:"Experiments", schema:"experiments", identifier:"experiment_id"}
+]
 
 const Gregor = () => {
   const dispatch = useDispatch();
   const tableView = useSelector(state => state.data['tableView']);
-  const tableName = useSelector(state => state.data['tableName']);
   const tableData = useSelector(state => state.data[tableView]);
   const rowID = useSelector(state => state.data['tableID']);
-  const formType = "Participant"
   const token = useSelector((state) => state.account.user?.access_token)
+  
+
   
   // Automatically fetch data if the table is empty
   useEffect(() => {
@@ -31,23 +41,29 @@ const Gregor = () => {
     }
   }, [dispatch, tableData, token]);
 
-  return (
-    
-    <Container>
-      <Box display="flex" flexdirection="column" height="100%" >
-        <Container className="table-container">
-          <Grid item>
-            <Typography variant="h4">{tableName} Table</Typography>
-          </Grid>
-          <br/>
-          <TableForm
-            rows={tableData || []}
-            schema={schemas[tableView] || { properties: {} }}
-            rowID={rowID || ""}
-          />
-        </Container>
-      </Box>
+  return (  
+    <Container className="table-container">
+      <Grid item>
+      <Typography variant="h4">Select GREGoR table to view:</Typography>
+        <Typography variant="h4">{tables.map((table) => (
+                <Button
+                  key={table.name}
+                  onClick={event => dispatch(setTableView(table))}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  {table.name}
+                </Button>
+              ))}</Typography>
+      </Grid>
+      <br/>
+      <TableForm
+        rows={tableData || []}
+        schema={schemas[tableView] || { properties: {} }}
+        rowID={rowID || ""}
+      />
     </Container>
+      
+    
     
   );
 };

@@ -8,9 +8,7 @@ import { handleExpiredJWT } from "./slices/accountSlice";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/Home";
 import Login from "./pages/Login";
-import Refferal from "./pages/Refferal";
 import GregorTables from "./pages/GregorTables";
-import FormLayout from "./layouts/FormLayout";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
     const currentTime = Date.now() / 1000; // Convert milliseconds to seconds
@@ -55,24 +53,7 @@ export default function Router() {
             children: [
                 { path: "/", element: <HomePage /> },
                 { path: "login", element: <Login /> },
-                { path: "/contact", element: <Login /> },
-                // { path: "/howto", element: <Login /> },
-            ]
-        },
-        {
-            path: "/gregor",
-            element: <FormLayout/>,
-            children: [
-                { path: "/gregor/forms", element: <Refferal />},
                 { path: "/gregor/", element: <GregorTables />}
-            ]
-        },
-        {
-            path: "/udn",
-            element: <FormLayout/>,
-            children: [
-                { path: "/udn/forms", element: <Refferal />},
-                { path: "/udn", element: <GregorTables />}
             ]
         },
         {
