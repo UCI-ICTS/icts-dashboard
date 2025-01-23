@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateTable } from '../slices/dataSlice';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+
 // Utility function to convert JSON schema to Yup validation schema
 const jsonSchemaToYup = (jsonSchema) => {
     const yupSchema = {};
@@ -118,7 +119,6 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID }) => {
 
                 {Object.entries(selectedRow).map(([key, value]) => {
                   const fieldSchema = schema.properties[key];
-
                   return (
                     <Grid container spacing={2} key={key} alignItems="center">
                       <Grid item>
@@ -127,54 +127,13 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID }) => {
                         </Tooltip>
                       </Grid>
                       <Grid item xs>
-                        {fieldSchema.type === 'array' && fieldSchema.items?.type === 'string' ? (
-                            <FieldArray name={key}>
-                            {(arrayHelpers) => (
-                                <div>
-                                {values[key]?.map((item, index) => (
-                                    <Grid container spacing={1} alignItems="center" key={index}>
-                                    <Grid item xs={10}>
-                                        <TextField
-                                        name={`${key}.${index}`}
-                                        value={item}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        margin="normal"
-                                        error={touched[key]?.[index] && Boolean(errors[key]?.[index])}
-                                        helperText={touched[key]?.[index] && errors[key]?.[index]}
-                                        label={`Item ${index + 1}`}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={2}>
-                                        <Button
-                                        type="button"
-                                        onClick={() => arrayHelpers.remove(index)}
-                                        color="secondary"
-                                        >
-                                        <RemoveCircleIcon />
-                                        </Button>
-                                    </Grid>
-                                    </Grid>
-                                ))}
-                                <Button
-                                    type="button"
-                                    onClick={() => arrayHelpers.push("")} // Add a new empty string to the array
-                                    color="primary"
-                                    startIcon={<AddCircleIcon />}
-                                >
-                                    Add Item
-                                </Button>
-                                </div>
-                            )}
-                            </FieldArray>
-                        ) : fieldSchema.type === 'array' && fieldSchema.items?.enum ? (
-                            <FormGroup>
+                        {fieldSchema.type === 'array' && fieldSchema.items?.enum ? (
+                          <FormGroup>
                             {fieldSchema.items.enum.map((option) => (
-                                <FormControlLabel
+                              <FormControlLabel
                                 key={option}
                                 control={
-                                    <Checkbox
+                                  <Checkbox
                                     name={key}
                                     value={option}
                                     checked={values[key]?.includes(option)}
@@ -196,51 +155,91 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID }) => {
                                         });
                                         }
                                     }}
-                                    />
+                                  />
                                 }
                                 label={option}
-                                />
+                              />
                             ))}
                             {touched[key] && errors[key] && (
                                 <FormHelperText error>{errors[key]}</FormHelperText>
                             )}
-                            </FormGroup>
-                        ) : fieldSchema.enum ? (
-                            <FormControl fullWidth margin="normal">
-                            <InputLabel id={`${key}-label`}>{key}</InputLabel>
+                          </FormGroup>
+                        ) : fieldSchema.type === 'array' && fieldSchema.items?.type === 'string' ? (
+                        <FieldArray name={key}>
+                          {(arrayHelpers) => (
+                              <div>
+                              {Array.isArray(values[key]) && values[key]?.map((item, index) => (
+                                <Grid container spacing={1} alignItems="center" key={index}>
+                                  <Grid item xs={10}>
+                                    <TextField
+                                      name={`${key}.${index}`}
+                                      value={item}
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                      fullWidth
+                                      margin="normal"
+                                      error={touched[key]?.[index] && Boolean(errors[key]?.[index])}
+                                      helperText={touched[key]?.[index] && errors[key]?.[index]}
+                                      label={`Item ${index + 1}`}
+                                    />
+                                  </Grid>
+                                  <Grid item xs={2}>
+                                    <Button
+                                      type="button"
+                                      onClick={() => arrayHelpers.remove(index)}
+                                      color="secondary"
+                                    >
+                                      <RemoveCircleIcon />
+                                    </Button>
+                                  </Grid>
+                                </Grid>
+                              ))}
+                              <Button
+                                type="button"
+                                onClick={() => arrayHelpers.push([""])} // Add a new empty string to the array
+                                color="primary"
+                                startIcon={<AddCircleIcon />}
+                              >
+                                Add Item
+                              </Button>
+                            </div>
+                          )}
+                        </FieldArray>
+                      ) : fieldSchema.enum ? (
+                        <FormControl fullWidth margin="normal">
+                          <InputLabel id={`${key}-label`}>{key}</InputLabel>
                             <Select
-                                labelId={`${key}-label`}
-                                id={key}
-                                name={key}
-                                value={values[key] || ''}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={touched[key] && Boolean(errors[key])}
+                              labelId={`${key}-label`}
+                              id={key}
+                              name={key}
+                              value={values[key] || ''}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              error={touched[key] && Boolean(errors[key])}
                             >
-                                {fieldSchema.enum.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
-                                </MenuItem>
-                                ))}
+                            {fieldSchema.enum.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
                             </Select>
-                            <FormHelperText>{touched[key] && errors[key]}</FormHelperText>
-                            </FormControl>
+                          <FormHelperText>{touched[key] && errors[key]}</FormHelperText>
+                        </FormControl>
                         ) : (
-                            <TextField
+                          <TextField
                             label={key}
                             name={key}
                             value={values[key] || ''}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             fullWidth
-                            disabled={key === rowID}
+                            disabled={key === rowID && values[key] !== ''}
                             margin="normal"
                             error={touched[key] && Boolean(errors[key])}
                             helperText={touched[key] && errors[key]}
-                            />
+                          />
                         )}
                         </Grid>
-
                     </Grid>
                   );
                 })}
