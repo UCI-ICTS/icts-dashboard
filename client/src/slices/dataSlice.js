@@ -1,6 +1,8 @@
 // slices/dataSlice.js
 import dataService from "../services/data.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { setMessage } from "./messageSlice";
+import { useSelector } from "react-redux";
 
 const initialState = {
   tableView: "participants",
@@ -36,17 +38,28 @@ export const dataSlice = createSlice({
         console.log(action.payload)
         state.jsonData = action.payload;
       })
+      .addCase(getAllTables.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(getAllTables.rejected, (state, action) => {
+        state.status = "rejected";
+      })
       .addCase(getAllTables.fulfilled, (state, action) => {
-        console.log("thing", action.payload)
         state.participants = action.payload.participants;
         state.families = action.payload.families;
         state.genetic_findings = action.payload.genetic_findings;
         state.analytes = action.payload.analytes;
         state.phenotypes = action.payload.phenotypes;
         state.experiments = action.payload.experiments;
+        state.status = "idle";
+      })
+      .addCase(updateTable.fulfilled, (state, action) => {
+        console.log(action.payload)
+        state.jsonData = action.payload;
       })
   }
 });
+
 
 export const submitParticipant = createAsyncThunk(
   "submitParticipant",
@@ -81,54 +94,66 @@ export const updateTable = createAsyncThunk(
       console.log("slice", table, data, token)
       try {
         const response = await dataService.updateParticipant(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
     if (table === "family_id") {
       console.log("slice", table, data, token)
       try {
         // const response = await dataService.updateTable(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         // return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
     if (table === "genetic_findings_id") {
       console.log("slice", table, data, token)
       try {
         const response = await dataService.updateTable(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
     if (table === "analyte_id") {
       console.log("slice", table, data, token)
       try {
         // const response = await dataService.updateTable(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         // return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
     if (table === "phenotype_id") {
       console.log("slice", table, data, token)
       try {
         // const response = await dataService.updateTable(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         // return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
     if (table === "experiment_id") {
       console.log("slice", table, data, token)
       try {
         // const response = await dataService.updateTable(data, token);
+        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
         // return response.data
       } catch(error) {
         console.log("ERROR! ",error)
+        return thunkAPI.rejectWithValue(error.response.data);
       }
     }
   }

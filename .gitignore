@@ -5,6 +5,7 @@
 
 #Server Items
 server/.env*
+server/.python-version
 server/.secrets
 server/db.sqlite
 server/env

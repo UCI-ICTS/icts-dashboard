@@ -13,6 +13,7 @@ const submitParticipant = async (data) => {
 }
 
 const getAllTables = async (token) => {
+  console.log("service",token)
   const response = await axios.get("http://localhost:8000/api/metadata/get_all_tables/", {
     headers: {
       "Content-Type": "application/json",
@@ -23,6 +24,7 @@ const getAllTables = async (token) => {
 }
 
 const updateParticipant = async (data, token) => {
+  console.log("service",token)
   const response = await axios.post("http://localhost:8000/api/metadata/update_participants/", [
     data
   ], {
