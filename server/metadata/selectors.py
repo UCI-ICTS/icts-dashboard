@@ -38,7 +38,15 @@ def get_phenotype(phenotype_id: str) -> Family:
 
 
 def get_family(family_id: str) -> Family:
-    """Retrieve a family instance by its ID or return None if not found."""
+    """
+    Retrieve a family instance by its ID or return None if not found.
+
+    Args:
+        family_id (str): Family object identifier
+
+    Returns:
+        Family: The family instance if found, otherwise None.
+    """
     try:
         family_instance = Family.objects.get(family_id=family_id)
         return family_instance
@@ -47,9 +55,19 @@ def get_family(family_id: str) -> Family:
 
 
 def get_participant(participant_id: str) -> Participant:
-    """Retrieve a family instance by its ID or return None if not found."""
+    """
+    Retrieve a participant instance by its ID or return None if not found.
+
+    Args:
+        participant_id (str): Participant object identifier
+
+    Returns:
+        Participant: The participant instance if found, otherwise None.
+    """
     try:
-        participant_instance = Participant.objects.get(participant_id=participant_id)
+        participant_instance = Participant.objects.get(
+            participant_id=participant_id
+        )
         return participant_instance
     except Participant.DoesNotExist:
         return None

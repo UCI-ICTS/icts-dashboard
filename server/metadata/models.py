@@ -229,7 +229,8 @@ class Participant(models.Model):
         help_text="Is the originating GREGoR Center likely able to recontact "
         "this participant",
     )
-    prior_testing = models.TextField(
+    prior_testing = models.JSONField(
+        default=list,
         blank=True,
         null=True,
         help_text="Text description of any genetic testing for individual "

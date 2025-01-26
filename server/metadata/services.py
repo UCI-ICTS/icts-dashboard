@@ -82,6 +82,7 @@ class FamilySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        """Create an new instance of the model with validated data"""
         family_id = validated_data.get("family_id")
         family, created = Family.objects.get_or_create(
             family_id=family_id, defaults=validated_data
@@ -105,15 +106,16 @@ class ParticipantOutputSerializer(serializers.ModelSerializer):
 class ParticipantInputSerializer(serializers.ModelSerializer):
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
-        help_text="List of prior testing entries",
         required=False,
-        allow_empty=True
+        allow_empty=True,
+        help_text="List of prior testing entries"
     )
 
     internal_project_id = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
         required=False,
+        allow_empty=True,
         help_text="An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
     )
 
@@ -121,6 +123,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         write_only=True,
         required=False,
+        allow_empty=True,
         help_text="Case specific PubMed IDs if applicable",
     )
 
@@ -128,6 +131,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         write_only=True,
         required=False,
+        allow_empty=True,
         help_text="Participant IDs for twins, triplets, etc.",
     )
 
@@ -135,6 +139,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         write_only=True,
         required=False,
+        allow_empty=True,
         help_text="Participant IDs for twins, triplets, etc.",
     )
 
@@ -201,7 +206,20 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
             raise
 
 
-def get_or_create_sub_models(datum):
+def get_or_create_sub_models(datum: dict) -> dict:
+    """
+    Create or retrieve related model instances based on the provided data.
+
+    This function processes the `datum` dictionary to handle the creation or retrieval
+    of related model instances. It updates the `datum` dictionary with the primary keys
+    of the related instances.
+
+    Args:
+        datum (dict): A dictionary containing the data for the main model and its related models.
+
+    Returns:
+        dict: The updated `datum` dictionary with primary keys of the related instances.
+    """
     # Define how to handle creation of related objects
     mapping = {
         "family_id": (Family, "family_id"),
