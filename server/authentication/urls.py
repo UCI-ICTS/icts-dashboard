@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # authentication/urls.py
 
-from django.urls import path, include
-from search.apis import SearchTablesAPI, TestConnection, DounlaodTablesAPI
+from django.urls import path
 from authentication.apis import (
     DecoratedTokenObtainPairView,
     DecoratedTokenRefreshView,

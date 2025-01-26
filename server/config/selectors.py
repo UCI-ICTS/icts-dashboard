@@ -12,6 +12,22 @@ from django.core.exceptions import ValidationError
 from rest_framework import status
 from requests.models import PreparedRequest
 
+from metadata.models import (
+    Participant,
+    Family,
+    Analyte,
+    GeneticFindings,
+    Phenotype
+)
+from metadata.services import (
+    AnalyteSerializer,
+    GeneticFindingsSerializer,
+    ParticipantInputSerializer,
+    ParticipantOutputSerializer,
+    FamilySerializer,
+    PhenotypeSerializer,
+    get_or_create_sub_models,
+)
 
 """DB Level Services
 
@@ -22,7 +38,17 @@ from requests.models import PreparedRequest
 
 
 class TableValidator:
-    """Table Validator class to validate JSON objects against predefined JSON schemas."""
+    """
+    The Table Validator class is used to validate JSON objects against 
+    predefined JSON schemas.
+
+    Methods: 
+        validate_json(self, json_object: dict, table_name: str):
+            Validates a JSON object against a specified schema
+
+        get_validation_results(self) -> dict:
+            Returns the validation results as a dictionary.
+    """
 
     def __init__(self):
         """Initializes the TableValidator with the path to JSON schemas."""
@@ -32,13 +58,19 @@ class TableValidator:
 
     def validate_json(self, json_object: dict, table_name: str):
         """
-        Validates a JSON object against a specified schema and updates the instance's valid and errors attributes.
+        Validate a JSON object against a specified schema.
 
-        Parameters:
-        - json_object (dict): The JSON object to be validated.
-        - table_name (str): The name of the table which corresponds to the schema file.
+        This method validates the provided JSON object against the schema corresponding
+        to the specified table name. It updates the instance's `valid` and `errors` attributes
+        based on the validation results.
+
+        Args:
+            json_object (dict): The JSON object to be validated.
+            table_name (str): The name of the table which corresponds to the schema file.
+
+        Returns:
+            None
         """
-
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
             with open(schema_path, "r") as schema_file:
@@ -61,12 +93,18 @@ class TableValidator:
             self.valid = False
             self.errors = [f"An unexpected error occurred: {str(e)}."]
 
-    def get_validation_results(self):
+    def get_validation_results(self) -> dict:
         """
         Returns the validation results as a dictionary.
 
+        This method provides the results of the JSON validation process. The 
+        returned dictionary contains two keys: 'valid' and 'errors'. The 
+        'valid' key holds a boolean indicating whether the JSON object passed 
+        validation, and the 'errors' key holds a list of error messages if 
+        any validation errors were encountered.
+
         Returns:
-        - dict: A dictionary with 'valid' and 'errors' keys.
+            dict: A dictionary with 'valid' (bool) and 'errors' (list) keys.
         """
 
         error_data = [
@@ -85,11 +123,20 @@ class TableValidator:
 
 
 def remove_na(datum: dict) -> dict:
-    """Remove NA
-    Remove `NA` from submissions
+    """
+    Remove 'NA' values from submissions.
+
+    This function iterates through a list of submissions and removes any entries
+    that have a value of 'NA'.
+
+    Args:
+        submissions (list): A list of submissions to process.
+
+    Returns:
+        list: The list of submissions with 'NA' values removed.
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"])}
+    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""])}
 
     return parsed_datum
 
@@ -222,7 +269,20 @@ def validate_cloud_url(url):
     except Exception as exc:
         return ValidationError(f"{url} is not a valid URL. Error: {str(exc)}")
 
+
 def generate_tsv(data):
+    """
+    Generate a TSV (Tab-Separated Values) string from a list of dictionaries.
+
+    This function takes a list of dictionaries and converts it into a TSV formatted string.
+    The keys of the first dictionary are used as the header row.
+
+    Args:
+        data (list): A list of dictionaries containing the data to be converted to TSV.
+
+    Returns:
+        str: A string containing the TSV formatted data.
+    """
     output = StringIO()
     writer = csv.writer(output, delimiter='\t')
     if data:
@@ -235,7 +295,20 @@ def generate_tsv(data):
     output.close()
     return tsv_content
 
+
 def generate_zip(files):
+    """
+    Generate a ZIP file from a dictionary of file names and contents.
+
+    This function takes a dictionary where the keys are file names and the values are
+    the file contents, and creates a ZIP file containing these files.
+
+    Args:
+        files (dict): A dictionary where keys are file names and values are file contents.
+
+    Returns:
+        BytesIO: A BytesIO object containing the ZIP file data.
+    """
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
         for file_name, content in files.items():
@@ -243,7 +316,24 @@ def generate_zip(files):
     zip_buffer.seek(0)
     return zip_buffer
 
+
 def compare_data(old_data:dict, new_data:dict) -> dict:
+    """
+    Compare two dictionaries and return a dictionary of changes.
+
+    Args:
+        old_data (dict): The original data dictionary.
+        new_data (dict): The new data dictionary to compare against the 
+        original.
+
+    Returns:
+        dict: A dictionary containing the changes. The keys are the attributes 
+        that have changed, and the values are strings describing the change 
+        (e.g., "old_value to new_value").
+        If an attribute is not found in old_data, the change is noted as "NA 
+        to new_value". If an error occurs during comparison, the change is 
+        noted as "Error with attr: error_message".
+    """
     changes = {}
     for attr, value in new_data.items():
         try:
@@ -258,3 +348,110 @@ def compare_data(old_data:dict, new_data:dict) -> dict:
             changes[attr] = f"Error with {attr}: {error}"
 
     return changes
+
+
+def bulk_retrieve(request_data: dict, model_class, id: str) -> dict:
+    """
+    Retrieve multiple instances of a model class based on a list of IDs.
+
+    Args:
+        request_data (dict): A dictionary containing the data with IDs to 
+            retrieve.
+        model_class: The Django model class to query.
+        id (str): The key in request_data that contains the IDs.
+
+    Returns:
+        dict: A dictionary of model instances keyed by their IDs.
+    """
+    model_dict = model_class.objects.in_bulk([datum[id] for datum in request_data])
+
+    return model_dict
+
+def create_or_update(table_name: str, identifier: str, model_instance, datum: dict):
+    """
+    Create or update a model instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to create or update.
+        identifier (str): The unique identifier for the model instance.
+        model_instance: The existing model instance to update, or None to create 
+            a new instance.
+        datum (dict): The data to create or update the model instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+   
+    table_serializers = {
+        "participant": {
+            "input_serializer": ParticipantInputSerializer,
+            "output_serializer": ParticipantOutputSerializer
+        },
+        "family":{
+            "input_serializer": FamilySerializer,
+            "output_serializer": FamilySerializer
+        }
+    }
+
+    model_input_serializer = table_serializers[table_name]["input_serializer"]
+    model_output_serializer = table_serializers[table_name]["output_serializer"]
+
+    table_validator = TableValidator()
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+    if results["valid"]:
+        changes = compare_data(
+            old_data=model_output_serializer(model_instance).data,
+            new_data=datum
+        ) if model_instance else {identifier:"CREATED"}
+        #create needed submodules before serialization
+        if table_name == "participant":
+            datum = get_or_create_sub_models(datum=datum) 
+        serializer = model_input_serializer(model_instance, data=datum)
+        if serializer.is_valid():
+            updated_instance = serializer.save()
+            if not changes:
+                return response_constructor(
+                    identifier=identifier,
+                    request_status="SUCCESS",
+                    code=200,
+                    message=f"{table_name} {identifier} had no changes.",
+                    data={
+                        "updates": None,
+                        "instance": model_output_serializer(updated_instance).data
+                    }
+                ), "accepted_request"
+
+            return response_constructor(
+                identifier=identifier,
+                request_status="UPDATED" if model_instance else "CREATED",
+                code=200 if model_instance else 201,
+                message=(
+                    f"{table_name} {identifier} updated." if model_instance 
+                    else f"{table_name} {identifier} created."
+                ),
+                data={
+                    "updates": changes,
+                    "instance": model_output_serializer(updated_instance).data
+                }
+            ), "accepted_request"
+            
+        else:
+            error_data = [
+                {item: serializer.errors[item]}
+                for item in serializer.errors
+            ]
+            return response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=error_data,
+            ), "rejected_request"
+        
+    else:
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=results["errors"],
+        ), "rejected_request"
