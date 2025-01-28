@@ -18,19 +18,44 @@ from submodels.models import ReportedRace
 
 
 class GeneticFindingsSerializer(serializers.ModelSerializer):
+    """
+    1. Pop the ManyToMany field from validated_data
+    2. Create/update the main instance with the remaining fields
+    3. Use .set() to assign the ManyToMany relation
+    """
+    additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(
+        queryset=Family.objects.all(),
+        many=True,
+        required=False
+    )
+
     class Meta:
         model = GeneticFindings
         fields = "__all__"
 
     def create(self, validated_data):
-        """Create a new GeneticFindings instance using the validated data"""
+        """
+        Create a new GeneticFindings instance using the validated data
+        """
+        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])            
         genetic_findings_instance = GeneticFindings.objects.create(**validated_data)
+        if additional_family_members:
+            genetic_findings_instance.additional_family_members_with_variant.set(additional_family_members)
+        genetic_findings_instance.save()
         return genetic_findings_instance
 
+
     def update(self, instance, validated_data):
-        """Update each attribute of the instance with validated data"""
+        """
+        Update each attribute of the instance with validated data
+        """
+        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        if additional_family_members:
+            instance.additional_family_members_with_variant.set(additional_family_members)
+        instance.save()
+
         return instance
 
 

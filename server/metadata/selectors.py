@@ -73,33 +73,6 @@ def get_participant(participant_id: str) -> Participant:
         return None
 
 
-def parse_geneti_findings(genetic_findings: str) -> dict:
-    """"""
-    for key, value in genetic_findings.items():
-        if isinstance(value, str) and "|" in value:
-            genetic_findings[key] = value.split("|")
-        if key == "pos" and genetic_findings[key] != "NA":
-            try:
-                genetic_findings["pos"] = float(genetic_findings["pos"])
-            except ValueError:
-                genetic_findings["pos"] = "NA"
-        if (
-            key == "allele_balance_or_heteroplasmy_percentage"
-            and genetic_findings[key] != "NA"
-        ):
-            try:
-                genetic_findings[key] = int(genetic_findings[key])
-            except ValueError:
-                genetic_findings[key] = "NA"
-        if (
-            key == "partial_contribution_explained"
-            and type(genetic_findings[key]) == str
-        ):
-            genetic_findings[key] = [value]
-
-    parsed_geneti_findings = remove_na(datum=genetic_findings)
-    return parsed_geneti_findings
-
 
 def participant_parser(participant: dict) -> dict:
     """
@@ -150,6 +123,4 @@ def participant_parser(participant: dict) -> dict:
             oops = error
             split_participant[key] = [oops]
 
-    parsed_participant = remove_na(datum=split_participant)
-
-    return parsed_participant
+    return split_participant

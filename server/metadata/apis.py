@@ -36,10 +36,8 @@ from metadata.services import (
 )
 from metadata.selectors import (
     participant_parser,
-    parse_geneti_findings,
     get_phenotype,
     get_analyte,
-    get_genetic_findings,
 )
 
 
@@ -422,99 +420,68 @@ class CreateOrUpdateAnalyte(APIView):
 
 
 class CreateOrUpdateGeneticFindings(APIView):
-    """ """
+    """
+    API view to create or update Genetic Findings entries.
+
+    This API endpoint accepts a list of genetic findings data objects, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
 
     @swagger_auto_schema(
-        operation_id="create_genetic_findings",
+        operation_id="submit_genetic_findings",
         request_body=GeneticFindingsSerializer(many=True),
         responses={
             200: "All submissions of genetic findings were successfull",
             207: "Some submissions of genetic findings were not successful.",
             400: "Bad request",
         },
-        tags=["Genetic Findings"],
+        tags=["CreateOrUpdate"],
     )
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        genetic_findings = bulk_retrieve(
+            request_data=request.data,
+            model_class=GeneticFindings,
+            id="genetic_findings_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["genetic_findings_id"]
-                parsed_geneti_findings = parse_geneti_findings(genetic_findings=datum)
-                validator.validate_json(
-                    json_object=parsed_geneti_findings, table_name="genetic_findings"
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
+                    table_name="genetic_findings",
+                    identifier = datum["genetic_findings_id"],
+                    model_instance = genetic_findings.get(datum["genetic_findings_id"]),
+                    datum = datum
                 )
 
-                results = validator.get_validation_results()
-                if results["valid"] is True:
-                    genetic_findings_instance = get_genetic_findings(
-                        genetic_findings_id=identifier
-                    )
-                    serializer = GeneticFindingsSerializer(
-                        genetic_findings_instance, data=parsed_geneti_findings
-                    )
-                    if serializer.is_valid():
-                        genetic_findings_instance = serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status=(
-                                    "UPDATED"
-                                    if genetic_findings_instance
-                                    else "CREATED"
-                                ),
-                                code=200 if genetic_findings_instance else 201,
-                                message=(
-                                    f"Genetic Findings {identifier} updated."
-                                    if genetic_findings_instance
-                                    else f"Genetic Findings {identifier} created."
-                                ),
-                                data=GeneticFindingsSerializer(
-                                    genetic_findings_instance
-                                ).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: serializer.errors[item]}
-                            for item in serializer.errors
-                        ]
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=results["errors"],
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["genetic_findings_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)

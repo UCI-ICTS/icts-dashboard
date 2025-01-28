@@ -27,49 +27,43 @@
     },
     {
         "model": "submodels.reportedrace",
-        "pk": 1,
+        "pk": "Asian",
         "fields": {
-            "name": "NATIVE_AMERICAN",
-            "description": "American Indian or Alaska Native"
-        }
-    },
-    {
-        "model": "submodels.reportedrace",
-        "pk": 2,
-        "fields": {
-            "name": "ASIAN",
             "description": "Asian"
         }
     },
     {
         "model": "submodels.reportedrace",
-        "pk": 3,
+        "pk": "Black or African American",
         "fields": {
-            "name": "BLACK",
             "description": "Black or African American"
         }
     },
     {
         "model": "submodels.reportedrace",
-        "pk": 4,
+        "pk": "Middle Eastern or North African",
         "fields": {
-            "name": "PACIFIC_ISLANDER",
-            "description": "Native Hawaiian or Other Pacific Islander"
-        }
-    },
-    {
-        "model": "submodels.reportedrace",
-        "pk": 5,
-        "fields": {
-            "name": "MIDDLE_EASTERN",
             "description": "Middle Eastern or North African"
         }
     },
     {
         "model": "submodels.reportedrace",
-        "pk": 6,
+        "pk": "American Indian or Alaska Native",
         "fields": {
-            "name": "WHITE",
+            "description": "American Indian or Alaska Native"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": "Native Hawaiian or Other Pacific Islander",
+        "fields": {
+            "description": "Native Hawaiian or Other Pacific Islander"
+        }
+    },
+    {
+        "model": "submodels.reportedrace",
+        "pk": "White",
+        "fields": {
             "description": "White"
         }
     },
