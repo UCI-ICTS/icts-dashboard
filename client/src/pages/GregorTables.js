@@ -27,8 +27,10 @@ const tables = [
 
 const Gregor = () => {
   const dispatch = useDispatch();
+  const tableName = useSelector(state => state.data.tableName);
   const tableView = useSelector(state => state.data['tableView']);
   const tableData = useSelector(state => state.data[tableView]);
+  const dataStatus = useSelector(state => state.data.status);
   const rowID = useSelector(state => state.data['tableID']);
   const token = useSelector((state) => state.account.user?.access_token)
   
@@ -36,7 +38,7 @@ const Gregor = () => {
   
   // Automatically fetch data if the table is empty
   useEffect(() => {
-    if (!tableData || tableData.length === 0) {
+    if (!tableData || tableData.length === 0 && dataStatus === "idle") {
       dispatch(getAllTables({ token }));
     }
   }, [dispatch, tableData, token]);
@@ -44,16 +46,22 @@ const Gregor = () => {
   return (  
     <Container className="table-container">
       <Grid item>
-      <Typography variant="h4">Select GREGoR table to view:</Typography>
+        <Grid item >
+          <img src="../GREGoR_Final_Logo.png" />
+          <Typography variant="h4">
+            {tableName} table
+          </Typography>
+        </Grid>
         <Typography variant="h4">{tables.map((table) => (
-                <Button
-                  key={table.name}
-                  onClick={event => dispatch(setTableView(table))}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {table.name}
-                </Button>
-              ))}</Typography>
+          <Button
+          key={table.name}
+          onClick={event => dispatch(setTableView(table))}
+          sx={{ my: 2, color: 'white', display: 'block' }}
+          >
+            {table.name}
+          </Button>
+        ))}
+        </Typography>
       </Grid>
       <br/>
       <TableForm

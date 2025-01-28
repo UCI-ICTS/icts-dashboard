@@ -5,9 +5,9 @@ import { setMessage } from "./messageSlice";
 import { useSelector } from "react-redux";
 
 const initialState = {
-  tableView: "participants",
-  tableID: "participant_id",
-  tableName: "Participants",
+  tableView: "genetic_findings",
+  tableID: "genetic_findings_id",
+  tableName: "Genetic Findings",
   jsonData: [],
   participants: [],
   families: [],
@@ -34,10 +34,6 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(submitParticipant.fulfilled, (state, action) => {
-        console.log(action.payload)
-        state.jsonData = action.payload;
-      })
       .addCase(getAllTables.pending, (state, action) => {
         state.status = "loading";
       })
@@ -51,18 +47,37 @@ export const dataSlice = createSlice({
         state.analytes = action.payload.analytes;
         state.phenotypes = action.payload.phenotypes;
         state.experiments = action.payload.experiments;
-        state.status = "idle";
+        state.status = "fulfilled";
       })
       .addCase(updateTable.fulfilled, (state, action) => {
-        if (action.payload.table === 'participant_id') {
-          const participant = action.payload.response[0].data.updated_instance
-          const identifier = participant[action.payload.table]
-          const updatedParticipant = state.participants.find(p => p.participant_id === identifier);
-          if (updatedParticipant) {
-            Object.assign(updatedParticipant, participant)
+        state.status = "fulfilled";
+        const { table, response, noChanges } = action.payload;
+        // Return early if no changes
+        if (noChanges) {
+          return; 
+        }
+        // Extract the updated object from the response
+        const updatedObject = response[0]?.data?.instance;
+
+        if (updatedObject && table) {
+          // Extract the identifier value dynamically using the table name
+          const identifier = updatedObject[table];
+          // Dynamically determine the collection to update based on the table name
+          const collectionName = table === "participant_id" ? "participants" : 
+                                 table === "family_id" ? "families" : 
+                                 table === "genetic_findings_id" ? "genetic_findings" :
+                                 table === "" ? "" : null 
+      
+          if (collectionName && state[collectionName]) {
+            // Find the object to update in the relevant collection
+            const objectToUpdate = state[collectionName].find(item => item[table] === identifier);
+      
+            if (objectToUpdate) {
+              // Update the object in the state
+              Object.assign(objectToUpdate, updatedObject);
+            }
           }
         }
-        state.status = "idle";
       })
       .addCase(updateTable.pending, (state, action) => {
         state.status = "loading";
@@ -73,20 +88,6 @@ export const dataSlice = createSlice({
   }
 });
 
-
-export const submitParticipant = createAsyncThunk(
-  "submitParticipant",
-  async ({data_list}, thunkAPI) => {
-    try {
-      console.log("slice", data_list)
-      const response = await dataService.submitParticipant(data_list);
-      console.log(response)
-      return response.data
-    } catch(error) {
-      console.log("hadley",error)
-    }
-  }
-)
 
 export const getAllTables = createAsyncThunk(
   "getAllTables",
@@ -103,76 +104,35 @@ export const getAllTables = createAsyncThunk(
 export const updateTable = createAsyncThunk(
   "updateTable",
   async ({table, data, token}, thunkAPI) => {
-    if (table === "participant_id") {
-      console.log("slice", table)
-      try {
-        const response = await dataService.updateParticipant(data, token);
-        const payload = {response: response.data, table}
-        if (response.data[0].message.includes("had no changes.")) {
-          thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} had no changes`));
-          return 0
-        }
-        thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} updated successfuly`));
-        return payload
-      } catch(error) {
-        console.log("ERROR! ",error.response)
-        return thunkAPI.rejectWithValue(error.response.data);
+    const apiCall = (table, data, token) => {
+      if (table === "participant_id") {
+        return dataService.updateParticipant(data, token);
       }
+      if (table === "family_id") {
+        return dataService.updateFamily(data, token);
+      }
+      if (table === "genetic_findings_id") {
+        return dataService.updateGeneticFindings(data, token);
+      }
+      throw new Error("Invalid table type");
     }
-    if (table === "family_id") {
-      console.log("slice", table, data, token)
-      try {
-        // const response = await dataService.updateTable(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        // return response.data
-      } catch(error) {
-        console.log("ERROR! ",error)
-        return thunkAPI.rejectWithValue(error.response.data);
+    // console.log("JSON data", JSON.stringify(data))
+    try {
+      const response = await apiCall(table, data, token);
+      const payload = {response: response.data, table}
+      console.log('herwe')
+      if (response.data[0].message.includes("had no changes.")) {
+        thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} had no changes`));
+        // Return a payload with a flag indicating no change
+        return { response: [], table, noChanges: true };
       }
-    }
-    if (table === "genetic_findings_id") {
-      console.log("slice", table, data, token)
-      try {
-        const response = await dataService.updateTable(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        return response.data
-      } catch(error) {
-        console.log("ERROR! ",error)
-        return thunkAPI.rejectWithValue(error.response.data);
-      }
-    }
-    if (table === "analyte_id") {
-      console.log("slice", table, data, token)
-      try {
-        // const response = await dataService.updateTable(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        // return response.data
-      } catch(error) {
-        console.log("ERROR! ",error)
-        return thunkAPI.rejectWithValue(error.response.data);
-      }
-    }
-    if (table === "phenotype_id") {
-      console.log("slice", table, data, token)
-      try {
-        // const response = await dataService.updateTable(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        // return response.data
-      } catch(error) {
-        console.log("ERROR! ",error)
-        return thunkAPI.rejectWithValue(error.response.data);
-      }
-    }
-    if (table === "experiment_id") {
-      console.log("slice", table, data, token)
-      try {
-        // const response = await dataService.updateTable(data, token);
-        thunkAPI.dispatch(setMessage(`${data[table]} updated successfully`));
-        // return response.data
-      } catch(error) {
-        console.log("ERROR! ",error)
-        return thunkAPI.rejectWithValue(error.response.data);
-      }
+      
+      thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} updated successfuly`));
+      return payload
+
+    } catch(error) {
+      console.log("ERROR! ",error.response)
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 )
