@@ -390,12 +390,17 @@ def create_or_update(table_name: str, identifier: str, model_instance, datum: di
         "family":{
             "input_serializer": FamilySerializer,
             "output_serializer": FamilySerializer
+        },
+        "genetic_findings": {
+            "input_serializer": GeneticFindingsSerializer,
+            "output_serializer": GeneticFindingsSerializer
         }
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
     model_output_serializer = table_serializers[table_name]["output_serializer"]
 
+    datum = remove_na(datum=datum) 
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
