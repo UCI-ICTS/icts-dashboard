@@ -1,13 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import "../App.css";
-import { alpha } from '@mui/material/styles';
 import {
   Box,
   Button, 
   FormControlLabel,
   IconButton,
-  Paper,
   Switch,
   Table,
   TableBody,
@@ -19,13 +16,13 @@ import {
   TableSortLabel,
   Toolbar,
   Tooltip,
-  Typography,
+  TextField,
 } from "@material-ui/core";
-
-import DeleteIcon from '@mui/icons-material/Delete';
+import "../App.css";
+import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import FormDialogue from './FormDialogue';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -68,7 +65,6 @@ function EnhancedTableHead({headCells, ...props}) {
   return (
     <TableHead>
       <TableRow>
-        
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -104,60 +100,25 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
+function SearchBox() {
+  const [query, setQuery] = useState();
   return (
-    <Toolbar
-      sx={[
-        {
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
-        },
-        numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        },
-      ]}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          **CHANGE THIS TO SEARCH FEATURES**
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+    <Toolbar>
+      <SearchIcon/>
+      <TextField
+        id="search"
+        label="Search"
+        variant="standard"
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <Tooltip title="Advanced Search">
+        <IconButton>
+          <FilterListIcon />
+        </IconButton>
+      </Tooltip>
     </Toolbar>
   );
 }
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
 
 export default function TableForm({rows, schema, rowID}) {
   const headCells = React.useMemo(() => generateHeadCells(schema), [schema]);
@@ -235,80 +196,78 @@ export default function TableForm({rows, schema, rowID}) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <Box className='box-flex' >
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleAddNewRow}
-            style={{ margin: '10px 0' }}
-            disabled={visibleRows === 0}
-          >
-            Add Row
-          </Button>
-          <TablePagination
-            rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+    
+      <Box className='box-flex' >
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleAddNewRow}
+          style={{ margin: '10px 0' }}
+          disabled={visibleRows === 0}
+        >
+          Add Row
+        </Button>
+        <TablePagination
+          rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <SearchBox />
+      </Box>
+      <TableContainer>
+        {loadStatus === "loading" ? (
+          <Box className='box-flex'>
+            <CircularProgress />
+          </Box>
+        ) : (
+        <Table
+          sx={{ minWidth: 750 }}
+          aria-labelledby="tableTitle"
+          size={dense ? 'small' : 'medium'}
+        >
+          <EnhancedTableHead
+            headCells={headCells}
+            numSelected={selected.length}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            rowCount={rows.length}
           />
-          <EnhancedTableToolbar numSelected={selected.length} />
-        </Box>
-        <TableContainer>
-          {loadStatus === "loading" ? (
-            <Box className='box-flex'>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              headCells={headCells}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                return (
-                  <TableRow
-                    hover
-                    onClick={() => handleClick(row)}
-                    key={row[rowID]}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    {headCells.map((cell) => (
-                      <TableCell key={cell.id} align={cell.numeric ? 'right' : 'left'}>
-                        {row[cell.id] || ""}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
+          <TableBody>
+            {visibleRows.map((row, index) => {
+              return (
                 <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
+                  hover
+                  onClick={() => handleClick(row)}
+                  key={row[rowID]}
+                  sx={{ cursor: 'pointer' }}
                 >
-                  <TableCell colSpan={6} />
+                  {headCells.map((cell) => (
+                    <TableCell key={cell.id} align={cell.numeric ? 'right' : 'left'}>
+                      {row[cell.id] || ""}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          )}
-        </TableContainer>
-
-      </Paper>
-      <FormControlLabel
+              );
+            })}
+            {emptyRows > 0 && (
+              <TableRow
+                style={{
+                  height: (dense ? 33 : 53) * emptyRows,
+                }}
+              >
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        )}
+      </TableContainer>
+     <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
@@ -318,6 +277,7 @@ export default function TableForm({rows, schema, rowID}) {
         schema={schema} // Ensure schema includes the 'title' property
         selectedRow={selectedRow}
         rowID={rowID}
+        identifier={headCells[0].label}
       />
     </Box>
   );

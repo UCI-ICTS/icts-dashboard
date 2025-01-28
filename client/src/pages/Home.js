@@ -8,15 +8,11 @@ import { Uploader } from "../components/Uploader";
 const HomePage = () => {
     return (
       <Container className="container-test" >
-            <InfoBox />
-        <Grid item xs={12} sm={6} lg={4} xl={12}  className="container-test">
-          <Box item xs={12} sm={6} lg={4} xl={1} l className="container-test">
-          <Box item xs={12} sm={6} lg={4} xl={1} l className="container-test">
-          </Box>
-          <Box item xs={12} sm={6} lg={4} xl={1} l className="container-test">
-          </Box>
-          </Box>
-        </Grid>
+        <InfoBox
+          header="Some test Text"
+          bodyText={"this is a test box. It is waiting for real content. Click me 3 times to go home"}
+          linkTo={"/"}
+        />
       </Container>
     )
 }

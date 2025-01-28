@@ -1,17 +1,5 @@
 import axios from "axios";
 
-const submitParticipant = async (data) => {
-  console.log("service",data)
-  const response = await axios.post("http://localhost:8000/metadata/submit_participant/", {
-      "participant_list": data
-  }, {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  return response;
-}
-
 const getAllTables = async (token) => {
   const response = await axios.get("http://localhost:8000/api/metadata/get_all_tables/", {
     headers: {
@@ -23,7 +11,7 @@ const getAllTables = async (token) => {
 }
 
 const updateParticipant = async (data, token) => {
-  const response = await axios.post("http://localhost:8000/api/metadata/update_participants/", [
+  const response = await axios.post("http://localhost:8000/api/metadata/submit_participants/", [
     data
   ], {
     headers: {
@@ -34,9 +22,37 @@ const updateParticipant = async (data, token) => {
   return response;
 }
 
+const updateFamily = async (data, token) => {
+  const response = await axios.post("http://localhost:8000/api/metadata/submit_families/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateGeneticFindings = async (data, token) => {
+  const response = await axios.post("http://localhost:8000/api/metadata/submit_genetic_findings/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
 const dataService = {
-    updateParticipant,
-    getAllTables
+  updateGeneticFindings,
+  updateFamily,  
+  updateParticipant,
+  getAllTables
 }
 
   export default dataService;
