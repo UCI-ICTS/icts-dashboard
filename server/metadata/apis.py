@@ -328,93 +328,69 @@ class CreateOrUpdatePhenotypeApi(APIView):
 
 
 class CreateOrUpdateAnalyte(APIView):
-    """ """
+    """
+    API view to create or update Analyte entries.
+
+    This API endpoint accepts a list of analyte data objects, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
 
     @swagger_auto_schema(
-        operation_id="create_analyte",
+        operation_id="submit_analyte",
         request_body=AnalyteSerializer(many=True),
         responses={
-            200: "All submissions of analytes were successfull",
-            207: "Some submissions of analytes were not successful.",
+            200: "All submissions of genetic findings were successfull",
+            207: "Some submissions of genetic findings were not successful.",
             400: "Bad request",
         },
-        tags=["Analyte"],
+        tags=["CreateOrUpdate"],
     )
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        genetic_findings = bulk_retrieve(
+            request_data=request.data,
+            model_class=Analyte,
+            id="analyte_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["analyte_id"]
-                parsed_analyte = remove_na(datum=datum)
-                validator.validate_json(
-                    json_object=parsed_analyte, table_name="analyte"
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
+                    table_name="analyte",
+                    identifier = datum["analyte_id"],
+                    model_instance = genetic_findings.get(datum["analyte_id"]),
+                    datum = datum
                 )
 
-                results = validator.get_validation_results()
-                if results["valid"] is True:
-                    analyte_instance = get_analyte(analyte_id=identifier)
-                    serializer = AnalyteSerializer(
-                        analyte_instance, data=parsed_analyte
-                    )
-
-                    if serializer.is_valid():
-                        analyte_instance = serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="UPDATED" if analyte_instance else "CREATED",
-                                code=200 if analyte_instance else 201,
-                                message=(
-                                    f"Analyte {identifier} updated."
-                                    if analyte_instance
-                                    else f"Analyte {identifier} created."
-                                ),
-                                data=AnalyteSerializer(analyte_instance).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: serializer.errors[item]}
-                            for item in serializer.errors
-                        ]
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=results["errors"],
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["analyte_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 

@@ -416,7 +416,7 @@ class Phenotype(models.Model):
     )
     syndromic = models.CharField(
         max_length=50,
-        choices=[["syndromic", "non-syndromic"]],
+        choices=[("syndromic", "syndromic"), ("non-syndromic", "non-syndromic")],
         default="non-syndromic",
         help_text="Indicates if the phenotype is part of a syndromic condition",
     )

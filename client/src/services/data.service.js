@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const APIDB = process.env.REACT_APP_APIDB;
+
 const getAllTables = async (token) => {
-  const response = await axios.get("http://localhost:8000/api/metadata/get_all_tables/", {
+  const response = await axios.get(APIDB + "/api/metadata/get_all_tables/", {
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + token
@@ -11,7 +13,7 @@ const getAllTables = async (token) => {
 }
 
 const updateParticipant = async (data, token) => {
-  const response = await axios.post("http://localhost:8000/api/metadata/submit_participants/", [
+  const response = await axios.post(APIDB + "/api/metadata/submit_participants/", [
     data
   ], {
     headers: {
@@ -23,7 +25,7 @@ const updateParticipant = async (data, token) => {
 }
 
 const updateFamily = async (data, token) => {
-  const response = await axios.post("http://localhost:8000/api/metadata/submit_families/", [
+  const response = await axios.post(APIDB + "/api/metadata/submit_families/", [
     data
   ], {
     headers: {
@@ -36,7 +38,46 @@ const updateFamily = async (data, token) => {
 
 
 const updateGeneticFindings = async (data, token) => {
-  const response = await axios.post("http://localhost:8000/api/metadata/submit_genetic_findings/", [
+  const response = await axios.post(APIDB + "/api/metadata/submit_genetic_findings/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateAnalyte = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/metadata/submit_analyte/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateExperiment = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/metadata/submit_experiment/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updatePhenotype = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/metadata/submit_phenotype/", [
     data
   ], {
     headers: {
@@ -49,6 +90,9 @@ const updateGeneticFindings = async (data, token) => {
 
 
 const dataService = {
+  updateExperiment,
+  updatePhenotype,
+  updateAnalyte,
   updateGeneticFindings,
   updateFamily,  
   updateParticipant,

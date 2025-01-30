@@ -29,7 +29,6 @@ export const dataSlice = createSlice({
       state.tableView = action.payload.schema;
       state.tableID = action.payload.identifier;
       state.tableName = action.payload.name;
-      console.log(action.payload)
     }
   },
   extraReducers: (builder) => {
@@ -41,13 +40,8 @@ export const dataSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
-        state.participants = action.payload.participants;
-        state.families = action.payload.families;
-        state.genetic_findings = action.payload.genetic_findings;
-        state.analytes = action.payload.analytes;
-        state.phenotypes = action.payload.phenotypes;
-        state.experiments = action.payload.experiments;
-        state.status = "fulfilled";
+        const { participants, families, genetic_findings, analytes, phenotypes, experiments } = action.payload;
+        Object.assign(state, { participants, families, genetic_findings, analytes, phenotypes, experiments, status: "fulfilled" });
       })
       .addCase(updateTable.fulfilled, (state, action) => {
         state.status = "fulfilled";
@@ -66,7 +60,9 @@ export const dataSlice = createSlice({
           const collectionName = table === "participant_id" ? "participants" : 
                                  table === "family_id" ? "families" : 
                                  table === "genetic_findings_id" ? "genetic_findings" :
-                                 table === "" ? "" : null 
+                                 table === "analyte_id" ? "analytes" :
+                                 table === "phenotype_id" ? "phenotypes" :
+                                 table === "experiment_id" ? "experiments" : null 
       
           if (collectionName && state[collectionName]) {
             // Find the object to update in the relevant collection
@@ -113,6 +109,15 @@ export const updateTable = createAsyncThunk(
       }
       if (table === "genetic_findings_id") {
         return dataService.updateGeneticFindings(data, token);
+      }
+      if (table === "analyte_id") {
+        return dataService.updateAnalyte(data, token);
+      }
+      if (table === "analyte_id") {
+        return dataService.updateExperiment(data, token);
+      }
+      if (table === "phenotype_id") {
+        return dataService.updatePhenotype(data, token);
       }
       throw new Error("Invalid table type");
     }

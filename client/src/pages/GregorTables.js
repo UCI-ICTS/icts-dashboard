@@ -22,7 +22,7 @@ const tables = [
   {name:"Genetic Findings", schema:"genetic_findings", identifier:"genetic_findings_id"},
   {name:"Analytes", schema:"analytes", identifier:"analyte_id"},
   {name:"Phenotypes", schema:"phenotypes", identifier:"phenotype_id"},
-  {name:"Experiments", schema:"experiments", identifier:"experiment_id"}
+  // {name:"Experiments", schema:"experiments", identifier:"experiment_id"}
 ]
 
 const Gregor = () => {
