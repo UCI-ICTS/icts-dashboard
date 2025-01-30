@@ -978,7 +978,9 @@ class Migration(migrations.Migration):
                 (
                     "syndromic",
                     models.CharField(
-                        choices=[("syndromic", "non-syndromic")],
+                        choices=[
+                            ("syndromic", "syndromic"),("non-syndromic", "non-syndromic"),
+                        ],
                         default="non-syndromic",
                         help_text="Indicates if the phenotype is part of a syndromic condition",
                         max_length=50,

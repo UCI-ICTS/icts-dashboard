@@ -108,6 +108,7 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
               try {
                 // console.log(JSON.stringify(values))
                 const result = dispatch(updateTable({table:rowID, data: values, token:token}));
+                
                 if (result.meta.requestStatus === 'fulfilled') {
                   onClose();
                 } else {
@@ -118,8 +119,7 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
                 console.log('Form error', error);
                 onClose();
               }
-              // console.log('Form Submitted', rowID, values);
-              }}
+            }}
           >
             {({ values, handleChange, handleBlur, touched, errors }) => (
               <Form>
