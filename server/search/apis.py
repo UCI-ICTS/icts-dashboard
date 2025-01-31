@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # search/apis.py
 
-import json
 from django.apps import apps
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -15,6 +14,71 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from search.selectors import get_anvil_tables
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from metadata.models import (
+    Participant,
+    Family,
+    GeneticFindings,
+    Phenotype,
+    Analyte,
+)
+
+from metadata.services import (
+    ParticipantInputSerializer,
+    ParticipantOutputSerializer,
+    FamilySerializer,
+    GeneticFindingsSerializer,
+    AnalyteSerializer,
+    PhenotypeSerializer
+)
+
+from experiments.models import (
+    Experiment,
+
+)
+
+from experiments.services import (
+    ExperimentSerializer
+)
+
+class GetAllTablesAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_tables",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
+            serilized_families = FamilySerializer(Family.objects.all(), many=True)
+            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
+            serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
+            serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
+ 
+            serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
+            
+            serilized_return_data = {
+                'participants': serialized_participants.data,
+                'families': serilized_families.data,
+                'genetic_findings': serilized_genetic_findings.data,
+                'analytes': serialized_analytes.data,
+                'phenotypes': serialized_phenotypes.data,
+                'experiments': serialized_experiments.data
+            }
+            # time.sleep(5)
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
 class DounlaodTablesAPI(APIView):

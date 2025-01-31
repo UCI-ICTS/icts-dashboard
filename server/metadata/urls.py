@@ -8,8 +8,6 @@ from metadata.apis import (
     CreateOrUpdateAnalyte,
     CreateOrUpdateFamilyApi,
     CreateOrUpdatePhenotypeApi,
-    GetAllTablesAPI,
-    
 )
 
 urlpatterns = [
@@ -18,5 +16,4 @@ urlpatterns = [
     path("submit_phenotype/", CreateOrUpdatePhenotypeApi.as_view()),
     path("submit_analyte/", CreateOrUpdateAnalyte.as_view()),
     path("submit_genetic_findings/", CreateOrUpdateGeneticFindings.as_view()),
-    path("get_all_tables/", GetAllTablesAPI.as_view())
 ]
