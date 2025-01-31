@@ -30,7 +30,6 @@ from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
     ParticipantInputSerializer,
-    ParticipantOutputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
 )
@@ -39,46 +38,6 @@ from metadata.selectors import (
     get_phenotype,
     get_analyte,
 )
-
-
-class GetAllTablesAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_tables",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Participant"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-
-            serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
-            serilized_families = FamilySerializer(Family.objects.all(), many=True)
-            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
-            serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
-            serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
-            serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
-
-            serilized_return_data = {
-                'participants': serialized_participants.data,
-                'families': serilized_families.data,
-                'genetic_findings': serilized_genetic_findings.data,
-                'analytes': serialized_analytes.data,
-                'phenotypes': serialized_phenotypes.data,
-                'experiments': serialized_experiments.data
-            }
-            # time.sleep(5)
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
 class CrearteOrUpdateParticipantAPI(APIView):
