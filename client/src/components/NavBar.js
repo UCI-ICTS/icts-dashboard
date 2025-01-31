@@ -14,7 +14,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from "../slices/accountSlice";
 import LoginIcon from '@mui/icons-material/Login';
@@ -27,6 +27,7 @@ const pages = [
 
 function NavBar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
   const isMobile = useMediaQuery('(max-width:900px)');
 
@@ -45,6 +46,11 @@ function NavBar() {
     dispatch(logout({token}))
   };
   
+  const handleProfileClick = () => {
+    handleCloseUserMenu();
+    navigate('/profile');
+  };
+
   return (
     <AppBar position="static" className='navbar'>
       <Container maxWidth="xl">
@@ -57,7 +63,7 @@ function NavBar() {
               to="/"
               className="navbar-link"
             >
-              UCI ITCTS Dashboard
+              UCI ITCS Dashboard
             </Typography>
           </Tooltip>
           {auth.isLoggedIn === true ?(
@@ -121,7 +127,7 @@ function NavBar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                <MenuItem onClick={handleCloseUserMenu}>Profile</MenuItem>
+                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
                 <MenuItem onClick={handleCloseUserMenu}>Settings</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>

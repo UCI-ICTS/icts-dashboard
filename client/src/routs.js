@@ -6,8 +6,10 @@ import { jwtDecode } from "jwt-decode";
 import { setMessage } from "./slices/messageSlice.js";
 import { handleExpiredJWT } from "./slices/accountSlice";
 import MainLayout from "./layouts/MainLayout";
+import PrivateRoute from './components/PrivateRoute';
 import HomePage from "./pages/Home";
 import Login from "./pages/Login";
+import ProfilePage from "./pages/Profile.js"
 import GregorTables from "./pages/GregorTables";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
@@ -53,7 +55,16 @@ export default function Router() {
             children: [
                 { path: "/", element: <HomePage /> },
                 { path: "login", element: <Login /> },
-                { path: "/gregor/", element: <GregorTables />}
+                { path: "/profile/", element: (
+                  <PrivateRoute>
+                    <ProfilePage />
+                  </PrivateRoute>)
+                },
+                { path: "/gregor/", element: (
+                    <PrivateRoute>
+                      <GregorTables />
+                    </PrivateRoute>)
+                }
             ]
         },
         {
