@@ -1,0 +1,273 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/participant.json",
+    "title": "participant",
+    "version": "1.7",
+    "type": "object",
+    "required": [
+        "participant_id",
+        "gregor_center",
+        "consent_code",
+        "family_id",
+        "paternal_id",
+        "maternal_id",
+        "proband_relationship",
+        "sex",
+        "affected_status",
+        "solve_status",
+        "missing_variant_case"
+    ],
+    "definitions": {},
+    "properties": {
+        "participant_id": {
+            "type": "string",
+            "description": "Subject/Participant Identifier (primary key)\n\nNotes: anticipate using RC-assigned ID prefixed by gregor_center value",
+            "examples": [
+                "BCM_Subject_1",
+                "BROAD_subj89054"
+            ]
+        },
+        "internal_project_id": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
+                "examples": [
+                    "UWCDR_uwcmg_distal_arthrogryposis_type 1_212",
+                    "UWCDR_uwcmg_sponastrime_dysplasia_487"
+                ]
+            }
+        },
+        "gregor_center": {
+            "type": "string",
+            "enum": [
+                "BCM",
+                "BROAD",
+                "CNH_I",
+                "UCI",
+                "UW_CRDR",
+                "GSS",
+                "UW_DCC"
+            ],
+            "description": "GREGoR Center to which the participant is originally associated"
+        },
+        "consent_code": {
+            "type": "string",
+            "enum": [
+                "GRU",
+                "HMB"
+            ],
+            "description": "Consent group pertaining to this participant's data",
+            "examples": "GRU"
+        },
+        "recontactable": {
+            "type": "string",
+            "enum": [
+                "Yes",
+                "No"
+            ],
+            "description": "Is the originating GREGoR Center likely able to recontact this participant"
+        },
+        "prior_testing": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "Text description of any genetic testing for individual conducted prior to enrollment",
+                "examples": "Normal karyotype | FBN2 screened clinically"
+            }
+        },
+        "pmid_id": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "Case specific PubMed ID if applicable\n\nNotes: Publication which included participant;  Used for publications which include participant known prior to or after inclusion in GREGoR",
+                "examples": "25683120"
+            }
+        },
+        "family_id": {
+            "type": "string",
+            "description": "Identifier for family",
+            "examples": [
+                "CNH-I_fam89052",
+                "UW_CRDR_Family_2"
+            ]
+        },
+        "paternal_id": {
+            "type": "string",
+            "description": "participant_id for father; 0 if not available\n\nNotes: intent is to be able to create .ped file format from consortium data;   Can enter 0 for mother or father not present",
+            "examples": [
+                "BCM_Subject_1",
+                "BROAD_subj89054"
+            ]
+        },
+        "maternal_id": {
+            "type": "string",
+            "description": "participant_id for mother; 0 if not available\n\nNotes: intent is to be able to create .ped file format from consortium data;   Can enter 0 for mother or father not present",
+            "examples": [
+                "BCM_Subject_1",
+                "BROAD_subj89054"
+            ]
+        },
+        "twin_id": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "participant_id for twins, triplets, etc; 0 if not available\n\nNotes: may be monozygotic, dizygotic, or polyzygotic",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054",
+                    "BROAD_subj89054|BROAD_subj89055"
+                ]
+            }
+        },
+        "proband_relationship": {
+            "type": "string",
+            "enum": [
+                "Self",
+                "Mother",
+                "Father",
+                "Sibling",
+                "Child",
+                "Maternal Half Sibling",
+                "Paternal Half Sibling",
+                "Maternal Grandmother",
+                "Maternal Grandfather",
+                "Paternal Grandmother",
+                "Paternal Grandfather",
+                "Maternal Aunt",
+                "Maternal Uncle",
+                "Paternal Aunt",
+                "Paternal Uncle",
+                "Niece",
+                "Nephew",
+                "Maternal 1st Cousin",
+                "Paternal 1st Cousin",
+                "Other",
+                "Unknown"
+            ],
+            "description": "Text description of individual relationship to proband in family, especially useful to capture relationships when connecting distant relatives and connecting relatives not studied\n\nNotes: limit enumerated fields to values in seqr, and use the proband_relationship_detail for other options",
+            "examples": "Mother"
+        },
+        "proband_relationship_detail": {
+            "type": "string",
+            "description": "Other proband relationship not captured in enumeration above\n\nNotes: keeping because not all relationships can be captured in proband_relationship (a way to describe 'other')",
+            "examples": [
+                "Third cousins, through mother's side",
+                "Father's brother's nephew's cousin's former roommate"
+            ]
+        },
+        "sex": {
+            "type": "string",
+            "enum": [
+                "Female",
+                "Male",
+                "Unknown"
+            ],
+            "description": "Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the phenotype information section."
+        },
+        "sex_detail": {
+            "type": "string",
+            "description": "Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype",
+            "examples": [
+                "XXY expected",
+                "XY expected [for someone assigned female at birth with XY DSD]"
+            ]
+        },
+        "reported_race": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "American Indian or Alaska Native",
+                    "Asian",
+                    "Black or African American",
+                    "Native Hawaiian or Other Pacific Islander",
+                    "Middle Eastern or North African",
+                    "White"
+                ],
+                "description": "Self/submitter-reported race (OMB categories)"
+            }
+        },
+        "reported_ethnicity": {
+            "type": "string",
+            "enum": [
+                "Hispanic or Latino",
+                "Not Hispanic or Latino"
+            ],
+            "description": "Self/submitter-reported ethnicity (OMB categories)"
+        },
+        "ancestry_detail": {
+            "type": "string",
+            "description": "Additional specific ancestry description free text beyond what is captured by OMB race/ethnicity categories",
+            "examples": [
+                "Polish",
+                "Amish",
+                "Ashkenazi Jewish"
+            ]
+        },
+        "age_at_last_observation": {
+            "type": "number",
+            "description": "Age at last observation, aka age in years at the last time the center can vouch for the accuracy phenotype data. For conditions with later age of onset, this field lets users know if individuals marked as unaffected were younger or older than the age when the phenotype is expected to appear.",
+            "examples": [
+                "21",
+                "32"
+            ]
+        },
+        "affected_status": {
+            "type": "string",
+            "enum": [
+                "Affected",
+                "Unaffected",
+                "Possibly affected",
+                "Unknown"
+            ],
+            "description": "Indicate affected status of individual (overall with respect to primary phenotype in the family). Note: Affected participants must have entry in phenotype table.\n\nNotes: useful from a ped file point of view;\ngeneral agreement to keep; phenotype table captures details and this is an overall status"
+        },
+        "phenotype_description": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband.\n\nNotes: For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
+                "examples": [
+                    "Missing one variant in gene XXX",
+                    "Distal arthrogryposis with stellate teeth"
+                ]
+            }
+        },
+        "age_at_enrollment": {
+            "type": "number",
+            "description": "age in years at which consent was originally obtained",
+            "examples": "42"
+        },
+        "solve_status": {
+            "type": "string",
+            "enum": [
+                "Solved",
+                "Partially solved",
+                "Probably solved",
+                "Unsolved",
+                "Unaffected"
+            ],
+            "description": "Indication of whether the submitting RC considers this case 'solved'\n\nNotes: See https://docs.google.com/document/d/1Qg-wjF34F3h4pyMjFNQcDP5-PvmlOh0HxDEDR8DyexE",
+            "examples": "Partially solved"
+        },
+        "missing_variant_case": {
+            "type": "string",
+            "enum": [
+                "Yes",
+                "No",
+                "Unknown"
+            ],
+            "description": "Indication of whether this is known to be a missing variant case, see notes for a description of the Missing Variant Project and inclusion criteria.\n\nNotes: The goal of the Missing Variant Project (MVP) is to identify a cohort of cases for which there is an extremely high expectation of the presence of one or two 'missing' pathogenic variants within a narrow and specific search space, i.e. a single gene/locus of interest for which the known phenotype is the suspected/likely diagnosis for the affected individual.\n\nMVP cases can include both those initially ascertained prospectively based on expectation of a missing pathogenic variant and those ascertained retrospectively after analysis identifies an expectation of a missing pathogenic variant within a narrow search space.\n\nThe case should meet one of the following criteria:\n- Has a LP/P variant identified in a gene underlying a recessive condition consistent with the phenotype observed in the patient, and suspected to be the correct diagnosis, for which a second explanatory LP/P variant has not been identified by prior genetic testing\n- Has a specific clinical diagnosis supported by evidence (e.g. biochemical testing) for a dominant condition known to be of single gene etiology for which an explanatory LP/P variant has not been identified by prior genetic testing(very uncommon) \n- Has no LP/P variants in a gene underlying a recessive condition consistent with the phenotype observed in the patient and the recessive condition is associated with a specific clinical diagnosis and has only been attributed to variants in a single gene (e.g. an individual clinically diagnosed with cystic fibrosis but no variants identified in CFTR)\n\nAny cases with potentially explanatory VUS identified as the 'missing variant,' are eligible and should be included (e.g. an individual with a LP/P variant and VUS in trans identified in a gene underlying a recessive condition consistent with the phenotype observed should be flagged for MVP)."
+        },
+        "missing_variant_details": {
+            "type": "string",
+            "description": "For missing variant cases, indicate gene(s) or region of interest and reason for inclusion in MVP.",
+            "examples": [
+                "Werner syndrome case with single pathogenic hit in WRN",
+                "Clinical diagnosis of Marfan syndrome with no pathogenic or likely pathogenic variant identified in FBN1",
+                "Clinical diagnosis of neurofibromatosis type 1 with no pathogenic or likely pathogenic variant identified in NF1"
+            ]
+        }
+    }
+}
