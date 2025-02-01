@@ -3,7 +3,7 @@ import axios from "axios";
 const APIDB = process.env.REACT_APP_APIDB;
 
 const getAllTables = async (token) => {
-  const response = await axios.get(APIDB + "/api/metadata/get_all_tables/", {
+  const response = await axios.get(APIDB + "/api/search/get_all_tables/", {
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + token

@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned_dna_short_read_set.json",
+    "title": "aligned_dna_short_read_set",
+    "version": "1.7",
+    "type": "object",
+    "required": [
+        "aligned_dna_short_read_set_id",
+        "aligned_dna_short_read_id"
+    ],
+    "definitions": {},
+    "properties": {
+        "aligned_dna_short_read_set_id": {
+            "type": "string",
+            "description": "identifier for a set of experiments (primary key)\n\nNotes: RCs make their own IDs (these must begin with center-specific prefix). \naligned_dna_short_read_set_id links the aligned_dna_short_read table to the called_variants_dna_short_read table. For centers that are only uploading single sample files, the aligned_short_read_set_id and aligned_short_read_id values can be identical. For centers uploading multi-sample files, they will need to come up with a value for aligned_short_read_set_id that makes sense to them for indicating the sample group for a multi-sample callset, and use that same value in called_variants_short_read."
+        },
+        "aligned_dna_short_read_id": {
+            "type": "string",
+            "description": "Notes: the identifier for a single-sample aligned_dna_short_read included in the read_set (one per row)"
+        }
+    }
+}

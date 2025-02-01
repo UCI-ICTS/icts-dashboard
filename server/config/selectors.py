@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from requests.models import PreparedRequest
+from django.conf import settings
 
 from metadata.models import (
     Participant,
@@ -36,6 +37,7 @@ from metadata.services import (
     API data conversion, and constructing standardized response objects.
 """
 
+SCHEMA_VERSION = settings.SCHEMA_VERSION
 
 class TableValidator:
     """
@@ -52,7 +54,7 @@ class TableValidator:
 
     def __init__(self):
         """Initializes the TableValidator with the path to JSON schemas."""
-        self.base_path = os.path.join(settings.BASE_DIR, "utilities/json_schemas/")
+        self.base_path = os.path.join(settings.BASE_DIR, f"utilities/json_schemas/{SCHEMA_VERSION}")
         self.valid = False
         self.errors = []
 

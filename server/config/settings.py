@@ -29,7 +29,7 @@ DEBUG = secrets["SERVER"]["DEBUG"]
 ALLOWED_HOSTS = secrets["SERVER"]["ALLOWED_HOSTS"].split(",")
 VERSION = secrets["SERVER"]["SERVER_VERSION"]
 PUBLIC_HOSTNAME = secrets["SERVER"]["DASHBOARD_URL"]
-
+SCHEMA_VERSION = secrets["SERVER"]["SCHEMA_VERSION"]
 # Application definition
 
 INSTALLED_APPS = [
