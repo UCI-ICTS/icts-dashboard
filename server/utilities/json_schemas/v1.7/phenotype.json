@@ -54,7 +54,9 @@
         "additional_details": {
             "type": "string",
             "description": "modifier of a term where the additional details are not supported/available as a term in HPO",
-            "examples": "intellectual disability, no IQ test but 3rd grade reading level at 15 years old"
+            "examples": [
+                "intellectual disability, no IQ test but 3rd grade reading level at 15 years old"
+            ]
         },
         "onset_age_range": {
             "type": "string",
@@ -326,7 +328,9 @@
                 "non-syndromic"
             ],
             "description": "For participants with few HPO terms, this optional field is to provide context on whether it is likely the most notable phenotype or cohort level phenotype or whether the individual really only has one trait.\n\nNotes: this field is intended to address a concern that if someone has only entered one trait/HPO term, there may be uncertainy about whether it is just the most notable phenotype or cohort level phenotype or whether the individual really only has one trait. For example, there could be a hearing loss cohort and someone might enter only 'sensorineural hearing loss' only, but an individual could have a syndromic hearing loss. Adding the syndromic/non-syndromic would provide a bit more assurance that if there are only one or two traits/HPO terms entered that there is not 'missing' traits/phenotype.",
-            "examples": "non-syndromic"
+            "examples": [
+                "non-syndromic"
+            ]
         }
     }
 }

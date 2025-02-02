@@ -26,7 +26,9 @@
         "experiment_sample_id": {
             "type": "string",
             "description": "identifier used in the data file (e.g. the SM tag in a BAM header, column headers for genotype fields in a VCF file)\n\nNotes: may be the same as experiment_short_read_id if the file does contain sample identifiers\nshould be present if downstream file contains a sample_id (e.g. BAM, VCF)\nsome centers have one id for the sample (tube) and a diff ID for the sample as named in the VCF; experiment_sample_id = ID in the VCF file; analyte_id = ID for the tube/aliquot/whatever",
-            "examples": "12339D-SA"
+            "examples": [
+                "12339D-SA"
+            ]
         },
         "seq_library_prep_kit_method": {
             "type": "string",
@@ -39,7 +41,9 @@
         "read_length": {
             "type": "integer",
             "description": "sequenced read length (bp); GREGoR RCs do paired end sequencing, so is the example of 100bp indicates 2x100bp.\n\nNotes: Can be missing if RC receives external data; all RCs are doing paired-end reads.",
-            "examples": "100"
+            "examples": [
+                "100"
+            ]
         },
         "experiment_type": {
             "type": "string",
@@ -49,29 +53,39 @@
                 "exome"
             ],
             "description": "Notes: facilitates having exome and GS-SR experiments in the same experiment_details table",
-            "examples": "targeted"
+            "examples": [
+                "targeted"
+            ]
         },
         "targeted_regions_method": {
             "type": "string",
             "description": "Which capture kit is used. Can be missing if RC receives external data",
-            "examples": "NimbleGen SeqCap EZ Human Exome Library v2.0"
+            "examples": [
+                "NimbleGen SeqCap EZ Human Exome Library v2.0"
+            ]
         },
         "targeted_region_bed_file": {
             "type": "string",
             "description": "name and path of bed file uploaded to workspace\n\nNotes: Can be missing if RC receives external data",
-            "examples": "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/SR_experiment.bed",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/SR_experiment.bed"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "date_data_generation": {
             "type": "string",
             "description": "Date of data generation (First sequencing date)\n\nNotes: Can be missing if RC receives external data; ISO 8601 date format",
-            "examples": "2022-06-29"
+            "examples": [
+                "2022-06-29"
+            ]
         },
         "target_insert_size": {
             "type": "integer",
             "description": "insert size the protocol targets for DNA fragments\n\nNotes: Can be missing if RC receives external data",
-            "examples": "500"
+            "examples": [
+                "500"
+            ]
         },
         "sequencing_platform": {
             "type": "string",

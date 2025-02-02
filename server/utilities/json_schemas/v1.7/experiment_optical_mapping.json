@@ -28,32 +28,44 @@
         "experiment_sample_id": {
             "type": "string",
             "description": "identifier used in the data file (e.g. the SM tag in a BAM header, column headers for genotype fields in a VCF file)\n\nNotes: may be the same as experiment_optical_mapping_id if the file does contain sample identifiers\nshould be present if downstream file contains a sample_id (e.g. BAM, VCF)\nsome centers have one id for the sample (tube) and a diff ID for the sample as named in the VCF; experiment_sample_id = ID in the VCF file; analyte_id = ID for the tube/aliquot/whatever",
-            "examples": "CLIA-000026"
+            "examples": [
+                "CLIA-000026"
+            ]
         },
         "isolation_protocol": {
             "type": "string",
             "description": "Name of DNA Isolation kit used",
-            "examples": "Bionano\u00a0Prep SP Blood & Cell Culture DNA Isolation Kit (80042)"
+            "examples": [
+                "Bionano Prep SP Blood & Cell Culture DNA Isolation Kit (80042)"
+            ]
         },
         "labeling_protocol": {
             "type": "string",
             "description": "Name of DNA labeling kit used",
-            "examples": "Direct Label and Stain-G2 (DLS-G2) Kit (80046)"
+            "examples": [
+                "Direct Label and Stain-G2 (DLS-G2) Kit (80046)"
+            ]
         },
         "date_data_generation": {
             "type": "string",
             "description": "Date of data generation (First sequencing date)\n\nNotes: Can be missing if RC receives external data; ISO 8601 date format",
-            "examples": "2022-06-29"
+            "examples": [
+                "2022-06-29"
+            ]
         },
         "DNA_concentration": {
             "type": "number",
             "description": "DNA concentration in ng/uL\n\nNotes: before labeling",
-            "examples": "112"
+            "examples": [
+                "112"
+            ]
         },
         "mapping_platform": {
             "type": "string",
             "description": "OGM platform used for the experiment",
-            "examples": "Saphyr"
+            "examples": [
+                "Saphyr"
+            ]
         }
     }
 }

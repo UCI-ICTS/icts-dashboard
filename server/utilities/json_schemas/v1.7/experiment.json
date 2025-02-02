@@ -15,7 +15,9 @@
         "experiment_id": {
             "type": "string",
             "description": "table_name.experiment_id_in_table",
-            "examples": "experiment_dna_short_read.GSS201938-01-021-SG-1"
+            "examples": [
+                "experiment_dna_short_read.GSS201938-01-021-SG-1"
+            ]
         },
         "table_name": {
             "type": "string",
@@ -26,7 +28,9 @@
                 "experiment_pac_bio",
                 "experiment_atac_short_read"
             ],
-            "examples": "experiment_dna_short_read"
+            "examples": [
+                "experiment_dna_short_read"
+            ]
         },
         "id_in_table": {
             "type": "string",

@@ -25,14 +25,18 @@
         "asc_file": {
             "type": "string",
             "description": "name and path of the tsv file with allele-specific chromatin accessibility measures (logFC) at heterozygous sites after QC and significance testing",
-            "examples": "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.bed",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.bed"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "asc_md5sum": {
             "type": "string",
             "description": "md5 checksum for called_peaks_file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "peak_set_type": {
             "type": "string",
@@ -51,14 +55,18 @@
         "het_sites_file": {
             "type": "string",
             "description": "VCF file containing prefiltered heterozygous sites used for reference alignment bias testing and calling allele-specific chromatin accessibility events",
-            "examples": "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.het_sites.vcf",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.het_sites.vcf"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "het_sites_md5sum": {
             "type": "string",
             "description": "md5 checksum for het_sites_file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "analysis_details": {
             "type": "string",

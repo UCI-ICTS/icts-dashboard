@@ -35,7 +35,9 @@
         "md5sum": {
             "type": "string",
             "description": "md5 checksum for file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "caller_software": {
             "type": "array",
@@ -64,7 +66,9 @@
                     "STR"
                 ],
                 "description": "types of variants called\n\nNotes: can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry",
-                "examples": "SNV|INDEL"
+                "examples": [
+                    "SNV|INDEL"
+                ]
             }
         },
         "analysis_details": {

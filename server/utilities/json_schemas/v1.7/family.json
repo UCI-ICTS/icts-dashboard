@@ -31,7 +31,9 @@
         "consanguinity_detail": {
             "type": "string",
             "description": "Free text description of any additional consanguinity details",
-            "examples": "Parents are second cousins once removed"
+            "examples": [
+                "Parents are second cousins once removed"
+            ]
         },
         "pedigree_file": {
             "type": "string",
@@ -46,7 +48,9 @@
         "pedigree_file_detail": {
             "type": "string",
             "description": "Free text description of other family structure/pedigree file caption or legend.\n\nNotes: clarifying purpose: sometimes no PED file is available and the effort involved to encode a full pedigree is high when an image is already available (i.e. legacy publication describing the family)",
-            "examples": "Additional informative family members not sequenced. Sequenced individuals indicated with sample_ID."
+            "examples": [
+                "Additional informative family members not sequenced. Sequenced individuals indicated with sample_ID."
+            ]
         },
         "family_history_detail": {
             "type": "string",

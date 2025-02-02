@@ -37,7 +37,9 @@
                 "PBMC"
             ],
             "description": "analyte derived from the primary_biosample. The actual thing you're sticking into a machine to analyze/sequence",
-            "examples": "DNA"
+            "examples": [
+                "DNA"
+            ]
         },
         "analyte_processing_details": {
             "type": "string",
@@ -72,7 +74,9 @@
                 "UBERON:0001133"
             ],
             "description": "Tissue type of biosample taken from the participant that the analyte was extracted or processed from (for unknown can use tissue - UBERON:0000479), e.g. skin, liver, brain\n\nNotes: Contact the GREGoR Data Standards WG to expand the list of allowable UBERON codes. Currently allowed values are:\nUBERON:0000479 (tissue) \nUBERON:0003714 (neural tissue) \nUBERON:0001836 (saliva) \nUBERON:0001003 (skin epidermis) \nUBERON:0002385 (muscle tissue) \nUBERON:0000178 (whole blood) \nUBERON:0002371 (bone marrow) \nUBERON:0006956 (buccal mucosa)\nUBERON:0001359 (cerebrospinal fluid)\nUBERON:0001088 (urine)\nUBERON:0019306 (nose epithelium)\nCL: 0000034 (iPSC)\nCL: 0000576 (monocytes - PBMCs)\nCL: 0000542 (lymphocytes - LCLs)\nCL: 0000057 (fibroblasts)\nUBERON:0005291 (embryonic tissue)\nCL: 0011020 (iPSC NPC)\nUBERON:0002037 (cerebellum tissue)\nUBERON:0001133 (cardiac tissue)",
-            "examples": "UBERON:0000178"
+            "examples": [
+                "UBERON:0000178"
+            ]
         },
         "primary_biosample_id": {
             "type": "string",
@@ -81,7 +85,9 @@
         "primary_biosample_details": {
             "type": "string",
             "description": "Free text to capture information not in structured fields",
-            "examples": "\"Biopsy of birthmark\""
+            "examples": [
+                "\"Biopsy of birthmark\""
+            ]
         },
         "tissue_affected_status": {
             "type": "string",
@@ -126,7 +132,9 @@
         "quality_issues": {
             "type": "string",
             "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note",
-            "examples": "degraded sample; unable to obtain more DNA"
+            "examples": [
+                "degraded sample; unable to obtain more DNA"
+            ]
         }
     }
 }

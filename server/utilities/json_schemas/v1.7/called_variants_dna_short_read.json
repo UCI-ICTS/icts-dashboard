@@ -35,7 +35,9 @@
         "md5sum": {
             "type": "string",
             "description": "md5 checksum for file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "caller_software": {
             "type": "array",

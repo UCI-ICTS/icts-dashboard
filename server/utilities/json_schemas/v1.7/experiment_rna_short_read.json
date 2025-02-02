@@ -30,7 +30,9 @@
         "experiment_sample_id": {
             "type": "string",
             "description": "identifier used in the data file (e.g. the SM tag in a BAM header, column headers for genotype fields in a VCF file)\n\nNotes: may be the same as experiment_short_read_id if the file does contain sample identifiers\nshould be present if downstream file contains a sample_id (e.g. BAM, VCF)\nsome centers have one id for the sample (tube) and a diff ID for the sample as named in the VCF; experiment_sample_id = ID in the VCF file; analyte_id = ID for the tube/aliquot/whatever",
-            "examples": "12339D-SA"
+            "examples": [
+                "12339D-SA"
+            ]
         },
         "seq_library_prep_kit_method": {
             "type": "string",
@@ -51,7 +53,9 @@
                     "globin depletion"
                 ],
                 "description": "type of library prep",
-                "examples": "stranded total RNA|globin depletion"
+                "examples": [
+                    "stranded total RNA|globin depletion"
+                ]
             }
         },
         "depletion_targets": {
@@ -71,13 +75,17 @@
                     "targeted",
                     "untargeted"
                 ],
-                "examples": "paired-end|targeted"
+                "examples": [
+                    "paired-end|targeted"
+                ]
             }
         },
         "read_length": {
             "type": "integer",
             "description": "sequenced read length (bp); GREGoR RCs do paired end sequencing, so is the example of 100bp indicates 2x100bp.\n\nNotes: contact the DCC if not doing paired-end or you wish to share data with unknown read length.",
-            "examples": "100"
+            "examples": [
+                "100"
+            ]
         },
         "single_or_paired_ends": {
             "type": "string",
@@ -90,7 +98,9 @@
         "date_data_generation": {
             "type": "string",
             "description": "Date of data generation (First sequencing date)\n\nNotes: Can be missing if RC receives external data; ISO 8601 date format",
-            "examples": "2022-06-29"
+            "examples": [
+                "2022-06-29"
+            ]
         },
         "sequencing_platform": {
             "type": "string",
@@ -105,53 +115,77 @@
         "within_site_batch_name": {
             "type": "string",
             "description": "batch number for the site, important for future batch correction",
-            "examples": "Batch 4"
+            "examples": [
+                "Batch 4"
+            ]
         },
         "RIN": {
             "type": "number",
             "description": "RIN number for quality of sample",
-            "examples": "9.8"
+            "examples": [
+                "9.8"
+            ]
         },
         "estimated_library_size": {
             "type": "number",
-            "examples": "364"
+            "examples": [
+                "364"
+            ]
         },
         "total_reads": {
             "type": "number",
             "description": "total number of reads\n\nNotes: float type required for large number, but value entered should be an integer",
-            "examples": "58,112,692"
+            "examples": [
+                "58,112,692"
+            ]
         },
         "percent_rRNA": {
             "type": "number",
-            "examples": "20"
+            "examples": [
+                "20"
+            ]
         },
         "percent_mRNA": {
             "type": "number",
-            "examples": "75"
+            "examples": [
+                "75"
+            ]
         },
         "percent_mtRNA": {
             "type": "number",
-            "examples": "4"
+            "examples": [
+                "4"
+            ]
         },
         "percent_Globin": {
             "type": "number",
-            "examples": "1"
+            "examples": [
+                "1"
+            ]
         },
         "percent_UMI": {
             "type": "number",
-            "examples": "0"
+            "examples": [
+                "0"
+            ]
         },
         "5prime3prime_bias": {
             "type": "number",
-            "examples": "1.09"
+            "examples": [
+                "1.09"
+            ]
         },
         "percent_GC": {
             "type": "number",
-            "examples": "66"
+            "examples": [
+                "66"
+            ]
         },
         "percent_chrX_Y": {
             "type": "number",
-            "examples": "12"
+            "examples": [
+                "12"
+            ]
         }
     }
 }
