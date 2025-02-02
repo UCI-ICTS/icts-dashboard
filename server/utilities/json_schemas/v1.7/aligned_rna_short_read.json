@@ -19,7 +19,9 @@
         "aligned_rna_short_read_id": {
             "type": "string",
             "description": "identifier for aligned_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
-            "examples": "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
         },
         "experiment_rna_short_read_id": {
             "type": "string",
@@ -28,21 +30,27 @@
         "aligned_rna_short_read_file": {
             "type": "string",
             "description": "name and path of file with aligned reads",
-            "examples": "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "aligned_rna_short_read_index_file": {
             "type": "string",
             "description": "name and path of index file corresponding to aligned reads file",
-            "examples": "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "md5sum": {
             "type": "string",
             "description": "md5 checksum for file",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "reference_assembly": {
             "type": "string",
@@ -53,20 +61,28 @@
                 "NCBI35",
                 "NCBI34"
             ],
-            "examples": "GRCh38"
+            "examples": [
+                "GRCh38"
+            ]
         },
         "reference_assembly_uri": {
             "type": "string",
-            "examples": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
+            "examples": [
+                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
+            ]
         },
         "reference_assembly_details": {
             "type": "string",
-            "examples": "primary, chrY-masked"
+            "examples": [
+                "primary, chrY-masked"
+            ]
         },
         "gene_annotation": {
             "type": "string",
             "description": "annotation file used for alignment",
-            "examples": "GENCODEv35"
+            "examples": [
+                "GENCODEv35"
+            ]
         },
         "gene_annotation_details": {
             "type": "string",
@@ -92,39 +108,53 @@
         "alignment_software": {
             "type": "string",
             "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
-            "examples": "STARvXXX"
+            "examples": [
+                "STARvXXX"
+            ]
         },
         "alignment_log_file": {
             "type": "string",
             "description": "path of (log) file with all parameters for alignment software",
-            "examples": "/path/to/STAR.log",
+            "examples": [
+                "/path/to/STAR.log"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "alignment_postprocessing": {
             "type": "string",
             "description": "If any post processing was applied",
-            "examples": "multimapped reads removed, reads trimmed"
+            "examples": [
+                "multimapped reads removed, reads trimmed"
+            ]
         },
         "mean_coverage": {
             "type": "number",
             "description": "Mean coverage of either the genome or the targeted regions\n\nNotes: Can be unknown if RC receives external data",
-            "examples": "100"
+            "examples": [
+                "100"
+            ]
         },
         "percent_uniquely_aligned": {
             "type": "number",
             "description": "how many reads aligned to just one place",
-            "examples": "81"
+            "examples": [
+                "81"
+            ]
         },
         "percent_multimapped": {
             "type": "number",
             "description": "how many reads aligned to multiple places",
-            "examples": "10"
+            "examples": [
+                "10"
+            ]
         },
         "percent_unaligned": {
             "type": "number",
             "description": "how many reads didn't align",
-            "examples": "9"
+            "examples": [
+                "9"
+            ]
         },
         "quality_issues": {
             "type": "string",

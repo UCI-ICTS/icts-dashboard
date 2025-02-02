@@ -24,14 +24,18 @@
         "called_peaks_file": {
             "type": "string",
             "description": "name and path of the bed file with open chromatin peaks after QC filtering",
-            "examples": "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.ATAC.IDR.bed",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.ATAC.IDR.bed"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "peaks_md5sum": {
             "type": "string",
             "description": "md5 checksum for called_peaks_file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "peak_caller_software": {
             "type": "array",

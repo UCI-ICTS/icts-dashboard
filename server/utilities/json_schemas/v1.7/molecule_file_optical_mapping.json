@@ -15,7 +15,9 @@
         "molecule_file_optical_mapping_id": {
             "type": "string",
             "description": "identifier for molecule_file_optical_mapping (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
-            "examples": "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
         },
         "experiment_optical_mapping_id": {
             "type": "string",
@@ -24,79 +26,109 @@
         "bnx_file": {
             "type": "string",
             "description": "name and path of raw molecule file",
-            "examples": "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/all.bnx",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/all.bnx"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
         "bnx_version": {
             "type": "number",
             "description": "Molecule file version",
-            "examples": "1.3"
+            "examples": [
+                "1.3"
+            ]
         },
         "md5sum": {
             "type": "string",
             "description": "md5 checksum for bnx file",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "n50_gt_20_kbp": {
             "type": "number",
             "description": "N50 of the molecules that are 20kbp or longer (in kbp)",
-            "examples": "225.75"
+            "examples": [
+                "225.75"
+            ]
         },
         "n50_gt_150_kbp": {
             "type": "number",
             "description": "N50 of DNA molecules that are 150kbp or longer (in kbp)",
-            "examples": "287.05"
+            "examples": [
+                "287.05"
+            ]
         },
         "total_DNA_gt_20_kbp": {
             "type": "number",
             "description": "Total amount of DNA from molecules that are 20 kbp or longer (in Gbp)",
-            "examples": "2,764.33"
+            "examples": [
+                "2,764.33"
+            ]
         },
         "total_DNA_gt_150_kbp": {
             "type": "number",
             "description": "Total amount of DNA from molecules that are 150kbp or longer (in Gpb)",
-            "examples": "1,800.90"
+            "examples": [
+                "1,800.90"
+            ]
         },
         "map_rate": {
             "type": "number",
             "description": "Percentage of molecules that are 150kbp or longer mapped to the reference",
-            "examples": "89.4"
+            "examples": [
+                "89.4"
+            ]
         },
         "ave_label_density_gt_150_kbp": {
             "type": "number",
             "description": "Average number of labels per 100 kbp for the molecules that are 150kbp or longer, example value is 15.57 /100kbp",
-            "examples": "15.57"
+            "examples": [
+                "15.57"
+            ]
         },
         "base_pairs_per_pixel": {
             "type": "number",
             "description": "Calculated base pairs per pixel in the alignment by comparing molecules to the reference.",
-            "examples": "486.52"
+            "examples": [
+                "486.52"
+            ]
         },
         "scaling_sd": {
             "type": "number",
             "description": "Linear term in sizing error relative to reference",
-            "examples": "0"
+            "examples": [
+                "0"
+            ]
         },
         "relative_sd": {
             "type": "number",
             "description": "Quadratic term in sizing error relative to reference",
-            "examples": "0.019"
+            "examples": [
+                "0.019"
+            ]
         },
         "site_sd": {
             "type": "number",
             "description": "Constant term in sizing error relative to reference",
-            "examples": "0.97"
+            "examples": [
+                "0.97"
+            ]
         },
         "positive_label_variance": {
             "type": "number",
             "description": "Percentage of labels absent in reference",
-            "examples": "3.21"
+            "examples": [
+                "3.21"
+            ]
         },
         "negative_label_variance": {
             "type": "number",
             "description": "Percentage of reference labels absent in molecules",
-            "examples": "7.6"
+            "examples": [
+                "7.6"
+            ]
         },
         "quality_issues": {
             "type": "string",

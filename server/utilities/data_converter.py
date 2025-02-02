@@ -1,76 +1,149 @@
 #!/usr/bin/env python3
-"""Data Converters
+"""
+Data Converters
+
+This module provides a class to convert tabular data (CSV/TSV) into JSON objects,
+and then call an existing API function (create_or_update) to create or update model instances.
+If a header column is found that starts with "entity:", its value is used as the table/entity identifier.
+An internal mapping (SCHEMA_MAPPING) is available to locate the schema file if needed,
+but in this version we assume that the create_or_update function handles validation.
 """
 
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+import django
+django.setup()
 import sys
 import csv
-import json
 import argparse
+from jsonschema import validate, ValidationError
+from config.selectors import create_or_update
+
+# An internal mapping from entity names to schema file paths (if needed).
+SCHEMA_MAPPING = {
+    "participant": "utilities/json_schemas/v1.7/participant.json",
+    "genetic_findings": "utilities/json_schemas/v1.7/genetic_findings_schema.json"
+    # Add more mappings as needed.
+}
 
 
 class TableConverter:
-    """Class for converting tabular data"""
+    """
+    Class for converting tabular data (CSV/TSV) to JSON objects and then
+    calling create_or_update for each record.
+    """
 
     @staticmethod
-    def convert_to_json(input_data: dict) -> json:
-        """Converts a CSV or TSV to a list of JSON objects"""
-        sheet = []
-        extension = input_data.split(".")[-1]
-        delimiter = "\t" if extension == "tsv" else ","
-
-        with open(input_data, "r", encoding="utf-8") as file:
-            data = csv.reader(file, delimiter=delimiter)
-            header = next(data)
-            for datum in data:
-                sheet.append(datum)
-
-        data_list = []
-        for row in sheet:
-            line = {}
-            for count, item in enumerate(header):
-                line[item] = row[count]
-            data_list.append(line)
-
-        json_list = json.dumps(data_list, indent=4)
-        return json_list
-
-    def usr_args():
-        """User Arguments
-
-        arguments for command line invocation
+    def convert_to_json(table_file: str) -> tuple[list, str]:
         """
+        Converts a CSV/TSV file to a list of JSON objects (dictionaries).
 
-        parser = argparse.ArgumentParser()
+        If a header field starts with "entity:", that field is renamed (removing the "entity:" prefix)
+        and its corresponding entity name is extracted (with an optional strip of a trailing "_id").
 
-        # set usages options
+        Args:
+            table_file (str): The path to the CSV/TSV file.
+
+        Returns:
+            tuple:
+                - list: A list of dictionaries representing rows in the file.
+                - str: The extracted entity name (if found), otherwise None.
+        """
+        data_list = []
+        entity = None
+
+        # Determine delimiter based on file extension.
+        delimiter = "\t" if table_file.lower().endswith("tsv") else ","
+        with open(table_file, "r", encoding="utf-8") as file:
+            reader = list(csv.reader(file, delimiter=delimiter))
+            if not reader:
+                return data_list, entity
+            header = reader[0]
+            new_header = []
+            for col in header:
+                if col.startswith("entity:"):
+                    col_clean = col[len("entity:"):]
+                    # Optionally, remove trailing "_id" if present.
+                    if col_clean.endswith("_id"):
+                        entity = col_clean[:-3]
+                    else:
+                        entity = col_clean
+                    new_header.append(col_clean)
+                else:
+                    new_header.append(col)
+            for row in reader[1:]:
+                data_list.append(dict(zip(new_header, row)))
+
+        return data_list, entity
+
+    def process_table(self, table_file: str, table_name: str = None) -> None:
+        """
+        Converts the table file into a list of JSON objects and for each record
+        calls the create_or_update function.
+
+        If table_name is not provided, it is determined from the TSV header (the value of the column starting with "entity:").
+
+        Args:
+            table_file (str): Path to the CSV/TSV file.
+            table_name (str, optional): The name of the table (model). If not provided,
+                the entity extracted from the file header will be used.
+        """
+        data_list, entity = self.convert_to_json(table_file)
+        print(f"Found {len(data_list)} records in the file.")
+
+        if not table_name:
+            if entity:
+                table_name = entity
+                print(f"Determined table name as '{table_name}' from header.")
+            else:
+                print("No table name provided and none found in header.")
+                sys.exit(1)
+
+        for record in data_list:
+            # Determine the unique identifier. In this example we assume that the identifier
+            # is in a field named "<table_name>_id" (e.g. "participant_id").
+            identifier_field = f"{table_name}_id"
+            identifier = record.get(identifier_field)
+            if not identifier:
+                print(f"No identifier ({identifier_field}) found in record: {record}")
+                continue
+
+            # model_instance: if you have a way to retrieve an existing model instance, do it here.
+            # Otherwise, pass None to indicate creation.
+            model_instance = None
+
+            # Call the existing create_or_update function.
+            response, status = create_or_update(table_name, identifier, model_instance, record)
+            print(response)
+
+    @staticmethod
+    def usr_args():
+        """
+        Parse user arguments for the command-line invocation.
+
+        Returns:
+            argparse.Namespace: Parsed arguments.
+        """
         parser = argparse.ArgumentParser(
-            prog="data_converter", usage="%(prog)s [options]"
+            prog="data_converter",
+            usage="%(prog)s [options]",
+            description="Convert a CSV/TSV file to JSON and submit each record using create_or_update."
         )
-
-        # # version
-        # parser.add_argument(
-        #     '-v', '--version',
-        #     action='version',
-        #     version='%(prog)s ' + __version__)
-
-        parser.add_argument(
-            "-t", "--table", required=True, help="table file to convert."
-        )
-
-        # parser.add_argument('-s', '--schema',
-        #                             # type = argparse.FileType('r'),
-        #                             help="Root json schema to parse")
-
-        # Print usage message if no args are supplied.
+        parser.add_argument("-t", "--table", required=True, help="Path to the table file (CSV or TSV).")
+        # Optionally allow an override for the table name.
+        parser.add_argument("-n", "--name", required=False, help="The table name (if not determined from header).")
+        
         if len(sys.argv) <= 1:
-            sys.argv.append("--help")
+            parser.print_help()
+            sys.exit(1)
+        return parser.parse_args()
 
-        options = parser.parse_args()
-        return options
-
+def main():
+    """Main function to run the table conversion and submission process."""
+    args = TableConverter.usr_args()
+    converter = TableConverter()
+    # If the user provided a table name, use it; otherwise let process_table determine it.
+    converter.process_table(args.table, table_name=args.name)
 
 if __name__ == "__main__":
-    options = TableConverter.usr_args()
-
-    json_output = TableConverter.convert_to_json(options.table)
-    print(json_output)
+    main()

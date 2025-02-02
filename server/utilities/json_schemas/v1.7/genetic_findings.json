@@ -18,12 +18,16 @@
         "genetic_findings_id": {
             "type": "string",
             "description": "Unique ID of this variant in this participant (primary key)\n\nNotes: RC submitted unique variant ID\n- Useful for tracking in downstream functional studies (i.e. V2F clickup database). \n- RC submitted but encourage conventional naming (genomic coordinate + participant id)",
-            "examples": "4_25145092_Broad_RGP_1432"
+            "examples": [
+                "4_25145092_Broad_RGP_1432"
+            ]
         },
         "participant_id": {
             "type": "string",
             "description": "Subject/Participant Identifier within project\n\nNotes: RC submitted",
-            "examples": "Broad_RGP_1432_3"
+            "examples": [
+                "Broad_RGP_1432_3"
+            ]
         },
         "experiment_id": {
             "type": "array",
@@ -53,7 +57,9 @@
                     "STR"
                 ],
                 "description": "Notes: SNV/INDEL: single nucelotide variants or short insertion/deletions (<50bp)\nRE: repeat elements\nSV: structural variants, including copy number variants and mobile element insertions",
-                "examples": "SNV|CNV"
+                "examples": [
+                    "SNV|CNV"
+                ]
             }
         },
         "sv_type": {
@@ -117,7 +123,10 @@
                 "MT"
             ],
             "description": "Chromosome of the variant",
-            "examples": "4"
+            "examples": [
+                "4"
+            ],
+            "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
         },
         "chrom_end": {
             "type": "string",
@@ -153,7 +162,10 @@
         "pos": {
             "type": "integer",
             "description": "Start position of the variant\n\nNotes: this field uses VCF-style coordinates",
-            "examples": "25145092"
+            "examples": [
+                "25145092"
+            ],
+            "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
         },
         "pos_end": {
             "type": "integer",
@@ -162,12 +174,18 @@
         "ref": {
             "type": "string",
             "description": "Reference allele of the variant",
-            "examples": "C"
+            "examples": [
+                "C"
+            ],
+            "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
         },
         "alt": {
             "type": "string",
             "description": "Alternate position of the variant",
-            "examples": "T"
+            "examples": [
+                "T"
+            ],
+            "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
         },
         "copy_number": {
             "type": "integer",
@@ -176,30 +194,41 @@
         "ClinGen_allele_ID": {
             "type": "string",
             "description": "ClinGen Allele ID for cross table refrence",
-            "examples": "CA2877328"
+            "examples": [
+                "CA2877328"
+            ]
         },
         "gene_of_interest": {
             "type": "array",
             "items": {
                 "type": "string",
                 "description": "HGNC approved symbol of the known or candidate gene(s) that are relevant for the observed phenotype.\n\nNotes: - If the SNV/INDEL or RE is intergenic with no clear gene of interest, use 'intergenic'\n- If the SV has multiple genes of interest, use a multi-value delimiter\n- If the SV has no specific gene of interest, leave blank",
-                "examples": "SEPSECS"
+                "examples": [
+                    "SEPSECS"
+                ],
+                "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
             }
         },
         "transcript": {
             "type": "string",
             "description": "Text description of transcript overlapping the variant\n\nNotes: Encourage to use MANE transcripts with version number.\n- If your variant does not have MANE transcript, add most relevant transcript.",
-            "examples": "ENST00000382103.7"
+            "examples": [
+                "ENST00000382103.7"
+            ]
         },
         "hgvsc": {
             "type": "string",
             "description": "HGVS c. description of the variant (m. for mitochondrial, n. for noncoding)\n\nNotes: This field is strongly encouraged if transcript is provided",
-            "examples": "c.846G>A"
+            "examples": [
+                "c.846G>A"
+            ]
         },
         "hgvsp": {
             "type": "string",
             "description": "HGVS p. description of the variant\n\nNotes: May use 'p.?' for non-coding variants",
-            "examples": "p.Leu282="
+            "examples": [
+                "p.Leu282="
+            ]
         },
         "hgvs": {
             "type": "string",
@@ -217,7 +246,9 @@
                 "Unknown"
             ],
             "description": "Zygosity of variant",
-            "examples": "Heterozygous"
+            "examples": [
+                "Heterozygous"
+            ]
         },
         "allele_balance_or_heteroplasmy_percentage": {
             "type": "number",
@@ -235,12 +266,16 @@
                 "unknown"
             ],
             "description": "Detection of variant in parents\n\nNotes: - For duos where the variant is only confirmed to be not maternally or paternally inherited, use nonmaternal or nonpaternal, respectively.\n- If the variant is found mosaic in a parent sample, report the patient allele balance in line 20 and use the free notes line 36 to report parental allele balance. \n- in scenario where variant is present in parent A and parent B's sequencing is not available (so cannot rule out possibility parent  B also carries the variant), this should be 'unknown', since line 34 (additional_family_members_with_variant) should also contain the info that parent A has this variant",
-            "examples": "nonmaternal"
+            "examples": [
+                "nonmaternal"
+            ]
         },
         "linked_variant": {
             "type": "string",
             "description": "Second variant in recessive cases\n\nNotes: genetic_findings_id of a second variant in the same gene to complete a compound het.",
-            "examples": "4_25156922_Broad_RGP_1432"
+            "examples": [
+                "4_25156922_Broad_RGP_1432"
+            ]
         },
         "linked_variant_phase": {
             "type": "string",
@@ -250,7 +285,9 @@
                 "unknown"
             ],
             "description": "Notes: optional description of phase if inheritance is unknown",
-            "examples": "unknown"
+            "examples": [
+                "unknown"
+            ]
         },
         "gene_known_for_phenotype": {
             "type": "string",
@@ -259,12 +296,17 @@
                 "Candidate"
             ],
             "description": "Indicate if the gene listed is a candidate or known disease gene. Known disease genes can be identified using OMIM or MONDO or MitoMap. Variant/phenotype in proband should be consistent with the described MOD/phenotype to be considered a known gene for condition.\n\nNotes: - Use OMIM or MONDO or MitoMap as truth source for known disease genes \n- Variant/phenotype/inheritance in the patient should be consistent with the disease entry to be considered 'Known', otherwise use 'Candidate' (e.g. phenotype expansions or novel phenotypes are considered 'Candidate' )",
-            "examples": "Known"
+            "examples": [
+                "Known"
+            ]
         },
         "known_condition_name": {
             "type": "string",
             "description": "Free text of condition name. Variant/phenotype/inheritance in proband should be consistent with the condition.\n\nNotes: - Condition name should match the OMIM or MONDO entry listed in line 26 for known disease genes.",
-            "examples": "Pontocerebellar hypoplasia type 2D"
+            "examples": [
+                "Pontocerebellar hypoplasia type 2D"
+            ],
+            "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
         },
         "condition_id": {
             "type": "string",
@@ -272,7 +314,8 @@
             "examples": [
                 "OMIM:613811",
                 "MONDO:0013438"
-            ]
+            ],
+            "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
         },
         "condition_inheritance": {
             "type": "array",
@@ -291,7 +334,10 @@
                     "Unknown"
                 ],
                 "description": "Description of the expected inheritance of condition used for variant interpretation\n\nNotes: Inheritance description should match the OMIM or MONDO entry listed in line 26. \n- If multiple inheritance types listed in OMIM/MONDO, select that which is suspected for this proband\n- In cases where multiple inheritance patterns are being considered, it is possible to select multiple here",
-                "examples": "Autosomal recessive"
+                "examples": [
+                    "Autosomal recessive"
+                ],
+                "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
             }
         },
         "GREGoR_variant_classification": {
@@ -309,7 +355,10 @@
                 "Well-established P/LP"
             ],
             "description": "Clinical significance of variant described to condition listed as determined by the RC's variant curation.\n\nNotes: Field to be updated in subsequent data submissions. TBD requirement timeline. Currently optional, to consider whether required if known disease gene.",
-            "examples": "Curation in progress"
+            "examples": [
+                "Curation in progress"
+            ],
+            "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
         },
         "GREGoR_ClinVar_SCV": {
             "type": "string",
@@ -327,7 +376,8 @@
                 "Refuted",
                 "Curation in progress"
             ],
-            "description": "Validity assessment of the gene-disease relationship\n\nNotes: Gene-disease validity as defined by ClinGen framework. \nEach RC can lookup in GenCC (search.thegencc.org; PMID 35507016) or curate themselves. \nAcceptable to use unpublished evidence/case data if an RC would like to curate a novel gene-disease association."
+            "description": "Validity assessment of the gene-disease relationship\n\nNotes: Gene-disease validity as defined by ClinGen framework. \nEach RC can lookup in GenCC (search.thegencc.org; PMID 35507016) or curate themselves. \nAcceptable to use unpublished evidence/case data if an RC would like to curate a novel gene-disease association.",
+            "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
         },
         "gene_disease_validity_notes": {
             "type": "string",
@@ -355,14 +405,19 @@
                 "Uncertain"
             ],
             "description": "Contribution of variant-linked condition to participant's phenotype.\n\nNotes: - Each discovery in a recessive pair is considered full contribution.\n- If the associated gene is not known ('candidate' on line 24), use Uncertain.\n- If the associated gene is known but a second hit is missing, use either Uncertain or Full (depending on your confidence of the gene in the diagnosis)",
-            "examples": "Full"
+            "examples": [
+                "Full"
+            ]
         },
         "partial_contribution_explained": {
             "type": "array",
             "items": {
                 "type": "string",
                 "description": "List of specific phenotypes (HPO IDs) explained by the condition associated with this variant/gene in cases of partial contribution\n\nNotes: Field used when a genetic finding only partially explains participant phenotype and a second genetic finding is expected. For example, a syndromic case with a well-established pathogenic non-syndromic hearing loss variant. \n- For recesssive variants with partial contribution, only one of the linked variants needs to list HPO IDs explained by the linked candidate set.",
-                "examples": "HP:0000365"
+                "examples": [
+                    "HP:0000365"
+                ],
+                "x-required-condition": "CONDITIONAL (phenotype_contribution = Partial)"
             }
         },
         "additional_family_members_with_variant": {
@@ -395,7 +450,9 @@
                     "LR RNA-seq-reanalysis"
                 ],
                 "description": "The method/assay(s) used to identify the candidate\n\nNotes: Field to be used to capture method of discovery if experiment not currently supported by data model. (eg. >experiment_table_name.id_in_table)",
-                "examples": "SR-GS"
+                "examples": [
+                    "SR-GS"
+                ]
             }
         },
         "notes": {
@@ -405,54 +462,9 @@
         "VRS_ID": {
             "type": "string",
             "description": "The Variation Representation Specification (VRS, pronounced \u201cverse\u201d) is a standard developed by the Global Alliance for Genomic Health to facilitate and improve sharing of genetic information.\n\nNotes: https://vrs.ga4gh.org/en/stable/\n doi:10.1016/j.xgen.2021.100027",
-            "examples": "rs429358C"
-        }
-    },
-    "allOf": [
-        {
-            "if": {
-            "properties": {
-                "variant_type": {
-                "enum": ["SNV", "INDEL", "RE"]
-                }
-            },
-            "required": ["variant_type"]
-            },
-            "then": {
-            "required": ["chrom", "pos", "ref", "alt", "gene_of_interest"]
-            }
-        },
-        {
-            "if": {
-            "properties": {
-                "gene_known_for_phenotype": {
-                "const": "Known"
-                }
-            },
-            "required": ["gene_known_for_phenotype"]
-            },
-            "then": {
-            "required": [
-                "known_condition_name",
-                "condition_id",
-                "condition_inheritance",
-                "GREGoR_variant_classification",
-                "gene_disease_validity"
+            "examples": [
+                "rs429358C"
             ]
-            }
-        },
-        {
-            "if": {
-            "properties": {
-                "phenotype_contribution": {
-                "const": "Partial"
-                }
-            },
-            "required": ["phenotype_contribution"]
-            },
-            "then": {
-            "required": ["partial_contribution_explained"]
-            }
         }
-    ]
+    }
 }

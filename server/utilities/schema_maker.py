@@ -89,9 +89,12 @@ def convert_column(column: dict) -> dict:
     if description:
         base_schema["description"] = description
 
-    # Add examples if provided.
+    # Add examples ensuring it's an array.
     if "examples" in column:
-        base_schema["examples"] = column["examples"]
+        ex = column["examples"]
+        if not isinstance(ex, list):
+            ex = [ex]
+        base_schema["examples"] = ex
 
     # Handle bucket paths: add a custom annotation and a pattern for validating URLs.
     if column.get("is_bucket_path") is True:

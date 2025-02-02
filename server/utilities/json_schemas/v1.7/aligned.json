@@ -15,7 +15,9 @@
         "aligned_id": {
             "type": "string",
             "description": "table_name.aligned_id_in_table",
-            "examples": "aligned_dna_short_read.BCM_H7YG5DSX2-3-IDUDI0014-1"
+            "examples": [
+                "aligned_dna_short_read.BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
         },
         "table_name": {
             "type": "string",
@@ -26,7 +28,9 @@
                 "aligned_pac_bio",
                 "aligned_atac_short_read"
             ],
-            "examples": "aligned_dna_short_read"
+            "examples": [
+                "aligned_dna_short_read"
+            ]
         },
         "id_in_table": {
             "type": "string",

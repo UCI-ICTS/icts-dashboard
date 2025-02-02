@@ -35,12 +35,16 @@
         "md5sum": {
             "type": "string",
             "description": "md5 checksum for vcf file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": "129c28163df082"
+            "examples": [
+                "129c28163df082"
+            ]
         },
         "called_cnv_heterozygosity_variants_optical_mapping_file": {
             "type": "string",
             "description": "name and path of the file with copy number variation and absence of heterozygosity calls",
-            "examples": "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.json",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.json"
+            ],
             "x-is_bucket_path": true,
             "pattern": "^(https?|gs|s3):\\/\\/.+$"
         },
@@ -49,7 +53,9 @@
             "items": {
                 "type": "string",
                 "description": "Bionano Solve Version (software that made the structural variation calls)",
-                "examples": "Solve3.8"
+                "examples": [
+                    "Solve3.8"
+                ]
             }
         },
         "analysis_details": {
