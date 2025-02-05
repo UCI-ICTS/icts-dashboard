@@ -58,20 +58,25 @@ class GetAllTablesAPI(APIView):
     def get(self, request):
         response_data = []
         try:
+            # Metadata Models
             serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
             serilized_families = FamilySerializer(Family.objects.all(), many=True)
-            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
             serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
             serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
- 
+            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
+
+            # Experiment Models
             serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
             
+
             serilized_return_data = {
+                # Metadata Tables
                 'participants': serialized_participants.data,
                 'families': serilized_families.data,
                 'genetic_findings': serilized_genetic_findings.data,
                 'analytes': serialized_analytes.data,
                 'phenotypes': serialized_phenotypes.data,
+                # Experiment Tables
                 'experiments': serialized_experiments.data
             }
             # time.sleep(5)

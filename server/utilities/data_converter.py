@@ -17,14 +17,14 @@ import sys
 import csv
 import argparse
 from jsonschema import validate, ValidationError
-from config.selectors import create_or_update
-
-# An internal mapping from entity names to schema file paths (if needed).
-SCHEMA_MAPPING = {
-    "participant": "utilities/json_schemas/v1.7/participant.json",
-    "genetic_findings": "utilities/json_schemas/v1.7/genetic_findings_schema.json"
-    # Add more mappings as needed.
-}
+from config.selectors import create_or_update, bulk_retrieve
+from metadata.models import (
+    Participant,
+    Family,
+    Analyte,
+    GeneticFindings,
+    Phenotype
+)
 
 
 class TableConverter:
@@ -90,7 +90,12 @@ class TableConverter:
         """
         data_list, entity = self.convert_to_json(table_file)
         print(f"Found {len(data_list)} records in the file.")
-
+        models = {
+            "participant": Participant,
+            "family": Family,
+            "analyte": Analyte,
+            "genetic_findings": GeneticFindings
+        }
         if not table_name:
             if entity:
                 table_name = entity
@@ -98,21 +103,23 @@ class TableConverter:
             else:
                 print("No table name provided and none found in header.")
                 sys.exit(1)
+        # Determine the unique identifier. In this example we assume that the identifier
+        # is in a field named "<table_name>_id" (e.g. "participant_id").
+        identifier_field = f"{table_name}_id"
 
+        model_instances = bulk_retrieve(
+            request_data=data_list,
+            model_class=models[entity],
+            id=identifier_field
+        )
         for record in data_list:
-            # Determine the unique identifier. In this example we assume that the identifier
-            # is in a field named "<table_name>_id" (e.g. "participant_id").
-            identifier_field = f"{table_name}_id"
             identifier = record.get(identifier_field)
             if not identifier:
                 print(f"No identifier ({identifier_field}) found in record: {record}")
                 continue
 
-            # model_instance: if you have a way to retrieve an existing model instance, do it here.
-            # Otherwise, pass None to indicate creation.
-            model_instance = None
+            model_instance = model_instances.get(record[identifier_field])
 
-            # Call the existing create_or_update function.
             response, status = create_or_update(table_name, identifier, model_instance, record)
             print(response)
 

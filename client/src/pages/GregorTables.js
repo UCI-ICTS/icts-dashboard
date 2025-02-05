@@ -13,7 +13,7 @@ import {
   Typography,
   Paper
 } from "@material-ui/core";
-import schemas from "../components/schemas.json";
+import schemas from "../schemas/v1.5schemas.json";
 import { setTableView } from '../slices/dataSlice';
 
 const tables = [
@@ -34,7 +34,7 @@ const Gregor = () => {
   const rowID = useSelector(state => state.data['tableID']);
   const token = useSelector((state) => state.account.user?.access_token)
   
-
+  console.log(schemas[tableView])
   
   // Automatically fetch data if the table is empty
   useEffect(() => {

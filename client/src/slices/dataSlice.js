@@ -121,7 +121,6 @@ export const updateTable = createAsyncThunk(
       }
       throw new Error("Invalid table type");
     }
-    // console.log("JSON data", JSON.stringify(data))
     try {
       const response = await apiCall(table, data, token);
       const payload = {response: response.data, table}
@@ -131,14 +130,52 @@ export const updateTable = createAsyncThunk(
         // Return a payload with a flag indicating no change
         return { response: [], table, noChanges: true };
       }
-      
       thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} updated successfuly`));
       return payload
 
-    } catch(error) {
-      console.log("ERROR! ",error.response)
-      return thunkAPI.rejectWithValue(error.response.data);
+    } catch (error) {
+      let message = "";
+      
+      // Check if there's a top-level message.
+      if (error.response && error.response.message) {
+        message = error.response.message;
+        console.log("Top-level message:", message);
+      } 
+      // Otherwise, if error.response.data is an array and has at least one element:
+      else if (
+        error.response &&
+        error.response.data &&
+        Array.isArray(error.response.data) &&
+        error.response.data.length > 0
+      ) {
+        const firstError = error.response.data[0];
+        // If the first element has a 'data' key that is an array, use that:
+        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
+          message = firstError.data
+            .map(err => `${err.field}: ${err.error}`)
+            .join(", ");
+        } 
+        // Otherwise, if the first element itself has 'field' and 'error', use those.
+        else if (firstError.field && firstError.error) {
+          message = `${firstError.field}: ${firstError.error}`;
+        } 
+        // Otherwise, fall back to stringifying the first element.
+        else {
+          message = JSON.stringify(firstError);
+        }
+        console.log("Constructed message from response data:", message);
+      } 
+      // Fallback generic message.
+      else {
+        message = "An unknown error occurred.";
+        console.log("Fallback message:", message);
+      }
+      
+      console.log("ERROR! ", error.response.data);
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
     }
+    
   }
 )
 
