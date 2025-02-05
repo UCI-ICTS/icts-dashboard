@@ -5,8 +5,6 @@
 """
 
 from metadata.models import Family, Phenotype, Analyte, Participant, GeneticFindings
-from config.selectors import remove_na, multi_value_split
-
 
 def get_analyte(analyte_id: str) -> Family:
     """Retrieve an analyte instance by its ID or return None if not found."""
@@ -73,6 +71,52 @@ def get_participant(participant_id: str) -> Participant:
         return None
 
 
+def genetic_findings_parser(genetic_findings: dict) -> dict:
+    """
+    """
+    from config.selectors import multi_value_split
+    multi_value = [
+        "experiment_id",
+        "variant_type",
+        "gene_of_interest", 
+        "condition_inheritance",
+        "method_of_discovery"
+    ]
+
+    for key, value in genetic_findings.items():
+        if isinstance(value, str) and "|" in value:
+            genetic_findings[key] = value.split("|")
+        if key == "pos" and genetic_findings[key] != "NA":
+            try:
+                genetic_findings["pos"] = float(genetic_findings["pos"])
+            except ValueError:
+                genetic_findings["pos"] = "NA"
+        if (
+            key == "allele_balance_or_heteroplasmy_percentage"
+            and genetic_findings[key] != "NA"
+        ):
+            try:
+                genetic_findings[key] = int(genetic_findings[key])
+            except ValueError:
+                genetic_findings[key] = "NA"
+        if (
+            key == "partial_contribution_explained"
+            and type(genetic_findings[key]) == str
+        ):
+            genetic_findings[key] = [value]
+        
+        split_findings = multi_value_split(genetic_findings)
+
+        for key in multi_value:
+            try:
+                if not isinstance(split_findings[key], list):
+                    split_findings[key] = [split_findings[key]]
+            except Exception as error:
+                oops = error
+                split_findings[key] = [oops]
+
+    return split_findings
+
 
 def participant_parser(participant: dict) -> dict:
     """
@@ -94,7 +138,7 @@ def participant_parser(participant: dict) -> dict:
     - 'prior_testing': Converts the string to a list containing the original string if not 'NA'.
     - 'age_at_last_observation' and 'age_at_enrollment': Converts the string to a float. Sets to 0 if conversion fails.
     """
-    
+    from config.selectors import multi_value_split
     multi_value = [
         "pmid_id",
         "twin_id",

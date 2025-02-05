@@ -1,0 +1,1341 @@
+{
+    "participants" : {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/participant.json",
+        "title": "participant",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "participant_id",
+            "gregor_center",
+            "consent_code",
+            "family_id",
+            "paternal_id",
+            "maternal_id",
+            "proband_relationship",
+            "sex",
+            "affected_status",
+            "solve_status",
+            "missing_variant_case"
+        ],
+        "definitions": {},
+        "properties": {
+            "participant_id": {
+                "type": "string",
+                "description": "Subject/Participant Identifier (primary key)\n\nNotes: anticipate using RC-assigned ID prefixed by gregor_center value",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054"
+                ]
+            },
+            "internal_project_id": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
+                    "examples": [
+                        "UWCDR_uwcmg_distal_arthrogryposis_type 1_212",
+                        "UWCDR_uwcmg_sponastrime_dysplasia_487"
+                    ]
+                }
+            },
+            "gregor_center": {
+                "type": "string",
+                "enum": [
+                    "BCM",
+                    "BROAD",
+                    "CNH_I",
+                    "UCI",
+                    "UW_CRDR",
+                    "GSS",
+                    "UW_DCC"
+                ],
+                "description": "GREGoR Center to which the participant is originally associated"
+            },
+            "consent_code": {
+                "type": "string",
+                "enum": [
+                    "GRU",
+                    "HMB"
+                ],
+                "description": "Consent group pertaining to this participant's data",
+                "examples": [
+                    "GRU"
+                ]
+            },
+            "recontactable": {
+                "type": "string",
+                "enum": [
+                    "Yes",
+                    "No"
+                ],
+                "description": "Is the originating GREGoR Center likely able to recontact this participant"
+            },
+            "prior_testing": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "Text description of any genetic testing for individual conducted prior to enrollment",
+                    "examples": [
+                        "Normal karyotype | FBN2 screened clinically"
+                    ]
+                }
+            },
+            "pmid_id": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "Case specific PubMed ID if applicable\n\nNotes: Publication which included participant;  Used for publications which include participant known prior to or after inclusion in GREGoR",
+                    "examples": [
+                        "25683120"
+                    ]
+                }
+            },
+            "family_id": {
+                "type": "string",
+                "description": "Identifier for family",
+                "examples": [
+                    "CNH-I_fam89052",
+                    "UW_CRDR_Family_2"
+                ]
+            },
+            "paternal_id": {
+                "type": "string",
+                "description": "participant_id for father; 0 if not available\n\nNotes: intent is to be able to create .ped file format from consortium data;   Can enter 0 for mother or father not present",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054"
+                ]
+            },
+            "maternal_id": {
+                "type": "string",
+                "description": "participant_id for mother; 0 if not available\n\nNotes: intent is to be able to create .ped file format from consortium data;   Can enter 0 for mother or father not present",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054"
+                ]
+            },
+            "twin_id": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "participant_id for twins, triplets, etc; 0 if not available\n\nNotes: may be monozygotic, dizygotic, or polyzygotic",
+                    "examples": [
+                        "BCM_Subject_1",
+                        "BROAD_subj89054",
+                        "BROAD_subj89054|BROAD_subj89055"
+                    ]
+                }
+            },
+            "proband_relationship": {
+                "type": "string",
+                "enum": [
+                    "Self",
+                    "Mother",
+                    "Father",
+                    "Sibling",
+                    "Child",
+                    "Maternal Half Sibling",
+                    "Paternal Half Sibling",
+                    "Maternal Grandmother",
+                    "Maternal Grandfather",
+                    "Paternal Grandmother",
+                    "Paternal Grandfather",
+                    "Maternal Aunt",
+                    "Maternal Uncle",
+                    "Paternal Aunt",
+                    "Paternal Uncle",
+                    "Niece",
+                    "Nephew",
+                    "Maternal 1st Cousin",
+                    "Paternal 1st Cousin",
+                    "Other",
+                    "Unknown"
+                ],
+                "description": "Text description of individual relationship to proband in family, especially useful to capture relationships when connecting distant relatives and connecting relatives not studied\n\nNotes: limit enumerated fields to values in seqr, and use the proband_relationship_detail for other options",
+                "examples": [
+                    "Mother"
+                ]
+            },
+            "proband_relationship_detail": {
+                "type": "string",
+                "description": "Other proband relationship not captured in enumeration above\n\nNotes: keeping because not all relationships can be captured in proband_relationship (a way to describe 'other')",
+                "examples": [
+                    "Third cousins, through mother's side",
+                    "Father's brother's nephew's cousin's former roommate"
+                ]
+            },
+            "sex": {
+                "type": "string",
+                "enum": [
+                    "Female",
+                    "Male",
+                    "Unknown"
+                ],
+                "description": "Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the phenotype information section."
+            },
+            "sex_detail": {
+                "type": "string",
+                "description": "Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype",
+                "examples": [
+                    "XXY expected",
+                    "XY expected [for someone assigned female at birth with XY DSD]"
+                ]
+            },
+            "reported_race": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "American Indian or Alaska Native",
+                        "Asian",
+                        "Black or African American",
+                        "Native Hawaiian or Other Pacific Islander",
+                        "Middle Eastern or North African",
+                        "White"
+                    ],
+                    "description": "Self/submitter-reported race (OMB categories)"
+                }
+            },
+            "reported_ethnicity": {
+                "type": "string",
+                "enum": [
+                    "Hispanic or Latino",
+                    "Not Hispanic or Latino"
+                ],
+                "description": "Self/submitter-reported ethnicity (OMB categories)"
+            },
+            "ancestry_detail": {
+                "type": "string",
+                "description": "Additional specific ancestry description free text beyond what is captured by OMB race/ethnicity categories",
+                "examples": [
+                    "Polish",
+                    "Amish",
+                    "Ashkenazi Jewish"
+                ]
+            },
+            "age_at_last_observation": {
+                "type": "number",
+                "description": "Age at last observation, aka age in years at the last time the center can vouch for the accuracy phenotype data. For conditions with later age of onset, this field lets users know if individuals marked as unaffected were younger or older than the age when the phenotype is expected to appear.",
+                "examples": [
+                    "21",
+                    "32"
+                ]
+            },
+            "affected_status": {
+                "type": "string",
+                "enum": [
+                    "Affected",
+                    "Unaffected",
+                    "Possibly affected",
+                    "Unknown"
+                ],
+                "description": "Indicate affected status of individual (overall with respect to primary phenotype in the family). Note: Affected participants must have entry in phenotype table.\n\nNotes: useful from a ped file point of view;\ngeneral agreement to keep; phenotype table captures details and this is an overall status"
+            },
+            "phenotype_description": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband.\n\nNotes: For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
+                    "examples": [
+                        "Missing one variant in gene XXX",
+                        "Distal arthrogryposis with stellate teeth"
+                    ]
+                }
+            },
+            "age_at_enrollment": {
+                "type": "number",
+                "description": "age in years at which consent was originally obtained",
+                "examples": [
+                    "42"
+                ]
+            },
+            "solve_status": {
+                "type": "string",
+                "enum": [
+                    "Solved",
+                    "Partially solved",
+                    "Probably solved",
+                    "Unsolved",
+                    "Unaffected"
+                ],
+                "description": "Indication of whether the submitting RC considers this case 'solved'\n\nNotes: See https://docs.google.com/document/d/1Qg-wjF34F3h4pyMjFNQcDP5-PvmlOh0HxDEDR8DyexE",
+                "examples": [
+                    "Partially solved"
+                ]
+            },
+            "missing_variant_case": {
+                "type": "string",
+                "enum": [
+                    "Yes",
+                    "No",
+                    "Unknown"
+                ],
+                "description": "Indication of whether this is known to be a missing variant case, see notes for a description of the Missing Variant Project and inclusion criteria.\n\nNotes: The goal of the Missing Variant Project (MVP) is to identify a cohort of cases for which there is an extremely high expectation of the presence of one or two 'missing' pathogenic variants within a narrow and specific search space, i.e. a single gene/locus of interest for which the known phenotype is the suspected/likely diagnosis for the affected individual.\n\nMVP cases can include both those initially ascertained prospectively based on expectation of a missing pathogenic variant and those ascertained retrospectively after analysis identifies an expectation of a missing pathogenic variant within a narrow search space.\n\nThe case should meet one of the following criteria:\n- Has a LP/P variant identified in a gene underlying a recessive condition consistent with the phenotype observed in the patient, and suspected to be the correct diagnosis, for which a second explanatory LP/P variant has not been identified by prior genetic testing\n- Has a specific clinical diagnosis supported by evidence (e.g. biochemical testing) for a dominant condition known to be of single gene etiology for which an explanatory LP/P variant has not been identified by prior genetic testing(very uncommon) \n- Has no LP/P variants in a gene underlying a recessive condition consistent with the phenotype observed in the patient and the recessive condition is associated with a specific clinical diagnosis and has only been attributed to variants in a single gene (e.g. an individual clinically diagnosed with cystic fibrosis but no variants identified in CFTR)\n\nAny cases with potentially explanatory VUS identified as the 'missing variant,' are eligible and should be included (e.g. an individual with a LP/P variant and VUS in trans identified in a gene underlying a recessive condition consistent with the phenotype observed should be flagged for MVP)."
+            },
+            "missing_variant_details": {
+                "type": "string",
+                "description": "For missing variant cases, indicate gene(s) or region of interest and reason for inclusion in MVP.",
+                "examples": [
+                    "Werner syndrome case with single pathogenic hit in WRN",
+                    "Clinical diagnosis of Marfan syndrome with no pathogenic or likely pathogenic variant identified in FBN1",
+                    "Clinical diagnosis of neurofibromatosis type 1 with no pathogenic or likely pathogenic variant identified in NF1"
+                ]
+            }
+        }
+    },
+    "families": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/family.json",
+        "title": "family",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "family_id",
+            "consanguinity"
+        ],
+        "definitions": {},
+        "properties": {
+            "family_id": {
+                "type": "string",
+                "description": "Identifier for family (primary key)\n\nNotes: Needs to be Unique across centers, use participant.gregor_center as ID prefix.",
+                "examples": [
+                    "CNH-I_fam89052",
+                    "UW_CRDR_Family_2"
+                ]
+            },
+            "consanguinity": {
+                "type": "string",
+                "enum": [
+                    "None suspected",
+                    "Suspected",
+                    "Present",
+                    "Unknown"
+                ],
+                "description": "Indicate if consanguinity is present or suspected within a family"
+            },
+            "consanguinity_detail": {
+                "type": "string",
+                "description": "Free text description of any additional consanguinity details",
+                "examples": [
+                    "Parents are second cousins once removed"
+                ]
+            },
+            "pedigree_file": {
+                "type": "string",
+                "description": "name of file (renamed from pedigree_image because it can contain a PED file or image)\n\nNotes: pedigree file should be deposited to upload workspace",
+                "examples": [
+                    "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/FamilyID_CMG_Site_PhsID_ConsentGroup_YYYYMMDD_YXQX.pdf",
+                    "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/FamilyID_CMG_Site_PhsID_ConsentGroup_YYYYMMDD_YXQX.ped"
+                ],
+                "x-is_bucket_path": true,
+                "pattern": "^(https?|gs|s3):\\/\\/.+$"
+            },
+            "pedigree_file_detail": {
+                "type": "string",
+                "description": "Free text description of other family structure/pedigree file caption or legend.\n\nNotes: clarifying purpose: sometimes no PED file is available and the effort involved to encode a full pedigree is high when an image is already available (i.e. legacy publication describing the family)",
+                "examples": [
+                    "Additional informative family members not sequenced. Sequenced individuals indicated with sample_ID."
+                ]
+            },
+            "family_history_detail": {
+                "type": "string",
+                "description": "Details about family history that do not fit into structured fields. Family relationship terms should be relative to the proband.\n\nNotes: useful if extended family history suggestive of mode of inheritance"
+            }
+        }
+    },
+    "genetic_findings": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/genetic_findings.json",
+        "title": "genetic_findings",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "genetic_findings_id",
+            "participant_id",
+            "experiment_id",
+            "variant_type",
+            "variant_reference_assembly",
+            "zygosity",
+            "gene_known_for_phenotype"
+        ],
+        "definitions": {},
+        "properties": {
+            "genetic_findings_id": {
+                "type": "string",
+                "description": "Unique ID of this variant in this participant (primary key)\n\nNotes: RC submitted unique variant ID\n- Useful for tracking in downstream functional studies (i.e. V2F clickup database). \n- RC submitted but encourage conventional naming (genomic coordinate + participant id)",
+                "examples": [
+                    "4_25145092_Broad_RGP_1432"
+                ]
+            },
+            "participant_id": {
+                "type": "string",
+                "description": "Subject/Participant Identifier within project\n\nNotes: RC submitted",
+                "examples": [
+                    "Broad_RGP_1432_3"
+                ]
+            },
+            "experiment_id": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "The experiment table and experiment ID(s) in which discovery was identified: experiment_table.id_in_table. Should correspond to an experiment_id in the DCC-generated experiment table.\n\nNotes: RC submitted. \n- If experiment identifier is not available due to current data model limitations, use the 'method_of_discovery' field\n- If variant is identified in multiple datasets, list the assigned primary experiment_id first and fill the following rows (e.g. allele balance) with data from this experiment\n- Additional information on orthogonal experiments can noted in the 'method_of_discovery' or 'notes' field",
+                    "examples": [
+                        "experiment_dna_short_read.GSS201938-01-021-SG-1",
+                        "experiment_nanopore.BCM_00001",
+                        "see_notes",
+                        "see_MOD"
+                    ]
+                }
+            },
+            "variant_type": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "SNV/INDEL",
+                        "SV",
+                        "RE",
+                        "SNV",
+                        "INDEL",
+                        "CNV",
+                        "MEI",
+                        "STR"
+                    ],
+                    "description": "Notes: SNV/INDEL: single nucelotide variants or short insertion/deletions (<50bp)\nRE: repeat elements\nSV: structural variants, including copy number variants and mobile element insertions",
+                    "examples": [
+                        "SNV|CNV"
+                    ]
+                }
+            },
+            "sv_type": {
+                "type": "string",
+                "enum": [
+                    "BND",
+                    "CNV",
+                    "CPX",
+                    "CTX",
+                    "DEL",
+                    "DUP",
+                    "INS",
+                    "INS:ME",
+                    "INS:ME:ALU",
+                    "INS:ME:LINE1",
+                    "INS:ME:SVA",
+                    "INS:UNK",
+                    "INV"
+                ],
+                "description": "Notes: SV-vcf code descriptions:\nBND = 'Translocation'\nCNV = 'Copy Number Variant'\nCPX  = 'Complex SV'\nCTX  = 'Reciprocal chromosomal translocation'\nDEL  = 'Deletion'\nDUP  = 'Duplication'\nINS  = 'Insertion'\nINS:ME  = 'Mobile element insertion of unspecified ME class'\nINS:ME:ALU  = 'Alu element insertion'\nINS:ME:LINE1  = 'LINE1 element insertion'\nINS:ME:SVA  = 'SVA element insertion'\nINS:UNK  = 'Sequence insertion of unspecified origin'\nINV  = 'Inversion'"
+            },
+            "variant_reference_assembly": {
+                "type": "string",
+                "enum": [
+                    "GRCh38",
+                    "CHM13"
+                ],
+                "description": "The genome build for identifying the variant position\n\nNotes: Supports hg38 and future human references. If your pipeline uses a reference_assembly not currently listed, please contact the tiger team/DSA WG.",
+                "examples": [
+                    "GRCh38",
+                    "CHM13"
+                ]
+            },
+            "chrom": {
+                "type": "string",
+                "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10",
+                    "11",
+                    "12",
+                    "13",
+                    "14",
+                    "15",
+                    "16",
+                    "17",
+                    "18",
+                    "19",
+                    "20",
+                    "21",
+                    "22",
+                    "X",
+                    "Y",
+                    "MT"
+                ],
+                "description": "Chromosome of the variant",
+                "examples": [
+                    "4"
+                ],
+                "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+            },
+            "chrom_end": {
+                "type": "string",
+                "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10",
+                    "11",
+                    "12",
+                    "13",
+                    "14",
+                    "15",
+                    "16",
+                    "17",
+                    "18",
+                    "19",
+                    "20",
+                    "21",
+                    "22",
+                    "X",
+                    "Y",
+                    "MT"
+                ],
+                "description": "End position chromosome of SV\n\nNotes: Optional field to report second chromosome in SV"
+            },
+            "pos": {
+                "type": "integer",
+                "description": "Start position of the variant\n\nNotes: this field uses VCF-style coordinates",
+                "examples": [
+                    "25145092"
+                ],
+                "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+            },
+            "pos_end": {
+                "type": "integer",
+                "description": "End position of SV\n\nNotes: this field uses VCF-style coordinates"
+            },
+            "ref": {
+                "type": "string",
+                "description": "Reference allele of the variant",
+                "examples": [
+                    "C"
+                ],
+                "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+            },
+            "alt": {
+                "type": "string",
+                "description": "Alternate position of the variant",
+                "examples": [
+                    "T"
+                ],
+                "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+            },
+            "copy_number": {
+                "type": "integer",
+                "description": "CNV copy number\n\nNotes: To indicate copy number for CNVs that aren't covered by DUP or DEL, such as a triplication"
+            },
+            "ClinGen_allele_ID": {
+                "type": "string",
+                "description": "ClinGen Allele ID for cross table refrence",
+                "examples": [
+                    "CA2877328"
+                ]
+            },
+            "gene_of_interest": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "HGNC approved symbol of the known or candidate gene(s) that are relevant for the observed phenotype.\n\nNotes: - If the SNV/INDEL or RE is intergenic with no clear gene of interest, use 'intergenic'\n- If the SV has multiple genes of interest, use a multi-value delimiter\n- If the SV has no specific gene of interest, leave blank",
+                    "examples": [
+                        "SEPSECS"
+                    ],
+                    "x-required-condition": "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+                }
+            },
+            "transcript": {
+                "type": "string",
+                "description": "Text description of transcript overlapping the variant\n\nNotes: Encourage to use MANE transcripts with version number.\n- If your variant does not have MANE transcript, add most relevant transcript.",
+                "examples": [
+                    "ENST00000382103.7"
+                ]
+            },
+            "hgvsc": {
+                "type": "string",
+                "description": "HGVS c. description of the variant (m. for mitochondrial, n. for noncoding)\n\nNotes: This field is strongly encouraged if transcript is provided",
+                "examples": [
+                    "c.846G>A"
+                ]
+            },
+            "hgvsp": {
+                "type": "string",
+                "description": "HGVS p. description of the variant\n\nNotes: May use 'p.?' for non-coding variants",
+                "examples": [
+                    "p.Leu282="
+                ]
+            },
+            "hgvs": {
+                "type": "string",
+                "description": "genomic HGVS description of the variant\n\nNotes: Strongly encouraged for complex SVs (SV_type=CPX). \nCan be used to show uncertainty in SV breakends (g.(?_234567)_(345678_?)del)"
+            },
+            "zygosity": {
+                "type": "string",
+                "enum": [
+                    "Heterozygous",
+                    "Homozygous",
+                    "Hemizygous",
+                    "Heteroplasmy",
+                    "Homoplasmy",
+                    "Mosaic",
+                    "Unknown"
+                ],
+                "description": "Zygosity of variant",
+                "examples": [
+                    "Heterozygous"
+                ]
+            },
+            "allele_balance_or_heteroplasmy_percentage": {
+                "type": "number",
+                "description": "Reported allele balance (mosaic) or heteroplasmy percentage (mitochondrial)\n\nNotes: Option reporting of allele balance for mosaic or mitochondrial variants. \n- If the variant is found mosaic in a parent sample, use the free notes line 36 to report parental allele balance."
+            },
+            "variant_inheritance": {
+                "type": "string",
+                "enum": [
+                    "de novo",
+                    "maternal",
+                    "paternal",
+                    "biparental",
+                    "nonmaternal",
+                    "nonpaternal",
+                    "unknown"
+                ],
+                "description": "Detection of variant in parents\n\nNotes: - For duos where the variant is only confirmed to be not maternally or paternally inherited, use nonmaternal or nonpaternal, respectively.\n- If the variant is found mosaic in a parent sample, report the patient allele balance in line 20 and use the free notes line 36 to report parental allele balance. \n- in scenario where variant is present in parent A and parent B's sequencing is not available (so cannot rule out possibility parent  B also carries the variant), this should be 'unknown', since line 34 (additional_family_members_with_variant) should also contain the info that parent A has this variant",
+                "examples": [
+                    "nonmaternal"
+                ]
+            },
+            "linked_variant": {
+                "type": "string",
+                "description": "Second variant in recessive cases\n\nNotes: genetic_findings_id of a second variant in the same gene to complete a compound het.",
+                "examples": [
+                    "4_25156922_Broad_RGP_1432"
+                ]
+            },
+            "linked_variant_phase": {
+                "type": "string",
+                "enum": [
+                    "in trans",
+                    "in cis",
+                    "unknown"
+                ],
+                "description": "Notes: optional description of phase if inheritance is unknown",
+                "examples": [
+                    "unknown"
+                ]
+            },
+            "gene_known_for_phenotype": {
+                "type": "string",
+                "enum": [
+                    "Known",
+                    "Candidate"
+                ],
+                "description": "Indicate if the gene listed is a candidate or known disease gene. Known disease genes can be identified using OMIM or MONDO or MitoMap. Variant/phenotype in proband should be consistent with the described MOD/phenotype to be considered a known gene for condition.\n\nNotes: - Use OMIM or MONDO or MitoMap as truth source for known disease genes \n- Variant/phenotype/inheritance in the patient should be consistent with the disease entry to be considered 'Known', otherwise use 'Candidate' (e.g. phenotype expansions or novel phenotypes are considered 'Candidate' )",
+                "examples": [
+                    "Known"
+                ]
+            },
+            "known_condition_name": {
+                "type": "string",
+                "description": "Free text of condition name. Variant/phenotype/inheritance in proband should be consistent with the condition.\n\nNotes: - Condition name should match the OMIM or MONDO entry listed in line 26 for known disease genes.",
+                "examples": [
+                    "Pontocerebellar hypoplasia type 2D"
+                ],
+                "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
+            },
+            "condition_id": {
+                "type": "string",
+                "description": "MONDO/OMIM number for condition used for variant interpretation.\n\nNotes: Only list a MONDO or OMIM ID if the patient's phenotype and inheritance is consistent with the established disease mechanism and gene-phenotype association.",
+                "examples": [
+                    "OMIM:613811",
+                    "MONDO:0013438"
+                ],
+                "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
+            },
+            "condition_inheritance": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "Autosomal recessive",
+                        "Autosomal dominant",
+                        "X-linked",
+                        "Mitochondrial",
+                        "Y-linked",
+                        "Contiguous gene syndrome",
+                        "Somatic mosaicism",
+                        "Digenic",
+                        "Other",
+                        "Unknown"
+                    ],
+                    "description": "Description of the expected inheritance of condition used for variant interpretation\n\nNotes: Inheritance description should match the OMIM or MONDO entry listed in line 26. \n- If multiple inheritance types listed in OMIM/MONDO, select that which is suspected for this proband\n- In cases where multiple inheritance patterns are being considered, it is possible to select multiple here",
+                    "examples": [
+                        "Autosomal recessive"
+                    ],
+                    "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
+                }
+            },
+            "GREGoR_variant_classification": {
+                "type": "string",
+                "enum": [
+                    "Benign",
+                    "Likely benign",
+                    "Uncertain significance - low",
+                    "Uncertain significance - moderate",
+                    "Uncertain significance - high",
+                    "Uncertain significance",
+                    "Likely pathogenic",
+                    "Pathogenic",
+                    "Curation in progress",
+                    "Well-established P/LP"
+                ],
+                "description": "Clinical significance of variant described to condition listed as determined by the RC's variant curation.\n\nNotes: Field to be updated in subsequent data submissions. TBD requirement timeline. Currently optional, to consider whether required if known disease gene.",
+                "examples": [
+                    "Curation in progress"
+                ],
+                "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
+            },
+            "GREGoR_ClinVar_SCV": {
+                "type": "string",
+                "description": "ClinVar accession number for the variant curation submitted by your center\n\nNotes: Field to be updated in subsequent data submissions. TBD requirement timeline. Currently optional, to consider whether required if already submitted."
+            },
+            "gene_disease_validity": {
+                "type": "string",
+                "enum": [
+                    "Definitive",
+                    "Strong",
+                    "Moderate",
+                    "Limited",
+                    "Disputed",
+                    "Animal Model Only",
+                    "Refuted",
+                    "Curation in progress"
+                ],
+                "description": "Validity assessment of the gene-disease relationship\n\nNotes: Gene-disease validity as defined by ClinGen framework. \nEach RC can lookup in GenCC (search.thegencc.org; PMID 35507016) or curate themselves. \nAcceptable to use unpublished evidence/case data if an RC would like to curate a novel gene-disease association.",
+                "x-required-condition": "CONDITIONAL (gene_known_for_phenotype = Known)"
+            },
+            "gene_disease_validity_notes": {
+                "type": "string",
+                "description": "additional context or explanation about the gene_disease_validity assessment"
+            },
+            "public_database_other": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "Public databases that this variant in this participant has been submitted by the RC."
+                }
+            },
+            "public_database_ID_other": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "Public database variant/case ID"
+                }
+            },
+            "phenotype_contribution": {
+                "type": "string",
+                "enum": [
+                    "Partial",
+                    "Full",
+                    "Uncertain"
+                ],
+                "description": "Contribution of variant-linked condition to participant's phenotype.\n\nNotes: - Each discovery in a recessive pair is considered full contribution.\n- If the associated gene is not known ('candidate' on line 24), use Uncertain.\n- If the associated gene is known but a second hit is missing, use either Uncertain or Full (depending on your confidence of the gene in the diagnosis)",
+                "examples": [
+                    "Full"
+                ]
+            },
+            "partial_contribution_explained": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of specific phenotypes (HPO IDs) explained by the condition associated with this variant/gene in cases of partial contribution\n\nNotes: Field used when a genetic finding only partially explains participant phenotype and a second genetic finding is expected. For example, a syndromic case with a well-established pathogenic non-syndromic hearing loss variant. \n- For recesssive variants with partial contribution, only one of the linked variants needs to list HPO IDs explained by the linked candidate set.",
+                    "examples": [
+                        "HP:0000365"
+                    ],
+                    "x-required-condition": "CONDITIONAL (phenotype_contribution = Partial)"
+                }
+            },
+            "additional_family_members_with_variant": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of related participant IDs carrying the same variant"
+                }
+            },
+            "method_of_discovery": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "SR-ES",
+                        "SR-GS",
+                        "LR-GS",
+                        "SNP array",
+                        "Optical mapping",
+                        "Karyotype",
+                        "SR RNA-seq",
+                        "LR RNA-seq",
+                        "SR-ES-reanalysis",
+                        "SR-GS-reanalysis",
+                        "LR-GS-reanalysis",
+                        "SNP array-reanalysis",
+                        "Optical mapping-reanalysis",
+                        "Karyotype-reanalysis",
+                        "SR RNA-seq-reanalysis",
+                        "LR RNA-seq-reanalysis"
+                    ],
+                    "description": "The method/assay(s) used to identify the candidate\n\nNotes: Field to be used to capture method of discovery if experiment not currently supported by data model. (eg. >experiment_table_name.id_in_table)",
+                    "examples": [
+                        "SR-GS"
+                    ]
+                }
+            },
+            "notes": {
+                "type": "string",
+                "description": "Free text field to explain edge cases or discovery updates or list parallel experiment IDs or list parental allele balance when mosaic... etc.\n\nNotes: Data collected in this section will be used to determine data model updates needed for future submission rounds."
+            },
+            "VRS_ID": {
+                "type": "string",
+                "description": "The Variation Representation Specification (VRS, pronounced \u201cverse\u201d) is a standard developed by the Global Alliance for Genomic Health to facilitate and improve sharing of genetic information.\n\nNotes: https://vrs.ga4gh.org/en/stable/\n doi:10.1016/j.xgen.2021.100027",
+                "examples": [
+                    "rs429358C"
+                ]
+            }
+        }
+    },
+    "analytes": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/analyte.json",
+        "title": "analyte",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "analyte_id",
+            "participant_id",
+            "analyte_type",
+            "primary_biosample"
+        ],
+        "definitions": {},
+        "properties": {
+            "analyte_id": {
+                "type": "string",
+                "description": "identifier for an analyte from a primary biosample source (primary key)\n\nNotes: ID is at level of analyte\nStanford example: SubjectID-TubetypeCode-TissueCode",
+                "examples": [
+                    "Broad_COL_FAM1_1_D1",
+                    "Broad_COL_FAM1_1_R1",
+                    "GSS_201938-01-021"
+                ]
+            },
+            "participant_id": {
+                "type": "string"
+            },
+            "analyte_type": {
+                "type": "string",
+                "enum": [
+                    "DNA",
+                    "RNA",
+                    "cDNA",
+                    "blood plasma",
+                    "frozen whole blood",
+                    "high molecular weight DNA",
+                    "urine",
+                    "PBMC"
+                ],
+                "description": "analyte derived from the primary_biosample. The actual thing you're sticking into a machine to analyze/sequence",
+                "examples": [
+                    "DNA"
+                ]
+            },
+            "analyte_processing_details": {
+                "type": "string",
+                "description": "details about how the analyte or original biosample was extracted or processed\n\nNotes: Regarding PMBC isolations from CPT tubes;  Isolations of PBMCs should be done on wet ice following the protocol.  Use only chilled cell freezing media.   Isolated PBMCs in freezing media",
+                "examples": [
+                    "PAX extraction protocol,",
+                    "CHX treatment,",
+                    "globin depletion, etc."
+                ]
+            },
+            "primary_biosample": {
+                "type": "string",
+                "enum": [
+                    "UBERON:0000479",
+                    "UBERON:0003714",
+                    "UBERON:0001836",
+                    "UBERON:0001003",
+                    "UBERON:0002385",
+                    "UBERON:0000178",
+                    "UBERON:0002371",
+                    "UBERON:0006956",
+                    "UBERON:0001359",
+                    "UBERON:0001088",
+                    "UBERON:0019306",
+                    "CL: 0000034",
+                    "CL: 0000576",
+                    "CL: 0000542",
+                    "CL: 0000057",
+                    "UBERON:0005291",
+                    "CL: 0011020",
+                    "UBERON:0002037",
+                    "UBERON:0001133"
+                ],
+                "description": "Tissue type of biosample taken from the participant that the analyte was extracted or processed from (for unknown can use tissue - UBERON:0000479), e.g. skin, liver, brain\n\nNotes: Contact the GREGoR Data Standards WG to expand the list of allowable UBERON codes. Currently allowed values are:\nUBERON:0000479 (tissue) \nUBERON:0003714 (neural tissue) \nUBERON:0001836 (saliva) \nUBERON:0001003 (skin epidermis) \nUBERON:0002385 (muscle tissue) \nUBERON:0000178 (whole blood) \nUBERON:0002371 (bone marrow) \nUBERON:0006956 (buccal mucosa)\nUBERON:0001359 (cerebrospinal fluid)\nUBERON:0001088 (urine)\nUBERON:0019306 (nose epithelium)\nCL: 0000034 (iPSC)\nCL: 0000576 (monocytes - PBMCs)\nCL: 0000542 (lymphocytes - LCLs)\nCL: 0000057 (fibroblasts)\nUBERON:0005291 (embryonic tissue)\nCL: 0011020 (iPSC NPC)\nUBERON:0002037 (cerebellum tissue)\nUBERON:0001133 (cardiac tissue)",
+                "examples": [
+                    "UBERON:0000178"
+                ]
+            },
+            "primary_biosample_id": {
+                "type": "string",
+                "description": "Optional ID for the biosample; allows for linking of multiple analytes extracted or processed from the same biosample"
+            },
+            "primary_biosample_details": {
+                "type": "string",
+                "description": "Free text to capture information not in structured fields",
+                "examples": [
+                    "\"Biopsy of birthmark\""
+                ]
+            },
+            "tissue_affected_status": {
+                "type": "string",
+                "enum": [
+                    "Yes",
+                    "No"
+                ],
+                "description": "If applicable to disease (suspected mosaic), is the tissue from an affected source or an unaffected source?"
+            },
+            "age_at_collection": {
+                "type": "number",
+                "description": "age or participant in years at biosample collection\n\nNotes: ages >89 are considered PHI."
+            },
+            "participant_drugs_intake": {
+                "type": "string",
+                "description": "The list of drugs patient is on, at the time of sample collection. This information is helpful during analysis of metabolomics and immune asssays. Free Text\n\nNotes: this is relevant when analyzing metabolomics data"
+            },
+            "participant_special_diet": {
+                "type": "string",
+                "description": "If the patient was fasting, when the sample was collected. this is relevant when analyzing metabolomics data. Free Text",
+                "examples": [
+                    "ketogenic",
+                    "gluten-free"
+                ]
+            },
+            "hours_since_last_meal": {
+                "type": "number",
+                "description": "his is relevant when analyzing metabolomics data\n\nNotes: this is relevant when analyzing metabolomics data"
+            },
+            "passage_number": {
+                "type": "integer",
+                "description": "passage_number is relevant for fibroblast cultures and possibly iPSC."
+            },
+            "time_to_freeze": {
+                "type": "number",
+                "description": "time (in hours) from collection to freezing the sample. delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation).\n\nNotes: Regarding PaxGene blood processing for RNA:   Strict adherence following blood draw; ie minimum 2hrs at Room Temp, longer may be better including overnight incubations.   Post thaw samples to Room Temp and allow another 2 hrs incubate prior to processing.   All in accord with the PaxGene RNA blood isolation manual."
+            },
+            "sample_transformation_detail": {
+                "type": "string",
+                "description": "details regarding sample transformation\n\nNotes: If sample was transformed"
+            },
+            "quality_issues": {
+                "type": "string",
+                "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note",
+                "examples": [
+                    "degraded sample; unable to obtain more DNA"
+                ]
+            }
+        }
+    },
+    "phenotypes": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/phenotype.json",
+        "title": "phenotype",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "participant_id",
+            "term_id",
+            "presence",
+            "ontology"
+        ],
+        "definitions": {},
+        "properties": {
+            "phenotype_id": {
+                "type": "string",
+                "description": "primary key\n\nNotes: This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file"
+            },
+            "participant_id": {
+                "type": "string",
+                "description": "Subject/Participant Identifier",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054"
+                ]
+            },
+            "term_id": {
+                "type": "string",
+                "examples": [
+                    "HP:0001627",
+                    "MONDO:0003847"
+                ]
+            },
+            "presence": {
+                "type": "string",
+                "enum": [
+                    "Present",
+                    "Absent",
+                    "Unknown"
+                ]
+            },
+            "ontology": {
+                "type": "string",
+                "enum": [
+                    "HPO",
+                    "MONDO",
+                    "OMIM",
+                    "ORPHANET",
+                    "SNOMED",
+                    "ICD10"
+                ],
+                "description": "Notes: HPO (requirement that phenotype must be described in HPO)\nMONDO (optional)\nOMIM (opt)\nORPHANET (opt)\nSNOMED (opt)\nICD10 (opt)"
+            },
+            "additional_details": {
+                "type": "string",
+                "description": "modifier of a term where the additional details are not supported/available as a term in HPO",
+                "examples": [
+                    "intellectual disability, no IQ test but 3rd grade reading level at 15 years old"
+                ]
+            },
+            "onset_age_range": {
+                "type": "string",
+                "enum": [
+                    "HP:0003581",
+                    "HP:0030674",
+                    "HP:0011463",
+                    "HP:0003577",
+                    "HP:0025708",
+                    "HP:0011460",
+                    "HP:0011461",
+                    "HP:0003593",
+                    "HP:0025709",
+                    "HP:0003621",
+                    "HP:0034199",
+                    "HP:0003584",
+                    "HP:0025710",
+                    "HP:0003596",
+                    "HP:0003623",
+                    "HP:0410280",
+                    "HP:4000040",
+                    "HP:0034198",
+                    "HP:0034197",
+                    "HP:0011462"
+                ],
+                "description": "Notes: values are subterm of 'Onset' HP:0003674 - specifically,\nHP:0003581 | Adult onset\nHP:0030674 | Antenatal onset\nHP:0011463 | Childhood onset\nHP:0003577 | Congenital onset\nHP:0025708 | Early young adult onset\nHP:0011460 | Embryonal onset\nHP:0011461 | Fetal onset\nHP:0003593 | Infantile onset\nHP:0025709 | Intermediate young adult onset\nHP:0003621 | Juvenile onset\nHP:0034199 | Late first trimester onset\nHP:0003584 | Late onset\nHP:0025710 | Late young adult onset\nHP:0003596 | Middle age onset\nHP:0003623 | Neonatal onset\nHP:0410280 | Pediatric onset\nHP:4000040 | Puerpural onset\nHP:0034198 | Second trimester onset\nHP:0034197 | Third trimester onset\nHP:0011462 | Young adult onset"
+            },
+            "additional_modifiers": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "HP:0025292",
+                        "HP:0011009",
+                        "HP:0025308",
+                        "HP:0025307",
+                        "HP:0025306",
+                        "HP:0003581",
+                        "HP:0011420",
+                        "HP:0003831",
+                        "HP:0025285",
+                        "HP:0032525",
+                        "HP:0025286",
+                        "HP:0025254",
+                        "HP:0032526",
+                        "HP:0025257",
+                        "HP:0032503",
+                        "HP:0025256",
+                        "HP:0032522",
+                        "HP:0025255",
+                        "HP:0030674",
+                        "HP:0033820",
+                        "HP:4000052",
+                        "HP:0025287",
+                        "HP:0012832",
+                        "HP:0012827",
+                        "HP:0033815",
+                        "HP:0030645",
+                        "HP:0033816",
+                        "HP:0032535",
+                        "HP:0011463",
+                        "HP:0011010",
+                        "HP:0031797",
+                        "HP:0045088",
+                        "HP:4000051",
+                        "HP:4000048",
+                        "HP:4000047",
+                        "HP:0003577",
+                        "HP:0011421",
+                        "HP:0033763",
+                        "HP:0003819",
+                        "HP:0100613",
+                        "HP:0001522",
+                        "HP:0033765",
+                        "HP:0033764",
+                        "HP:0025294",
+                        "HP:0020034",
+                        "HP:4000053",
+                        "HP:0012839",
+                        "HP:0045089",
+                        "HP:0025293",
+                        "HP:0025302",
+                        "HP:0025282",
+                        "HP:0025708",
+                        "HP:0011460",
+                        "HP:0025303",
+                        "HP:0032365",
+                        "HP:0032502",
+                        "HP:0032501",
+                        "HP:0025315",
+                        "HP:0032534",
+                        "HP:0032542",
+                        "HP:0032500",
+                        "HP:0011461",
+                        "HP:0031914",
+                        "HP:0030650",
+                        "HP:4000042",
+                        "HP:0012837",
+                        "HP:4000043",
+                        "HP:0025295",
+                        "HP:0003829",
+                        "HP:0003593",
+                        "HP:0003587",
+                        "HP:0025709",
+                        "HP:0032539",
+                        "HP:0032540",
+                        "HP:0003621",
+                        "HP:0034199",
+                        "HP:0003584",
+                        "HP:0025710",
+                        "HP:0025275",
+                        "HP:0012831",
+                        "HP:0012835",
+                        "HP:0012838",
+                        "HP:0025291",
+                        "HP:0003596",
+                        "HP:0030648",
+                        "HP:0025279",
+                        "HP:0012825",
+                        "HP:0033817",
+                        "HP:0045090",
+                        "HP:0005268",
+                        "HP:0012826",
+                        "HP:0025296",
+                        "HP:0040006",
+                        "HP:0030651",
+                        "HP:0003811",
+                        "HP:0003623",
+                        "HP:0025301",
+                        "HP:0003680",
+                        "HP:4000046",
+                        "HP:0003674",
+                        "HP:4000050",
+                        "HP:0003679",
+                        "HP:0025280",
+                        "HP:0030647",
+                        "HP:0033814",
+                        "HP:0410280",
+                        "HP:0030649",
+                        "HP:0033813",
+                        "HP:0033819",
+                        "HP:0025304",
+                        "HP:0030646",
+                        "HP:0003812",
+                        "HP:0031450",
+                        "HP:0012830",
+                        "HP:0032544",
+                        "HP:0034241",
+                        "HP:0012829",
+                        "HP:0003676",
+                        "HP:0025297",
+                        "HP:0012840",
+                        "HP:4000040",
+                        "HP:0025305",
+                        "HP:0003678",
+                        "HP:0031796",
+                        "HP:0031375",
+                        "HP:0033818",
+                        "HP:0012834",
+                        "HP:0034198",
+                        "HP:4000049",
+                        "HP:0033349",
+                        "HP:0012828",
+                        "HP:0012824",
+                        "HP:0025281",
+                        "HP:0025284",
+                        "HP:0003677",
+                        "HP:0012836",
+                        "HP:4000045",
+                        "HP:0031915",
+                        "HP:0003826",
+                        "HP:0011011",
+                        "HP:0011008",
+                        "HP:0025283",
+                        "HP:0034197",
+                        "HP:0025153",
+                        "HP:4000044",
+                        "HP:0025204",
+                        "HP:0033185",
+                        "HP:0033032",
+                        "HP:0500261",
+                        "HP:0025205",
+                        "HP:0025208",
+                        "HP:0033789",
+                        "HP:0025206",
+                        "HP:0025207",
+                        "HP:0025334",
+                        "HP:0025211",
+                        "HP:0025227",
+                        "HP:0025377",
+                        "HP:0025212",
+                        "HP:0034060",
+                        "HP:0025215",
+                        "HP:0033793",
+                        "HP:0025209",
+                        "HP:0025213",
+                        "HP:0025210",
+                        "HP:0500260",
+                        "HP:0025214",
+                        "HP:0025216",
+                        "HP:0025217",
+                        "HP:0025218",
+                        "HP:0033184",
+                        "HP:0031167",
+                        "HP:0025220",
+                        "HP:0034195",
+                        "HP:0031135",
+                        "HP:0025221",
+                        "HP:0025222",
+                        "HP:0025223",
+                        "HP:0025224",
+                        "HP:0025225",
+                        "HP:0025226",
+                        "HP:0025228",
+                        "HP:0025219",
+                        "HP:0025229",
+                        "HP:0033198",
+                        "HP:0012833",
+                        "HP:0025290",
+                        "HP:0003828",
+                        "HP:0003682",
+                        "HP:0410401",
+                        "HP:0011462",
+                        "MONDO:0021125",
+                        "MONDO:0021135",
+                        "MONDO:0021139",
+                        "MONDO:0021149",
+                        "MONDO:0045034",
+                        "MONDO:0045040",
+                        "MONDO:0100355",
+                        "MONDO:0700004",
+                        "MONDO:0100369",
+                        "MONDO:0700061",
+                        "MONDO:0024488",
+                        "MONDO:0021126",
+                        "MONDO:0021136",
+                        "MONDO:0021137",
+                        "MONDO:0021140",
+                        "MONDO:0021141",
+                        "MONDO:0021151",
+                        "MONDO:0021152",
+                        "MONDO:0045036",
+                        "MONDO:0045035",
+                        "MONDO:0022202",
+                        "MONDO:0045042",
+                        "MONDO:0100356",
+                        "MONDO:0100357",
+                        "MONDO:0700005",
+                        "MONDO:0700006",
+                        "MONDO:0100427",
+                        "MONDO:0100426",
+                        "MONDO:0700063",
+                        "MONDO:0700062",
+                        "MONDO:0024489",
+                        "MONDO:0021128",
+                        "MONDO:0021127",
+                        "MONDO:0024497",
+                        "MONDO:0024495",
+                        "MONDO:0024490",
+                        "MONDO:0024496"
+                    ],
+                    "description": "Notes: this field should use the same ontology as above (e.g. Mondo disease characteristic if using mondo). \nIt should be a | delimited list of valid HPO IDs that are subordinate to HP:0012823 (clinical modifier) (For HPO terms) or a\n| delimited list of valid MONDO IDs that are subordinate to MONDO_0021125 (disease characteristic) (For MONDO terms)"
+                }
+            },
+            "syndromic": {
+                "type": "string",
+                "enum": [
+                    "syndromic",
+                    "non-syndromic"
+                ],
+                "description": "For participants with few HPO terms, this optional field is to provide context on whether it is likely the most notable phenotype or cohort level phenotype or whether the individual really only has one trait.\n\nNotes: this field is intended to address a concern that if someone has only entered one trait/HPO term, there may be uncertainy about whether it is just the most notable phenotype or cohort level phenotype or whether the individual really only has one trait. For example, there could be a hearing loss cohort and someone might enter only 'sensorineural hearing loss' only, but an individual could have a syndromic hearing loss. Adding the syndromic/non-syndromic would provide a bit more assurance that if there are only one or two traits/HPO terms entered that there is not 'missing' traits/phenotype.",
+                "examples": [
+                    "non-syndromic"
+                ]
+            }
+        }
+    },
+    "experiments": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/experiment.json",
+        "title": "experiment",
+        "version": "1.7",
+        "type": "object",
+        "required": [
+            "experiment_id",
+            "table_name",
+            "id_in_table",
+            "participant_id"
+        ],
+        "definitions": {},
+        "properties": {
+            "experiment_id": {
+                "type": "string",
+                "description": "table_name.experiment_id_in_table",
+                "examples": [
+                    "experiment_dna_short_read.GSS201938-01-021-SG-1"
+                ]
+            },
+            "table_name": {
+                "type": "string",
+                "enum": [
+                    "experiment_dna_short_read",
+                    "experiment_rna_short_read",
+                    "experiment_nanopore",
+                    "experiment_pac_bio",
+                    "experiment_atac_short_read"
+                ],
+                "examples": [
+                    "experiment_dna_short_read"
+                ]
+            },
+            "id_in_table": {
+                "type": "string",
+                "enum": [
+                    "GSS201938-01-021-SG-1"
+                ]
+            },
+            "participant_id": {
+                "type": "string",
+                "enum": [
+                    "GSS201938"
+                ]
+            }
+        }
+    }
+}

@@ -30,6 +30,8 @@ from metadata.services import (
     get_or_create_sub_models,
 )
 
+from metadata.selectors import participant_parser, genetic_findings_parser
+
 """DB Level Services
 
     This module contains service functions that apply to the entire Database.
@@ -142,6 +144,7 @@ def remove_na(datum: dict) -> dict:
 
     return parsed_datum
 
+
 def multi_value_split(datum: dict) -> dict:
     """Multi valu split
     """
@@ -165,7 +168,6 @@ def multi_value_split(datum: dict) -> dict:
                 split_datum[k] = v
 
     return split_datum
-
 
 
 def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
@@ -383,11 +385,12 @@ def create_or_update(table_name: str, identifier: str, model_instance, datum: di
     Returns:
         dict: A response dictionary indicating the status of the operation.
     """
-   
+    
     table_serializers = {
         "participant": {
             "input_serializer": ParticipantInputSerializer,
-            "output_serializer": ParticipantOutputSerializer
+            "output_serializer": ParticipantOutputSerializer,
+            "parsed_data": lambda datum: participant_parser(participant=datum)
         },
         "family":{
             "input_serializer": FamilySerializer,
@@ -395,14 +398,26 @@ def create_or_update(table_name: str, identifier: str, model_instance, datum: di
         },
         "genetic_findings": {
             "input_serializer": GeneticFindingsSerializer,
-            "output_serializer": GeneticFindingsSerializer
+            "output_serializer": GeneticFindingsSerializer,
+            "parsed_data": lambda datum: genetic_findings_parser(genetic_findings=datum)
+        },
+        "analyte": {
+            "input_serializer": AnalyteSerializer,
+            "output_serializer": AnalyteSerializer
+        },
+        "phenotype": {
+            "input_serializer": PhenotypeSerializer,
+            "output_serializer": PhenotypeSerializer
         }
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
     model_output_serializer = table_serializers[table_name]["output_serializer"]
 
-    datum = remove_na(datum=datum) 
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
+    else:
+        datum = remove_na(datum=datum) 
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
