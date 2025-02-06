@@ -135,6 +135,9 @@ class TableConverter:
             model_class=models[entity],
             id=identifier_field
         )
+        
+        results = []
+
         for record in data_list:
             identifier = record.get(identifier_field)
             if not identifier:
@@ -144,7 +147,44 @@ class TableConverter:
             model_instance = model_instances.get(record[identifier_field])
 
             response, status = create_or_update(table_name, identifier, model_instance, record)
-            print(response)
+            result_entry = {
+                "identifier": identifier,
+                "request_status": "NO CHANGE" \
+                    if  response['request_status'] == "SUCCESS" \
+                    else response.get("request_status", "UNKNOWN"),
+                "updates": response['data'].get("updates", []) \
+                    if response.get("request_status") == "UPDATED" \
+                    else []
+            }
+            results.append(result_entry)
+            # if result_entry['request_status'] == "SUCCESS":
+            #     import pdb; pdb.set_trace()
+        self.write_results(table_file.split('.')[0], results)
+
+
+    def write_results(self, table_file: str, results: list):
+        """
+        Writes the results to a TSV file with identifier, request_status, and updates (if applicable).
+
+        Args:
+            table_file (str): The original input file path (used to generate output file name).
+            results (list): A list of dictionaries containing 'identifier', 'request_status', and 'updates'.
+        """
+        output_dir = os.path.join(os.path.dirname(table_file), "update_results")  # Construct path
+        os.makedirs(output_dir, exist_ok=True)  # Ensure directory exists
+        table_name = table_file.split('/')[-1]
+        output_file = os.path.join(output_dir, f"{table_name}_results.tsv")  # Generate full path
+
+        with open(output_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f, delimiter="\t")
+            writer.writerow(["identifier", "request_status", "updates"])  # Header
+            for result in results:
+                writer.writerow([
+                    result["identifier"],
+                    result["request_status"],
+                    ", ".join(result["updates"]) if result["request_status"] == "UPDATED" else ""
+                ])
+
 
     @staticmethod
     def usr_args():
