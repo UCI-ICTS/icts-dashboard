@@ -10,12 +10,9 @@ from rest_framework.views import APIView
 from config.selectors import (
     response_constructor,
     response_status,
+    bulk_retrieve
 )
-
-from experiments.models import Experiment
-from experiments.services import ExperimentSerializer
-
-from config.selectors import bulk_retrieve, create_or_update
+from search.selectors import create_or_update
 
 from metadata.models import (
     Participant,

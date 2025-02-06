@@ -24,10 +24,16 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
     3. Use .set() to assign the ManyToMany relation
     """
     additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(
-        queryset=Family.objects.all(),
+        queryset=Participant.objects.all(),
         many=True,
         required=False
     )
+
+    experiment_id = serializers.JSONField(required=False)
+    variant_type = serializers.JSONField(required=False)
+    gene_of_interest = serializers.JSONField(required=False)
+    condition_inheritance = serializers.JSONField(required=False)
+    method_of_discovery = serializers.JSONField(required=False)
 
     class Meta:
         model = GeneticFindings
@@ -53,6 +59,7 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if additional_family_members:
+            instance.additional_family_members_with_variant.clear()
             instance.additional_family_members_with_variant.set(additional_family_members)
         instance.save()
 

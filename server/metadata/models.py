@@ -298,12 +298,14 @@ class GeneticFindings(models.Model):
         on_delete=models.CASCADE,
         help_text="Subject/Participant Identifier within project",
     )
-    experiment_id = models.CharField(
-        max_length=255,
+    experiment_id = models.JSONField(
+        default=list,
         help_text="The experiment table and experiment ID(s) in which discovery was identified",
     )
-    variant_type = models.CharField(
-        max_length=50, choices=VariantType.choices, help_text="Type of genetic variant"
+    variant_type = models.JSONField(
+        default=list,
+        choices=VariantType.choices, 
+        help_text="Type of genetic variant"
     )
     sv_type = models.CharField(
         max_length=50, blank=True, help_text="Type of structural variant if applicable"
@@ -327,8 +329,8 @@ class GeneticFindings(models.Model):
         blank=True,
         help_text="ClinGen Allele ID for cross table reference",
     )
-    gene_of_interest = models.CharField(
-        max_length=255,
+    gene_of_interest = models.JSONField(
+        default=list,
         blank=True,
         null=True,
         help_text="HGNC approved symbol of the known or candidate gene(s)",
@@ -381,8 +383,8 @@ class GeneticFindings(models.Model):
         blank=True,
         help_text="MONDO/OMIM number for condition used for variant interpretation",
     )
-    condition_inheritance = models.CharField(
-        max_length=50,
+    condition_inheritance = models.JSONField(
+        default=list,
         blank=True,
         help_text="Expected inheritance of the condition used for variant interpretation",
     )
@@ -427,10 +429,9 @@ class GeneticFindings(models.Model):
         related_name="family_variants",
         help_text="List of related participant IDs carrying the same variant",
     )
-    method_of_discovery = models.CharField(
-        max_length=50,
+    method_of_discovery = models.JSONField(
+        default=list,
         blank=True,
-        choices=DiscoveryMethod.choices,
         help_text="The method/assay(s) used to identify the candidate",
     )
     notes = models.TextField(

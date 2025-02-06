@@ -65,10 +65,16 @@ class VariantInheritance(models.TextChoices):
     NONPATERNAL = "nonpaternal", "Nonpaternal"
     UNKNOWN = "unknown", "Unknown"
 
-
 class GeneDiseaseValidity(models.TextChoices):
-    VALID = "Valid", "Valid"
-    INVALID = "Invalid", "Invalid"
+    DEFINITIVE = "Definitive", "Definitive"
+    STRONG = "Strong", "Strong"
+    MODERATE = "Moderate", "Moderate"
+    LIMITED = "Limited", "Limited"
+    DISPUTED = "Disputed", "Disputed"
+    ANIMAL_MODEL_ONLY = "Animal Model Only", "Animal Model Only"
+    REFUTED = "Refuted", "Refuted"
+    CURATION_IN_PROGRESS = "Curation in progress", "Curation in progress"
+
 
 
 class DiscoveryMethod(models.TextChoices):

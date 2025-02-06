@@ -4,7 +4,6 @@
 """Experiments Selectors
 """
 
-from config.selectors import remove_na
 from experiments.models import (
     AlignedDNAShortRead,
     AlignedPacBio,
@@ -47,8 +46,7 @@ def parse_short_read_aligned(short_read_aligned: dict) -> dict:
         except ValueError:
             short_read_aligned["mean_coverage"] = "NA"
 
-    parsed_short_read_aligned = remove_na(datum=short_read_aligned)
-    return parsed_short_read_aligned
+    return short_read_aligned
 
 
 def parse_short_read(short_read: dict) -> dict:
@@ -79,8 +77,7 @@ def parse_short_read(short_read: dict) -> dict:
         except ValueError:
             short_read["target_insert_size"] = "NA"
 
-    parsed_short_read = remove_na(datum=short_read)
-    return parsed_short_read
+    return short_read
 
 
 def parse_pac_bio_aligned(pac_bio_aligned: dict) -> dict:
@@ -103,21 +100,21 @@ def parse_pac_bio_aligned(pac_bio_aligned: dict) -> dict:
         "methylation_called" in pac_bio_aligned
         and pac_bio_aligned["methylation_called"] != "NA"
     ):
-        if pac_bio_aligned["methylation_called"] == "TRUE":
+        if pac_bio_aligned["methylation_called"] == "TRUE" or \
+            pac_bio_aligned["methylation_called"] == "true":
             try:
                 pac_bio_aligned["methylation_called"] = True
             except ValueError:
                 pac_bio_aligned["methylation_called"] = "NA"
 
-        if pac_bio_aligned["methylation_called"] == "FALSE":
+        if pac_bio_aligned["methylation_called"] == "FALSE" or \
+            pac_bio_aligned["methylation_called"] == "false":
             try:
                 pac_bio_aligned["methylation_called"] = False
             except ValueError:
                 pac_bio_aligned["methylation_called"] = "NA"
 
-    parsed_pac_bio_aligned = remove_na(datum=pac_bio_aligned)
-
-    return parsed_pac_bio_aligned
+    return pac_bio_aligned
 
 
 def parse_pac_bio(pac_bio_datum: dict) -> dict:
@@ -136,20 +133,22 @@ def parse_pac_bio(pac_bio_datum: dict) -> dict:
     """
 
     if "was_barcoded" in pac_bio_datum and pac_bio_datum["was_barcoded"] != "NA":
-        if pac_bio_datum["was_barcoded"] == "TRUE":
+        
+        if pac_bio_datum["was_barcoded"] == "TRUE" \
+            or pac_bio_datum["was_barcoded"] == 'true':
             try:
                 pac_bio_datum["was_barcoded"] = True
             except ValueError:
                 pac_bio_datum["was_barcoded"] = "NA"
 
-        if pac_bio_datum["was_barcoded"] == "FALSE":
+        if pac_bio_datum["was_barcoded"] == "FALSE" \
+            or pac_bio_datum["was_barcoded"] == 'false':
             try:
                 pac_bio_datum["was_barcoded"] = False
             except ValueError:
                 pac_bio_datum["was_barcoded"] = "NA"
 
-    parsed_pac_bio = remove_na(datum=pac_bio_datum)
-    return parsed_pac_bio
+    return pac_bio_datum
 
 
 def parse_nanopore_aligned(nanopore_aligned: dict) -> dict:
@@ -172,21 +171,21 @@ def parse_nanopore_aligned(nanopore_aligned: dict) -> dict:
         "methylation_called" in nanopore_aligned
         and nanopore_aligned["methylation_called"] != "NA"
     ):
-        if nanopore_aligned["methylation_called"] == "TRUE":
+        if nanopore_aligned["methylation_called"] == "TRUE" or \
+            nanopore_aligned["methylation_called"] == "true":
             try:
                 nanopore_aligned["methylation_called"] = True
             except ValueError:
                 nanopore_aligned["methylation_called"] = "NA"
 
-        if nanopore_aligned["methylation_called"] == "FALSE":
+        if nanopore_aligned["methylation_called"] == "FALSE" or \
+            nanopore_aligned["methylation_called"] == "false":
             try:
                 nanopore_aligned["methylation_called"] = False
             except ValueError:
                 nanopore_aligned["methylation_called"] = "NA"
 
-    parsed_pac_bio_aligned = remove_na(datum=nanopore_aligned)
-
-    return parsed_pac_bio_aligned
+    return nanopore_aligned
 
 
 def parse_nanopore(nanopore: dict) -> dict:
@@ -205,20 +204,19 @@ def parse_nanopore(nanopore: dict) -> dict:
     """
 
     if "was_barcoded" in nanopore and nanopore["was_barcoded"] != "NA":
-        if nanopore["was_barcoded"] == "TRUE":
+        if nanopore["was_barcoded"] == "TRUE" or nanopore["was_barcoded"] == 'true':
             try:
                 nanopore["was_barcoded"] = True
             except ValueError:
                 nanopore["was_barcoded"] = "NA"
 
-        if nanopore["was_barcoded"] == "FALSE":
+        if nanopore["was_barcoded"] == "FALSE" or nanopore["was_barcoded"] == 'false':
             try:
                 nanopore["was_barcoded"] = False
             except ValueError:
                 nanopore["was_barcoded"] = "NA"
 
-    parsed_nanopore = remove_na(datum=nanopore)
-    return parsed_nanopore
+    return nanopore
 
 
 def parse_rna_aligned(rna_aligned: dict) -> dict:
@@ -262,9 +260,7 @@ def parse_rna_aligned(rna_aligned: dict) -> dict:
         "aligned_index_file": rna_aligned["aligned_rna_short_read_index_file"],
     }
 
-    parsed_rna_aligned = remove_na(datum=rna_aligned)
-
-    return parsed_rna_aligned, aligned_data
+    return rna_aligned
 
 
 def parse_rna(rna_datum: dict) -> dict:
@@ -301,8 +297,7 @@ def parse_rna(rna_datum: dict) -> dict:
             except ValueError:
                 rna_datum[key] = "NA"
 
-    parsed_rna = remove_na(datum=rna_datum)
-    return parsed_rna, experiment_data
+    return rna_datum
 
 
 def get_experiment(experiment_id: str) -> Experiment:
