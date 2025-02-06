@@ -16,8 +16,8 @@ django.setup()
 import sys
 import csv
 import argparse
-from jsonschema import validate, ValidationError
-from config.selectors import create_or_update, bulk_retrieve
+from config.selectors import bulk_retrieve
+from search.selectors import create_or_update
 from metadata.models import (
     Participant,
     Family,
@@ -26,6 +26,20 @@ from metadata.models import (
     Phenotype
 )
 
+from experiments.models import (
+    Experiment,
+    ExperimentATACShortRead,
+    ExperimentDNAShortRead,
+    ExperimentRNAShortRead,
+    ExperimentPacBio,
+    ExperimentNanopore,
+    ExperimentType,
+    Aligned,
+    AlignedNanopore,
+    AlignedDNAShortRead,
+    AlignedPacBio,
+    AlignedRNAShortRead
+)
 
 class TableConverter:
     """
@@ -94,7 +108,16 @@ class TableConverter:
             "participant": Participant,
             "family": Family,
             "analyte": Analyte,
-            "genetic_findings": GeneticFindings
+            "phenotype": Phenotype,
+            "genetic_findings": GeneticFindings,
+            "experiment_dna_short_read": ExperimentDNAShortRead,
+            "experiment_nanopore": ExperimentNanopore,
+            "experiment_pac_bio": ExperimentPacBio,
+            "experiment_rna_short_read": ExperimentRNAShortRead,
+            "aligned_dna_short_read": AlignedDNAShortRead,
+            "aligned_nanopore": AlignedNanopore,
+            "aligned_pac_bio": AlignedPacBio,
+            "aligned_rna_short_read":AlignedRNAShortRead
         }
         if not table_name:
             if entity:

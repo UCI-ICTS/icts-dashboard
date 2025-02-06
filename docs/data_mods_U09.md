@@ -29,5 +29,13 @@
 - Participant
 - Family
 - Analyte
-- 
+- Phenotype
+- experiment_pac_bio
+- experiment_nanopore
+- experiment_rna_short_read
+- experiment_dna_short_read
+- aligned_dna_short_read
+- aligned_pac_bio
+- aligned_nanopore
+- aligned_rna_short_read
 - Genetic Findings

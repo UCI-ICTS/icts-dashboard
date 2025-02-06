@@ -10,15 +10,15 @@
 
 - For HTTPS access: 
 
-`git clone https://github.com/UCI-GREGoR/GREGor_dashboard/` 
+		git clone https://github.com/UCI-GREGoR/GREGor_dashboard/
 
 - For SSH access*(RECCOMENDED)*: 
 
-`git@github.com:UCI-GREGoR/GREGor_dashboard.git` 
+		git@github.com:UCI-GREGoR/GREGor_dashboard.git
 
 **Then**
 
-`cd GREGor_dashboard/`
+	cd GREGor_dashboard/
 
 **If you need to use a branch other than `main`:**
 
@@ -28,31 +28,24 @@
 
 **Open a new terminal and retrun to the project root**
 
-`cd PATH/TO/PROJECT/GREGor_dashboard`
+	cd PATH/TO/PROJECT/GREGor_dashboard
 
 ### Enter the server directory, create a virtual environment, and install the required packages
 
-##### For Mac/Linux:
+##### For Mac/Linux: *[pyenv(optional)](https://github.com/pyenv/pyenv?tab=readme-ov-file#simple-python-version-management-pyenv)*
 
-`cd server`
-
-`pyenv local 3.11.1` *[(optional)](https://github.com/pyenv/pyenv?tab=readme-ov-file#simple-python-version-management-pyenv)*
-
-`python3 -m venv env`
-
-`source env/bin/activate`
-
-`pip3.9 install -r requirements.txt`
+	cd server
+	pyenv local 3.11.1 
+	python3 -m venv env
+	source env/bin/activate
+	pip3.9 install -r requirements.txt
 
 ##### For Windows:
 
-`cd server`
-
-`python -m venv env`
-
-`source env/Scripts/activate`
-
-`pip install -r requirements.txt`
+	cd server
+	python -m venv env
+	source env/Scripts/activate
+	pip install -r requirements.txt
 
 
 #### Generate the secrets file
@@ -60,15 +53,15 @@
 
 - Copy the `.secrets.example` to `.secrets`
 
-	`cp .secrets.example .secrets`
+		cp .secrets.example .secrets
 
 - On linux (or MAC) generate a 32-bytes long PSK key using the openssl command for the `DJANO_KEY`:
 
-`openssl rand -base64 32`
+		openssl rand -base64 32
 
 - On Windows, generate a 32-bytes long PSK key using the PowerShell command for the `DJANGO_KEY`:
    
-`[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }) -as [byte[]])`
+		[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }) -as [byte[]])
 
 
 - Update the `.secrets` file with the required keys: 
@@ -87,9 +80,8 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 ---
 ##### Option #1: Use existing DB
 
-`cp admin/db.sqlite3 .`
-
-`python3 manage.py migrate`
+	cp admin/db.sqlite3 .
+	python3 manage.py migrate
 
 ````
 superusername: wheel
@@ -100,11 +92,11 @@ password: wheel
 ##### Option #2: Create a new DB with fixture data
 Create a DB:
 
-`python3 manage.py migrate`
+	python3 manage.py migrate
 
 Load the DB with test data:
 
-`python manage.py loaddata config/fixtures/local_data.json`
+	python manage.py loaddata config/fixtures/local_data.json
 
 ---
 #### Run Server
@@ -127,15 +119,23 @@ username: wheel
 password: wheel
 ````
 
-## [WIP] MGRC GREGoR Dashboard Client deployment  (GREGor_dashboard/client)
+## MGRC GREGoR Dashboard Client deployment  (GREGor_dashboard/client)
 
 ### Enter the repository, create a environment file, and install the required packages
 
-`cd GREGor_dashboard/client/`
+	cd GREGor_dashboard/client/
 
 **Install Node packages via Node Package Manager (NPM)**
 
-`npm install`
+	npm install
+
+### Update the `.env` file with the required keys: 
+	cp .env.example .env
+
+The APIDB should be `localhost:8000` for local dev.
+```
+REACT_APP_APIDB="http://localhost:8000"
+```
 
 ### **Start service**
 
