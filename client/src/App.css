@@ -80,11 +80,6 @@
 }
 
 .button-confirm {
-  background-color: white; /* UCI Blue */
-  color: white;
-}
-
-.button-confirm {
   background-color: #0064a4; /* UCI Blue */
   color: white;
 }

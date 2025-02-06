@@ -63,19 +63,6 @@ const updateAnalyte = async (data, token) => {
 }
 
 
-const updateExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/submit_experiment/", [
-    data
-  ], {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    }
-  });
-  return response;
-}
-
-
 const updatePhenotype = async (data, token) => {
   const response = await axios.post(APIDB + "/api/metadata/submit_phenotype/", [
     data
@@ -89,7 +76,76 @@ const updatePhenotype = async (data, token) => {
 }
 
 
+const updateExperiment = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/experiments/submit_experiment/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateDnaShortRead = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/experiments/submit_experiment_dna_short_read/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateRnaShortRead = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/experiments/submit_experiment_rna_short_read/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updatePacBio = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/experiments/submit_pac_bio/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
+const updateNanoPore = async (data, token) => {
+  const response = await axios.post(APIDB + "/api/experiments/submit_nanopore/", [
+    data
+  ], {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    }
+  });
+  return response;
+}
+
+
 const dataService = {
+  updateNanoPore,
+  updatePacBio,
+  updateRnaShortRead,
+  updateDnaShortRead,
   updateExperiment,
   updatePhenotype,
   updateAnalyte,
