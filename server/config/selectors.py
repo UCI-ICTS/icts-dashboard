@@ -323,7 +323,7 @@ def compare_data(old_data:dict, new_data:dict) -> dict:
     for attr, value in new_data.items():
         try:
             if old_data[attr] != value and old_data[attr] != str(value):
-                print(f"{attr}: {old_data[attr]} to {value}")
+                # print(f"{attr}: {old_data[attr]} to {value}")
                 changes[attr] = f"{old_data[attr]} to {value}"
         except KeyError as error:
             print("ERROR: ", error)

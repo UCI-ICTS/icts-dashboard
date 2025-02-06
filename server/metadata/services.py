@@ -226,7 +226,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
 
     def _set_relationship(self, instance, model, ids, related_name):
         # Setting ManyToMany relations
-        print(instance, model, ids, related_name)  # Debugging
+        # print(instance, model, ids, related_name)  # Debugging
         try:
             manager = getattr(instance, related_name)
             if model == ReportedRace:  # Special handling for ReportedRace
