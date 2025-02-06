@@ -133,7 +133,11 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
                 </DialogActions>
 
                 {Object.entries(selectedRow).map(([key, value]) => {
-                  const fieldSchema = schema.properties[key];
+                  const fieldSchema = schema.properties?.[key];
+                  if (!fieldSchema) {
+                    console.warn(`Warning: Key "${key}" not found in schema.properties`);
+                    return null; // Skip rendering if schema does not define the key
+                  }
                   return (
                     <Grid container spacing={2} key={key} alignItems="center">
                       <Grid item>

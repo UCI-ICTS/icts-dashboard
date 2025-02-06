@@ -34,11 +34,18 @@ from metadata.services import (
 
 from experiments.models import (
     Experiment,
-
+    ExperimentDNAShortRead,
+    ExperimentPacBio,
+    ExperimentNanopore,
+    ExperimentRNAShortRead
 )
 
 from experiments.services import (
-    ExperimentSerializer
+    ExperimentSerializer,
+    ExperimentShortReadSerializer,
+    ExperimentNanoporeSerializer,
+    ExperimentPacBioSerializer,
+    ExperimentRnaSerializer
 )
 
 class GetAllTablesAPI(APIView):
@@ -67,6 +74,10 @@ class GetAllTablesAPI(APIView):
 
             # Experiment Models
             serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
+            serialized_dna = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
+            serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
+            serialized_pacbio = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
+            serialized_rna = ExperimentRnaSerializer(ExperimentRNAShortRead.objects.all(), many=True)
             
 
             serilized_return_data = {
@@ -77,7 +88,12 @@ class GetAllTablesAPI(APIView):
                 'analytes': serialized_analytes.data,
                 'phenotypes': serialized_phenotypes.data,
                 # Experiment Tables
-                'experiments': serialized_experiments.data
+                'experiments': serialized_experiments.data,
+                'experiment_dna_short_read' : serialized_dna.data,
+                'experiment_nanopore': serialized_nanopore.data,
+                'experiment_pac_bio': serialized_pacbio.data,
+                'experiment_rna_short_read': serialized_rna.data
+
             }
             # time.sleep(5)
             return Response(status=status.HTTP_200_OK, data=serilized_return_data)

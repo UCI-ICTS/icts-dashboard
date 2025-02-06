@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 # experiments/apis.py
 
-import json
 from config.selectors import TableValidator, response_constructor, response_status
-from django.db import transaction
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from config.selectors import bulk_retrieve
+
+from search.selectors import create_or_update
+
+from experiments.models import (
+    Experiment,
+    ExperimentDNAShortRead,
+    ExperimentNanopore,
+    ExperimentPacBio,
+    ExperimentRNAShortRead
+)
 from experiments.services import (
     AlignedDNAShortReadSerializer,
     AlignedNanoporeSerializer,
@@ -25,25 +40,11 @@ from experiments.selectors import (
     get_aligned_nanopore,
     get_aligned_rna,
     get_experiment,
-    get_experiment_dna_short_read,
-    get_experiment_nanopore,
-    get_experiment_pac_bio,
-    get_experiment_rna,
-    parse_nanopore,
-    parse_rna,
     parse_nanopore_aligned,
-    parse_pac_bio,
     parse_pac_bio_aligned,
     parse_rna_aligned,
-    parse_short_read,
     parse_short_read_aligned,
 )
-from rest_framework import status, serializers
-
-# from rest_framework.authtoken.models import Token
-# from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 
 class CreateOrUpdateAlignedShortRead(APIView):
@@ -196,146 +197,72 @@ class CreateOrUpdateAlignedShortRead(APIView):
 
 
 class CreateOrUpdateExperimentShortReadApi(APIView):
-    """Creating or Updating DNA Short Read Experiment
+    """API endpoint for creating or updating DNA short read experiment entries.
 
-    API endpoint for creating or updating DNA short read experiment entries.
+    This API endpoint accepts a list of DNA short read experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'experiment_dna_short_read_id'.
 
-    This endpoint accepts multiple DNA short read experiment entries and attempts
-    to create new records or update existing ones based on the provided experiment ID.
-    It validates both the experiment data and the associated short read data against
-    specified JSON schema to ensure data integrity before processing. If validation
-    or processing fails for any record, detailed error information is returned.
-
-    Attributes:
-        post (request): Processes a list of DNA short read experiment data. Each entry
-        is validated and then processed to either update an existing record or create a new one.
-        The results for each entry are collected and returned in the response.
-
-    Methods:
-        post(request): Takes a request containing JSON data in the form of a list
-        of experiment data entries. Each entry should include details about the experiment
-        and the associated short read. Validates and processes each entry individually.
-
-    Raises:
-        Exception: Catches any exceptions during processing and returns an error status.
-
-    Returns:
-        Response: A response object containing the results for each submitted experiment
-        entry, including success messages or details about any errors encountered.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_short_read",
+        operation_id="update_dna_short_read",
         request_body=ExperimentShortReadSerializer(many=True),
         responses={
-            200: "All submissions of experiments were successfull",
-            207: "Some submissions of experiments were not successful.",
+            200: "All submissions of DNA short read experiments were successfull",
+            207: "Some submissions of DNA short read experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        dna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=ExperimentDNAShortRead,
+            id="experiment_dna_short_read_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["experiment_dna_short_read_id"]
-                experiment_data = {
-                    "experiment_id": "experiment_dna_short_read" + "." + identifier,
-                    "table_name": "experiment_dna_short_read",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                }
-
-                experiment_results = ExperimentService.validate_experiment(
-                    experiment_data, validator
-                )
-                parsed_short_read = parse_short_read(short_read=datum)
-                validator.validate_json(
-                    json_object=parsed_short_read,
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
                     table_name="experiment_dna_short_read",
+                    identifier = datum["experiment_dna_short_read_id"],
+                    model_instance = dna_short_read.get(datum["experiment_dna_short_read_id"]),
+                    datum = datum
                 )
-                short_read_results = validator.get_validation_results()
-                if (
-                    short_read_results["valid"] is True
-                    and experiment_results["valid"] is True
-                ):
-                    existing_short_read = get_experiment_dna_short_read(
-                        experiment_dna_short_read_id=identifier
-                    )
-                    short_read_serializer = ExperimentShortReadSerializer(
-                        existing_short_read, data=parsed_short_read
-                    )
-                    experiment_serializer = (
-                        ExperimentService.create_or_update_experiment(experiment_data)
-                    )
-                    short_read_valid = short_read_serializer.is_valid()
-                    experiment_valid = experiment_serializer.is_valid()
-                    if experiment_valid and short_read_valid:
-                        short_read_instance = short_read_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="UPDATED" if existing_short_read else "CREATED",
-                                code=200 if existing_short_read else 201,
-                                message=(
-                                    f"Short read experiment {identifier} updated."
-                                    if existing_short_read
-                                    else f"Short read experiment {identifier} created."
-                                ),
-                                data=ExperimentShortReadSerializer(
-                                    short_read_instance
-                                ).data,
-                            )
-                        )
-                        accepted_requests = True
 
-                    else:
-                        error_data = [
-                            {item: short_read_serializer.errors[item]}
-                            for item in short_read_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: experiment_serializer.errors[item]}
-                            for item in experiment_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = short_read_results["errors"] + experiment_results["errors"]
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            # import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["experiment_dna_short_read_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -484,128 +411,72 @@ class CreateOrUpdateAlignedPacBio(APIView):
 
 
 class CreateOrUpdateExperimentPacBio(APIView):
+    """API view to create or update PacBio experiments.
+
+    This API endpoint accepts a list of PacBio experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'experiment_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
-    API view to create or update PacBio experiments.
 
-    This view handles the POST request to create or update multiple PacBio experiments.
-    It validates each experiment's data and constructs a response indicating the status
-    of each operation.
-
-    Args:
-        request (Request): The request object containing the data to process.
-
-    Returns:
-        Response: The response object containing the status and data of the operations.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="create_pac_bio",
+        operation_id="experiment_pac_bio",
         request_body=ExperimentPacBioSerializer(many=True),
         responses={
-            200: "All submissions of experiments were successfull",
-            207: "Some submissions of experiments were not successful.",
+            200: "All submissions of PacBio experiments were successfull",
+            207: "Some submissions of PacBio experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        dna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=ExperimentPacBio,
+            id="experiment_pac_bio_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["experiment_pac_bio_id"]
-                experiment_data = {
-                    "experiment_id": "experiment_pac_bio" + "." + identifier,
-                    "table_name": "experiment_pac_bio",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                }
-                experiment_results = ExperimentService.validate_experiment(
-                    experiment_data, validator
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
+                    table_name="experiment_pac_bio",
+                    identifier = datum["experiment_pac_bio_id"],
+                    model_instance = dna_short_read.get(datum["experiment_pac_bio_id"]),
+                    datum = datum
                 )
-                parsed_pac_bio = parse_pac_bio(pac_bio_datum=datum)
-                validator.validate_json(
-                    json_object=parsed_pac_bio, table_name="experiment_pac_bio"
-                )
-                pac_bio_results = validator.get_validation_results()
-                if (
-                    pac_bio_results["valid"] is True
-                    and experiment_results["valid"] is True
-                ):
-                    existing_pac_bio = get_experiment_pac_bio(
-                        experiment_pac_bio_id=identifier
-                    )
-                    pac_bio_serializer = ExperimentPacBioSerializer(
-                        existing_pac_bio, data=parsed_pac_bio
-                    )
-                    experiment_serializer = (
-                        ExperimentService.create_or_update_experiment(experiment_data)
-                    )
-                    pac_bio_valid = pac_bio_serializer.is_valid()
-                    experiment_valid = experiment_serializer.is_valid()
-                    if experiment_valid and pac_bio_valid:
-                        pac_bio_instance = pac_bio_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="UPDATED" if existing_pac_bio else "CREATED",
-                                code=200 if existing_pac_bio else 201,
-                                message=(
-                                    f"PacBio experiment {identifier} updated."
-                                    if existing_pac_bio
-                                    else f"PacBio experiment {identifier} created."
-                                ),
-                                data=ExperimentPacBioSerializer(pac_bio_instance).data,
-                            )
-                        )
-                        accepted_requests = True
 
-                    else:
-                        error_data = [
-                            {item: pac_bio_serializer.errors[item]}
-                            for item in pac_bio_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: experiment_serializer.errors[item]}
-                            for item in experiment_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = pac_bio_results["errors"] + experiment_results["errors"]
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            # import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["experiment_pac_bio_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -759,128 +630,70 @@ class CreateOrUpdateAlignedNanopore(APIView):
 class CreateOrUpdateExperimentNanopore(APIView):
     """API view to create or update Nanopore experiments.
 
-    This view handles the POST request to create or update multiple Nanopore experiments.
-    It validates each experiment's data and constructs a response indicating the status
-    of each operation.
+    This API endpoint accepts a list of Nanopore experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'experiment_nanopore_id'.
 
-    Args:
-        request (Request): The request object containing the data to process.
-
-    Returns:
-        Response: The response object containing the status and data of the operations.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_nanopoer",
+        operation_id="update_nanopore",
         request_body=ExperimentNanoporeSerializer(many=True),
         responses={
             200: "All submissions of Nanopore experiments were successfull",
             207: "Some submissions of Nanopore experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        dna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=ExperimentNanopore,
+            id="experiment_nanopore_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["experiment_nanopore_id"]
-                experiment_data = {
-                    "experiment_id": "experiment_nanopore" + "." + identifier,
-                    "table_name": "experiment_nanopore",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                }
-                experiment_results = ExperimentService.validate_experiment(
-                    experiment_data, validator
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
+                    table_name="experiment_nanopore",
+                    identifier = datum["experiment_nanopore_id"],
+                    model_instance = dna_short_read.get(datum["experiment_nanopore_id"]),
+                    datum = datum
                 )
-                parsed_nanopore = parse_nanopore(nanopore=datum)
-                validator.validate_json(
-                    json_object=parsed_nanopore, table_name="experiment_nanopore"
-                )
-                nanopore_results = validator.get_validation_results()
 
-                if (
-                    nanopore_results["valid"] is True
-                    and experiment_results["valid"] is True
-                ):
-                    existing_nanopore = get_experiment_nanopore(
-                        experiment_nanopore_id=identifier
-                    )
-                    nanopore_serializer = ExperimentNanoporeSerializer(
-                        existing_nanopore, data=parsed_nanopore
-                    )
-                    experiment_serializer = (
-                        ExperimentService.create_or_update_experiment(experiment_data)
-                    )
-                    nanopore_valid = nanopore_serializer.is_valid()
-                    experiment_valid = experiment_serializer.is_valid()
-                    if experiment_valid and nanopore_valid:
-                        nanopore_instance = nanopore_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="UPDATED" if existing_nanopore else "CREATED",
-                                code=200 if existing_nanopore else 201,
-                                message=(
-                                    f"Nanopore experiment {identifier} updated."
-                                    if existing_nanopore
-                                    else f"Nanopore experiment {identifier} created."
-                                ),
-                                data=ExperimentNanoporeSerializer(
-                                    nanopore_instance
-                                ).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: nanopore_serializer.errors[item]}
-                            for item in nanopore_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: experiment_serializer.errors[item]}
-                            for item in experiment_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = nanopore_results["errors"] + experiment_results["errors"]
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            # import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["experiment_nanopore_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -1022,115 +835,70 @@ class CreateOrUpdateAlignedRna(APIView):
 class CreateOrUpdateExperimentRna(APIView):
     """API view to create or update short read RNA experiments.
 
-    This view handles the POST request to create or update multiple short read RNA experiments.
-    It validates each experiment's data and constructs a response indicating the status
-    of each operation.
+    This API endpoint accepts a list of short read RNA experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'experiment_dna_short_read_id'.
 
-    Args:
-        request (Request): The request object containing the data to process.
-
-    Returns:
-        Response: The response object containing the status and data of the operations.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_short_rna",
-        request_body=ExperimentRnaSerializer(many=True),
+        operation_id="update_rna_short_read",
+        request_body=ExperimentShortReadSerializer(many=True),
         responses={
-            200: "All submissions of RNA experiments were successfull",
-            207: "Some submissions of RNA experiments were not successful.",
+            200: "All submissions of RNA short read experiments were successfull",
+            207: "Some submissions of RNA short read experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        rna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=ExperimentRNAShortRead,
+            id="experiment_rna_short_read_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["experiment_rna_short_read_id"]
-                parsed_rna, experiment_data = parse_rna(rna_datum=datum)
-                experiment_results = ExperimentService.validate_experiment(
-                    experiment_data, validator
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update(
+                    table_name="experiment_rna_short_read",
+                    identifier = datum["experiment_rna_short_read_id"],
+                    model_instance = rna_short_read.get(datum["experiment_rna_short_read_id"]),
+                    datum = datum
                 )
-                validator.validate_json(
-                    json_object=parsed_rna, table_name="experiment_rna_short_read"
-                )
-                rna_results = validator.get_validation_results()
-                if rna_results["valid"] is True and experiment_results["valid"] is True:
-                    existing_rna = get_experiment_rna(experiment_rna=identifier)
-                    rna_serializer = ExperimentRnaSerializer(
-                        existing_rna, data=parsed_rna
-                    )
-                    experiment_serializer = (
-                        ExperimentService.create_or_update_experiment(experiment_data)
-                    )
-                    rna_valid = rna_serializer.is_valid()
 
-                    experiment_valid = experiment_serializer.is_valid()
-                    if experiment_valid and rna_valid:
-                        rna_instance = rna_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="UPDATED" if existing_rna else "CREATED",
-                                code=200 if existing_rna else 201,
-                                message=(
-                                    f"Short read RNA experiment {identifier} updated."
-                                    if existing_rna
-                                    else f"Short read RNA experiment {identifier} created."
-                                ),
-                                data=ExperimentRnaSerializer(rna_instance).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: rna_serializer.errors[item]}
-                            for item in rna_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: experiment_serializer.errors[item]}
-                            for item in experiment_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = rna_results["errors"] + experiment_results["errors"]
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            # import pdb; pdb.set_trace()
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["experiment_rna_short_read_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 

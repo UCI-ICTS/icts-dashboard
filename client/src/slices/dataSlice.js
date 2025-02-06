@@ -15,6 +15,10 @@ const initialState = {
   analytes: [],
   phenotypes: [],
   experiments: [],
+  experiment_dna_short_read: [],
+  experiment_rna_short_read: [],
+  experiment_pac_bio: [], 
+  experiment_nanopore: [], 
   status: "idle"
 };
 
@@ -26,6 +30,7 @@ export const dataSlice = createSlice({
       state.jsonData = action.payload;
     },
     setTableView: (state, action) => {
+      console.log(action.payload)
       state.tableView = action.payload.schema;
       state.tableID = action.payload.identifier;
       state.tableName = action.payload.name;
@@ -40,8 +45,13 @@ export const dataSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
-        const { participants, families, genetic_findings, analytes, phenotypes, experiments } = action.payload;
-        Object.assign(state, { participants, families, genetic_findings, analytes, phenotypes, experiments, status: "fulfilled" });
+        const { 
+          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore 
+        } = action.payload;
+        
+        Object.assign(state, { 
+          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, status: "fulfilled" 
+        });
       })
       .addCase(updateTable.fulfilled, (state, action) => {
         state.status = "fulfilled";
@@ -62,7 +72,11 @@ export const dataSlice = createSlice({
                                  table === "genetic_findings_id" ? "genetic_findings" :
                                  table === "analyte_id" ? "analytes" :
                                  table === "phenotype_id" ? "phenotypes" :
-                                 table === "experiment_id" ? "experiments" : null 
+                                 table === "experiment_id" ? "experiments" : 
+                                 table === "experiment_dna_short_read_id" ? "experiment_dna_short_read" :
+                                 table === "experiment_rna_short_read_id" ? "experiment_rna_short_read" :
+                                 table === "experiment_pac_bio_id" ? "experiment_pac_bio" :
+                                 table === "experiment_nanopore_id" ? "experiment_nanopore" : null
       
           if (collectionName && state[collectionName]) {
             // Find the object to update in the relevant collection
@@ -119,12 +133,25 @@ export const updateTable = createAsyncThunk(
       if (table === "phenotype_id") {
         return dataService.updatePhenotype(data, token);
       }
+      if (table === "experiment_dna_short_read_id") {
+        console.log("stuff")
+        return dataService.updateDnaShortRead(data, token);
+      }
+      if (table === "experiment_rna_short_read_id") {
+        return dataService.updateRnaShortRead(data, token);
+      }
+      if (table === "experiment_pac_bio_id") {
+        return dataService.updatePacBio(data, token);
+      }
+      if (table === "experiment_nanopore_id") {
+        return dataService.updateNanoPore(data, token);
+      }
       throw new Error("Invalid table type");
     }
     try {
+      console.log('herwe', table, data, token)
       const response = await apiCall(table, data, token);
       const payload = {response: response.data, table}
-      console.log('herwe')
       if (response.data[0].message.includes("had no changes.")) {
         thunkAPI.dispatch(setMessage(`${payload.table} ${response.data[0].identifier} had no changes`));
         // Return a payload with a flag indicating no change
