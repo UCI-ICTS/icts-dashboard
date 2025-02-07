@@ -63,7 +63,7 @@ function NavBar() {
               to="/"
               className="navbar-link"
             >
-              UCI ITCS Dashboard
+              UCI ICTS Dashboard
             </Typography>
           </Tooltip>
           {auth.isLoggedIn === true ?(
