@@ -1,236 +1,173 @@
-import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import {
+import React, { useState, useMemo } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { 
   Box,
-  Button, 
-  FormControlLabel,
-  IconButton,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  TableSortLabel,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Toolbar,
   Tooltip,
   TextField,
-} from "@material-ui/core";
-import "../App.css";
-import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils';
-import { useSelector } from 'react-redux';
-import FormDialogue from './FormDialogue';
-import CircularProgress from '@mui/material/CircularProgress';
-import DownloadTSVButton from './TableDownload';
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import DownloadTSVButton from "./TableDownload";
+import FormDialogue from "./FormDialogue";
 
-const generateHeadCells = (schema) => {
-  return schema
-    ? Object.entries(schema.properties).map(([key, value]) => ({
-        id: key,
-        numeric: value.type === 'number',
-        disablePadding: false,
-        label: value.label || key,
-        description: value.description || key,
-      }))
-    : [];
-};
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) return -1;
-  if (b[orderBy] > a[orderBy]) return 1;
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function EnhancedTableHead({ headCells, order, orderBy, onRequestSort }) {
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-
-  return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden} />
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-EnhancedTableHead.propTypes = {
-  headCells: PropTypes.array.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
-};
-
-export default function TableForm({ rows, schema, rowID }) {
-  const headCells = useMemo(() => generateHeadCells(schema), [schema]);
+const TableForm = ({ rows, schema, rowID }) => {
   const loadStatus = useSelector((state) => state.data.status);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState(rowID);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [dense, setDense] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false)
   const [selectedRow, setSelectedRow] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // ✅ **New: State for search query**
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleClick = (row) => {
-    setSelectedRow(row);
+  const [searchQuery, setSearchQuery] = useState(""); // General Search
+  const [selectedColumn, setSelectedColumn] = useState(""); // Column Filter
+  const [advancedFilters, setAdvancedFilters] = useState({}); // Advanced Filter State
+  const [openFilterDialog, setOpenFilterDialog] = useState(false); // Filter Dialog Toggle
+  
+  const handleRowClick = (params) => {
+    setSelectedRow(params.row);
     setOpenDialog(true);
+  };  
+
+  // Define columns with filterable options
+  const columns = useMemo(
+    () =>
+      Object.entries(schema.properties).map(([key, value]) => ({
+        field: key,
+        headerName: value.label || key,
+        width: 150,
+        minWidth: 100,
+        flex: 0,
+        resizable: true,
+        sortable: true,
+      })),
+    [schema]
+  );
+
+  // Advanced Filter Logic
+  const applyFilters = (row) => {
+    return Object.entries(advancedFilters).every(([column, filterValue]) => {
+      if (!filterValue) return true;
+      const cellValue = row[column]?.toString().toLowerCase() || "";
+      return cellValue.includes(filterValue.toLowerCase());
+    });
   };
 
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-    setSelectedRow(null);
-  };
-
-  const handleAddNewRow = () => {
-    const emptyRow = Object.keys(schema.properties).reduce((acc, key) => {
-      acc[key] = "";
-      return acc;
-    }, {});
-    setSelectedRow(emptyRow);
-    setOpenDialog(true);
-  };
-
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const handleChangeDense = (event) => setDense(event.target.checked);
-
-  // ✅ **New: Filter rows based on search query**
+  // Full Search Logic (Text Query + Advanced Filters)
   const filteredRows = useMemo(() => {
-    return rows.filter((row) =>
-      Object.values(row).some(
-        (value) =>
-          value &&
-          value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [rows, searchQuery]);
-
-  // ✅ **Updated to use filtered rows**
-  const visibleRows = useMemo(() => {
-    return filteredRows
-      .sort(getComparator(order, orderBy))
-      .slice(
-        page * (rowsPerPage === -1 ? filteredRows.length : rowsPerPage),
-        rowsPerPage === -1 ? filteredRows.length : page * rowsPerPage + rowsPerPage
-      );
-  }, [filteredRows, order, orderBy, page, rowsPerPage]);
+    return rows.filter((row) => {
+      const rowString = Object.values(row).join(" ").toLowerCase();
+      const searchMatch = searchQuery === "" || rowString.includes(searchQuery.toLowerCase());
+      return searchMatch && applyFilters(row);
+    });
+  }, [rows, searchQuery, advancedFilters]);
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box className="box-flex">
-
-        <Button
+    <Box sx={{ width: "100%", height: 600 }}>
+      <Toolbar>
+        {/* General Search Input */}
+        <SearchIcon />
+        <TextField
+          id="search"
+          label="Search All Fields"
           variant="outlined"
-          color="primary"
-          onClick={handleAddNewRow}
-          style={{ margin: '10px 0' }}
-          disabled={visibleRows.length === 0 || searchQuery !== ""}
-        >
-          Add Row
-        </Button>
-
-        <TablePagination
-          rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}
-          component="div"
-          count={filteredRows.length} // Count from filtered rows
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          fullWidth
         />
 
-        <Toolbar>
-          <SearchIcon />
-          <TextField
-            id="search"
-            label="Search"
-            variant="standard"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            fullWidth
-          />
-          <Tooltip title="Advanced Search">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
+        {/* Column-Specific Search */}
+        {/* <FormControl sx={{ minWidth: 200, marginLeft: 2 }}>
+          <InputLabel>Filter by Column</InputLabel>
+          <Select
+            value={selectedColumn}
+            onChange={(e) => setSelectedColumn(e.target.value)}
+          >
+            {columns.map((col) => (
+              <MenuItem key={col.field} value={col.field}>
+                {col.headerName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl> */}
 
-        <Box className="box-flex">
-          <DownloadTSVButton 
-            rows={filteredRows}
-            headCells={headCells}
-            disabled={searchQuery == ""}
-          />
+        {/* Open Advanced Filters */}
+        <Tooltip title="Advanced Filters">
+          <Button
+            startIcon={<FilterListIcon />}
+            onClick={() => setOpenFilterDialog(true)}
+          >
+            Advanced Filters
+          </Button>
+        </Tooltip>
+
+        {/* Download Button */}
+        <DownloadTSVButton 
+          rows={filteredRows} 
+          headCells={columns} 
+          disabled={
+            searchQuery === "" && 
+            Object.values(advancedFilters).every(value => !value)
+          }
+        />
+      </Toolbar>
+
+      {/* Advanced Filters Dialog */}
+      <Dialog open={openFilterDialog} onClose={() => setOpenFilterDialog(false)}>
+        <DialogTitle>Advanced Filters</DialogTitle>
+        <DialogContent>
+          {columns.map((col) => (
+            <TextField
+              key={col.field}
+              label={`Filter by ${col.headerName}`}
+              variant="outlined"
+              value={advancedFilters[col.field] || ""}
+              onChange={(e) =>
+                setAdvancedFilters((prev) => ({
+                  ...prev,
+                  [col.field]: e.target.value,
+                }))
+              }
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAdvancedFilters({})}>Clear</Button>
+          <Button onClick={() => setOpenFilterDialog(false)}>Apply</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Data Table */}
+      {loadStatus === "loading" ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
         </Box>
-      </Box>
-
-      <TableContainer>
-        {loadStatus === "loading" ? (
-          <Box className="box-flex">
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-            <EnhancedTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
-            <TableBody>
-              {visibleRows.map((row, index) => (
-                <TableRow hover onClick={() => handleClick(row)} key={row[rowID]} sx={{ cursor: 'pointer' }}>
-                  {headCells.map((cell) => (
-                    <TableCell key={cell.id} align={cell.numeric ? 'right' : 'left'}>
-                      {row[cell.id] || ""}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
-
-      <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
-
-      <FormDialogue open={openDialog} onClose={handleDialogClose} schema={schema} selectedRow={selectedRow} rowID={rowID} identifier={headCells.length > 0 ? headCells[0].label : ""} />
+      ) : (
+        <DataGrid
+          rows={filteredRows}
+          columns={columns}
+          getRowId={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
+          pageSize={25}
+          rowsPerPageOptions={[25, 50, 100]}
+          disableSelectionOnClick
+          onRowClick={handleRowClick}
+          checkboxSelection={false}
+        />
+      )}
+      <FormDialogue
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        schema={schema}
+        selectedRow={selectedRow}
+        rowID={rowID}
+      />
     </Box>
   );
-}
+};
+
+export default TableForm;
