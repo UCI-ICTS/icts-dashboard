@@ -43,9 +43,15 @@ const TableForm = ({ rows, schema, rowID }) => {
         flex: 0,
         resizable: true,
         sortable: true,
+        sortComparator: (v1, v2) => {
+          const num1 = parseFloat(v1);
+          const num2 = parseFloat(v2);
+          return (isNaN(num1) || isNaN(num2)) ? v1.localeCompare(v2) : num1 - num2;
+        },
       })),
     [schema]
   );
+  
 
   // Advanced Filter Logic
   const applyFilters = (row) => {

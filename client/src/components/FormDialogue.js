@@ -1,7 +1,6 @@
 // src/components/FormDialogue.js
-
-import React, { useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useMemo } from "react";
+import PropTypes from "prop-types";
 import {
   Dialog,
   DialogTitle,
@@ -19,286 +18,238 @@ import {
   MenuItem,
   InputLabel,
   FormHelperText,
-} from "@material-ui/core";
-import { Formik, Form, FieldArray } from 'formik';
-import * as Yup from 'yup';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateTable } from '../slices/dataSlice';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+} from "@mui/material";
+import { Formik, Form, FieldArray } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { updateTable } from "../slices/dataSlice";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
-// Utility function to convert JSON schema to Yup validation schema
+/**
+ * Converts JSON schema into a Yup validation schema
+ */
 const jsonSchemaToYup = (jsonSchema) => {
-    const yupSchema = {};
-  
-    Object.entries(jsonSchema.properties).forEach(([key, value]) => {
-      let validator = Yup.mixed();
-  
-      // Add validation based on type
-      if (value.type === 'string') {
-        validator = Yup.string();
-        if (value.minLength) validator = validator.min(value.minLength);
-        if (value.maxLength) validator = validator.max(value.maxLength);
-      } else if (value.type === 'integer') {
-        validator = Yup.number().integer()
-          .typeError(`${key} must be a valid integer`) // Error for non-integer values
-        if (value.minimum) validator = validator.min(value.minimum);
-        if (value.maximum) validator = validator.max(value.maximum);
-       } else if (value.type === 'number') {
-        validator = Yup.number()
-          .typeError(`${key} must be a valid number`) // Error for non-numeric values
-        if (value.minimum) validator = validator.min(value.minimum);
-        if (value.maximum) validator = validator.max(value.maximum);
-      } else if (value.type === 'array' && value.items?.enum) {
-        validator = Yup.array()
-          .of(Yup.string().oneOf(value.items.enum))
-          .min(1, `${key} must have at least one selected value`);
-      }
-    
-      // Mark field as required if it's in the "required" list
-      if (jsonSchema.required && jsonSchema.required.includes(key)) {
-        validator = validator.required(`${key} is required`);
-      }
-  
-      yupSchema[key] = validator;
-    });
-  
-    return Yup.object().shape(yupSchema);
-  };
+  const yupSchema = {};
+
+  Object.entries(jsonSchema.properties).forEach(([key, value]) => {
+    let validator = Yup.mixed();
+
+    if (value.type === "string") {
+      validator = Yup.string().min(value.minLength || 0).max(value.maxLength || 255);
+    } else if (value.type === "integer") {
+      validator = Yup.number()
+        .integer()
+        .typeError(`${key} must be a valid integer`)
+        .min(value.minimum || Number.MIN_SAFE_INTEGER)
+        .max(value.maximum || Number.MAX_SAFE_INTEGER);
+    } else if (value.type === "number") {
+      validator = Yup.number()
+        .typeError(`${key} must be a valid number`)
+        .min(value.minimum || Number.MIN_SAFE_INTEGER)
+        .max(value.maximum || Number.MAX_SAFE_INTEGER);
+    } else if (value.type === "array" && value.items?.enum) {
+      validator = Yup.array()
+        .of(Yup.string().oneOf(value.items.enum))
+        .min(1, `${key} must have at least one selected value`);
+    }
+
+    if (jsonSchema.required?.includes(key)) {
+      validator = validator.required(`${key} is required`);
+    }
+
+    yupSchema[key] = validator;
+  });
+
+  return Yup.object().shape(yupSchema);
+};
 
 const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.account.user?.access_token);
-  const yupSchema = React.useMemo(() => jsonSchemaToYup(schema), [schema]);
-  
-  // Default initialization of selectedRow
-  const initialValues = React.useMemo(() => {
-      if (!selectedRow) return {};
 
-      const defaultValues = {};
-      Object.entries(schema.properties).forEach(([key, fieldSchema]) => {
-        if (fieldSchema.type === 'array') {
-          defaultValues[key] = Array.isArray(selectedRow?.[key]) ? selectedRow[key] : [];
-        } else if (fieldSchema.type === 'integer') {
-          defaultValues[key] = selectedRow?.[key] ?? null; // Use null for missing integer values
-        } else {
-          defaultValues[key] = selectedRow?.[key] ?? ''; // Default to an empty string for other types
-        }
-      });
-    
-      return defaultValues;
-    }, [selectedRow, schema]);
-    
+  const yupSchema = useMemo(() => jsonSchemaToYup(schema), [schema]);
+
+  const initialValues = useMemo(() => {
+    if (!selectedRow) return {};
+
+    return Object.entries(schema.properties).reduce((acc, [key, fieldSchema]) => {
+      acc[key] = fieldSchema.type === "array"
+        ? Array.isArray(selectedRow[key]) ? selectedRow[key] : []
+        : selectedRow[key] ?? (fieldSchema.type === "integer" ? null : "");
+      return acc;
+    }, {});
+  }, [selectedRow, schema]);
 
   const [initialFieldValues, setInitialFieldValues] = useState({});
 
   useEffect(() => {
     setInitialFieldValues(initialValues);
   }, [initialValues]);
-  
+
+  /**
+   * Renders the appropriate input field based on the schema definition
+   */
+  const renderField = (key, fieldSchema, values, handleChange, handleBlur, touched, errors) => {
+    if (fieldSchema.type === "array" && fieldSchema.items?.enum) {
+      return (
+        <div className="form-checkbox-group">
+          {/* Title above the checkbox group */}
+          <Tooltip title={fieldSchema.description || `Options for ${key}`} arrow>
+            <span className="form-checkbox-title">{key}</span>
+          </Tooltip>
+    
+          <FormGroup>
+            {fieldSchema.items.enum.map((option) => (
+              <FormControlLabel
+                key={option}
+                className="form-checkbox"
+                control={
+                  <Checkbox
+                    name={key}
+                    value={option}
+                    checked={values[key]?.includes(option)}
+                    onChange={(e) => {
+                      const updatedValues = e.target.checked
+                        ? [...(values[key] || []), option]
+                        : values[key].filter((val) => val !== option);
+                      handleChange({ target: { name: key, value: updatedValues } });
+                    }}
+                  />
+                }
+                label={option}
+              />
+            ))}
+          </FormGroup>
+    
+          {touched[key] && errors[key] && <FormHelperText error>{errors[key]}</FormHelperText>}
+        </div>
+      );
+    }
+    
+
+    if (fieldSchema.type === "array" && fieldSchema.items?.type === "string") {
+      return (
+        <FieldArray name={key}>
+          {(arrayHelpers) => (
+            <>
+              {Array.isArray(values[key]) &&
+                values[key]?.map((item, index) => (
+                  <Grid container spacing={1} alignItems="center" key={index}>
+                    <Grid item xs={10}>
+                    <Tooltip title={fieldSchema.description || `Item ${index + 1}`} arrow>
+                      <TextField
+                        name={`${key}.${index}`}
+                        value={item}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        fullWidth
+                        margin="normal"
+                        error={touched[key]?.[index] && Boolean(errors[key]?.[index])}
+                        helperText={touched[key]?.[index] && errors[key]?.[index]}
+                        label={`Item ${index + 1}`}
+                      />
+                      </Tooltip>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Button onClick={() => arrayHelpers.remove(index)} color="secondary">
+                        <RemoveCircleIcon />
+                      </Button>
+                    </Grid>
+                  </Grid>
+                ))}
+              <Button onClick={() => arrayHelpers.push("")} color="primary" startIcon={<AddCircleIcon />}>
+                Add Item
+              </Button>
+            </>
+          )}
+        </FieldArray>
+      );
+    }
+
+    if (fieldSchema.enum) {
+      return (
+        <FormControl fullWidth margin="normal">
+          <InputLabel id={`${key}-label`}>{key}</InputLabel>
+          <Select
+            labelId={`${key}-label`}
+            id={key}
+            name={key}
+            value={values[key] || ""}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched[key] && Boolean(errors[key])}
+          >
+            {fieldSchema.enum.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{touched[key] && errors[key]}</FormHelperText>
+        </FormControl>
+      );
+    }
+
+    return (
+      <TextField
+        label={key}
+        name={key}
+        type={fieldSchema.type === "integer" ? "number" : "text"}
+        inputProps={fieldSchema.type === "integer" ? { step: 1 } : {}}
+        value={values[key] || ""}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        fullWidth
+        disabled={initialFieldValues[key] !== "" && identifier === key}
+        margin="normal"
+        error={touched[key] && Boolean(errors[key])}
+        helperText={touched[key] && errors[key]}
+      />
+    );
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} className="dialog-form-container">
-      <DialogTitle className="dialog-form-title">{schema.title || "Form" } Details</DialogTitle>
-      <DialogContent className="dialog-form-content">
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{schema.title || "Form"} Details</DialogTitle>
+      <DialogContent>
         {selectedRow && (
           <Formik
             initialValues={initialValues}
             validationSchema={yupSchema}
             onSubmit={async (values) => {
               try {
-                // console.log(JSON.stringify(values))
-                const result = dispatch(updateTable({table:rowID, data: values, token:token}));
-                
-                if (result.meta.requestStatus === 'fulfilled') {
-                  onClose();
-                } else {
-                  console.log('Form error', result.error);
-                  onClose();
-                }
+                const result = dispatch(updateTable({ table: rowID, data: values, token }));
+                if (result.meta.requestStatus === "fulfilled") onClose();
               } catch (error) {
-                console.log('Form error', error);
+                console.error("Form error", error);
                 onClose();
               }
             }}
           >
             {({ values, handleChange, handleBlur, touched, errors }) => (
               <Form>
-                <DialogActions className="dialog-form-actions">
-                  <Button onClick={onClose} color="secondary">
-                    Close
-                  </Button>
-                  <Button type="submit" color="primary">
-                    Submit
-                  </Button>
-                </DialogActions>
-
-                {Object.entries(selectedRow).map(([key, value]) => {
-                  const fieldSchema = schema.properties?.[key];
-                  if (!fieldSchema) {
-                    console.warn(`Warning: Key "${key}" not found in schema.properties`);
-                    return null; // Skip rendering if schema does not define the key
-                  }
-                  return (
-                    <Grid container spacing={2} key={key} alignItems="center">
-                      <Grid item>
-                        <Tooltip title={fieldSchema.description || ''} arrow>
-                          <span style={{ fontWeight: 'bold' }}>{key}</span>
-                        </Tooltip>
-                      </Grid>
-                      <Grid item xs>
-                        {/* Handle arrays with enum => Checkbox */}
-                        {fieldSchema.type === 'array' && fieldSchema.items?.enum ? (
-                          <FormGroup>
-                            {fieldSchema.items.enum.map((option) => (
-                              <FormControlLabel
-                                key={option}
-                                control={
-                                  <Checkbox
-                                    name={key}
-                                    value={option}
-                                    checked={values[key]?.includes(option)}
-                                    onChange={(event) => {
-                                        const currentValues = values[key] || [];
-                                        if (event.target.checked) {
-                                        handleChange({
-                                            target: {
-                                            name: key,
-                                            value: [...currentValues, option],
-                                            },
-                                        });
-                                        } else {
-                                        handleChange({
-                                            target: {
-                                            name: key,
-                                            value: currentValues.filter((val) => val !== option),
-                                            },
-                                        });
-                                        }
-                                    }}
-                                  />
-                                }
-                                label={option}
-                              />
-                            ))}
-                            {touched[key] && errors[key] && (
-                                <FormHelperText error>{errors[key]}</FormHelperText>
-                            )}
-                          </FormGroup>
-                        ) : fieldSchema.type === 'array' && fieldSchema.items?.type === 'string' ? (
-                          <FieldArray name={key}>
-                            {/* Handle arrays with string => List of textbox */}
-                            {(arrayHelpers) => (
-                              <div>
-                                {Array.isArray(values[key]) && values[key]?.map((item, index) => (
-                                  <Grid container spacing={1} alignItems="center" key={index}>
-                                    <Grid item xs={10}>
-                                      <TextField
-                                        name={`${key}.${index}`}
-                                        value={item}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        margin="normal"
-                                        error={touched[key]?.[index] && Boolean(errors[key]?.[index])}
-                                        helperText={touched[key]?.[index] && errors[key]?.[index]}
-                                        label={`Item ${index + 1}`}
-                                      />
-                                    </Grid>
-                                    <Grid item xs={2}>
-                                      <Button
-                                        type="button"
-                                        onClick={() => arrayHelpers.remove(index)}
-                                        color="secondary"
-                                      >
-                                        <RemoveCircleIcon />
-                                      </Button>
-                                    </Grid>
-                                  </Grid>
-                                ))}
-                                <Button
-                                  type="button"
-                                  onClick={() => arrayHelpers.push([""])} // Add a new empty string to the array
-                                  color="primary"
-                                  startIcon={<AddCircleIcon />}
-                                >
-                                  Add Item
-                                </Button>
-                              </div>
-                            )}
-                          </FieldArray>
-                        ) : fieldSchema.enum ? (
-                          <FormControl fullWidth margin="normal">
-                            {/* // Handle dropdowns */}
-                            <InputLabel id={`${key}-label`}>{key}</InputLabel>
-                              <Select
-                                labelId={`${key}-label`}
-                                id={key}
-                                name={key}
-                                value={values[key] || ''}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={touched[key] && Boolean(errors[key])}
-                              >
-                              {fieldSchema.enum.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                  {option}
-                                </MenuItem>
-                              ))}
-                              </Select>
-                            <FormHelperText>{touched[key] && errors[key]}</FormHelperText>
-                          </FormControl>
-                        ) : fieldSchema.type === 'number' ? (
-                          <TextField
-                            label={key}
-                            name={key}
-                            value={values[key] || ''}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={touched[key] && Boolean(errors[key])}
-                            helperText={touched[key] && errors[key]}
-                          />
-                        ) : fieldSchema.type === 'integer' ? (
-                          <TextField
-                          label={key}
-                          name={key}
-                          type="number" // Use "number" type for integers
-                          inputProps={{ step: 1 }} // Ensures only integers can be entered
-                          value={values[key] || ''}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            handleChange({
-                              target: {
-                                name: key,
-                                value: value === '' ? '' : parseInt(value, 10), // Parse as integer
-                              },
-                            });
-                          }}
-                          onBlur={handleBlur}
-                          fullWidth
-                          margin="normal"
-                          error={touched[key] && Boolean(errors[key])}
-                          helperText={touched[key] && errors[key]}
-                        />
-                        ) : (
-                          <TextField
-                            label={key}// All other values
-                            name={key}
-                            value={values[key] || ''}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            disabled={initialFieldValues[key] !== '' && identifier == key}
-                            margin="normal"
-                            error={touched[key] && Boolean(errors[key])}
-                            helperText={touched[key] && errors[key]}
-                          />
-                        )}
-                      </Grid>
+                {Object.entries(selectedRow).map(([key]) => (
+                  <Grid container spacing={2} key={key} alignItems="center">
+                    <Grid item>
+                      <Tooltip title={
+                        schema.properties[key]?.description ||
+                        schema.properties[key]?.items?.description ||
+                        "Description unavailable"} arrow>
+                        <div style={{ display: "inline-block", fontWeight: "bold", cursor: "help" }}>
+                          {key}
+                        </div>
+                      </Tooltip>
                     </Grid>
-                  );
-                })}
+                    <Grid item xs>{}
+                      {renderField(key, schema.properties[key], values, handleChange, handleBlur, touched, errors)}
+                    </Grid>
+                  </Grid>
+                ))}
+                <DialogActions>
+                  <Button onClick={onClose} color="secondary">Close</Button>
+                  <Button type="submit" color="primary">Submit</Button>
+                </DialogActions>
               </Form>
             )}
           </Formik>
@@ -306,14 +257,6 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
       </DialogContent>
     </Dialog>
   );
-};
-
-DialogForm.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  schema: PropTypes.object.isRequired,
-  selectedRow: PropTypes.object,
-  rowID: PropTypes.string.isRequired,
 };
 
 export default DialogForm;
