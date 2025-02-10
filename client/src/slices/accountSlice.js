@@ -121,4 +121,45 @@ export const handleExpiredJWT = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  "auth/change_password",
+  async (values, thunkAPI) => {
+    try {
+      const response = await AccountService.changePassword(values);
+      thunkAPI.dispatch(setMessage("Password changed successfully"));
+      return response.data;
+    } catch (error) {
+      let message = "An error occurred";
+
+      if (error.response) {
+        const errorData = error.response.data;
+
+        // Handle "detail" errors (e.g., token issues)
+        if (errorData?.detail) {
+          message = errorData.detail;
+        } 
+        // Handle field validation errors (e.g., incorrect password)
+        else if (typeof errorData === "object") {
+          message = Object.entries(errorData)
+            .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
+            .join(" | "); // Join multiple field errors with " | "
+        } 
+        // Generic error message
+        else {
+          message = "Something went wrong";
+        }
+      } else if (error.message) {
+        message = error.message;
+      }
+
+      // Dispatch message to Redux state
+      thunkAPI.dispatch(setMessage(message));
+
+      // Reject the request and pass the message
+      return thunkAPI.rejectWithValue(message);
+    }
+
+  }
+);
+
 export const accountReducer = accountSlice.reducer

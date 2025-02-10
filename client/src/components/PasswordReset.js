@@ -2,95 +2,102 @@ import React from "react";
 import { 
   Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, TextField
 } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { Form, Formik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { Form, Formik, Field, ErrorMessage, useField } from "formik";
 import * as Yup from "yup";
-// import { changePassword } from ""../slices/accountSlice";
+import { changePassword } from "../slices/accountSlice";
 
-export default function PasswordReset ({open, setOpen}) {
+export default function PasswordReset({ open, setOpen }) {
   const dispatch = useDispatch();
+  const token = useSelector((state) => state.account.user.access_token);
   const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   return (
-    <Dialog open={open}>
-      <Card>
+    <Dialog open={open} onClose={handleClose}>
+      <Card sx={{ padding: 2 }}>
         <DialogTitle>Password Reset</DialogTitle>
         <Formik
           initialValues={{
-            old_password:"",
-            new_password:"",
-            confirm_password:""
+            old_password: "",
+            new_password: "",
+            confirm_password: "",
+            token: token
           }}
           validationSchema={Yup.object().shape({
             old_password: Yup.string()
-              .test(
-                "len",
-                "The password must be between 6 and 40 characters.",
-                (val) =>
-                  val &&
-                val.toString().length >= 6 &&
-                val.toString().length <= 40
-              )
+              .min(6, "Password must be at least 6 characters.")
+              .max(40, "Password must be at most 40 characters.")
               .required("This field is required!"),
             new_password: Yup.string()
-              .test(
-                "len",
-                "The password must be between 6 and 40 characters.",
-                (val) =>
-                  val &&
-                val.toString().length >= 6 &&
-                val.toString().length <= 40
-              )
+              .min(6, "Password must be at least 6 characters.")
+              .max(40, "Password must be at most 40 characters.")
               .required("This field is required!"),
             confirm_password: Yup.string()
               .oneOf([Yup.ref("new_password")], "Passwords must match")
               .required("This field is required!"),
           })}
-          onSubmit = {(values, {setSubmitting, resetForm}) => {
-            setSubmitting(true)
-            console.log(values)
-            // dispatch(changePassword(values))
-            //   .unwrap()
-            //   .then((response) => {
-            //     console.log(response)
-            //   })
-            //   .catch((error) => {
-            //     console.log(error)
-            //   })
-            setOpen(false)
-            resetForm()
-            setSubmitting(false)
+          onSubmit={async (values, { setSubmitting, resetForm }) => {
+            try {
+              dispatch(changePassword(values)); 
+              resetForm();
+              setOpen(false);
+            } catch (error) {
+              console.error("Password reset failed:", error);
+            } finally {
+              setSubmitting(false); 
+            }
           }}
         >
-          {({isSubmitting})=> (
+          {({ isSubmitting }) => (
             <Form>
               <DialogContent>
-                <TextField name='old_password' type='password' lable='Old Password' placeholder='Old Password'/><br/>
-                <TextField name='new_password' type='password' lable='New Password' placeholder='New Password'/><br/>
-                <TextField name='confirm_password' type='password'lable='Confirm Password' placeholder='Confirm Password'/><br/>
+                <FieldWithError name="old_password" label="Old Password" autoComplete="current-password" />
+                <FieldWithError name="new_password" label="New Password" autoComplete="new-password" />
+                <FieldWithError name="confirm_password" label="Confirm Password" autoComplete="new-password" />
               </DialogContent>
               <DialogActions>
                 <Button
                   id="submit-resetPassword"
                   disabled={isSubmitting}
-                  variant="outlined"
+                  variant="contained"
                   type="submit"
-                  // disabled={isSubmitting}
                   color="primary"
-                >submit</Button>
+                >
+                  Submit
+                </Button>
                 <Button
                   id="cancel-resetPassword"
                   onClick={handleClose}
                   variant="outlined"
                   color="secondary"
-                >CANCEL</Button>
+                >
+                  Cancel
+                </Button>
               </DialogActions>
             </Form>
           )}
         </Formik>
       </Card>
     </Dialog>
-  )
+  );
+}
+
+// Extracted Component for Handling Field Errors Properly
+function FieldWithError({ name, label, autoComplete }) {
+  const [field, meta] = useField(name);
+  return (
+    <TextField
+      {...field}
+      label={label}
+      fullWidth
+      margin="dense"
+      variant="outlined"
+      type="password"
+      autoComplete={autoComplete}
+      error={meta.touched && Boolean(meta.error)}
+      helperText={meta.touched && meta.error}
+    />
+  );
 }
