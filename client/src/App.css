@@ -207,6 +207,43 @@
   margin: 5px;
 }
 
+/* Style each checkbox group with a distinct border */
+.form-checkbox-group {
+  border: 2px solid rgba(0, 0, 0, 0.3); /* Slightly darker border for clarity */
+  border-radius: 6px; /* Rounded corners */
+  padding: 10px;
+  margin: 10px 0; /* Adds spacing between different checkbox groups */
+}
+
+/* Style individual checkbox options */
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  margin: 4px 0;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Highlight effect when hovering over a checkbox */
+.form-checkbox:hover {
+  border-color: rgba(0, 0, 0, 0.5);
+}
+
+/* More distinct border when checked */
+.form-checkbox input:checked + span {
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Add a clear label title above each group */
+.form-checkbox-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+  color: #333;
+}
+
 .box-flex {
   display: flex;
   justify-content: center;
