@@ -84,6 +84,7 @@ const TableForm = ({ rows, schema, rowID }) => {
     });
   }, [rows, searchQuery, advancedFilters]);
 
+  // Visable rows: Search results with pagination
   const visibleRows = useMemo(() => {
     if (rowsPerPage === -1) return filteredRows; // Show all rows
     return filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -148,7 +149,8 @@ const TableForm = ({ rows, schema, rowID }) => {
 
         {/* Download Button */}
         <DownloadTSVButton 
-          rows={filteredRows} 
+          rows={filteredRows}
+          rowID={rowID}
           headCells={columns} 
           disabled={
             searchQuery === "" && 
