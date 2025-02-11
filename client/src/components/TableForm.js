@@ -7,6 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  TablePagination,
   Toolbar,
   Tooltip,
   TextField,
@@ -19,6 +20,8 @@ import DownloadTSVButton from "./TableDownload";
 import FormDialogue from "./FormDialogue";
 
 const TableForm = ({ rows, schema, rowID }) => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const loadStatus = useSelector((state) => state.data.status);
   const [openDialog, setOpenDialog] = useState(false)
   const [selectedRow, setSelectedRow] = useState(null);
@@ -27,10 +30,21 @@ const TableForm = ({ rows, schema, rowID }) => {
   const [advancedFilters, setAdvancedFilters] = useState({}); // Advanced Filter State
   const [openFilterDialog, setOpenFilterDialog] = useState(false); // Filter Dialog Toggle
   
+  // Open dialogue for row
   const handleRowClick = (params) => {
     setSelectedRow(params.row);
     setOpenDialog(true);
   };  
+
+  // Add new row to table
+  const handleAddNewRow = () => {
+    const emptyRow = Object.keys(schema.properties).reduce((acc, key) => {
+      acc[key] = "";
+      return acc;
+    }, {});
+    setSelectedRow(emptyRow);
+    setOpenDialog(true);
+  };
 
   // Define columns with filterable options
   const columns = useMemo(
@@ -51,7 +65,6 @@ const TableForm = ({ rows, schema, rowID }) => {
       })),
     [schema]
   );
-  
 
   // Advanced Filter Logic
   const applyFilters = (row) => {
@@ -71,8 +84,31 @@ const TableForm = ({ rows, schema, rowID }) => {
     });
   }, [rows, searchQuery, advancedFilters]);
 
+  const visibleRows = useMemo(() => {
+    if (rowsPerPage === -1) return filteredRows; // Show all rows
+    return filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [filteredRows, page, rowsPerPage]);
+
   return (
-    <Box sx={{ width: "100%", height: 600 }}>
+    <Box >
+      <Box className="pagination-container">
+      <Button
+        variant="outlined"
+        color="primary"
+        onClick={handleAddNewRow}
+        style={{ margin: '10px 0' }}
+        disabled={visibleRows.length === 0 || searchQuery !== ""}
+        >Add Row</Button>
+      <TablePagination
+        rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}
+        component="div"
+        count={filteredRows.length} // Count from filtered rows
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        onRowsPerPageChange={(event) => setRowsPerPage(parseInt(event.target.value, 10))}
+        />
+        </Box>
       <Toolbar>
         {/* General Search Input */}
         <SearchIcon />
@@ -155,14 +191,14 @@ const TableForm = ({ rows, schema, rowID }) => {
         </Box>
       ) : (
         <DataGrid
-          rows={filteredRows}
+          rows={visibleRows}
           columns={columns}
           getRowId={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
-          pageSize={25}
-          rowsPerPageOptions={[25, 50, 100]}
           disableSelectionOnClick
           onRowClick={handleRowClick}
           checkboxSelection={false}
+          pagination={false}
+          hideFooter
         />
       )}
       <FormDialogue
