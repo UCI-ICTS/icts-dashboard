@@ -54,7 +54,7 @@ const Login = () => {
   }
 
   return (
-    <Container maxWidth="sm"> >
+    <Container maxWidth="sm">
       <Box className="login-box">
         <Container>
           <Grid item>
