@@ -29,7 +29,8 @@
 .outlet-container {
   display: flex;
   flex: 1;
-  padding-top: 75px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   overflow: hidden;
 }
 
@@ -207,50 +208,54 @@
   margin: 5px;
 }
 
-/* Style each checkbox group with a distinct border */
-.form-checkbox-group {
-  border: 2px solid rgba(0, 0, 0, 0.3); /* Slightly darker border for clarity */
-  border-radius: 6px; /* Rounded corners */
-  padding: 10px;
-  margin: 10px 0; /* Adds spacing between different checkbox groups */
-}
-
-/* Style individual checkbox options */
-.form-checkbox {
-  display: flex;
-  align-items: center;
-  padding: 5px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  margin: 4px 0;
-  transition: border-color 0.3s ease-in-out;
-}
-
-/* Highlight effect when hovering over a checkbox */
-.form-checkbox:hover {
-  border-color: rgba(0, 0, 0, 0.5);
-}
-
-/* More distinct border when checked */
-.form-checkbox input:checked + span {
-  border-color: rgba(0, 0, 0, 0.8);
-}
-
-/* Add a clear label title above each group */
-.form-checkbox-title {
-  font-weight: bold;
-  margin-bottom: 8px;
-  display: block;
-  color: #333;
-}
-
-.box-flex {
+/* Centering the Pagination */
+.pagination-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
-  padding: 0 16px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.responsive-table-wrapper {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  width: 100%;
+  overflow-x: auto; /* Allows scrolling on small screens */
+  padding: 16px; /* Optional padding */
+}
+
+.responsive-table-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  max-width: 1200px; /* Limits the width */
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
+  padding: 16px;
+}
+
+/* Responsive Columns */
+@media (min-width: 1200px) {
+  .responsive-table-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (max-width: 1199px) and (min-width: 900px) {
+  .responsive-table-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 899px) and (min-width: 600px) {
+  .responsive-table-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .responsive-table-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .table-container {
