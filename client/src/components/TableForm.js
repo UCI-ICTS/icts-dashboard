@@ -98,7 +98,7 @@ const TableForm = ({ rows, schema, rowID }) => {
         color="primary"
         onClick={handleAddNewRow}
         style={{ margin: '10px 0' }}
-        disabled={visibleRows.length === 0 || searchQuery !== ""}
+        // disabled={visibleRows === 0 || searchQuery !== ""}
         >Add Row</Button>
       <TablePagination
         rowsPerPageOptions={[25, 50, 75, 100, { label: 'Show all', value: -1 }]}

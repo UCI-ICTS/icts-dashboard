@@ -273,8 +273,8 @@ class Phenotype(models.Model):
         default="unknown",
         help_text="Age range at the onset of the phenotype",
     )
-    additional_modifiers = models.TextField(
-        blank=True, help_text="Additional modifiers that further specify the phenotype"
+    additional_modifiers = models.JSONField(
+        default=list, blank=True, help_text="List of additional modifiers (HPO/MONDO terms)"
     )
     syndromic = models.CharField(
         max_length=50,
@@ -514,7 +514,7 @@ class Analyte(models.Model):
     tissue_affected_status = models.CharField(
         max_length=50,
         choices=YesNo.choices,
-        default=False,
+        default="No",
         help_text="If applicable to disease (suspected mosaic), indicates if the tissue is from an affected source.",
     )
     age_at_collection = models.FloatField(

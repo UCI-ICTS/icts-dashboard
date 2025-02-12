@@ -158,8 +158,8 @@ def create_or_update(table_name: str, identifier: str, model_instance, datum: di
         },
         "experiment_rna_short_read": {
             "input_serializer": ExperimentRnaSerializer,
-            "output_serializer": ExperimentRnaSerializer,
-            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
+            "output_serializer": ExperimentRnaSerializer#,
+            # "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         },
         "aligned_dna_short_read": {
             "input_serializer": AlignedDNAShortReadSerializer,
@@ -193,7 +193,6 @@ def create_or_update(table_name: str, identifier: str, model_instance, datum: di
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
-    
     if results["valid"]:
         changes = compare_data(
             old_data=model_output_serializer(model_instance).data,

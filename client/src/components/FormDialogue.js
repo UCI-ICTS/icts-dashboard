@@ -51,7 +51,10 @@ const jsonSchemaToYup = (jsonSchema) => {
     } else if (value.type === "array" && value.items?.enum) {
       validator = Yup.array()
         .of(Yup.string().oneOf(value.items.enum))
-        .min(1, `${key} must have at least one selected value`);
+        if (jsonSchema.required?.includes(key)) { // Only require if in required list
+          validator = validator.min(1, `${key} must have at least one selected value`);
+        }
+      
     }
 
     if (jsonSchema.required?.includes(key)) {

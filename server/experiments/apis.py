@@ -850,7 +850,7 @@ class CreateOrUpdateExperimentRna(APIView):
 
     @swagger_auto_schema(
         operation_id="update_rna_short_read",
-        request_body=ExperimentShortReadSerializer(many=True),
+        request_body=ExperimentRnaSerializer(many=True),
         responses={
             200: "All submissions of RNA short read experiments were successfull",
             207: "Some submissions of RNA short read experiments were not successful.",
