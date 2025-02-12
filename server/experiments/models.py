@@ -7,7 +7,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from metadata.models import Analyte, Participant, VariantType
-from config.selectors import validate_cloud_url
+from config.selectors import validate_url
 
 
 class Experiment(models.Model):
@@ -161,10 +161,10 @@ class AlignedDNAShortRead(models.Model):
         db_column="experiment_dna_short_read_id",
     )
     aligned_dna_short_read_file = models.CharField(
-        max_length=1024, validators=[validate_cloud_url]
+        max_length=1024, validators=[validate_url]
     )
     aligned_dna_short_read_index_file = models.CharField(
-        max_length=1024, validators=[validate_cloud_url]
+        max_length=1024, validators=[validate_url]
     )
     md5sum = models.CharField(max_length=32, unique=True)
     reference_assembly = models.CharField(
@@ -484,7 +484,7 @@ class ExperimentNanopore(models.Model):
         max_length=1024,
         blank=True,
         null=True,
-        validators=[validate_cloud_url],
+        validators=[validate_url],
         help_text="Name and path of bed file uploaded to workspace.",
     )
     date_data_generation = models.DateField(help_text="Date of data generation.")
@@ -539,13 +539,13 @@ class AlignedNanopore(models.Model):
     aligned_nanopore_file = models.CharField(
         unique=True,
         max_length=1024,
-        validators=[validate_cloud_url],
+        validators=[validate_url],
         help_text="Name and path of file with aligned reads. This must be a unique path.",
     )
     aligned_nanopore_index_file = models.CharField(
         unique=True,
         max_length=1024,
-        validators=[validate_cloud_url],
+        validators=[validate_url],
         help_text="Name and path of index file corresponding to aligned reads file. This must be a unique path.",
     )
     md5sum = models.CharField(
@@ -825,12 +825,12 @@ class AlignedPacBio(models.Model):
     )
     aligned_pac_bio_file = models.CharField(
         max_length=1024,
-        validators=[validate_cloud_url],
+        validators=[validate_url],
         help_text="name and path of file with aligned reads",
     )
     aligned_pac_bio_index_file = models.CharField(
         max_length=1024,
-        validators=[validate_cloud_url],
+        validators=[validate_url],
         help_text="name and path of index file corresponding to aligned reads file",
     )
     md5sum = models.CharField(

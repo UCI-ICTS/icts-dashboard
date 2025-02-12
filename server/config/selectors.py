@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# config/services.py
+# config/selectors.py
 
 import csv
 import os
@@ -121,7 +121,7 @@ def remove_na(datum: dict) -> dict:
         list: The list of submissions with 'NA' values removed.
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""])}
+    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""], None)}
 
     return parsed_datum
 
@@ -225,34 +225,40 @@ def response_constructor(
     return response_object
 
 
-def validate_cloud_url(url):
+from requests.models import PreparedRequest
+from django.core.exceptions import ValidationError
+from urllib.parse import urlparse
+
+def validate_url(url):
     """
-    Validates that a given URL is correctly formatted according to the standards
-    expected by the Requests library. This validation ensures that the URL can be
-    properly handled by Requests without causing errors in the preparation phase.
+    Validates that a given URL is correctly formatted according to standard URL structure.
 
     Parameters:
     - url (str): The URL to be validated.
 
     Returns:
-    - None: If the URL is valid, the function completes without returning anything.
+    - True: If the URL is valid.
 
     Raises:
-    - ValidationError: If the URL preparation fails, indicating the URL is not
-      valid or well-formed.
-
-    Notes:
-    - This function utilizes the `PreparedRequest.prepare_url` method from the
-      Requests library, which can throw various exceptions if the URL does not
-      meet expected standards. If such an exception is caught, this function
-      raises a `ValidationError` with a message describing the issue.
+    - ValidationError: If the URL is invalid.
     """
 
+    if not isinstance(url, str) or not url.strip():
+        raise ValidationError("Invalid URL: URL must be a non-empty string.")
+
+    parsed_url = urlparse(url)
+
+    if not parsed_url.scheme or not parsed_url.netloc:
+        raise ValidationError(f"'{url}' is not a valid URL.")
+
     prepared_request = PreparedRequest()
+    
     try:
         prepared_request.prepare_url(url, None)
     except Exception as exc:
-        return ValidationError(f"{url} is not a valid URL. Error: {str(exc)}")
+        raise ValidationError(f"'{url}' is not a valid URL. Error: {str(exc)}")
+
+    return True
 
 
 def generate_tsv(data):
@@ -268,12 +274,10 @@ def generate_tsv(data):
     Returns:
         str: A string containing the TSV formatted data.
     """
-    output = StringIO()
-    writer = csv.writer(output, delimiter='\t')
+    output = StringIO(newline="")
+    writer = csv.writer(output, delimiter='\t', lineterminator='\n')
     if data:
-        # Write the header row
         writer.writerow(data[0].keys())
-        # Write the data rows
         for row in data:
             writer.writerow(row.values())
     tsv_content = output.getvalue()
