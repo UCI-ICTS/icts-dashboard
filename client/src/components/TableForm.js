@@ -58,9 +58,19 @@ const TableForm = ({ rows, schema, rowID }) => {
         resizable: true,
         sortable: true,
         sortComparator: (v1, v2) => {
-          const num1 = parseFloat(v1);
-          const num2 = parseFloat(v2);
-          return (isNaN(num1) || isNaN(num2)) ? v1.localeCompare(v2) : num1 - num2;
+          // Convert both values to strings first
+          const str1 = v1 ? v1.toString() : "";
+          const str2 = v2 ? v2.toString() : "";
+        
+          // Attempt numerical comparison first
+          const num1 = parseFloat(str1);
+          const num2 = parseFloat(str2);
+        
+          if (!isNaN(num1) && !isNaN(num2)) {
+            return num1 - num2; // Sort numerically if both are valid numbers
+          }
+        
+          return str1.localeCompare(str2); // Default to string comparison
         },
       })),
     [schema]
