@@ -1,11 +1,20 @@
 import React from "react";
 import { Card, CardActionArea, CardContent, Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
 
-export const InfoBox = ( {header, bodyText, linkTo}) => {
-    return (
+export const InfoBox = ({ header, bodyText, linkTo }) => {
+  const handleClick = (event) => {
+    event.preventDefault(); // Prevent default navigation
+    window.open(linkTo, "_blank", "noopener,noreferrer"); // Open in a new tab
+  };
+
+  return (
     <Card className="home-linkcard" elevation={1}>
-      <CardActionArea className="home-linkcard" component={Link} to={linkTo}>
+      <CardActionArea 
+        className="home-linkcard" 
+        component="a" 
+        href={linkTo} 
+        onClick={handleClick} // ✅ Manually open link in new tab
+      >
         <CardContent>
           <Typography className="home-intro-title">
             {header}
@@ -17,5 +26,5 @@ export const InfoBox = ( {header, bodyText, linkTo}) => {
         </CardContent>
       </CardActionArea>
     </Card>
-    )
-}
+  );
+};
