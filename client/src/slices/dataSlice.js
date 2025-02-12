@@ -18,7 +18,12 @@ const initialState = {
   experiment_dna_short_read: [],
   experiment_rna_short_read: [],
   experiment_pac_bio: [], 
-  experiment_nanopore: [], 
+  experiment_nanopore: [],
+  aligned: [],
+  aligned_dna_short_read: [],
+  aligned_nanopore: [],
+  aligned_pac_bio: [],
+  aligned_rna_short_read: [],
   status: "idle"
 };
 
@@ -46,11 +51,11 @@ export const dataSlice = createSlice({
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
         const { 
-          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore 
+          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore,  aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read
         } = action.payload;
         
         Object.assign(state, { 
-          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, status: "fulfilled" 
+          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read, status: "fulfilled" 
         });
       })
       .addCase(updateTable.fulfilled, (state, action) => {
@@ -75,8 +80,12 @@ export const dataSlice = createSlice({
                                  table === "experiment_id" ? "experiments" : 
                                  table === "experiment_dna_short_read_id" ? "experiment_dna_short_read" :
                                  table === "experiment_rna_short_read_id" ? "experiment_rna_short_read" :
-                                 table === "experiment_pac_bio_id" ? "experiment_pac_bio" :
-                                 table === "experiment_nanopore_id" ? "experiment_nanopore" : null
+                                 table === "experiment_nanopore_id" ? "experiment_nanopore" : 
+                                 table === "aligned_id" ? "aligned" :
+                                 table === "aligned_dna_short_read_id" ? "aligned_dna_short_read" : 
+                                 table === "aligned_nanopore_nanopore_id" ? "aligned_nanopore" : 
+                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" : 
+                                 table === "aligned_rna_short_read_id" ? "aligned_rna_short_read" : null
       
           if (collectionName && state[collectionName]) {
             // Find the object to update in the relevant collection

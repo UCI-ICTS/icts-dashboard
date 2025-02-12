@@ -1,4 +1,5 @@
-# search/urls.py
+#!/usr/bin/env python
+# # search/urls.py
 
 from django.urls import path
 
