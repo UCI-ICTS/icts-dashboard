@@ -33,6 +33,11 @@ from metadata.services import (
 )
 
 from experiments.models import (
+    Aligned,
+    AlignedDNAShortRead,
+    AlignedNanopore,
+    AlignedPacBio,
+    AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentPacBio,
@@ -41,6 +46,11 @@ from experiments.models import (
 )
 
 from experiments.services import (
+    AlignedSerializer,
+    AlignedDNAShortReadSerializer,
+    AlignedNanoporeSerializer,
+    AlignedPacBioSerializer,
+    AlignedRnaSerializer,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
@@ -73,6 +83,21 @@ class GetAllTablesAPI(APIView):
             serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
 
             # Experiment Models
+            serialized_aligned_experiments = AlignedSerializer(
+                Aligned.objects.all(), many=True
+            )
+            serialized_aligned_dna = AlignedDNAShortReadSerializer(
+                AlignedDNAShortRead.objects.all(), many=True
+            )
+            serialized_aligned_nanopore = AlignedNanoporeSerializer(
+                AlignedNanopore.objects.all(), many=True
+            )
+            serialized_aligned_pacbio = AlignedPacBioSerializer(
+                AlignedPacBio.objects.all(), many=True
+            )
+            serialized_aligned_rna = AlignedRnaSerializer(
+                AlignedRNAShortRead.objects.all(), many=True
+            )
             serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
             serialized_dna = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
             serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
@@ -92,8 +117,13 @@ class GetAllTablesAPI(APIView):
                 'experiment_dna_short_read' : serialized_dna.data,
                 'experiment_nanopore': serialized_nanopore.data,
                 'experiment_pac_bio': serialized_pacbio.data,
-                'experiment_rna_short_read': serialized_rna.data
-
+                'experiment_rna_short_read': serialized_rna.data,
+                # Aligned tables
+                'aligned': serialized_aligned_experiments.data,
+                'aligned_dna_short_read': serialized_aligned_dna.data,
+                'aligned_nanopore': serialized_aligned_nanopore.data,
+                'aligned_pac_bio': serialized_aligned_pacbio.data,
+                'aligned_rna_short_read': serialized_aligned_rna.data
             }
             # time.sleep(5)
             return Response(status=status.HTTP_200_OK, data=serilized_return_data)

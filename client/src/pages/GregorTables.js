@@ -25,7 +25,12 @@ const tables = [
   { name: "DNA Short Read", schema: "experiment_dna_short_read", identifier: "experiment_dna_short_read_id" },
   { name: "RNA Short Read", schema: "experiment_rna_short_read", identifier: "experiment_rna_short_read_id" },
   { name: "PacBio", schema: "experiment_pac_bio", identifier: "experiment_pac_bio_id" },
-  { name: "NanoPore", schema: "experiment_nanopore", identifier: "experiment_nanopore_id" }
+  { name: "NanoPore", schema: "experiment_nanopore", identifier: "experiment_nanopore_id" },
+  { name: "Aligned Experiments", schema: "aligned", identifier: "aligned_id" },
+  { name: "Aligned DNA Short Read", schema: "aligned_dna_short_read", identifier: "aligned_dna_short_read_id" },
+  { name: "Aligned NanoPore", schema: "aligned_nanopore", identifier: "aligned_nanopore_id" },
+  { name: "Aligned Pac Bio", schema: "aligned_pac_bio", identifier: "aligned_pac_bio_id" },
+  { name: "Aligned RNA Short Read", schema: "aligned_rna_short_read", identifier: "aligned_rna_short_read_id" }
 ];
 
 const Gregor = () => {
