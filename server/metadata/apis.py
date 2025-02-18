@@ -12,7 +12,6 @@ from config.selectors import (
     response_status,
     bulk_retrieve
 )
-from search.selectors import create_or_update
 
 from metadata.models import (
     Participant,
@@ -28,6 +27,7 @@ from metadata.services import (
     ParticipantInputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
+    create_or_update_metadata
 )
 
 
@@ -73,7 +73,7 @@ class CrearteOrUpdateParticipantAPI(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_metadata(
                     table_name="participant",
                     identifier = datum["participant_id"],
                     model_instance = participants.get(datum["participant_id"]),
@@ -91,7 +91,6 @@ class CrearteOrUpdateParticipantAPI(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["participant_id"],
@@ -118,7 +117,7 @@ class CreateOrUpdateFamilyApi(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="create_family",
+        operation_id="update_family",
         request_body=FamilySerializer(many=True),
         responses={
             200: "All submissions of families were successfull",
@@ -143,7 +142,7 @@ class CreateOrUpdateFamilyApi(APIView):
         try:
             for index, datum in enumerate(request.data):
                 identifier = datum["family_id"]
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_metadata(
                     table_name="family",
                     identifier=datum["family_id"],
                     model_instance=families.get(datum["family_id"]),
@@ -210,7 +209,7 @@ class CreateOrUpdateAnalyte(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_metadata(
                     table_name="analyte",
                     identifier = datum["analyte_id"],
                     model_instance = analytes.get(datum["analyte_id"]),
@@ -228,7 +227,6 @@ class CreateOrUpdateAnalyte(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["analyte_id"],
@@ -278,7 +276,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
         accepted_requests = False
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_metadata(
                     table_name="phenotype",
                     identifier = datum["phenotype_id"],
                     model_instance = phenotypes.get(datum["phenotype_id"]),
@@ -296,7 +294,6 @@ class CreateOrUpdatePhenotypeApi(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["phenotype_id"],
@@ -346,7 +343,7 @@ class CreateOrUpdateGeneticFindings(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_metadata(
                     table_name="genetic_findings",
                     identifier = datum["genetic_findings_id"],
                     model_instance = genetic_findings.get(datum["genetic_findings_id"]),
@@ -364,7 +361,6 @@ class CreateOrUpdateGeneticFindings(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["genetic_findings_id"],

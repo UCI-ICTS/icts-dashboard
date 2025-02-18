@@ -48,7 +48,7 @@ def deidentify_json(input_file, output_file):
 
     # Apply the replacement
     deidentified_data = replace_values(data)
-    # import pdb; pdb.set_trace()
+
     # Save to new JSON file
     with open(output_file, "w") as file:
         json.dump(deidentified_data, file, indent=4)

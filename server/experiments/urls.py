@@ -20,8 +20,8 @@ urlpatterns = [
     path("submit_experiment_rna_short_read/", CreateOrUpdateExperimentRna.as_view()),
     path("submit_pac_bio/", CreateOrUpdateExperimentPacBio.as_view()),
     path("submit_nanopore/", CreateOrUpdateExperimentNanopore.as_view()),
-    path("create_aligned_short_read/", CreateOrUpdateAlignedShortRead.as_view()),
+    path("submit_aligned_dna_short_read/", CreateOrUpdateAlignedShortRead.as_view()),
     path("create_aligned_pac_bio/", CreateOrUpdateAlignedPacBio.as_view()),
     path("create_aligned_nanopore/", CreateOrUpdateAlignedNanopore.as_view()),
-    path("create_aligned_rna/", CreateOrUpdateAlignedRna.as_view()),
+    path("submit_aligned_rna_short_read/", CreateOrUpdateAlignedRna.as_view()),
 ]
