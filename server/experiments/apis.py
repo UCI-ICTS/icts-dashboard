@@ -17,6 +17,7 @@ from experiments.models import (
     AlignedRNAShortRead,
     AlignedPacBio,
     AlignedDNAShortRead,
+    AlignedNanopore,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
@@ -39,14 +40,8 @@ from experiments.services import (
 )
 from experiments.selectors import (
     get_aligned_pac_bio,
-    get_aligned_dna_short_read,
-    get_aligned_nanopore,
-    get_aligned_rna,
     get_experiment,
-    parse_nanopore_aligned,
     parse_pac_bio_aligned,
-    parse_rna_aligned,
-    parse_short_read_aligned,
 )
 
 
@@ -193,142 +188,69 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
 class CreateOrUpdateAlignedPacBio(APIView):
     """Create or Update Aligned PacBio
 
-    API view to create or update aligned PacBio records.
+        This API endpoint accepts a list of short read RNA experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'aligned_pac_bio_id'.
 
-    This view handles the submission of one or more PacBio entries,
-    performing validation and either creating new records or updating existing ones.
-    It integrates detailed validation and response formatting to ensure data integrity
-    and provide clear feedback to the client.
-
-    Iterates over the provided data, validating and processing each aligned DNA short read.
-    Valid entries are either updated or created in the database, and responses are
-    compiled to provide detailed feedback on the outcome of each entry.
-
-    Args:
-        request (Request): The request object containing the aligned DNA short read data.
-
-    Returns:
-        Response: A Response object containing the status code and a list of results for
-        each processed entry indicating whether it was successfully created or updated,
-        or if there were any errors.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_aligned_pac_bio",
+        operation_id="aligned_pac_bio",
         request_body=AlignedPacBioSerializer(many=True),
         responses={
-            200: "All submissions of aligned PacBio data were successfull",
-            207: "Some submissions of aligned PacBio data were not successful.",
+            200: "All submissions of PacBio experiments were successfull",
+            207: "Some submissions of PacBio experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        aligned_pac_bio = bulk_retrieve(
+            request_data=request.data,
+            model_class=AlignedPacBio,
+            id="aligned_pac_bio_id"
+        )
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["aligned_pac_bio_id"]
-                aligned_data = {
-                    "aligned_id": "aligned_pac_bio" + "." + identifier,
-                    "table_name": "aligned_pac_bio",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                    "aligned_file": datum["aligned_pac_bio_file"],
-                    "aligned_index_file": datum["aligned_pac_bio_index_file"],
-                }
-
-                aligned_results = AlignedService.validate_aligned(
-                    aligned_data, validator
-                )
-                parsed_pac_bio_aligned = parse_pac_bio_aligned(pac_bio_aligned=datum)
-                validator.validate_json(
-                    json_object=parsed_pac_bio_aligned,
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update_alignment(
                     table_name="aligned_pac_bio",
+                    identifier = datum["aligned_pac_bio_id"],
+                    model_instance = aligned_pac_bio.get(datum["aligned_pac_bio_id"]),
+                    datum = datum
                 )
-                pac_bio_aligned_results = validator.get_validation_results()
-                if (
-                    pac_bio_aligned_results["valid"] is True
-                    and aligned_results["valid"] is True
-                ):
-                    existing_aligned_pac_bio = get_aligned_pac_bio(
-                        aligned_pac_bio_id=identifier
-                    )
-                    aligned_pac_bio_serializer = AlignedPacBioSerializer(
-                        existing_aligned_pac_bio, data=parsed_pac_bio_aligned
-                    )
-                    aligned_pac_bio_valid = aligned_pac_bio_serializer.is_valid()
-                    aligned_serializer = AlignedService.create_or_update_aligned(
-                        aligned_data
-                    )
-                    aligned_valid = aligned_serializer.is_valid()
-                    if aligned_valid and aligned_pac_bio_valid:
-                        pac_bio_instance = aligned_pac_bio_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status=(
-                                    "UPDATED" if existing_aligned_pac_bio else "CREATED"
-                                ),
-                                code=200 if existing_aligned_pac_bio else 201,
-                                message=(
-                                    f"Short read alignement {identifier} updated."
-                                    if existing_aligned_pac_bio
-                                    else f"Short read alignement {identifier} created."
-                                ),
-                                data=AlignedPacBioSerializer(pac_bio_instance).data,
-                            )
-                        )
-                        accepted_requests = True
 
-                    else:
-                        error_data = [
-                            {item: aligned_pac_bio_serializer.errors[item]}
-                            for item in aligned_pac_bio_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: aligned_serializer.errors[item]}
-                            for item in aligned_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = (
-                        pac_bio_aligned_results["errors"] + aligned_results["errors"]
-                    )
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["aligned_pac_bio_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -350,7 +272,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="experiment_pac_bio",
+        operation_id="submit_experiment_pac_bio",
         request_body=ExperimentPacBioSerializer(many=True),
         responses={
             200: "All submissions of PacBio experiments were successfull",
@@ -362,7 +284,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        dna_short_read = bulk_retrieve(
+        experiment_pac_bio = bulk_retrieve(
             request_data=request.data,
             model_class=ExperimentPacBio,
             id="experiment_pac_bio_id"
@@ -377,7 +299,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
                 return_data, result = create_or_update_experiment(
                     table_name="experiment_pac_bio",
                     identifier = datum["experiment_pac_bio_id"],
-                    model_instance = dna_short_read.get(datum["experiment_pac_bio_id"]),
+                    model_instance = experiment_pac_bio.get(datum["experiment_pac_bio_id"]),
                     datum = datum
                 )
 
@@ -420,7 +342,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_nanopore",
+        operation_id="submit_aligned_nanopore",
         request_body=AlignedNanoporeSerializer(many=True),
         responses={
             200: "All submissions of RNA short read experiments were successfull",
@@ -432,9 +354,9 @@ class CreateOrUpdateAlignedNanopore(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        rna_short_read = bulk_retrieve(
+        aligned_nanopore = bulk_retrieve(
             request_data=request.data,
-            model_class=ExperimentRNAShortRead,
+            model_class=AlignedNanopore,
             id="aligned_nanopore_id"
         )
         
@@ -444,10 +366,10 @@ class CreateOrUpdateAlignedNanopore(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_experiment(
+                return_data, result = create_or_update_alignment(
                     table_name="aligned_nanopore",
                     identifier = datum["aligned_nanopore_id"],
-                    model_instance = rna_short_read.get(datum["aligned_nanopore_id"]),
+                    model_instance = aligned_nanopore.get(datum["aligned_nanopore_id"]),
                     datum = datum
                 )
 
@@ -464,7 +386,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=datum["experiment_rna_short_read_id"],
+                    identifier=datum["aligned_nanopore_id"],
                     request_status="SERVER ERROR",
                     code=500,
                     data=str(error),
@@ -490,7 +412,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_nanopore",
+        operation_id="submit_experiment_nanopore",
         request_body=ExperimentNanoporeSerializer(many=True),
         responses={
             200: "All submissions of Nanopore experiments were successfull",
