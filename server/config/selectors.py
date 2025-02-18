@@ -121,8 +121,8 @@ def remove_na(datum: dict) -> dict:
         list: The list of submissions with 'NA' values removed.
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""], None)}
-
+    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""], None, [None])}
+    
     return parsed_datum
 
 
@@ -352,6 +352,7 @@ def bulk_retrieve(request_data: dict, model_class, id: str) -> dict:
     Returns:
         dict: A dictionary of model instances keyed by their IDs.
     """
+
     model_dict = model_class.objects.in_bulk([datum[id] for datum in request_data])
 
     return model_dict
