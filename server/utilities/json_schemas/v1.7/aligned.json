@@ -34,13 +34,13 @@
         },
         "id_in_table": {
             "type": "string",
-            "enum": [
+            "examples": [
                 "BCM_H7YG5DSX2-3-IDUDI0014-1"
             ]
         },
         "participant_id": {
             "type": "string",
-            "enum": [
+            "examples": [
                 "BCM_H7YG5DSX2"
             ]
         },

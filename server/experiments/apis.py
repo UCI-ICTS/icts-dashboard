@@ -12,9 +12,11 @@ from rest_framework.views import APIView
 
 from config.selectors import bulk_retrieve
 
-from search.selectors import create_or_update
-
 from experiments.models import (
+    Aligned,
+    AlignedRNAShortRead,
+    AlignedPacBio,
+    AlignedDNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
@@ -32,7 +34,8 @@ from experiments.services import (
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
     ExperimentRnaSerializer,
-    ExperimentService,
+    create_or_update_experiment,
+    create_or_update_alignment
 )
 from experiments.selectors import (
     get_aligned_pac_bio,
@@ -50,148 +53,69 @@ from experiments.selectors import (
 class CreateOrUpdateAlignedShortRead(APIView):
     """Create or Update Aligned DNA Short Read Records
 
-    API view to create or update aligned DNA short read records.
+    This API endpoint accepts a list of short read RNA experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'aligned_dna_short_read_id'.
 
-    This view handles the submission of one or more aligned DNA short read entries,
-    performing validation and either creating new records or updating existing ones.
-    It integrates detailed validation and response formatting to ensure data integrity
-    and provide clear feedback to the client.
-
-    Iterates over the provided data, validating and processing each aligned DNA short read.
-    Valid entries are either updated or created in the database, and responses are
-    compiled to provide detailed feedback on the outcome of each entry.
-
-    Args:
-        request (Request): The request object containing the aligned DNA short read data.
-
-    Returns:
-        Response: A Response object containing the status code and a list of results for
-        each processed entry indicating whether it was successfully created or updated,
-        or if there were any errors.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_aligned_short_read",
+        operation_id="submit_aligned_dna",
         request_body=AlignedDNAShortReadSerializer(many=True),
         responses={
-            200: "All submissions of aligned DNA short read were successfull",
-            207: "Some submissions of aligned DNA short read were not successful.",
+            200: "All submissions of RNA short read experiments were successfull",
+            207: "Some submissions of RNA short read experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        aligned_dna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=AlignedDNAShortRead,
+            id="aligned_dna_short_read_id"
+        )
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["aligned_dna_short_read_id"]
-                aligned_data = {
-                    "aligned_id": "aligned_dna_short_read" + "." + identifier,
-                    "table_name": "aligned_dna_short_read",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                    "aligned_file": datum["aligned_dna_short_read_file"],
-                    "aligned_index_file": datum["aligned_dna_short_read_index_file"],
-                }
-
-                aligned_results = AlignedService.validate_aligned(
-                    aligned_data, validator
-                )
-                parsed_short_read_aligned = parse_short_read_aligned(
-                    short_read_aligned=datum
-                )
-                validator.validate_json(
-                    json_object=parsed_short_read_aligned,
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update_alignment(
                     table_name="aligned_dna_short_read",
+                    identifier = datum["aligned_dna_short_read_id"],
+                    model_instance = aligned_dna_short_read.get(datum["aligned_dna_short_read_id"]),
+                    datum = datum
                 )
-                short_read_aligned_results = validator.get_validation_results()
-                if (
-                    short_read_aligned_results["valid"] is True
-                    and aligned_results["valid"] is True
-                ):
-                    existing_aligned_short_read = get_aligned_dna_short_read(
-                        aligned_dna_short_read_id=identifier
-                    )
-                    aligned_short_read_serializer = AlignedDNAShortReadSerializer(
-                        existing_aligned_short_read, data=parsed_short_read_aligned
-                    )
-                    aligned_short_read_valid = aligned_short_read_serializer.is_valid()
-                    aligned_serializer = AlignedService.create_or_update_aligned(
-                        aligned_data
-                    )
-                    aligned_valid = aligned_serializer.is_valid()
-                    if aligned_valid and aligned_short_read_valid:
-                        short_read_instance = aligned_short_read_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                                request_status=(
-                                    "UPDATED"
-                                    if existing_aligned_short_read
-                                    else "CREATED"
-                                ),
-                                code=200 if existing_aligned_short_read else 201,
-                                message=(
-                                    f"Short read alignement {identifier} updated."
-                                    if existing_aligned_short_read
-                                    else f"Short read alignement {identifier} created."
-                                ),
-                                data=AlignedDNAShortReadSerializer(
-                                    short_read_instance
-                                ).data,
-                            )
-                        )
-                        accepted_requests = True
 
-                    else:
-                        error_data = [
-                            {item: aligned_short_read_serializer.errors[item]}
-                            for item in aligned_short_read_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: aligned_serializer.errors[item]}
-                            for item in aligned_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                                request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = (
-                        short_read_aligned_results["errors"] + aligned_results["errors"]
-                    )
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["aligned_dna_short_read_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -237,7 +161,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_experiment(
                     table_name="experiment_dna_short_read",
                     identifier = datum["experiment_dna_short_read_id"],
                     model_instance = dna_short_read.get(datum["experiment_dna_short_read_id"]),
@@ -255,7 +179,6 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["experiment_dna_short_read_id"],
@@ -451,7 +374,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_experiment(
                     table_name="experiment_pac_bio",
                     identifier = datum["experiment_pac_bio_id"],
                     model_instance = dna_short_read.get(datum["experiment_pac_bio_id"]),
@@ -469,7 +392,6 @@ class CreateOrUpdateExperimentPacBio(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["experiment_pac_bio_id"],
@@ -484,145 +406,69 @@ class CreateOrUpdateExperimentPacBio(APIView):
 class CreateOrUpdateAlignedNanopore(APIView):
     """Create or Update Aligned Nanopore
 
-    API view to create or update aligned Nanopore records.
+    This API endpoint accepts a list of aligned NanoPore experiment entries, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'aligned_nanopore_id'.
 
-    This view handles the submission of one or more Nanopore entries,
-    performing validation and either creating new records or updating existing ones.
-    It integrates detailed validation and response formatting to ensure data integrity
-    and provide clear feedback to the client.
-
-    Iterates over the provided data, validating and processing each aligned DNA short read.
-    Valid entries are either updated or created in the database, and responses are
-    compiled to provide detailed feedback on the outcome of each entry.
-
-    Args:
-        request (Request): The request object containing the aligned DNA short read data.
-
-    Returns:
-        Response: A Response object containing the status code and a list of results for
-        each processed entry indicating whether it was successfully created or updated,
-        or if there were any errors.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_aligned_nanopore",
+        operation_id="update_nanopore",
         request_body=AlignedNanoporeSerializer(many=True),
         responses={
-            200: "All submissions of aligned Nanopore data were successfull",
-            207: "Some submissions of aligned Nanopore data were not successful.",
+            200: "All submissions of RNA short read experiments were successfull",
+            207: "Some submissions of RNA short read experiments were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
+
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        rna_short_read = bulk_retrieve(
+            request_data=request.data,
+            model_class=ExperimentRNAShortRead,
+            id="aligned_nanopore_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["aligned_nanopore_id"]
-                aligned_data = {
-                    "aligned_id": "aligned_nanopore" + "." + identifier,
-                    "table_name": "aligned_nanopore",
-                    "id_in_table": identifier,
-                    "participant_id": identifier.split("_")[0],
-                    "aligned_file": datum["aligned_nanopore_file"],
-                    "aligned_index_file": datum["aligned_nanopore_index_file"],
-                }
-
-                aligned_results = AlignedService.validate_aligned(
-                    aligned_data, validator
-                )
-                parsed_nanopore_aligned = parse_nanopore_aligned(nanopore_aligned=datum)
-                validator.validate_json(
-                    json_object=parsed_nanopore_aligned,
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update_experiment(
                     table_name="aligned_nanopore",
+                    identifier = datum["aligned_nanopore_id"],
+                    model_instance = rna_short_read.get(datum["aligned_nanopore_id"]),
+                    datum = datum
                 )
-                nanopore_aligned_results = validator.get_validation_results()
-                if (
-                    nanopore_aligned_results["valid"] is True
-                    and aligned_results["valid"] is True
-                ):
-                    existing_aligned_nanopore = get_aligned_nanopore(
-                        aligned_nanopore_id=identifier
-                    )
 
-                    aligned_nanopore_serializer = AlignedNanoporeSerializer(
-                        existing_aligned_nanopore, data=parsed_nanopore_aligned
-                    )
-                    aligned_pac_bio_valid = aligned_nanopore_serializer.is_valid()
-                    aligned_serializer = AlignedService.create_or_update_aligned(
-                        aligned_data
-                    )
-                    aligned_valid = aligned_serializer.is_valid()
-                    if aligned_valid and aligned_pac_bio_valid:
-                        nanpore_instance = aligned_nanopore_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status=(
-                                    "UPDATED"
-                                    if existing_aligned_nanopore
-                                    else "CREATED"
-                                ),
-                                code=200 if existing_aligned_nanopore else 201,
-                                message=(
-                                    f"Nanopore alignement {identifier} updated."
-                                    if existing_aligned_nanopore
-                                    else f"Nanopore alignement {identifier} created."
-                                ),
-                                data=AlignedNanoporeSerializer(nanpore_instance).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: aligned_nanopore_serializer.errors[item]}
-                            for item in aligned_nanopore_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: aligned_serializer.errors[item]}
-                            for item in aligned_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = (
-                        nanopore_aligned_results["errors"] + aligned_results["errors"]
-                    )
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["experiment_rna_short_read_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -668,7 +514,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_experiment(
                     table_name="experiment_nanopore",
                     identifier = datum["experiment_nanopore_id"],
                     model_instance = dna_short_read.get(datum["experiment_nanopore_id"]),
@@ -686,7 +532,6 @@ class CreateOrUpdateExperimentNanopore(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["experiment_nanopore_id"],
@@ -699,135 +544,68 @@ class CreateOrUpdateExperimentNanopore(APIView):
 
 
 class CreateOrUpdateAlignedRna(APIView):
-    """Create or Update Aligned RNA
+    """
+    API view to create or update Aligned RNA entries.
 
-    API view to create or update aligned RNA records.
+    This API endpoint accepts a list of aligned RNA data objects, 
+    validates them, and either creates new entries or updates existing ones 
+    based on the presence of a 'aligned_rna_short_read_id'.
 
-    This view handles the submission of one or more RNA entries,
-    performing validation and either creating new records or updating existing ones.
-    It integrates detailed validation and response formatting to ensure data integrity
-    and provide clear feedback to the client.
-
-    Iterates over the provided data, validating and processing each aligned DNA short read.
-    Valid entries are either updated or created in the database, and responses are
-    compiled to provide detailed feedback on the outcome of each entry.
-
-    Args:
-        request (Request): The request object containing the aligned RNA short read data.
-
-    Returns:
-        Response: A Response object containing the status code and a list of results for
-        each processed entry indicating whether it was successfully created or updated,
-        or if there were any errors.
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
     """
 
     @swagger_auto_schema(
-        operation_id="create_aligned_rna",
+        operation_id="submit_aligned_rna",
         request_body=AlignedRnaSerializer(many=True),
         responses={
-            200: "All submissions of aligned Nanopore data were successfull",
-            207: "Some submissions of aligned Nanopore data were not successful.",
+            200: "All submissions of genetic findings were successfull",
+            207: "Some submissions of genetic findings were not successful.",
             400: "Bad request",
         },
-        tags=["Experiment"],
+        tags=["CreateOrUpdate"],
     )
     def post(self, request):
-        validator = TableValidator()
+        # Most efficient query is to pull all ids from request at once
+        aligned_rna = bulk_retrieve(
+            request_data=request.data,
+            model_class=AlignedRNAShortRead,
+            id="aligned_rna_short_read_id"
+        )
+        
         response_data = []
         rejected_requests = False
         accepted_requests = False
+
         try:
-            for datum in request.data:
-                identifier = datum["aligned_rna_short_read_id"]
-                parsed_rna_aligned, aligned_data = parse_rna_aligned(rna_aligned=datum)
-                aligned_results = AlignedService.validate_aligned(
-                    aligned_data, validator
-                )
-                validator.validate_json(
-                    json_object=parsed_rna_aligned,
+            for index, datum in enumerate(request.data):
+                return_data, result = create_or_update_alignment(
                     table_name="aligned_rna_short_read",
+                    identifier = datum["aligned_rna_short_read_id"],
+                    model_instance = aligned_rna.get(datum["aligned_rna_short_read_id"]),
+                    datum = datum
                 )
-                rna_aligned_results = validator.get_validation_results()
 
-                if (
-                    rna_aligned_results["valid"] is True
-                    and aligned_results["valid"] is True
-                ):
-                    existing_aligned_rna = get_aligned_rna(
-                        aligned_rna_short_read_id=identifier
-                    )
-
-                    aligned_rna_serializer = AlignedRnaSerializer(
-                        existing_aligned_rna, data=parsed_rna_aligned
-                    )
-                    aligned_rna_valid = aligned_rna_serializer.is_valid()
-                    aligned_serializer = AlignedService.create_or_update_aligned(
-                        aligned_data
-                    )
-                    aligned_valid = aligned_serializer.is_valid()
-                    if aligned_valid and aligned_rna_valid:
-                        rna_instance = aligned_rna_serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status=(
-                                    "UPDATED" if existing_aligned_rna else "CREATED"
-                                ),
-                                code=200 if existing_aligned_rna else 201,
-                                message=(
-                                    f"Nanopore alignement {identifier} updated."
-                                    if existing_aligned_rna
-                                    else f"Nanopore alignement {identifier} created."
-                                ),
-                                data=AlignedRnaSerializer(rna_instance).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: aligned_rna_serializer.errors[item]}
-                            for item in aligned_rna_serializer.errors
-                        ]
-                        error_data.extend(
-                            {item: aligned_serializer.errors[item]}
-                            for item in aligned_serializer.errors
-                        )
-
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                               request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    errors = rna_aligned_results["errors"] + aligned_results["errors"]
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                           request_status="BAD REQUEST",
-                            code=400,
-                            data=errors,
-                        )
-                    )
+                if result == "accepted_request":
+                    accepted_requests = True
+                elif result == "rejected_request":
                     rejected_requests = True
-                    continue
+                response_data.append(return_data)
+                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
+            response_data.insert(0,
                 response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
+                    identifier=datum["aligned_rna_short_read_id"],
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
@@ -873,7 +651,7 @@ class CreateOrUpdateExperimentRna(APIView):
 
         try:
             for index, datum in enumerate(request.data):
-                return_data, result = create_or_update(
+                return_data, result = create_or_update_experiment(
                     table_name="experiment_rna_short_read",
                     identifier = datum["experiment_rna_short_read_id"],
                     model_instance = rna_short_read.get(datum["experiment_rna_short_read_id"]),
@@ -891,7 +669,6 @@ class CreateOrUpdateExperimentRna(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            # import pdb; pdb.set_trace()
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["experiment_rna_short_read_id"],

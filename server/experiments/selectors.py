@@ -15,7 +15,7 @@ from experiments.models import (
     ExperimentPacBio,
     ExperimentRNAShortRead,
 )
-from metadata.selectors import get_analyte
+
 from metadata.models import Analyte, Participant
 
 
@@ -221,7 +221,7 @@ def parse_nanopore(nanopore: dict) -> dict:
 
 def parse_rna_aligned(rna_aligned: dict) -> dict:
     """
-    Parses and processes the nanopore_aligned dictionary to format and clean specific fields.
+    Parses and processes the rna_aligned dictionary to format and clean specific fields.
 
     The function handles specific fields that may contain delimiters or need conversion to different data types.
     It removes or transforms values based on their content to ensure consistent data handling downstream.
@@ -277,18 +277,10 @@ def parse_rna(rna_datum: dict) -> dict:
     - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
       fields are properly formatted.
     """
-
-    identifier = rna_datum["experiment_rna_short_read_id"]
-    participant_id = get_analyte(rna_datum["analyte_id"]).participant_id.participant_id
-
-    experiment_data = {
-        "experiment_id": "experiment_rna_short_read" + "." + identifier,
-        "table_name": "experiment_rna_short_read",
-        "id_in_table": identifier,
-        "participant_id": participant_id,
-    }
-
+    
     for key, value in rna_datum.items():
+        if value is None:
+            continue
         if isinstance(value, str) and "|" in value:
             rna_datum[key] = value.split("|")
         if key in ["read_length", "RIN", "total_reads"]:
@@ -300,6 +292,26 @@ def parse_rna(rna_datum: dict) -> dict:
     return rna_datum
 
 
+def swap_experiment_aligned(text: str) -> str:
+    """
+    Swap 'aligned' with 'experiment' and vice versa in a given string.
+
+    Args:
+        text (str): The input string.
+
+    Returns:
+        str: The modified string with swapped words.
+    """
+    replacements = {
+        "aligned": "experiment",
+        "experiment": "aligned"
+    }
+
+    words = text.split("_")
+    modified_words = [replacements.get(word, word) for word in words]
+    return "_".join(modified_words)
+
+
 def get_experiment(experiment_id: str) -> Experiment:
     """Retrieve an experiment instance by its ID or return None if not found."""
 
@@ -307,20 +319,6 @@ def get_experiment(experiment_id: str) -> Experiment:
         experiment_instance = Experiment.objects.get(experiment_id=experiment_id)
         return experiment_instance
     except Experiment.DoesNotExist:
-        return None
-
-
-def get_experiment_dna_short_read(
-    experiment_dna_short_read_id: str,
-) -> ExperimentDNAShortRead:
-    """Retrieve an experiment instance by its ID or return None if not found."""
-
-    try:
-        experiment_dna_short_read_instance = ExperimentDNAShortRead.objects.get(
-            experiment_dna_short_read_id=experiment_dna_short_read_id
-        )
-        return experiment_dna_short_read_instance
-    except ExperimentDNAShortRead.DoesNotExist:
         return None
 
 

@@ -84,6 +84,8 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
     ]
 
     for key, value in genetic_findings.items():
+        if value is None:
+            continue
         if isinstance(value, str) and "|" in value:
             genetic_findings[key] = value.split("|")
         if key == "pos" and genetic_findings[key] != "NA":
