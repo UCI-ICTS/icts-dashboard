@@ -4,7 +4,9 @@
 """Metadata Selectors
 """
 
-from metadata.models import Family, Phenotype, Analyte, Participant, GeneticFindings
+from metadata.models import (
+    Family, Analyte,
+)
 
 def get_analyte(analyte_id: str) -> Family:
     """Retrieve an analyte instance by its ID or return None if not found."""
@@ -12,62 +14,6 @@ def get_analyte(analyte_id: str) -> Family:
         analyte_instance = Analyte.objects.get(analyte_id=analyte_id)
         return analyte_instance
     except Analyte.DoesNotExist:
-        return None
-
-
-def get_genetic_findings(genetic_findings_id: str) -> GeneticFindings:
-    """Retrieve a GeneticFindings instance by its ID or return None if not found."""
-    try:
-        get_genetic_findings_instance = GeneticFindings.objects.get(
-            genetic_findings_id=genetic_findings_id
-        )
-        return get_genetic_findings_instance
-    except GeneticFindings.DoesNotExist:
-        return None
-
-
-def get_phenotype(phenotype_id: str) -> Family:
-    """Retrieve a phenotype instance by its ID or return None if not found."""
-    try:
-        phenotype_instance = Phenotype.objects.get(phenotype_id=phenotype_id)
-        return phenotype_instance
-    except Phenotype.DoesNotExist:
-        return None
-
-
-def get_family(family_id: str) -> Family:
-    """
-    Retrieve a family instance by its ID or return None if not found.
-
-    Args:
-        family_id (str): Family object identifier
-
-    Returns:
-        Family: The family instance if found, otherwise None.
-    """
-    try:
-        family_instance = Family.objects.get(family_id=family_id)
-        return family_instance
-    except Family.DoesNotExist:
-        return None
-
-
-def get_participant(participant_id: str) -> Participant:
-    """
-    Retrieve a participant instance by its ID or return None if not found.
-
-    Args:
-        participant_id (str): Participant object identifier
-
-    Returns:
-        Participant: The participant instance if found, otherwise None.
-    """
-    try:
-        participant_instance = Participant.objects.get(
-            participant_id=participant_id
-        )
-        return participant_instance
-    except Participant.DoesNotExist:
         return None
 
 
@@ -108,11 +54,11 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
             genetic_findings[key] = [value]
         
         split_findings = multi_value_split(genetic_findings)
-
-        for key in multi_value:
+        
+        for value in multi_value:
             try:
-                if not isinstance(split_findings[key], list):
-                    split_findings[key] = [split_findings[key]]
+                if value in split_findings and not isinstance(split_findings[value], list):
+                    split_findings[value] = [split_findings[value]]
             except Exception as error:
                 oops = error
                 split_findings[key] = [oops]
@@ -163,7 +109,7 @@ def participant_parser(participant: dict) -> dict:
 
     for key in multi_value:
         try:
-            if not isinstance(split_participant[key], list):
+            if key in split_participant and not isinstance(split_participant[key], list):
                 split_participant[key] = [split_participant[key]]
         except Exception as error:
             oops = error
