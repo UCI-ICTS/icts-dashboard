@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# tests/test_metadata/test_models.py
+# tests/test_apps/test_metadata/test_models.py
 
 """Metadata Tests: Models and selectors
 """

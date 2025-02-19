@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
-# tests/test_metadata/test_apis.py
+# tests/test_apps/test_metadata/test_apis.py
 
-import json
 from django.test import TestCase
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
-from metadata.models import Family, Participant, Phenotype, GeneticFindings, Analyte
-from metadata.selectors import get_analyte, genetic_findings_parser, participant_parser
-from metadata.services import (
-    GeneticFindingsSerializer, AnalyteSerializer, PhenotypeSerializer,
-    FamilySerializer, ParticipantInputSerializer, ParticipantOutputSerializer
-)
+from metadata.models import Family, Participant
 
 class FamilyModelTest(TestCase):
     fixtures = ['tests/fixtures/test_fixture.json']
