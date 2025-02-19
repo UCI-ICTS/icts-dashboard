@@ -13,12 +13,10 @@ from rest_framework.views import APIView
 from config.selectors import bulk_retrieve
 
 from experiments.models import (
-    Aligned,
     AlignedRNAShortRead,
     AlignedPacBio,
     AlignedDNAShortRead,
     AlignedNanopore,
-    Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
@@ -29,7 +27,6 @@ from experiments.services import (
     AlignedNanoporeSerializer,
     AlignedPacBioSerializer,
     AlignedRnaSerializer,
-    AlignedService,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
@@ -38,11 +35,7 @@ from experiments.services import (
     create_or_update_experiment,
     create_or_update_alignment
 )
-from experiments.selectors import (
-    get_aligned_pac_bio,
-    get_experiment,
-    parse_pac_bio_aligned,
-)
+from experiments.selectors import get_experiment
 
 
 class CreateOrUpdateAlignedShortRead(APIView):
