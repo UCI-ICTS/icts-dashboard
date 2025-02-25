@@ -42,3 +42,4 @@ server/config/fixtures/dump.json
 server/tests/.coverage
 server/tests/fixtures/U09_flattened_sampled_dump.json
 server/config/fixtures/dump.json
+server/config/fixtures/U09_dump.json
