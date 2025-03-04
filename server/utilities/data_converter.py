@@ -17,7 +17,7 @@ import sys
 import csv
 import argparse
 from config.selectors import bulk_retrieve
-from search.selectors import create_or_update
+from metadata.services import create_or_update_metadata
 from metadata.models import (
     Participant,
     Family,
@@ -26,15 +26,12 @@ from metadata.models import (
     Phenotype
 )
 
+from experiments.services import create_or_update_alignment, create_or_update_experiment
 from experiments.models import (
-    Experiment,
-    ExperimentATACShortRead,
     ExperimentDNAShortRead,
     ExperimentRNAShortRead,
     ExperimentPacBio,
     ExperimentNanopore,
-    ExperimentType,
-    Aligned,
     AlignedNanopore,
     AlignedDNAShortRead,
     AlignedPacBio,
@@ -119,6 +116,10 @@ class TableConverter:
             "aligned_pac_bio": AlignedPacBio,
             "aligned_rna_short_read":AlignedRNAShortRead
         }
+        metadata_models =["participant", "analyte", "family", "genetic_findings", "phenotype"]
+        experiment_models = ["experiment_dna_short_read", "experiment_rna_short_read", "experiment_nanopore", "experiment_pac_bio"]
+        alignment_models = ["aligned_dna_short_read", "aligned_rna_short_read", "aligned_nanopore", "aligned_pac_bio"]
+
         if not table_name:
             if entity:
                 table_name = entity
@@ -132,9 +133,16 @@ class TableConverter:
 
         model_instances = bulk_retrieve(
             request_data=data_list,
-            model_class=models[entity],
+            model_class=models[table_name],
             id=identifier_field
         )
+        
+        if table_name in metadata_models:
+            create_or_update = create_or_update_metadata
+        if table_name in experiment_models:
+            create_or_update = create_or_update_experiment
+        if table_name in alignment_models:
+            create_or_update = create_or_update_alignment
         
         results = []
 
@@ -145,7 +153,16 @@ class TableConverter:
                 continue
 
             model_instance = model_instances.get(record[identifier_field])
-
+            # if model_instance:
+            #     result_entry = {
+            #         "identifier": identifier,
+            #         "request_status": "NO CHANGE",
+                        
+            #         "updates": "NA",
+            #         "validation_fails": "NA"
+            #     }
+            #     results.append(result_entry)
+            # else:
             response, status = create_or_update(table_name, identifier, model_instance, record)
             result_entry = {
                 "identifier": identifier,
@@ -154,11 +171,12 @@ class TableConverter:
                     else response.get("request_status", "UNKNOWN"),
                 "updates": response['data'].get("updates", []) \
                     if response.get("request_status") == "UPDATED" \
-                    else []
+                    else [],
+                "validation_fails":response['data']
             }
             results.append(result_entry)
             # if result_entry['request_status'] == "SUCCESS":
-            #     import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
         self.write_results(table_file.split('.')[0], results)
 
 
@@ -177,13 +195,15 @@ class TableConverter:
 
         with open(output_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f, delimiter="\t")
-            writer.writerow(["identifier", "request_status", "updates"])  # Header
+            writer.writerow(["identifier", "request_status", "updates", "validation errors" ])  # Header
             for result in results:
                 writer.writerow([
                     result["identifier"],
                     result["request_status"],
-                    ", ".join(result["updates"]) if result["request_status"] == "UPDATED" else ""
+                    ", ".join(result["updates"]) if result["request_status"] == "UPDATED" else "",
+                    result["validation_fails"]
                 ])
+        # import pdb; pdb.set_trace()
 
 
     @staticmethod
