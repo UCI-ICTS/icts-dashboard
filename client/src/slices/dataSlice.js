@@ -5,9 +5,9 @@ import { setMessage } from "./messageSlice";
 import { useSelector } from "react-redux";
 
 const initialState = {
-  tableView: "genetic_findings",
-  tableID: "genetic_findings_id",
-  tableName: "Genetic Findings",
+  tableView: "participants",
+  tableID: "participant_id",
+  tableName: "Participants",
   jsonData: [],
   participants: [],
   families: [],
