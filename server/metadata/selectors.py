@@ -95,9 +95,9 @@ def participant_parser(participant: dict) -> dict:
         "reported_race"
     ]
     if participant["reported_race"] == "Unknown" or participant["reported_race"] == "More than one race":
-        participant["reported_race"] = []
+        participant["reported_race"] = ["NA"]
     if participant["reported_ethnicity"] == "Unknown":
-        participant["reported_ethnicity"] = []
+        participant["reported_ethnicity"] = ["NA"]
 
     try:
         participant["age_at_last_observation"] = float(
