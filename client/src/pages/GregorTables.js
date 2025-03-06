@@ -41,7 +41,7 @@ const Gregor = () => {
   const dataStatus = useSelector(state => state.data.status);
   const rowID = useSelector(state => state.data['tableID']);
   const token = useSelector((state) => state.account.user?.access_token);
-  
+
   const handleChange = (value) => {
     const selectedTable = tables.find(table => table.schema === value);
     dispatch(setTableView(selectedTable));
@@ -55,7 +55,7 @@ const Gregor = () => {
     }
   }, [dispatch, tableData, token]);
 
-  return (  
+  return (
     <Container className="table-container">
       {/* Centered Grid for Logo and Table Selector */}
       <Grid container direction="column" alignItems="center" justifyContent="center" spacing={2}>
@@ -72,7 +72,7 @@ const Gregor = () => {
               <Select
                 labelId="table-select-label"
                 id="table-select"
-                value={tableView} 
+                value={tableView}
                 onChange={(event) => handleChange(event.target.value)}
                 sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
@@ -95,7 +95,7 @@ const Gregor = () => {
         schema={schemas[tableView] || { properties: {} }}
         rowID={rowID || ""}
       />
-    </Container>  
+    </Container>
   );
 };
 
