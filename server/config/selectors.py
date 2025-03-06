@@ -339,20 +339,64 @@ def compare_data(old_data:dict, new_data:dict) -> dict:
     return changes
 
 
-def bulk_retrieve(request_data: dict, model_class, id: str) -> dict:
+def bulk_model_retrieve(request_data: list, model_class, id: str) -> dict:
     """
     Retrieve multiple instances of a model class based on a list of IDs.
 
     Args:
-        request_data (dict): A dictionary containing the data with IDs to 
-            retrieve.
+        request_data (list): A list of dictionaries containing the data with IDs to retrieve.
         model_class: The Django model class to query.
         id (str): The key in request_data that contains the IDs.
 
     Returns:
         dict: A dictionary of model instances keyed by their IDs.
     """
+    if not isinstance(request_data, list) or not request_data:
+        return {}
 
-    model_dict = model_class.objects.in_bulk([datum[id] for datum in request_data])
+    # Validate that the given field exists in the model
+    if not hasattr(model_class, id):
+        return {"error": f"Invalid field '{id}' for model {model_class.__name__}"}
 
+    try:
+        ids = [datum[id] for datum in request_data if id in datum]
+        model_dict = model_class.objects.in_bulk(ids)
+    except Exception as e:
+        return {"error": str(e)}
+    
     return model_dict
+
+
+def bulk_retrieve(model_class, id_list: list, id_field: str = "id") -> dict:
+    """
+    Retrieve multiple instances of a Django model class based on a list of IDs.
+
+    Args:
+        model_class (models.Model): The Django model class to query.
+        id_list (list): A list of IDs to retrieve.
+        id_field (str): The name of the field to filter by (default is "id").
+
+    Returns:
+        dict: A dictionary of model instances serialized as JSON, keyed by their IDs.
+    """
+
+    if not isinstance(id_list, list) or not id_list:
+        return {}
+
+    try:
+        # Retrieve model instances based on the given ID field
+        model_dict = model_class.objects.in_bulk(id_list, field_name=id_field)
+
+        # Convert queryset to JSON-like structure
+        serialized_data = {
+            str(obj_id): obj.__dict__ for obj_id, obj in model_dict.items()
+        }
+
+        # Remove internal Django fields (_state) from the response
+        for obj in serialized_data.values():
+            obj.pop("_state", None)
+
+        return serialized_data
+
+    except Exception as e:
+        return {"error": str(e)}
