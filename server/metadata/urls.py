@@ -3,15 +3,22 @@
 
 from django.urls import path
 from metadata.apis import (
+    CrearteParticipantAPI,
+    ReadParticipantAPI,
+    UpdateParticipantAPI,
+    DeleteParticipantAPI,
     CreateOrUpdateGeneticFindings,
-    CrearteOrUpdateParticipantAPI,
     CreateOrUpdateAnalyte,
     CreateOrUpdateFamilyApi,
     CreateOrUpdatePhenotypeApi,
 )
 
 urlpatterns = [
-    path("submit_participants/", CrearteOrUpdateParticipantAPI.as_view()),
+    path("create_participants/", CrearteParticipantAPI.as_view()),
+    path("read_participants/", ReadParticipantAPI.as_view()),
+    path("update_participants/", UpdateParticipantAPI.as_view()),
+    path("delete_participants/", DeleteParticipantAPI.as_view()),
+
     path("submit_families/", CreateOrUpdateFamilyApi.as_view()),
     path("submit_phenotype/", CreateOrUpdatePhenotypeApi.as_view()),
     path("submit_analyte/", CreateOrUpdateAnalyte.as_view()),

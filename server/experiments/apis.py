@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.selectors import bulk_retrieve
+from config.selectors import bulk_model_retrieve
 
 from experiments.models import (
     AlignedRNAShortRead,
@@ -67,7 +67,7 @@ class CreateOrUpdateAlignedShortRead(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        aligned_dna_short_read = bulk_retrieve(
+        aligned_dna_short_read = bulk_model_retrieve(
             request_data=request.data,
             model_class=AlignedDNAShortRead,
             id="aligned_dna_short_read_id"
@@ -137,7 +137,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        dna_short_read = bulk_retrieve(
+        dna_short_read = bulk_model_retrieve(
             request_data=request.data,
             model_class=ExperimentDNAShortRead,
             id="experiment_dna_short_read_id"
@@ -207,7 +207,7 @@ class CreateOrUpdateAlignedPacBio(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        aligned_pac_bio = bulk_retrieve(
+        aligned_pac_bio = bulk_model_retrieve(
             request_data=request.data,
             model_class=AlignedPacBio,
             id="aligned_pac_bio_id"
@@ -277,7 +277,7 @@ class CreateOrUpdateExperimentPacBio(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        experiment_pac_bio = bulk_retrieve(
+        experiment_pac_bio = bulk_model_retrieve(
             request_data=request.data,
             model_class=ExperimentPacBio,
             id="experiment_pac_bio_id"
@@ -347,7 +347,7 @@ class CreateOrUpdateAlignedNanopore(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        aligned_nanopore = bulk_retrieve(
+        aligned_nanopore = bulk_model_retrieve(
             request_data=request.data,
             model_class=AlignedNanopore,
             id="aligned_nanopore_id"
@@ -417,7 +417,7 @@ class CreateOrUpdateExperimentNanopore(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        dna_short_read = bulk_retrieve(
+        dna_short_read = bulk_model_retrieve(
             request_data=request.data,
             model_class=ExperimentNanopore,
             id="experiment_nanopore_id"
@@ -484,7 +484,7 @@ class CreateOrUpdateAlignedRna(APIView):
     )
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        aligned_rna = bulk_retrieve(
+        aligned_rna = bulk_model_retrieve(
             request_data=request.data,
             model_class=AlignedRNAShortRead,
             id="aligned_rna_short_read_id"
@@ -554,7 +554,7 @@ class CreateOrUpdateExperimentRna(APIView):
 
     def post(self, request):
         # Most efficient query is to pull all ids from request at once
-        rna_short_read = bulk_retrieve(
+        rna_short_read = bulk_model_retrieve(
             request_data=request.data,
             model_class=ExperimentRNAShortRead,
             id="experiment_rna_short_read_id"

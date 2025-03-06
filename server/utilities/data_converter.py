@@ -16,7 +16,7 @@ django.setup()
 import sys
 import csv
 import argparse
-from config.selectors import bulk_retrieve
+from config.selectors import bulk_model_retrieve
 from metadata.services import create_or_update_metadata
 from metadata.models import (
     Participant,
@@ -131,7 +131,7 @@ class TableConverter:
         # is in a field named "<table_name>_id" (e.g. "participant_id").
         identifier_field = f"{table_name}_id"
 
-        model_instances = bulk_retrieve(
+        model_instances = bulk_model_retrieve(
             request_data=data_list,
             model_class=models[table_name],
             id=identifier_field

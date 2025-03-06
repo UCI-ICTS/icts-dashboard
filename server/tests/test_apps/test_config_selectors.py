@@ -8,7 +8,7 @@ from rest_framework import status
 from metadata.models import Family
 from config.selectors import (
     TableValidator, remove_na, multi_value_split, response_status, response_constructor,
-    validate_url, generate_tsv, generate_zip, compare_data, bulk_retrieve
+    validate_url, generate_tsv, generate_zip, compare_data, bulk_model_retrieve, bulk_retrieve
 )
 
 class TableValidatorTests(TestCase):
@@ -140,10 +140,19 @@ class UtilityFunctionTests(TestCase):
         result = compare_data(old_data, new_data)
         self.assertEqual(result["age"], "30 to 31")
 
-    def test_bulk_retrieve(self):
-        """Tests retrieving objects from the test database."""
 
-        result = bulk_retrieve(
+class BulkModelRetrieveTestCase(TestCase):
+    fixtures = ['tests/fixtures/test_fixture.json']
+
+    def setUp(self):
+        """Retrieve existing families from the fixture instead of creating duplicates."""
+        self.family_1 = Family.objects.get(family_id="GREGoR_test-001")
+        self.family_2 = Family.objects.get(family_id="GREGoR_test-002")
+
+
+    def test_bulk_model_retrieve_valid_ids(self):
+        """Tests retrieving objects using valid IDs."""
+        result = bulk_model_retrieve(
             [
                 {"family_id": "GREGoR_test-001"},
                 {"family_id": "GREGoR_test-002"}
@@ -151,4 +160,50 @@ class UtilityFunctionTests(TestCase):
 
         self.assertIn("GREGoR_test-001", result)
         self.assertIn("GREGoR_test-002", result)
+        self.assertEqual(result["GREGoR_test-001"], self.family_1)
+        self.assertEqual(result["GREGoR_test-002"], self.family_2)
+    
+    def test_bulk_model_retrieve_invalid_ids(self):
+        """Tests retrieving objects with non-existent IDs."""
+        result = bulk_model_retrieve(
+            [{"family_id": "GREGoR_test-999"}], Family, "family_id")
+        self.assertEqual(result, {})
+    
+    def test_bulk_model_retrieve_empty_list(self):
+        """Tests retrieving objects with an empty ID list."""
+        result = bulk_model_retrieve([], Family, "family_id")
+        self.assertEqual(result, {})
+    
+    def test_bulk_model_retrieve_invalid_field(self):
+        """Tests retrieving objects with an invalid field name."""
+        result = bulk_model_retrieve(
+            [{"family_id": "GREGoR_test-001"}], Family, "invalid_field")
+        self.assertIn("error", result)
 
+        
+class BulkRetrieveTestCase(TestCase):
+    fixtures = ['tests/fixtures/test_fixture.json']
+
+    def test_bulk_retrieve_valid_ids(self):
+        """Tests retrieving objects using valid IDs."""
+        result = bulk_retrieve(Family, ["GREGoR_test-001", "GREGoR_test-002"], "family_id")
+
+        self.assertIn("GREGoR_test-001", result)
+        self.assertIn("GREGoR_test-002", result)
+        self.assertEqual(result["GREGoR_test-001"]["family_id"], "GREGoR_test-001")
+        self.assertEqual(result["GREGoR_test-002"]["family_id"], "GREGoR_test-002")
+    
+    def test_bulk_retrieve_invalid_ids(self):
+        """Tests retrieving objects with non-existent IDs."""
+        result = bulk_retrieve(Family, ["GREGoR_test-999"], "family_id")
+        self.assertEqual(result, {})
+    
+    def test_bulk_retrieve_empty_list(self):
+        """Tests retrieving objects with an empty ID list."""
+        result = bulk_retrieve(Family, [], "family_id")
+        self.assertEqual(result, {})
+    
+    def test_bulk_retrieve_invalid_field(self):
+        """Tests retrieving objects with an invalid field name."""
+        result = bulk_retrieve(Family, ["GREGoR_test-001"], "invalid_field")
+        self.assertIn("error", result)
