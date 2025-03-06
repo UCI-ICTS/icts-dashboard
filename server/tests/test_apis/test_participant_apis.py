@@ -16,24 +16,24 @@ class APITestCaseWithAuth(APITestCase):
 class CreateParticipantAPITest(APITestCaseWithAuth):
     def test_create_participant_api(self):
         url = "/api/metadata/create_participants/"
-        part1 = {
+        part1 = {  # Valid submission
             "participant_id": "P-002-101-0",
-            "consent_code": "HMB",
             "gregor_center": "UCI",
+            "consent_code": "HMB",
             "family_id": "GREGoR_test-001",
             "paternal_id": "0",
             "maternal_id": "0",
             "proband_relationship": "Self",
             "sex": "Male",
-            "affected_status": "Unaffected",
-            "solve_status": "Unsolved",
-            "age_at_last_observation": 20,
-            "age_at_enrollment": 20,
-            "missing_variant_case": "No" #,
+            # "reported_race": "More than one",
             # "reported_ethnicity": "Unknown",
-            # "reported_race": "More than one"
+            "age_at_last_observation": 20,
+            "affected_status": "Unaffected",
+            "age_at_enrollment": 20,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "No"
         }
-        part2 = {
+        part2 = {  # Invalid submission; missing participant_id
             "gregor_center": "UCI",
             "consent_code": "GRU",
             "family_id": "GREGoR_test-001",
@@ -43,17 +43,17 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
             "proband_relationship_detail": "",
             "sex": "Female",
             "sex_detail": "",
+            "reported_race": [],
             "reported_ethnicity": "Hispanic or Latino",
             "ancestry_detail": "",
             "age_at_last_observation": 45.1,
             "affected_status": "Unaffected",
             "age_at_enrollment": 45.1,
             "solve_status": "Unaffected",
-            "missing_variant_case": "Unknown",
-            "reported_race": []
+            "missing_variant_case": "Unknown"
         }
-        part3 = {
-            "participant_id": "P-202-001-0",
+        part3 = {  # Valid submission
+            "participant_id": "P-003-101-2",
             "gregor_center": "UCI",
             "consent_code": "GRU",
             "family_id": "GREGoR_test-001",
@@ -63,14 +63,14 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
             "proband_relationship_detail": "",
             "sex": "Female",
             "sex_detail": "",
+            "reported_race": [],
             "reported_ethnicity": "Hispanic or Latino",
             "ancestry_detail": "",
             "age_at_last_observation": 45.1,
             "affected_status": "Unaffected",
             "age_at_enrollment": 45.1,
             "solve_status": "Unaffected",
-            "missing_variant_case": "Unknown",
-            "reported_race": []
+            "missing_variant_case": "Unknown"
         }
         response_200 = self.client.post(url, [part3], format='json')
         response_207 = self.client.post(url, [part1, part3], format='json')
@@ -84,20 +84,23 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
 class ReadParticipantAPITest(APITestCaseWithAuth):
     def test_read_participant_success(self):
         url1 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2"
-        url2 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2, DNE-01-1"
-        url3 = "/api/metadata/read_participants/?ids=DNE-01-1, DNE-2-2"
+        url2 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2,DNE-01-1"
+        url3 = "/api/metadata/read_participants/?ids=DNE-01-1,DNE-2-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
         response_400 = self.client.get(url3, format='json')
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
+        self.assertEqual(response_207.data[0]["request_status"], "SUCCESS")
+        self.assertEqual(response_207.data[1]["request_status"], "SUCCESS")
+        self.assertEqual(response_207.data[2]["request_status"], "NOT FOUND")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 class UpdateParticipantAPITest(APITestCaseWithAuth):
     def test_update_participant(self):
         url = "/api/metadata/update_participants/"
-        
+
         part1= {
             "participant_id": "GREGoR_test-001-002-0",
             "consent_code": "HMB",
@@ -128,11 +131,12 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
             "age_at_enrollment": 20,
             "missing_variant_case": "No"
         }
-        
+
         response_200 = self.client.post(url, [part1], format='json')
         response_207 = self.client.post(url, [part1, part2], format='json')
         response_400 = self.client.post(url, [part2, part2], format='json')
-        
+
+        import pdb; pdb.set_trace()
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)

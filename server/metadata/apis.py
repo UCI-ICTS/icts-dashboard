@@ -40,8 +40,8 @@ class CrearteParticipantAPI(APIView):
     """
     API view to create Participant entries.
 
-    This API endpoint accepts a list of participant data objects, checks that 
-    the submission does not exist, and creates new entries based on the 
+    This API endpoint accepts a list of participant data objects, checks that
+    the submission does not exist, and creates new entries based on the
     presence of a 'participant_id'.
 
     Responses vary based on the results of the submissions:
@@ -58,7 +58,7 @@ class CrearteParticipantAPI(APIView):
         request_body=ParticipantInputSerializer(many=True),
         responses={
             200: "All updates successfull",
-            207: "Some updates were not successfull",
+            207: "Some updates were not successful",
             400: "Bad request",
         },
         tags=["Participant"],
@@ -71,14 +71,14 @@ class CrearteParticipantAPI(APIView):
             model_class=Participant,
             id="participant_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
 
         new_records = []
         existing_records = []
-        
+
         # Split request data into new and existing records
         for datum in request.data:
             participant_id = datum.get("participant_id")  # Safely retrieve participant_id
@@ -154,7 +154,7 @@ class ReadParticipantAPI(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
-        
+
         responses={
             200: "All queries returned successfull",
             207: "Some queries were not successfull",
@@ -213,7 +213,7 @@ class ReadParticipantAPI(APIView):
                 )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-   
+
 
 class UpdateParticipantAPI(APIView):
     """
@@ -250,7 +250,7 @@ class UpdateParticipantAPI(APIView):
             model_class=Participant,
             id="participant_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
@@ -260,7 +260,7 @@ class UpdateParticipantAPI(APIView):
 
         # Split request data into new and existing records
         for datum in request.data:
-            participant_id = datum.get("participant_id")  
+            participant_id = datum.get("participant_id")
             if participant_id and participant_id in participants:
                 existing_records.append(datum)
             else:
@@ -313,8 +313,7 @@ class DeleteParticipantAPI(APIView):
     API view to create or update Participant entries.
 
     This API endpoint accepts a list of participant data objects, validates
-     them, and either creates new entries or updates existing ones based on
-     the presence of a 'participant_id'.
+     them, and deletes them based on the 'participant_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -348,13 +347,13 @@ class DeleteParticipantAPI(APIView):
             model_class=Participant,
             id_list=id_list,
             id_field="participant_id"
-        ) 
+        )
         try:
             for identifier in id_list:
                 if identifier in participants:
                     return_data, result = delete_metadata(
                         table_name="participant",
-                        identifier=identifier, 
+                        identifier=identifier,
                         id_field="participant_id"
                     )
                     response_data.append(return_data)
@@ -389,11 +388,12 @@ class DeleteParticipantAPI(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
-class CreateOrUpdateFamilyApi(APIView):
+class CreateOrUpdateFamilyAPI(APIView):
     """
     API view to create or update Family entries.
 
-    This API endpoint accepts a list of family data objects, validates them, and either creates new entries or updates existing ones based on the presence of a 'family_id'.
+    This API endpoint accepts a list of family data objects, validates them, and either
+     creates new entries or updates existing ones based on the presence of a 'family_id'.
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
     - Returns HTTP 207 if some operations fail.
@@ -404,7 +404,7 @@ class CreateOrUpdateFamilyApi(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_family",
+        operation_id="submit_families",
         request_body=FamilySerializer(many=True),
         responses={
             200: "All submissions of families were successfull",
@@ -425,7 +425,7 @@ class CreateOrUpdateFamilyApi(APIView):
         response_data = []
         rejected_requests = False
         accepted_requests = False
-        
+
         try:
             for index, datum in enumerate(request.data):
                 identifier = datum["family_id"]
@@ -457,14 +457,178 @@ class CreateOrUpdateFamilyApi(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+class ReadFamilyAPI(APIView):
+    """
+    API view to read Family entries.
 
-class CreateOrUpdateAnalyte(APIView):
+    This API endpoint requests a list of family data objects based on the 'family_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_families",
+        operation_description="Retrieve families details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of family IDs (e.g., F1, F2, F3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Families"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch families
+        families = bulk_retrieve(
+            model_class=Family,
+            id_list=id_list,
+            id_field="family_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in families:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=families[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Family not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class DeleteFamilyAPI(APIView):
+    """
+    API view to create or update Family entries.
+
+    This API endpoint accepts a list of family data objects, validates
+     them, and deletes them based on the 'family_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_families",
+        request_body=FamilySerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Families"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch families
+        families = bulk_retrieve(
+            model_class=Family,
+            id_list=id_list,
+            id_field="family_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in families:
+                    return_data, result = delete_metadata(
+                        table_name="family",
+                        identifier=identifier,
+                        id_field="family_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Family not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class CreateOrUpdateAnalyteAPI(APIView):
     """
     API view to create or update Analyte entries.
 
-    This API endpoint accepts a list of analyte data objects, 
-    validates them, and either creates new entries or updates existing ones 
-    based on the presence of a 'genetic_findings_id'.
+    This API endpoint accepts a list of analyte data objects,
+     validates them, and either creates new entries or updates existing ones
+     based on the presence of a 'analyte_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -473,11 +637,11 @@ class CreateOrUpdateAnalyte(APIView):
     """
 
     @swagger_auto_schema(
-        operation_id="submit_analyte",
+        operation_id="submit_analytes",
         request_body=AnalyteSerializer(many=True),
         responses={
-            200: "All submissions of genetic findings were successfull",
-            207: "Some submissions of genetic findings were not successful.",
+            200: "All submissions of analytes were successfull",
+            207: "Some submissions of analytes were not successful.",
             400: "Bad request",
         },
         tags=["CreateOrUpdate"],
@@ -489,7 +653,7 @@ class CreateOrUpdateAnalyte(APIView):
             model_class=Analyte,
             id="analyte_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
@@ -524,15 +688,180 @@ class CreateOrUpdateAnalyte(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+class ReadAnalyteAPI(APIView):
+    """
+    API view to read Analyte entries.
 
-class CreateOrUpdatePhenotypeApi(APIView):
+    This API endpoint requests a list of analyte data objects based on the
+     'analyte_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_analytes",
+        operation_description="Retrieve analytes details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of analyte IDs (e.g., A1, A2, A3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Analytes"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch analytes
+        analytes = bulk_retrieve(
+            model_class=Analyte,
+            id_list=id_list,
+            id_field="analyte_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in analytes:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=analytes[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Analyte not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class DeleteAnalyteAPI(APIView):
+    """
+    API view to delete Analyte entries.
+
+    This API endpoint accepts a list of analyte data objects, validates
+     them, and deletes them based on the 'analyte_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_analytes",
+        request_body=AnalyteSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Analytes"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch analytes
+        analytes = bulk_retrieve(
+            model_class=Analyte,
+            id_list=id_list,
+            id_field="analyte_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in analytes:
+                    return_data, result = delete_metadata(
+                        table_name="analyte",
+                        identifier=identifier,
+                        id_field="analyte_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Analyte not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class CreateOrUpdatePhenotypeAPI(APIView):
     """
     API view to create or update phenotype entries.
 
-    This API endpoint allows clients to submit multiple phenotype entries at 
-    once. Each phenotype can either be created or updated depending on whether 
-    it already exists. The request must be in the form of a JSON array of
-    phenotype objects.
+    This API endpoint allows clients to submit multiple phenotype entries at
+     once. Each phenotype can either be created or updated depending on whether
+     it already exists. The request must be in the form of a JSON array of
+     phenotype objects.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -541,7 +870,7 @@ class CreateOrUpdatePhenotypeApi(APIView):
     """
 
     @swagger_auto_schema(
-        operation_id="create_phenotype",
+        operation_id="submit_phenotypes",
         request_body=PhenotypeSerializer(many=True),
         responses={
             200: "All submissions of phenotypes were successfull",
@@ -590,15 +919,180 @@ class CreateOrUpdatePhenotypeApi(APIView):
                 )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-        
 
-class CreateOrUpdateGeneticFindings(APIView):
+class ReadPhenotypeAPI(APIView):
+    """
+    API view to read Phenotype entries.
+
+    This API endpoint requests a list of phenotype data objects based on the
+     'phenotype_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_phenotypes",
+        operation_description="Retrieve phenotypes details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of phenotype IDs (e.g., Ph1, Ph2, Ph3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Phenotypes"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch phenotypes
+        phenotypes = bulk_retrieve(
+            model_class=Phenotype,
+            id_list=id_list,
+            id_field="phenotype_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in phenotypes:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=phenotypes[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Phenotype not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class DeletePhenotypeAPI(APIView):
+    """
+    API view to delete Phenotype entries.
+
+    This API endpoint accepts a list of phenotype data objects, validates
+     them, and deletes them based on the 'phenotype_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_phenotypes",
+        request_body=PhenotypeSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Phenotypes"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch phenotypes
+        phenotypes = bulk_retrieve(
+            model_class=Phenotype,
+            id_list=id_list,
+            id_field="phenotype_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in phenotypes:
+                    return_data, result = delete_metadata(
+                        table_name="phenotype",
+                        identifier=identifier,
+                        id_field="phenotype_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Phenotype not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class CreateOrUpdateGeneticFindingsAPI(APIView):
     """
     API view to create or update Genetic Findings entries.
 
-    This API endpoint accepts a list of genetic findings data objects, 
-    validates them, and either creates new entries or updates existing ones 
-    based on the presence of a 'genetic_findings_id'.
+    This API endpoint accepts a list of genetic findings data objects,
+     validates them, and either creates new entries or updates existing ones
+     based on the presence of a 'genetic_findings_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -623,7 +1117,7 @@ class CreateOrUpdateGeneticFindings(APIView):
             model_class=GeneticFindings,
             id="genetic_findings_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
@@ -658,3 +1152,169 @@ class CreateOrUpdateGeneticFindings(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+class ReadGeneticFindingsAPI(APIView):
+    """
+    API view to read Genetic Findings entries.
+
+    This API endpoint requests a list of genetic findings data objects based on the
+     'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_genetic_findings",
+        operation_description="Retrieve genetic findings details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of genetic findings IDs (e.g., G1, G2, G3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Genetic_Findings"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch genetic_findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
+            id_list=id_list,
+            id_field="genetic_findings_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in genetic_findings:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=genetic_findings[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Genetic findings not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class DeleteGeneticFindingsAPI(APIView):
+    """
+    API view to create or update Genetic Findings entries.
+
+    This API endpoint accepts a list of genetic finding data objects, validates
+     them, and either creates new entries or updates existing ones based on
+     the presence of a 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Genetic_Findings"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch genetic_findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
+            id_list=id_list,
+            id_field="genetic_findings_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in genetic_findings:
+                    return_data, result = delete_metadata(
+                        table_name="genetic_findings",
+                        identifier=identifier,
+                        id_field="genetic_findings_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Genetic Findings not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
