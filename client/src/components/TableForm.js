@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { 
+import {
   Box,
   Button,
   Dialog,
@@ -21,7 +21,7 @@ import FormDialogue from "./FormDialogue";
 
 const TableForm = ({ rows, schema, rowID }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(-1);
   const loadStatus = useSelector((state) => state.data.status);
   const [openDialog, setOpenDialog] = useState(false)
   const [selectedRow, setSelectedRow] = useState(null);
@@ -29,12 +29,12 @@ const TableForm = ({ rows, schema, rowID }) => {
   const [selectedColumn, setSelectedColumn] = useState(""); // Column Filter
   const [advancedFilters, setAdvancedFilters] = useState({}); // Advanced Filter State
   const [openFilterDialog, setOpenFilterDialog] = useState(false); // Filter Dialog Toggle
-  
+
   // Open dialogue for row
   const handleRowClick = (params) => {
     setSelectedRow(params.row);
     setOpenDialog(true);
-  };  
+  };
 
   // Add new row to table
   const handleAddNewRow = () => {
@@ -58,18 +58,18 @@ const TableForm = ({ rows, schema, rowID }) => {
         resizable: true,
         sortable: true,
         sortComparator: (v1, v2) => {
-          // Convert both values to strings first
-          const str1 = v1 ? v1.toString() : "";
-          const str2 = v2 ? v2.toString() : "";
-        
+          // Convert both values to strings first and remove PMGRC prefix if present
+          const str1 = v1 ? v1.toString().replace(/^PMGRC-/, "") : "";
+          const str2 = v2 ? v2.toString().replace(/^PMGRC-/, "") : "";
+
           // Attempt numerical comparison first
           const num1 = parseFloat(str1);
           const num2 = parseFloat(str2);
-        
+
           if (!isNaN(num1) && !isNaN(num2)) {
             return num1 - num2; // Sort numerically if both are valid numbers
           }
-        
+
           return str1.localeCompare(str2); // Default to string comparison
         },
       })),
@@ -158,12 +158,12 @@ const TableForm = ({ rows, schema, rowID }) => {
         </Tooltip>
 
         {/* Download Button */}
-        <DownloadTSVButton 
+        <DownloadTSVButton
           rows={filteredRows}
           rowID={rowID}
-          headCells={columns} 
+          headCells={columns}
           disabled={
-            searchQuery === "" && 
+            searchQuery === "" &&
             Object.values(advancedFilters).every(value => !value)
           }
         />
@@ -203,6 +203,22 @@ const TableForm = ({ rows, schema, rowID }) => {
         </Box>
       ) : (
         <DataGrid
+        initialState={{  /* Changes specific only to the PMGRC participants table */
+          columns: {
+            columnVisibilityModel: {
+              internal_project_id: false,
+              gregor_center: false,
+              consent_code: false,
+              recontactable: false,
+              pmid_id: false,
+              proband_relationship_detail: false,
+              sex_detail: false,
+            }
+          },
+          sorting: {
+            sortModel: [{ field: "family_id", sort: "asc" }]
+          }
+        }}
           rows={visibleRows}
           columns={columns}
           getRowId={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}

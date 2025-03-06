@@ -54,7 +54,7 @@ const jsonSchemaToYup = (jsonSchema) => {
         if (jsonSchema.required?.includes(key)) { // Only require if in required list
           validator = validator.min(1, `${key} must have at least one selected value`);
         }
-      
+
     }
 
     if (jsonSchema.required?.includes(key)) {
@@ -69,6 +69,8 @@ const jsonSchemaToYup = (jsonSchema) => {
 
 const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) => {
   const dispatch = useDispatch();
+  const[editForm, setEditForm] = useState(false);
+  const handleEdit = () => {setEditForm(!editForm)};
   const token = useSelector((state) => state.account.user?.access_token);
 
   const yupSchema = useMemo(() => jsonSchemaToYup(schema), [schema]);
@@ -101,7 +103,7 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
           <Tooltip title={fieldSchema.description || `Options for ${key}`} arrow>
             <span className="form-checkbox-title">{key}</span>
           </Tooltip>
-    
+
           <FormGroup>
             {fieldSchema.items.enum.map((option) => (
               <FormControlLabel
@@ -124,12 +126,12 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
               />
             ))}
           </FormGroup>
-    
+
           {touched[key] && errors[key] && <FormHelperText error>{errors[key]}</FormHelperText>}
         </div>
       );
     }
-    
+
 
     if (fieldSchema.type === "array" && fieldSchema.items?.type === "string") {
       return (
@@ -150,7 +152,7 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
                         margin="normal"
                         error={touched[key]?.[index] && Boolean(errors[key]?.[index])}
                         helperText={touched[key]?.[index] && errors[key]?.[index]}
-                        label={`Item ${index + 1}`}
+                        label={`${key} ${index + 1}`}
                       />
                       </Tooltip>
                     </Grid>
@@ -214,7 +216,8 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{schema.title || "Form"} Details</DialogTitle>
+      <DialogTitle>{schema.title.charAt(0).toUpperCase()+schema.title.slice(1) ||
+        "Form"} Details</DialogTitle>
       <DialogContent>
         {selectedRow && (
           <Formik
@@ -232,27 +235,35 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
           >
             {({ values, handleChange, handleBlur, touched, errors }) => (
               <Form>
+                <DialogActions>
+                  <Button onClick={handleEdit} color="primary" Toggle Statue>Edit</Button>
+                  <Button onClick={onClose} color="secondary">Close</Button>
+                  <Button type="submit" color="primary">Submit</Button>
+                </DialogActions>
                 {Object.entries(selectedRow).map(([key]) => (
                   <Grid container spacing={2} key={key} alignItems="center">
+                    {editForm ? (
+                      <Grid item xs>
+                        {renderField(
+                          key, schema.properties[key], values, handleChange,
+                          handleBlur=false, touched=false, errors=false
+                        )}
+                      </Grid>
+                    ) : (
                     <Grid item>
                       <Tooltip title={
                         schema.properties[key]?.description ||
                         schema.properties[key]?.items?.description ||
                         "Description unavailable"} arrow>
                         <div style={{ display: "inline-block", fontWeight: "bold", cursor: "help" }}>
-                          {key}
+                          {key}:&nbsp;&nbsp;
                         </div>
+                        <div style={{ display: "inline-block" }}>{selectedRow[key]}</div>
                       </Tooltip>
                     </Grid>
-                    <Grid item xs>{}
-                      {renderField(key, schema.properties[key], values, handleChange, handleBlur, touched, errors)}
-                    </Grid>
+                    )}
                   </Grid>
                 ))}
-                <DialogActions>
-                  <Button onClick={onClose} color="secondary">Close</Button>
-                  <Button type="submit" color="primary">Submit</Button>
-                </DialogActions>
               </Form>
             )}
           </Formik>
