@@ -125,7 +125,6 @@ def list_2_schema(input_file: str, out_dir:str)-> dict:
     with open(input_file, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    import pdb; pdb.set_trace()
     for table in data["tables"]:
         table_name = table["table"]
         table_schema = {

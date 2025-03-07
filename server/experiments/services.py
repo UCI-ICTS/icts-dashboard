@@ -76,13 +76,6 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
             "five_prime_three_prime_bias": "5prime3prime_bias"
         }
 
-    def to_representation(self, instance):
-        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
-        data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
-        return data
-
     def to_internal_value(self, data):
         """ Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias` """
         if "5prime3prime_bias" in data:
@@ -129,7 +122,13 @@ class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-
+    
+    def to_representation(self, instance):
+        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
     class Meta:
