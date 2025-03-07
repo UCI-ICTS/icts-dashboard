@@ -55,7 +55,7 @@ from experiments.services import (
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
-    ExperimentRnaSerializer
+    ExperimentRnaOutputSerializer
 )
 
 class GetAllTablesAPI(APIView):
@@ -102,7 +102,7 @@ class GetAllTablesAPI(APIView):
             serialized_dna = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
             serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
             serialized_pacbio = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
-            serialized_rna = ExperimentRnaSerializer(ExperimentRNAShortRead.objects.all(), many=True)
+            serialized_rna = ExperimentRnaOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
             
 
             serilized_return_data = {
