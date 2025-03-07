@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateFamilyAPITest(APITestCaseWithAuth):
     def test_create_family_api(self):
-        url = "/api/metadata/submit_families/"
+        url = "/api/metadata/create_families/"
         part1 = {  # Valid submission
             "family_id": "P-101",
             "consanguinity": "Unknown",
@@ -24,8 +24,16 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "pedigree_file_detail": "",
             "family_history_detail": ""
         }
-        part2 = {  # Invalid submission; missing consanguinity
+        part2 = {  # Valid submission 2
             "family_id": "P-102",
+            "consanguinity": "Present",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
+            "pedigree_file_detail": "",
+            "family_history_detail": ""
+        }
+        part3 = {  # Invalid submission; missing consanguinity
+            "family_id": "P-103",
             "consanguinity": "",
             "consanguinity_detail": "",
             "pedigree_file": "",
@@ -33,11 +41,11 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": ""
         }
         response_200 = self.client.post(url, [part1], format='json')
-        response_207 = self.client.post(url, [part1, part2], format='json')
-        response_400 = self.client.post(url, [part2], format='json')
+        response_207 = self.client.post(url, [part2, part3], format='json')
+        response_400 = self.client.post(url, [part3], format='json')
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "SUCCESS")
+        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -60,7 +68,7 @@ class ReadFamilyAPITest(APITestCaseWithAuth):
 
 class UpdateFamilyAPITest(APITestCaseWithAuth):
     def test_update_family_api(self):
-        url = "/api/metadata/submit_families/"
+        url = "/api/metadata/update_families/"
         part1 = {  # Valid submission
             "family_id": "GREGoR_test-001",
             "consanguinity": "Present",
@@ -83,7 +91,7 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "SUCCESS")
+        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
