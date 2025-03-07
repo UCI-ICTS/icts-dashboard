@@ -145,7 +145,6 @@ class ReadParticipantAPI(APIView):
 
     @swagger_auto_schema(
         operation_id="read_participants",
-        operation_description="Retrieve participant details by their IDs",
         manual_parameters=[
             openapi.Parameter(
                 "ids",
@@ -168,7 +167,7 @@ class ReadParticipantAPI(APIView):
         rejected_requests = False
         accepted_requests = False
 
-        id_list = request.GET.get("ids", "").split(",")
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
 
         # Fetch participants
         participants = bulk_retrieve(
@@ -310,11 +309,10 @@ class UpdateParticipantAPI(APIView):
 
 class DeleteParticipantAPI(APIView):
     """
-    API view to create or update Participant entries.
+    API view to delete Participant entries.
 
-    This API endpoint accepts a list of participant data objects, validates
-     them, and either creates new entries or updates existing ones based on
-     the presence of a 'participant_id'.
+    This API endpoint delets a list of participant data objects based on
+     the 'participant_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -327,10 +325,18 @@ class DeleteParticipantAPI(APIView):
 
     @swagger_auto_schema(
         operation_id="delete_participants",
-        request_body=ParticipantInputSerializer(many=True),
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of participant IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        
         responses={
-            200: "All updates successfull",
-            207: "Some updates were not successfull",
+            200: "All queries successfully deleted",
+            207: "Some queries were not successfully deleted",
             400: "Bad request",
         },
         tags=["Participant"],
@@ -341,7 +347,7 @@ class DeleteParticipantAPI(APIView):
         rejected_requests = False
         accepted_requests = False
 
-        id_list = request.GET.get("ids", "").split(",")
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
 
         # Fetch participants
         participants = bulk_retrieve(
