@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Grid } from "@material-ui/core";
+import { Box, Container, Grid } from "@mui/material"
 import "../App.css"
 import { InfoBox } from "../components/InfoBox";
 import { TableForm } from "../components/TableForm";

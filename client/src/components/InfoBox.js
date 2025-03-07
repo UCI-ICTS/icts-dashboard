@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardActionArea, CardContent, Typography } from "@material-ui/core";
+import { Card, CardActionArea, CardContent, Typography } from "@mui/material"
 
 export const InfoBox = ({ header, bodyText, linkTo }) => {
   const handleClick = (event) => {
@@ -13,7 +13,7 @@ export const InfoBox = ({ header, bodyText, linkTo }) => {
         className="home-linkcard" 
         component="a" 
         href={linkTo} 
-        onClick={handleClick} // ✅ Manually open link in new tab
+        onClick={handleClick}
       >
         <CardContent>
           <Typography className="home-intro-title">

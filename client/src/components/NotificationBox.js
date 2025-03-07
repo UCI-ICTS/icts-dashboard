@@ -1,6 +1,6 @@
 
 import React, { useEffect } from "react"
-import { Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core"
+import { Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux";
 import { clearMessage } from "../slices/messageSlice";
 

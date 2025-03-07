@@ -11,7 +11,7 @@ import {
   Container,
   Grid,
   Typography
-} from "@material-ui/core";
+} from "@mui/material"
 import schemas from "../schemas/v1.7schemas.json";
 import { setTableView } from '../slices/dataSlice';
 

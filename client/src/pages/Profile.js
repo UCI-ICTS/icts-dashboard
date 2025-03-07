@@ -1,7 +1,7 @@
 // src/pages/profile.js
 
 import React, { useState} from "react";
-import { Button, Card, CardContent, CardHeader, Grid, TextField } from "@material-ui/core";
+import { Button, Card, CardContent, CardHeader, Grid, TextField } from "@mui/material"
 import "../App.css"
 import PasswordReset from "../components/PasswordReset.js";
 import { useDispatch, useSelector } from "react-redux";
