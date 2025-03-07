@@ -11,7 +11,7 @@ from experiments.apis import (
     CreateOrUpdateAlignedNanopore,
     CreateOrUpdateExperimentNanopore,
     CreateOrUpdateAlignedRna,
-    # CreateExperimentRnaShortRead,
+    CreateExperimentRnaShortRead,
     ReadExperimentRnaShortRead,
     UpdateExperimentRnaShortRead,
     # DeleteExperimentRnaShortRead
@@ -24,7 +24,7 @@ urlpatterns = [
     path("submit_pac_bio/", CreateOrUpdateExperimentPacBio.as_view()),
     path("submit_aligned_pac_bio/", CreateOrUpdateAlignedPacBio.as_view()),
     
-    # path("create_experiment_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
+    path("create_experiment_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
     path("read_experiment_rna_short_read/", ReadExperimentRnaShortRead.as_view()),
     path("update_experiment_rna_short_read/", UpdateExperimentRnaShortRead.as_view()),
     # path("delete_experiment_rna_short_read/", DeleteExperimentRnaShortRead.as_view()),

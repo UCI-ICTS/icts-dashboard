@@ -4,6 +4,7 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
+from experiments.models import Experiment
 
 class APITestCaseWithAuth(APITestCase):
     fixtures = ['tests/fixtures/test_fixture.json']
@@ -14,7 +15,129 @@ class APITestCaseWithAuth(APITestCase):
         self.client.force_authenticate(user=self.user)
 
 
-# class CreateRNAShortReadAPITest(APITestCaseWithAuth):
+class CreateRNAShortReadAPITest(APITestCaseWithAuth):
+    def test_create_rna_short_read_api(self):
+        url = "/api/experiments/create_experiment_rna_short_read/"
+
+        experiment1 = {
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "read_length": 150,
+            "single_or_paired_ends": "paired-end",
+            "date_data_generation": "2023-03-18",
+            "sequencing_platform": "NovaSeq",
+            "within_site_batch_name": "RNA 2A",
+            "RIN": None,
+            "estimated_library_size": None,
+            "total_reads": 240349679.0,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None,
+            "library_prep_type": [
+                "rRNA depletion",
+                "globin depletion"
+            ],
+            "experiment_type": [
+                "paired-end",
+                "untargeted"
+            ]
+        }
+
+        experiment2 = {
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA_2",
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "read_length": 150,
+            "single_or_paired_ends": "paired-end",
+            "date_data_generation": "2023-03-18",
+            "sequencing_platform": "NovaSeq",
+            "within_site_batch_name": "RNA 2A",
+            "RIN": None,
+            "estimated_library_size": None,
+            "total_reads": 240349679.0,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None,
+            "library_prep_type": [
+                "rRNA depletion",
+                "globin depletion"
+            ],
+            "experiment_type": [
+                "paired-end",
+                "untargeted"
+            ]
+        }
+
+        experiment3 = {
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA_3",
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "read_length": 150,
+            "single_or_paired_ends": "paired-end",
+            "date_data_generation": "2023-03-18",
+            "sequencing_platform": "NovaSeq",
+            "within_site_batch_name": "RNA 2A",
+            "RIN": None,
+            "estimated_library_size": None,
+            "total_reads": 240349679.0,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None,
+            "library_prep_type": [
+                "rRNA depletion",
+                "globin depletion"
+            ],
+            "experiment_type": [
+                "paired-end",
+                "untargeted"
+            ]
+        }
+  
+        response_200 = self.client.post(url, [experiment2], format='json')
+        response_207 = self.client.post(url, [experiment1, experiment3], format='json')
+        response_400 = self.client.post(url, [experiment1, experiment1], format='json')
+        
+        #Checks for the Experiment table
+        experiment1_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+        ).exists()
+        experiment2_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA_2"
+        ).exists()
+        experiment3_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA_3"
+        ).exists()
+        assert experiment1_exists
+        assert experiment2_exists
+        assert experiment3_exists
+        
+        self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_200.data[0]["request_status"], "CREATED")
+        self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
+        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
+        
+
 
 
 class ReadRNAShortReadAPITest(APITestCaseWithAuth):
@@ -103,7 +226,6 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-
         self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
         self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")

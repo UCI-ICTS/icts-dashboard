@@ -346,6 +346,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
     Returns:
         dict: A response dictionary indicating the status of the operation.
     """
+
     table_serializers = {
         "experiment_dna_short_read": {
             "model": ExperimentDNAShortRead,
@@ -392,27 +393,48 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         "participant_id": participant_id,
     }
     
-    serializer = table_serializers[table_name]["input_serializer"](data=datum)
-    if serializer.is_valid():
-        new_instance = serializer.save()
-        return response_constructor(
-            identifier=identifier,
-            request_status="CREATED",
-            code=201,
-            message=f"{table_name} {identifier} created.",
-            data={
-                "instance": table_serializers[table_name]["output_serializer"](new_instance).data
-            }
-        ), "accepted_request"
+    experiment_results = ExperimentService.validate_experiment(experiment_data, table_validator)
+    
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
-        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+        datum = remove_na(datum=datum)
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+
+    if results["valid"] and experiment_results['valid']:
+        serializer = table_serializers[table_name]["input_serializer"](data=datum)
+        experiment_serializer = ExperimentService.create_or_update_experiment(experiment_data)
+        if serializer.is_valid() and experiment_serializer.is_valid():
+            new_instance = serializer.save()
+            return response_constructor(
+                identifier=identifier,
+                request_status="CREATED",
+                code=201,
+                message=f"{table_name} {identifier} created.",
+                data={
+                    "instance": table_serializers[table_name]["output_serializer"](new_instance).data
+                }
+            ), "accepted_request"
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            if experiment_serializer and hasattr(experiment_serializer, 'errors'):
+                error_data.extend(
+                    [{item: experiment_serializer.errors[item]} for item in experiment_serializer.errors]
+                )
+            return response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=error_data,
+            ), "rejected_request"
+    else:
         return response_constructor(
             identifier=identifier,
             request_status="BAD REQUEST",
             code=400,
-            data=error_data,
+            data=results["errors"] + experiment_results["errors"],
         ), "rejected_request"
-
 
 def update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
