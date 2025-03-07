@@ -344,7 +344,6 @@ class ExperimentRNAShortRead(models.Model):
         help_text="Percentage of UMI (Unique Molecular Identifier).",
     )
     five_prime_three_prime_bias = models.FloatField(
-        db_column="5prime3prime_bias",
         null=True, blank=True, help_text="5' to 3' bias of sequencing."
     )
     percent_GC = models.FloatField(
