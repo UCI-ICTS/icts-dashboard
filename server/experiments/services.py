@@ -63,9 +63,31 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
         many=True, slug_field="name", queryset=ExperimentType.objects.all()
     )
 
+    # This renames the field in API input/output while keeping it correct in Django ORM
+    five_prime_three_prime_bias = serializers.FloatField(required=False)
+    
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
+        extra_kwargs = {
+            "five_prime_three_prime_bias": {"read_only": True}  # Prevents duplication issues
+        }
+        rename_fields = {  # Custom rename logic
+            "five_prime_three_prime_bias": "5prime3prime_bias"
+        }
+
+    def to_representation(self, instance):
+        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
+
+    def to_internal_value(self, data):
+        """ Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias` """
+        if "5prime3prime_bias" in data:
+            data["five_prime_three_prime_bias"] = data.pop("5prime3prime_bias")
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """Create a new ExperimentRNAShortRead instance using the validated data and set the many-to-many relationships"""

@@ -72,11 +72,13 @@ def convert_column(column: dict) -> dict:
     base_schema = {"type": json_type}
 
     # Add enum if provided.
-    if "enumerations" in column:
+    if "enumerations" in column and column["enumerations"] != "":
         enum_val = column["enumerations"]
+        enum_val = enum_val.split(",")
         if not isinstance(enum_val, list):
             enum_val = [enum_val]
         base_schema["enum"] = enum_val
+        # import pdb; pdb.set_trace()
 
     # Add description and append notes if provided.
     description = column.get("description", "")
@@ -116,40 +118,41 @@ def convert_column(column: dict) -> dict:
         return base_schema
 
 
-def list_2_schema(input_file: str, out_dir:str)-> dict:
+def table_2_schema(input_file: str, out_dir:str)-> dict:
     """Create Schema JSON
     """
 
     raw_url = "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas"
-
+    table_name = input_file.split("/")[-1].split(".")[0]
+    table_schema = {
+        '$schema': 'http://json-schema.org/draft-07/schema#',
+        '$id': f"{raw_url}/{table_name}.json",
+        'title': table_name,
+        'version': "1.7.1", #data["version"],
+        'type': 'object',
+        'required':[],
+        'definitions': {},
+        'properties':{}
+    }
+    property_keys = ['required', 'column', 'data_type', 'references', 'description', 'example_value', 'enumerations', 'multi_value_delimiter', 'notes']
     with open(input_file, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    for table in data["tables"]:
-        table_name = table["table"]
-        table_schema = {
-            '$schema': 'http://json-schema.org/draft-07/schema#',
-            '$id': f"{raw_url}/{table_name}.json",
-            'title': table_name,
-            'version': data["version"],
-            'type': 'object',
-            'required':[],
-            'definitions': {},
-            'properties':{}
-        }
-
-        for column in table.get("columns", []):
-            req = column.get("required")
-            if req is True:
-                table_schema["required"].append(column["column"])
-            table_schema["properties"][column["column"]] = convert_column(column)
+        data = csv.reader(file, delimiter="\t")
+        next(data)
+        headers = next(data)
+        next(data)
         
-        write_schema(
-            schema=table_schema,
-            schema_name=f"{table_name}.json",
-            out_dir=out_dir
-        )
+        for line in data:
+            result_dict = dict(zip(property_keys, line))
+            if result_dict["required"] == "yes":
+                table_schema["required"].append(result_dict["column"])
+            table_schema["properties"][result_dict["column"]] = convert_column(result_dict)
         
+    write_schema(
+        schema=table_schema,
+        schema_name=f"{table_name}.json",
+        out_dir=out_dir
+    )
+    
 
 def write_schema(schema: dict, schema_name: str, out_dir: str):
     """Write JSON Schema to a file, ensuring that the output directory exists."""
@@ -169,7 +172,7 @@ def main():
 
     options = usr_args()
     print(options)
-    list_2_schema(
+    table_2_schema(
         input_file=options.input,
         out_dir=options.output
     )
