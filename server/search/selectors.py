@@ -15,7 +15,7 @@ serializer_mapping ={
     "aligned": "AlignedSerializer",
     "experimentdnashortread": "ExperimentShortReadSerializer",
     "aligneddnashortread": "AlignedDNAShortReadSerializer",
-    "experimentrnashortread": "ExperimentRnaSerializer",
+    "experimentrnashortread": "ExperimentRnaOPutputSerializer",
     "alignedrnashortread": "AlignedRnaSerializer",
     "experimentnanopore":"ExperimentNanoporeSerializer",
     "alignednanopore":"AlignedNanoporeSerializer",

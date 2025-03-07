@@ -4,7 +4,7 @@
 from django.test import TestCase
 from experiments.models import ExperimentRNAShortRead
 from experiments.services import (
-    ExperimentRnaSerializer, ExperimentSerializer, AlignedRnaSerializer
+    ExperimentRnaInputSerializer, ExperimentRnaOutputSerializer, ExperimentSerializer, AlignedRnaSerializer
 )
 from metadata.models import Analyte, Participant
 
@@ -41,7 +41,7 @@ class ExperimentServiceTest(TestCase):
             "single_or_paired_ends": "paired-end",
             "within_site_batch_name": "RNA 234A"
         }
-        serializer = ExperimentRnaSerializer(data=data)
+        serializer = ExperimentRnaInputSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
         self.assertEqual(instance.experiment_rna_short_read_id, "RNA001")

@@ -82,7 +82,7 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
 
 class ReadParticipantAPITest(APITestCaseWithAuth):
-    def test_read_participant_success(self):
+    def test_read_participant(self):
         url1 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2"
         url2 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2,DNE-01-1"
         url3 = "/api/metadata/read_participants/?ids=DNE-01-1,DNE-2-2"
