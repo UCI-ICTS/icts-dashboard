@@ -54,7 +54,7 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
         """
         Create a new GeneticFindings instance using the validated data
         """
-        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])            
+        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])
         genetic_findings_instance = GeneticFindings.objects.create(**validated_data)
         if additional_family_members:
             genetic_findings_instance.additional_family_members_with_variant.set(additional_family_members)
@@ -183,7 +183,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
         allow_empty=True,
-        help_text="Participant IDs for twins, triplets, etc.",
+        help_text="Participant race if available.",
     )
 
     class Meta:
@@ -299,7 +299,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
         dict: A response dictionary indicating the status of the operation.
     """
 
-    
+
     table_serializers = {
         "participant": {
             "input_serializer": ParticipantInputSerializer,
