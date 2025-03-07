@@ -40,8 +40,8 @@ class CrearteParticipantAPI(APIView):
     """
     API view to create Participant entries.
 
-    This API endpoint accepts a list of participant data objects, checks that 
-    the submission does not exist, and creates new entries based on the 
+    This API endpoint accepts a list of participant data objects, checks that
+    the submission does not exist, and creates new entries based on the
     presence of a 'participant_id'.
 
     Responses vary based on the results of the submissions:
@@ -58,7 +58,7 @@ class CrearteParticipantAPI(APIView):
         request_body=ParticipantInputSerializer(many=True),
         responses={
             200: "All updates successfull",
-            207: "Some updates were not successfull",
+            207: "Some updates were not successful",
             400: "Bad request",
         },
         tags=["Participant"],
@@ -71,14 +71,14 @@ class CrearteParticipantAPI(APIView):
             model_class=Participant,
             id="participant_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
 
         new_records = []
         existing_records = []
-        
+
         # Split request data into new and existing records
         for datum in request.data:
             participant_id = datum.get("participant_id")  # Safely retrieve participant_id
@@ -153,7 +153,7 @@ class ReadParticipantAPI(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
-        
+
         responses={
             200: "All queries returned successfull",
             207: "Some queries were not successfull",
@@ -212,7 +212,7 @@ class ReadParticipantAPI(APIView):
                 )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-   
+
 
 class UpdateParticipantAPI(APIView):
     """
@@ -249,7 +249,7 @@ class UpdateParticipantAPI(APIView):
             model_class=Participant,
             id="participant_id"
         )
-        
+
         response_data = []
         rejected_requests = False
         accepted_requests = False
@@ -259,7 +259,7 @@ class UpdateParticipantAPI(APIView):
 
         # Split request data into new and existing records
         for datum in request.data:
-            participant_id = datum.get("participant_id")  
+            participant_id = datum.get("participant_id")
             if participant_id and participant_id in participants:
                 existing_records.append(datum)
             else:
@@ -354,13 +354,13 @@ class DeleteParticipantAPI(APIView):
             model_class=Participant,
             id_list=id_list,
             id_field="participant_id"
-        ) 
+        )
         try:
             for identifier in id_list:
                 if identifier in participants:
                     return_data, result = delete_metadata(
                         table_name="participant",
-                        identifier=identifier, 
+                        identifier=identifier,
                         id_field="participant_id"
                     )
                     response_data.append(return_data)
@@ -394,12 +394,14 @@ class DeleteParticipantAPI(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-
-class CreateOrUpdateFamilyApi(APIView):
+class CreateFamilyAPI(APIView):
     """
-    API view to create or update Family entries.
+    API view to create Family entries.
 
-    This API endpoint accepts a list of family data objects, validates them, and either creates new entries or updates existing ones based on the presence of a 'family_id'.
+    This API endpoint accepts a list of family data objects, checks that
+    the submission does not exist, and creates new entries based on the
+    presence of a 'family_id'.
+
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
     - Returns HTTP 207 if some operations fail.
@@ -410,18 +412,18 @@ class CreateOrUpdateFamilyApi(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_family",
+        operation_id="create_families",
         request_body=FamilySerializer(many=True),
         responses={
-            200: "All submissions of families were successfull",
-            207: "Some submissions of families were not successful.",
+            200: "All updates successfull",
+            207: "Some updates were not successful",
             400: "Bad request",
         },
-        tags=["CreateOrUpdate"],
+        tags=["Family"],
     )
 
     def post(self, request):
-        # Most efficient query is to pull all ids from request at once
+        # Retrieve existing families in bulk
         families = bulk_model_retrieve(
             request_data=request.data,
             model_class=Family,
@@ -431,46 +433,62 @@ class CreateOrUpdateFamilyApi(APIView):
         response_data = []
         rejected_requests = False
         accepted_requests = False
-        
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            family_id = datum.get("family_id")  # Safely retrieve family_id
+            if family_id and family_id in families:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
         try:
-            for index, datum in enumerate(request.data):
-                identifier = datum["family_id"]
-                return_data, result = create_or_update_metadata(
+            # Handle creating new families
+            for datum in new_records:
+                return_data, result = create_metadata(
                     table_name="family",
                     identifier=datum["family_id"],
-                    model_instance=families.get(datum["family_id"]),
                     datum=datum
                 )
-
+                response_data.append(return_data)
                 if result == "accepted_request":
                     accepted_requests = True
-                elif result == "rejected_request":
+                else:
                     rejected_requests = True
-                response_data.append(return_data)
 
-                continue
+            # Handle updating existing families
+            for datum in existing_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum["family_id"],
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Family already exists",
+                    )
+                )
+                rejected_requests = True
 
             status_code = response_status(accepted_requests, rejected_requests)
-
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(
-                0,
-                response_constructor(
-                    identifier=identifier,request_status="ERROR", code=500, message=str(error)
-                ),
-            )
+            identifier = datum.get("family_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-
-class CreateOrUpdateAnalyte(APIView):
+class ReadFamilyAPI(APIView):
     """
-    API view to create or update Analyte entries.
+    API view to read Family entries.
 
-    This API endpoint accepts a list of analyte data objects, 
-    validates them, and either creates new entries or updates existing ones 
-    based on the presence of a 'genetic_findings_id'.
+    This API endpoint requests a list of family data objects based on the 'family_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -478,43 +496,65 @@ class CreateOrUpdateAnalyte(APIView):
     - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="submit_analyte",
-        request_body=AnalyteSerializer(many=True),
+        operation_id="read_families",
+        operation_description="Retrieve families details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of family IDs (e.g., F1, F2, F3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
         responses={
-            200: "All submissions of genetic findings were successfull",
-            207: "Some submissions of genetic findings were not successful.",
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
             400: "Bad request",
         },
-        tags=["CreateOrUpdate"],
+        tags=["Family"],
     )
-    def post(self, request):
-        # Most efficient query is to pull all ids from request at once
-        analytes = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=Analyte,
-            id="analyte_id"
-        )
-        
+
+    def get(self, request):
         response_data = []
         rejected_requests = False
         accepted_requests = False
 
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_metadata(
-                    table_name="analyte",
-                    identifier = datum["analyte_id"],
-                    model_instance = analytes.get(datum["analyte_id"]),
-                    datum = datum
-                )
+        id_list = request.GET.get("ids", "").split(",")
 
-                if result == "accepted_request":
+        # Fetch families
+        families = bulk_retrieve(
+            model_class=Family,
+            id_list=id_list,
+            id_field="family_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in families:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=families[identifier]
+                        )
+                    )
                     accepted_requests = True
-                elif result == "rejected_request":
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Family not found"
+                        )
+                    )
                     rejected_requests = True
-                response_data.append(return_data)
-                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
             return Response(status=status_code, data=response_data)
@@ -522,7 +562,7 @@ class CreateOrUpdateAnalyte(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=datum["analyte_id"],
+                    identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
                     data=str(error),
@@ -530,15 +570,13 @@ class CreateOrUpdateAnalyte(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-
-class CreateOrUpdatePhenotypeApi(APIView):
+class UpdateFamilyAPI(APIView):
     """
-    API view to create or update phenotype entries.
+    API view to create or update Family entries.
 
-    This API endpoint allows clients to submit multiple phenotype entries at 
-    once. Each phenotype can either be created or updated depending on whether 
-    it already exists. The request must be in the form of a JSON array of
-    phenotype objects.
+    This API endpoint accepts a list of family data objects, validates
+     them, and either creates new entries or updates existing ones based on
+     the presence of a 'family_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -546,65 +584,90 @@ class CreateOrUpdatePhenotypeApi(APIView):
     - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="create_phenotype",
-        request_body=PhenotypeSerializer(many=True),
+        operation_id="update_families",
+        request_body=FamilySerializer(many=True),
         responses={
-            200: "All submissions of phenotypes were successfull",
-            207: "Some submissions of phenotypes were not successful.",
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
             400: "Bad request",
         },
-        tags=["CreateOrUpdate"],
+        tags=["Family"],
     )
 
     def post(self, request):
-        phenotypes = bulk_model_retrieve(
+        # Retrieve existing partifamiliescipants in bulk
+        families = bulk_model_retrieve(
             request_data=request.data,
-            model_class=Phenotype,
-            id="phenotype_id"
+            model_class=Family,
+            id="family_id"
         )
 
         response_data = []
         rejected_requests = False
         accepted_requests = False
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_metadata(
-                    table_name="phenotype",
-                    identifier = datum["phenotype_id"],
-                    model_instance = phenotypes.get(datum["phenotype_id"]),
-                    datum = datum
-                )
 
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            family_id = datum.get("family_id")
+            if family_id and family_id in families:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            # Reject non-existent records (Prevent updates to records that don't exist)
+            for datum in new_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum.get("family_id", "UNKNOWN"),
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Family does not exist and cannot be updated.",
+                    )
+                )
+                rejected_requests = True
+
+            # Handle updating existing participants
+            for datum in existing_records:
+                family_id = datum["family_id"]
+                return_data, result = update_metadata(
+                    table_name="family",
+                    identifier=family_id,
+                    model_instance=families.get(family_id),
+                    datum=datum
+                )
+                response_data.append(return_data)
                 if result == "accepted_request":
                     accepted_requests = True
-                elif result == "rejected_request":
+                else:
                     rejected_requests = True
-                response_data.append(return_data)
-                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=datum["phenotype_id"],
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
+            identifier = datum.get("family_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-        
 
-class CreateOrUpdateGeneticFindings(APIView):
+class DeleteFamilyAPI(APIView):
     """
-    API view to create or update Genetic Findings entries.
+    API view to create or update Family entries.
 
-    This API endpoint accepts a list of genetic findings data objects, 
-    validates them, and either creates new entries or updates existing ones 
-    based on the presence of a 'genetic_findings_id'.
+    This API endpoint accepts a list of family data objects, validates
+     them, and deletes them based on the 'family_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -612,43 +675,57 @@ class CreateOrUpdateGeneticFindings(APIView):
     - Returns HTTP 400 for bad input formats or validation failures.
     """
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_id="submit_genetic_findings",
-        request_body=GeneticFindingsSerializer(many=True),
+        operation_id="delete_families",
+        request_body=FamilySerializer(many=True),
         responses={
-            200: "All submissions of genetic findings were successfull",
-            207: "Some submissions of genetic findings were not successful.",
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
             400: "Bad request",
         },
-        tags=["CreateOrUpdate"],
+        tags=["Family"],
     )
-    def post(self, request):
-        # Most efficient query is to pull all ids from request at once
-        genetic_findings = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=GeneticFindings,
-            id="genetic_findings_id"
-        )
-        
+
+    def delete(self, request):
         response_data = []
         rejected_requests = False
         accepted_requests = False
 
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_metadata(
-                    table_name="genetic_findings",
-                    identifier = datum["genetic_findings_id"],
-                    model_instance = genetic_findings.get(datum["genetic_findings_id"]),
-                    datum = datum
-                )
+        id_list = request.GET.get("ids", "").split(",")
 
-                if result == "accepted_request":
-                    accepted_requests = True
-                elif result == "rejected_request":
+        # Fetch families
+        families = bulk_retrieve(
+            model_class=Family,
+            id_list=id_list,
+            id_field="family_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in families:
+                    return_data, result = delete_metadata(
+                        table_name="family",
+                        identifier=identifier,
+                        id_field="family_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Family not found"
+                        )
+                    )
                     rejected_requests = True
-                response_data.append(return_data)
-                continue
 
             status_code = response_status(accepted_requests, rejected_requests)
             return Response(status=status_code, data=response_data)
@@ -656,11 +733,10 @@ class CreateOrUpdateGeneticFindings(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=datum["genetic_findings_id"],
+                    identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
                     data=str(error),
                 )
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
