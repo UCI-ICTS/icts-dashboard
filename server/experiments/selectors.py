@@ -283,6 +283,12 @@ def parse_rna(rna_datum: dict) -> dict:
             continue
         if isinstance(value, str) and "|" in value:
             rna_datum[key] = value.split("|")
+        if key == "5prime3prime_bias":
+            try:
+                rna_datum[key] = float(rna_datum[key])
+            except ValueError:
+                print("oops!")
+                rna_datum[key] = "NA"
         if key in ["read_length", "RIN", "total_reads"]:
             try:
                 rna_datum[key] = int(rna_datum[key])

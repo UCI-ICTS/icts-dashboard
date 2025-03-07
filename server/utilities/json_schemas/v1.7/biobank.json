@@ -1,0 +1,123 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/PMGRC_data_model_with_extensions - biobank.json",
+    "title": "PMGRC_data_model_with_extensions - biobank",
+    "version": "1.7.1",
+    "type": "object",
+    "required": [
+        "analyte_id",
+        "collection_date",
+        "specimen_type",
+        "status"
+    ],
+    "definitions": {},
+    "properties": {
+        "analyte_id": {
+            "type": "string",
+            "description": "primary key, printed on tubes"
+        },
+        "participant_id": {
+            "type": "string",
+            "description": "printed on tube, automatically reference with participant table"
+        },
+        "collection_date": {
+            "type": "string",
+            "description": "8-digit date as MM/DD/YYYY, printed on tube"
+        },
+        "specimen_type": {
+            "type": "string",
+            "enum": [
+                "EDTA in Cryovial",
+                "PAX Tube",
+                "OCD-100",
+                "OGR-675",
+                "Extracted DNA",
+                "Extracted RNA"
+            ],
+            "description": "Maps to analyte codes: D - EDTA in Cryovial R - PAX Tube SC - OCD-100 buccal collection kit SG - OGR-675 saliva collection kit X - Extracted DNA XR - Extracted RNA"
+        },
+        "current_location": {
+            "type": "string",
+            "description": "Sample storage locations"
+        },
+        "freezer_id": {
+            "type": "string",
+            "description": "Freezer name in the Vilain Lab"
+        },
+        "shelf_id": {
+            "type": "string",
+            "description": "Shelf number from top to bottom"
+        },
+        "rack_id": {
+            "type": "string",
+            "description": "Rack name"
+        },
+        "box_type": {
+            "type": "string",
+            "enum": [
+                "5x5 Cryobox",
+                "9x9 Cryobox",
+                "10x10 Cryobox",
+                "SBS plate",
+                "Wire rack",
+                "8x12 metal rack"
+            ],
+            "description": "Current box types in our freezer. This affects the valid box map positions"
+        },
+        "box_id": {
+            "type": "string",
+            "description": "Box names"
+        },
+        "box_position": {
+            "type": "string",
+            "description": "XY positions for boxes and racks. X-axis are numbers (1-12), Y-axis are letters (A-H)"
+        },
+        "2d_barcode": {
+            "type": "string",
+            "description": "For tubes with these barcodes available"
+        },
+        "plate_barcode": {
+            "type": "string",
+            "description": "For SBS plates with barcodes"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "Pending shipment",
+                "Shipped",
+                "Received",
+                "Stored",
+                "Accessionied",
+                "Extracted",
+                "Sequenced",
+                "Data Delivered",
+                "Replacement requested",
+                "Lost",
+                "QC Issue-see comments"
+            ],
+            "description": "Notes: See participant_sample_status table in retool"
+        },
+        "shipment_date": {
+            "type": "string",
+            "description": "8-digit date MM/DD/YYYY"
+        },
+        "child_analytes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
+            }
+        },
+        "parent_analytes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "Zero or many prior analytes and their analyte IDs\n\nNotes: Currently saliva gDNA combines two analytes into one larger DNA pool. This is the only time we pool analytes together. "
+            }
+        },
+        "comments": {
+            "type": "string",
+            "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+        }
+    }
+}
