@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateTable } from "../slices/dataSlice";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import ErrorBoundary from "./ErrorBoundary";
 
 /**
  * Converts JSON schema into a Yup validation schema
@@ -96,6 +97,13 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
    * Renders the appropriate input field based on the schema definition
    */
   const renderField = (key, fieldSchema, values, handleChange, handleBlur, touched, errors) => {
+    if (!fieldSchema) {
+      console.error(`Field schema for "${key}" is undefined`);
+      return (
+        <div>Error: {key}</div>
+      )
+    }
+
     if (fieldSchema.type === "array" && fieldSchema.items?.enum) {
       return (
         <div className="form-checkbox-group">

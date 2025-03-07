@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import DownloadTSVButton from "./TableDownload";
 import FormDialogue from "./FormDialogue";
+import ErrorBoundary from "./ErrorBoundary";
 
 const TableForm = ({ rows, schema, rowID }) => {
   const [page, setPage] = useState(0);
@@ -225,10 +226,11 @@ const TableForm = ({ rows, schema, rowID }) => {
           disableSelectionOnClick
           onRowClick={handleRowClick}
           checkboxSelection={false}
-          pagination={false}
+          // pagination={false}
           hideFooter
         />
       )}
+      <ErrorBoundary>
       <FormDialogue
         open={openDialog}
         onClose={() => setOpenDialog(false)}
@@ -236,6 +238,7 @@ const TableForm = ({ rows, schema, rowID }) => {
         selectedRow={selectedRow}
         rowID={rowID}
       />
+      </ErrorBoundary>
     </Box>
   );
 };
