@@ -14,7 +14,7 @@ from experiments.apis import (
     CreateExperimentRnaShortRead,
     ReadExperimentRnaShortRead,
     UpdateExperimentRnaShortRead,
-    # DeleteExperimentRnaShortRead
+    DeleteExperimentRnaShortRead
 )
 
 urlpatterns = [
@@ -27,7 +27,7 @@ urlpatterns = [
     path("create_experiment_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
     path("read_experiment_rna_short_read/", ReadExperimentRnaShortRead.as_view()),
     path("update_experiment_rna_short_read/", UpdateExperimentRnaShortRead.as_view()),
-    # path("delete_experiment_rna_short_read/", DeleteExperimentRnaShortRead.as_view()),
+    path("delete_experiment_rna_short_read/", DeleteExperimentRnaShortRead.as_view()),
 
     # path("create_aligned_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
     # path("read_aligned_rna_short_read/", ReadExperimentRnaShortRead.as_view()),

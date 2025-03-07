@@ -129,7 +129,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         assert experiment1_exists
         assert experiment2_exists
         assert experiment3_exists
-        
+
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
@@ -137,8 +137,6 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         
-
-
 
 class ReadRNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_participant(self):
@@ -230,4 +228,32 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
-# class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
+
+class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
+    def test_delete_rna_short_read_api(self):
+        
+        #Checks for the Experiment table before deletion
+        
+        experiment1_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+        ).exists()
+        
+        assert experiment1_exists
+
+        url2 = "/api/experiments/delete_experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA, DNE-01-1"
+        url3 = "/api/experiments/delete_experiment_rna_short_read/?ids=DNE-1, DNE2"
+
+        response_207 = self.client.delete(url2, format='json')
+        response_400 = self.client.delete(url3, format='json')
+        
+        #Checks for the Experiment table after deletion
+        experiment2_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+        ).exists()
+        assert not experiment2_exists
+
+        self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
+        self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(response_207.data[0]["request_status"], "DELETED")
+        self.assertEqual(response_207.data[1]["request_status"], "NOT FOUND")

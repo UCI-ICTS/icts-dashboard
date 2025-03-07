@@ -503,6 +503,69 @@ def update_experiment(table_name: str, identifier: str, model_instance, datum: d
         ), "rejected_request"
     
 
+def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
+    """
+    Delete an existing experiment model instance and the corresponding Experiment object 
+    based on the provided identifier.
+
+    Args:
+        table_name (str): The name of the table (model) to delete from.
+        identifier (str): The unique identifier of the model instance.
+        id_field (str): The field used as an identifier (default is "id").
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    model_mapping = {
+        "experiment_dna_short_read": ExperimentDNAShortRead,
+        "experiment_nanopore": ExperimentNanopore,
+        "experiment_pac_bio": ExperimentPacBio,
+        "experiment_rna_short_read": ExperimentRNAShortRead
+    }
+
+    model_class = model_mapping.get(table_name)
+    if not model_class:
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=f"Invalid table name: {table_name}",
+        ), "rejected_request"
+
+    try:
+        instance = model_class.objects.filter(**{id_field: identifier}).first()
+        if instance:
+            instance.delete()
+            
+            # Remove the associated entry from the Experiment table
+            experiment_id = f"{table_name}.{identifier}"
+            experiment_instance = Experiment.objects.filter(pk=experiment_id).first()
+            if experiment_instance:
+                experiment_instance.delete()
+            
+            return response_constructor(
+                identifier=identifier,
+                request_status="DELETED",
+                code=200,
+                data=f"{table_name} {identifier} and associated experiment deleted successfully."
+            ), "accepted_request"
+        else:
+            return response_constructor(
+                identifier=identifier,
+                request_status="NOT FOUND",
+                code=404,
+                data=f"{table_name} {identifier} not found."
+            ), "rejected_request"
+    
+    except Exception as error:
+        return response_constructor(
+            identifier=identifier,
+            request_status="SERVER ERROR",
+            code=500,
+            data=str(error),
+        ), "rejected_request"
+
+
 def create_or_update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
     Create or update a model instance based on the provided data.

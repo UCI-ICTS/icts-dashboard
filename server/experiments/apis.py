@@ -35,7 +35,7 @@ from experiments.services import (
     ExperimentRnaInputSerializer,
     create_experiment,
     update_experiment,
-    # delete_experiment,
+    delete_experiment,
     create_or_update_experiment,
     create_or_update_alignment
 )
@@ -795,92 +795,91 @@ class UpdateExperimentRnaShortRead(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
-# class DeleteExperimentRnaShortRead(APIView):
-#     """
-#     API view to delete short read RNA experiments.
+class DeleteExperimentRnaShortRead(APIView):
+    """
+    API view to delete short read RNA experiments.
 
-#     This API endpoint delets a list of short read RNA experiments based on
-#      the 'experiment_rna_short_read_id'.
+    This API endpoint delets a list of short read RNA experiments based on
+     the 'experiment_rna_short_read_id'.
 
-#     Responses vary based on the results of the submissions:
-#     - Returns HTTP 200 if all operations are successful.
-#     - Returns HTTP 207 if some operations fail.
-#     - Returns HTTP 400 for bad input formats or validation failures.
-#     """
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
 
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-#     @swagger_auto_schema(
-#         operation_id="delete_participants",
-#         manual_parameters=[
-#             openapi.Parameter(
-#                 "ids",
-#                 openapi.IN_QUERY,
-#                 description="Comma-separated list of participant IDs (e.g., P1-0,P2-1,P3-0)",
-#                 type=openapi.TYPE_STRING,
-#             )
-#         ],
+    @swagger_auto_schema(
+        operation_id="delete_experiment_rna_short_read",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of participant IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
         
-#         responses={
-#             200: "All queries successfully deleted",
-#             207: "Some queries were not successfully deleted",
-#             400: "Bad request",
-#         },
-#         tags=["ExperimentRnaShortRead"],
-#     )
+        responses={
+            200: "All queries successfully deleted",
+            207: "Some queries were not successfully deleted",
+            400: "Bad request",
+        },
+        tags=["ExperimentRnaShortRead"],
+    )
 
-#     def delete(self, request):
-#         response_data = []
-#         rejected_requests = False
-#         accepted_requests = False
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
 
-#         id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
 
-#         # Fetch participants
-#         participants = bulk_retrieve(
-#             model_class=ExperimentRNAShortRead,
-#             id_list=id_list,
-#             id_field="experiment_rna_short_read_id"
-#         ) 
-#         try:
-#             for identifier in id_list:
-#                 if identifier in participants:
-#                     # return_data, result = delete_experiment(
-#                     #     table_name="participant",
-#                     #     identifier=identifier, 
-#                     #     id_field="participant_id"
-#                     # )
-#                     response_data.append(return_data)
+        experiment_rna_short_read = bulk_retrieve(
+            model_class=ExperimentRNAShortRead,
+            id_list=id_list,
+            id_field="experiment_rna_short_read_id"
+        ) 
+        try:
+            for identifier in id_list:
+                if identifier in experiment_rna_short_read:
+                    return_data, result = delete_experiment(
+                        table_name="experiment_rna_short_read",
+                        identifier=identifier, 
+                        id_field="experiment_rna_short_read_id"
+                    )
+                    response_data.append(return_data)
 
-#                     if result == "accepted_request":
-#                         accepted_requests = True
-#                     else:
-#                         rejected_requests = True
-#                 else:
-#                     response_data.append(
-#                         response_constructor(
-#                             identifier=identifier,
-#                             request_status="NOT FOUND",
-#                             code=404,
-#                             data="Participant not found"
-#                         )
-#                     )
-#                     rejected_requests = True
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Short read RNA experiment not found"
+                        )
+                    )
+                    rejected_requests = True
 
-#             status_code = response_status(accepted_requests, rejected_requests)
-#             return Response(status=status_code, data=response_data)
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
 
-#         except Exception as error:
-#             response_data.insert(0,
-#                 response_constructor(
-#                     identifier=id_list,
-#                     request_status="SERVER ERROR",
-#                     code=500,
-#                     data=str(error),
-#                 )
-#             )
-#             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         
         
 class CreateOrUpdateExperimentRna(APIView):
