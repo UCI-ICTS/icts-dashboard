@@ -39,7 +39,7 @@ from experiments.selectors import (
 from metadata.selectors import get_analyte
 
 from rest_framework import serializers
-from .models import ExperimentRNAShortRead, LibraryPrepType, ExperimentType
+from experiments.models import ExperimentRNAShortRead, LibraryPrepType, ExperimentType
 
 
 class LibraryPrepTypeSerializer(serializers.ModelSerializer):
@@ -54,7 +54,7 @@ class ExperimentTypeSerializer(serializers.ModelSerializer):
         fields = ["name"]
 
 
-class ExperimentRnaSerializer(serializers.ModelSerializer):
+class ExperimentRnaInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
     )
@@ -70,17 +70,10 @@ class ExperimentRnaSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create a new ExperimentRNAShortRead instance using the validated data and set the many-to-many relationships"""
 
-        library_prep_types_data = validated_data.pop("library_prep_type")
-        experiment_types_data = validated_data.pop("experiment_type")
+        library_prep_types_data = validated_data.pop("library_prep_type", [])
+        experiment_types_data = validated_data.pop("experiment_type", [])
 
-        experiment_rna_short_read_id = validated_data.get(
-            "experiment_rna_short_read_id"
-        )
-        experiment_rna_instance, created = ExperimentRNAShortRead.objects.get_or_create(
-            experiment_rna_short_read_id=experiment_rna_short_read_id,
-            defaults=validated_data,
-        )
-
+        experiment_rna_instance = ExperimentRNAShortRead.objects.create(**validated_data)
         experiment_rna_instance.library_prep_type.set(library_prep_types_data)
         experiment_rna_instance.experiment_type.set(experiment_types_data)
 
@@ -100,7 +93,20 @@ class ExperimentRnaSerializer(serializers.ModelSerializer):
         if experiment_types_data is not None:
             instance.experiment_type.set(experiment_types_data)
 
+        instance.save()
         return instance
+
+class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
+    library_prep_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
+    experiment_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
+
+    class Meta:
+        model = ExperimentRNAShortRead
+        fields = "__all__"
 
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
@@ -328,6 +334,153 @@ class AlignedService:
         return validator.get_validation_results()
 
 
+def create_experiment(table_name: str, identifier: str, datum: dict):
+    """
+    Create a new experiment instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to create.
+        identifier (str): The unique identifier for the experiment instance.
+        datum (dict): The data to create the experiment instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "experiment_dna_short_read": {
+            "model": ExperimentDNAShortRead,
+            "input_serializer": ExperimentShortReadSerializer,
+            "output_serializer": ExperimentShortReadSerializer,
+            "parsed_data": lambda datum: parse_short_read(short_read=datum)
+        },
+        "experiment_nanopore": {
+            "model": ExperimentNanopore,
+            "input_serializer": ExperimentNanoporeSerializer,
+            "output_serializer": ExperimentNanoporeSerializer,
+            "parsed_data": lambda datum: parse_nanopore(nanopore=datum)
+        },
+        "experiment_pac_bio": {
+            "model": ExperimentPacBio,
+            "input_serializer": ExperimentPacBioSerializer,
+            "output_serializer": ExperimentPacBioSerializer,
+            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum)
+        },
+        "experiment_rna_short_read": {
+            "model": ExperimentRNAShortRead,
+            "input_serializer": ExperimentRnaInputSerializer,
+            "output_serializer": ExperimentRnaOutputSerializer,
+            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
+        }
+    }
+    table_validator = TableValidator()
+    
+    if get_analyte(datum["analyte_id"]) is not None:
+        participant_id = get_analyte(datum["analyte_id"]).participant_id.participant_id
+    else: 
+        analyte_id = datum["analyte_id"]
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=f"Analyte {analyte_id} does not exist.",
+        ), "rejected_request"
+
+    experiment_data = {
+        "experiment_id": f"{table_name}.{identifier}",
+        "table_name": table_name,
+        "id_in_table": identifier,
+        "participant_id": participant_id,
+    }
+    
+    serializer = table_serializers[table_name]["input_serializer"](data=datum)
+    if serializer.is_valid():
+        new_instance = serializer.save()
+        return response_constructor(
+            identifier=identifier,
+            request_status="CREATED",
+            code=201,
+            message=f"{table_name} {identifier} created.",
+            data={
+                "instance": table_serializers[table_name]["output_serializer"](new_instance).data
+            }
+        ), "accepted_request"
+    else:
+        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=error_data,
+        ), "rejected_request"
+
+
+def update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
+    """
+    Update an existing experiment instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to update.
+        identifier (str): The unique identifier for the experiment instance.
+        model_instance: The existing model instance to update.
+        datum (dict): The data to update the experiment instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "experiment_dna_short_read": {
+            "model": ExperimentDNAShortRead,
+            "input_serializer": ExperimentShortReadSerializer,
+            "output_serializer": ExperimentShortReadSerializer,
+            "parsed_data": lambda datum: parse_short_read(short_read=datum)
+        },
+        "experiment_nanopore": {
+            "model": ExperimentNanopore,
+            "input_serializer": ExperimentNanoporeSerializer,
+            "output_serializer": ExperimentNanoporeSerializer,
+            "parsed_data": lambda datum: parse_nanopore(nanopore=datum)
+        },
+        "experiment_pac_bio": {
+            "model": ExperimentPacBio,
+            "input_serializer": ExperimentPacBioSerializer,
+            "output_serializer": ExperimentPacBioSerializer,
+            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum)
+        },
+        "experiment_rna_short_read": {
+            "model": ExperimentRNAShortRead,
+            "input_serializer": ExperimentRnaInputSerializer,
+            "output_serializer": ExperimentRnaOutputSerializer,
+            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
+        }
+    }
+    
+    serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
+    if serializer.is_valid():
+        updated_instance = serializer.save()
+        changes = compare_data(
+            old_data=table_serializers[table_name]["output_serializer"](model_instance).data,
+            new_data=datum
+        )
+        return response_constructor(
+            identifier=identifier,
+            request_status="UPDATED",
+            code=200,
+            message=f"{table_name} {identifier} updated.",
+            data={
+                "updates": changes,
+                "instance": table_serializers[table_name]["output_serializer"](updated_instance).data
+            }
+        ), "accepted_request"
+    else:
+        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=error_data,
+        ), "rejected_request"
+    
+
 def create_or_update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
     Create or update a model instance based on the provided data.
@@ -365,8 +518,8 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
-            "input_serializer": ExperimentRnaSerializer,
-            "output_serializer": ExperimentRnaSerializer,
+            "input_serializer": ExperimentRnaInputSerializer,
+            "output_serializer": ExperimentRnaOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         }
     }

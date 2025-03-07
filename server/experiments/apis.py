@@ -2,6 +2,7 @@
 # experiments/apis.py
 
 from config.selectors import TableValidator, response_constructor, response_status
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.selectors import bulk_model_retrieve
+from config.selectors import bulk_model_retrieve, bulk_retrieve
 
 from experiments.models import (
     AlignedRNAShortRead,
@@ -31,7 +32,9 @@ from experiments.services import (
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
-    ExperimentRnaSerializer,
+    ExperimentRnaInputSerializer,
+    create_experiment,
+    update_experiment,
     create_or_update_experiment,
     create_or_update_alignment
 )
@@ -181,7 +184,7 @@ class CreateOrUpdateExperimentShortReadApi(APIView):
 class CreateOrUpdateAlignedPacBio(APIView):
     """Create or Update Aligned PacBio
 
-        This API endpoint accepts a list of short read RNA experiment entries, 
+        This API endpoint accepts a list of short read PacBio experiment entries, 
     validates them, and either creates new entries or updates existing ones 
     based on the presence of a 'aligned_pac_bio_id'.
 
@@ -338,8 +341,8 @@ class CreateOrUpdateAlignedNanopore(APIView):
         operation_id="submit_aligned_nanopore",
         request_body=AlignedNanoporeSerializer(many=True),
         responses={
-            200: "All submissions of RNA short read experiments were successfull",
-            207: "Some submissions of RNA short read experiments were not successful.",
+            200: "All submissions of NanoPore short read experiments were successfull",
+            207: "Some submissions of NanoPore short read experiments were not successful.",
             400: "Bad request",
         },
         tags=["CreateOrUpdate"],
@@ -525,6 +528,269 @@ class CreateOrUpdateAlignedRna(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
+# class CreateExperimentRnaShortRead(APIView):
+
+
+class ReadExperimentRnaShortRead(APIView):
+    """
+    API view to read short read RNA experiments.
+
+    This API endpoint requests a list of short read RNA experiment data 
+    objects based on the 'experiment_rna_short_read_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_experiment_rna_short_read",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of short read RNA IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["ExperimentRnaShortRead"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        # Fetch participants
+        experiment_rna_short_read = bulk_retrieve(
+            model_class=ExperimentRNAShortRead,
+            id_list=id_list,
+            id_field="experiment_rna_short_read_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in experiment_rna_short_read:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=experiment_rna_short_read[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Short read RNA experiment not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class UpdateExperimentRnaShortRead(APIView):
+    """API view to update short read RNA experiments.
+
+    This API endpoint accepts a list of short read RNA experiment entries, 
+    validates them, and update existing entries based on the presence of 
+    a 'experiment_dna_short_read_id'.
+
+    Responses vary based on the results of the update:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="update_experiment_rna_short_read",
+        request_body=ExperimentRnaInputSerializer(many=True),
+        responses={
+            200: "All updates of RNA short read experiments were successfull",
+            207: "Some updates of RNA short read experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["ExperimentRnaShortRead"],
+    )
+
+    def post(self, request):
+        # Retrieve existing participants in bulk
+        experiment_rna_short_read = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=ExperimentRNAShortRead,
+            id="experiment_rna_short_read_id"
+        )
+        
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            experiment_rna_short_read_id = datum.get("experiment_rna_short_read_id")  
+            if experiment_rna_short_read_id and experiment_rna_short_read_id \
+                in experiment_rna_short_read:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            # Reject non-existent records (Prevent updates to records that don't exist)
+            for datum in new_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum.get("experiment_rna_short_read_id", "UNKNOWN"),
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Short Read RNA experiment does not exist and cannot be updated.",
+                    )
+                )
+                rejected_requests = True
+
+            # Handle updating existing participants
+            for datum in existing_records:
+                participant_id = datum["experiment_rna_short_read_id"]
+                return_data, result = update_experiment(
+                    table_name="experiment_rna_short_read",
+                    identifier=participant_id,
+                    model_instance=experiment_rna_short_read.get(participant_id),
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("experiment_rna_short_read_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class DeleteExperimentRnaShortRead(APIView):
+    """
+    API view to delete short read RNA experiments.
+
+    This API endpoint accepts a list of participant data objects, validates
+     them, and either creates new entries or updates existing ones based on
+     the presence of a 'participant_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_participants",
+        request_body=ExperimentRnaInputSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Participant"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        # Fetch participants
+        participants = bulk_retrieve(
+            model_class=Participant,
+            id_list=id_list,
+            id_field="participant_id"
+        ) 
+        try:
+            for identifier in id_list:
+                if identifier in participants:
+                    return_data, result = delete_metadata(
+                        table_name="participant",
+                        identifier=identifier, 
+                        id_field="participant_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Participant not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        
+        
 class CreateOrUpdateExperimentRna(APIView):
     """API view to create or update short read RNA experiments.
 
@@ -543,7 +809,7 @@ class CreateOrUpdateExperimentRna(APIView):
 
     @swagger_auto_schema(
         operation_id="update_rna_short_read",
-        request_body=ExperimentRnaSerializer(many=True),
+        request_body=ExperimentRnaInputSerializer(many=True),
         responses={
             200: "All submissions of RNA short read experiments were successfull",
             207: "Some submissions of RNA short read experiments were not successful.",
