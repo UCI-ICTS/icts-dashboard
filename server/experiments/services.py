@@ -64,7 +64,7 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
     )
 
     # This renames the field in API input/output while keeping it correct in Django ORM
-    five_prime_three_prime_bias = serializers.FloatField(required=False)
+    five_prime_three_prime_bias = serializers.FloatField(required=False, allow_null=True)
     
     class Meta:
         model = ExperimentRNAShortRead
@@ -111,6 +111,7 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
@@ -129,6 +130,7 @@ class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
         if "five_prime_three_prime_bias" in data:
             data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
         return data
+
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -496,7 +498,7 @@ def update_experiment(table_name: str, identifier: str, model_instance, datum: d
             "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         }
     }
-    
+
     serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
     if serializer.is_valid():
         updated_instance = serializer.save()
@@ -586,6 +588,224 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
             data=str(error),
         ), "rejected_request"
 
+
+def create_aligned(table_name: str, identifier: str, datum: dict):
+    """
+    Create a new alignment instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to create.
+        identifier (str): The unique identifier for the alignment instance.
+        datum (dict): The data to create the alignment instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "aligned_dna_short_read": {
+            "model": AlignedDNAShortRead,
+            "input_serializer": AlignedDNAShortReadSerializer,
+            "output_serializer": AlignedDNAShortReadSerializer,
+            "parsed_data": lambda datum: parse_short_read_aligned(short_read_aligned=datum)
+        },
+        "aligned_nanopore": {
+            "model": AlignedNanopore,
+            "input_serializer": AlignedNanoporeSerializer,
+            "output_serializer": AlignedNanoporeSerializer,
+            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum)
+        },
+        "aligned_pac_bio": {
+            "model": AlignedPacBio,
+            "input_serializer": AlignedPacBioSerializer,
+            "output_serializer": AlignedPacBioSerializer,
+            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum)
+        },
+        "aligned_rna_short_read": {
+            "model": AlignedRNAShortRead,
+            "input_serializer": AlignedRnaSerializer,
+            "output_serializer": AlignedRnaSerializer,
+            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
+        }
+    }
+    table_validator = TableValidator()
+    experiment_name = swap_experiment_aligned(table_name)
+
+    try:
+        experiment_object = Experiment.objects.get(id_in_table=datum[experiment_name + "_id"])
+        participant_id = experiment_object.participant_id.participant_id
+    except Experiment.DoesNotExist:
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=f"Experiment {experiment_name} for {identifier} does not exist.",
+        ), "rejected_request"
+    
+    aligned_data = {
+        "aligned_id": f"{table_name}.{identifier}",
+        "table_name": table_name,
+        "id_in_table": identifier,
+        "participant_id": participant_id,
+        "aligned_file": datum[f"{table_name}_file"],
+        "aligned_index_file": datum[f"{table_name}_index_file"]
+    }
+    
+    aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
+
+    if aligned_results['valid']:
+        alignment_serializer = AlignedService.create_or_update_aligned(aligned_data)
+        if alignment_serializer.is_valid():
+            alignment_instance = alignment_serializer.save()
+            return response_constructor(
+                identifier=identifier,
+                request_status="CREATED",
+                code=201,
+                message=f"{table_name} {identifier} created.",
+                data={
+                    "instance": alignment_serializer.data
+                }
+            ), "accepted_request"
+        else:
+            error_data = [{item: alignment_serializer.errors[item]} for item in alignment_serializer.errors]
+            return response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=error_data,
+            ), "rejected_request"
+    else:
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=aligned_results["errors"],
+        ), "rejected_request"
+
+
+def update_aligned(table_name: str, identifier: str, model_instance, datum: dict):
+    """
+    Update an existing alignment instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to update.
+        identifier (str): The unique identifier for the alignment instance.
+        model_instance: The existing model instance to update.
+        datum (dict): The data to update the alignment instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "aligned_dna_short_read": {
+            "model": AlignedDNAShortRead,
+            "input_serializer": AlignedDNAShortReadSerializer,
+            "output_serializer": AlignedDNAShortReadSerializer
+        },
+        "aligned_nanopore": {
+            "model": AlignedNanopore,
+            "input_serializer": AlignedNanoporeSerializer,
+            "output_serializer": AlignedNanoporeSerializer
+        },
+        "aligned_pac_bio": {
+            "model": AlignedPacBio,
+            "input_serializer": AlignedPacBioSerializer,
+            "output_serializer": AlignedPacBioSerializer
+        },
+        "aligned_rna_short_read": {
+            "model": AlignedRNAShortRead,
+            "input_serializer": AlignedRnaSerializer,
+            "output_serializer": AlignedRnaSerializer
+        }
+    }
+    serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
+    if serializer.is_valid():
+        updated_instance = serializer.save()
+        changes = compare_data(
+            old_data=table_serializers[table_name]["output_serializer"](model_instance).data,
+            new_data=datum
+        )
+        return response_constructor(
+            identifier=identifier,
+            request_status="UPDATED",
+            code=200,
+            message=f"{table_name} {identifier} updated.",
+            data={
+                "updates": changes,
+                "instance": table_serializers[table_name]["output_serializer"](updated_instance).data
+            }
+        ), "accepted_request"
+    else:
+        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=error_data,
+        ), "rejected_request"
+
+
+def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
+    """
+    Delete an existing aligned model instance and the corresponding Aligned object 
+    based on the provided identifier.
+
+    Args:
+        table_name (str): The name of the table (model) to delete from.
+        identifier (str): The unique identifier of the model instance.
+        id_field (str): The field used as an identifier (default is "id").
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    model_mapping = {
+        "aligned_dna_short_read": AlignedDNAShortRead,
+        "aligned_nanopore": AlignedNanopore,
+        "aligned_pac_bio": AlignedPacBio,
+        "aligned_rna_short_read": AlignedRNAShortRead
+    }
+
+    model_class = model_mapping.get(table_name)
+    if not model_class:
+        return response_constructor(
+            identifier=identifier,
+            request_status="BAD REQUEST",
+            code=400,
+            data=f"Invalid table name: {table_name}",
+        ), "rejected_request"
+
+    try:
+        instance = model_class.objects.filter(**{id_field: identifier}).first()
+        if instance:
+            instance.delete()
+            
+            # Remove the associated entry from the Aligned table
+            aligned_id = f"{table_name}.{identifier}"
+            aligned_instance = Aligned.objects.filter(pk=aligned_id).first()
+            if aligned_instance:
+                aligned_instance.delete()
+            
+            return response_constructor(
+                identifier=identifier,
+                request_status="DELETED",
+                code=200,
+                data=f"{table_name} {identifier} and associated alignment deleted successfully."
+            ), "accepted_request"
+        else:
+            return response_constructor(
+                identifier=identifier,
+                request_status="NOT FOUND",
+                code=404,
+                data=f"{table_name} {identifier} not found."
+            ), "rejected_request"
+    
+    except Exception as error:
+        return response_constructor(
+            identifier=identifier,
+            request_status="SERVER ERROR",
+            code=500,
+            data=str(error),
+        ), "rejected_request"
+    
 
 def create_or_update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
