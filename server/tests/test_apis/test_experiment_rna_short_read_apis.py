@@ -37,7 +37,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_mtRNA": None,
             "percent_Globin": None,
             "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
+            "5prime3prime_bias": None,
             "percent_GC": None,
             "percent_chrX_Y": None,
             "library_prep_type": [
@@ -68,7 +68,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_mtRNA": None,
             "percent_Globin": None,
             "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
+            "5prime3prime_bias": None,
             "percent_GC": None,
             "percent_chrX_Y": None,
             "library_prep_type": [
@@ -99,7 +99,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_mtRNA": None,
             "percent_Globin": None,
             "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
+            "5prime3prime_bias": None,
             "percent_GC": None,
             "percent_chrX_Y": None,
             "library_prep_type": [
@@ -139,7 +139,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         
 
 class ReadRNAShortReadAPITest(APITestCaseWithAuth):
-    def test_read_participant(self):
+    def test_read_experiment_rna_short_read(self):
         url1 = "/api/experiments/read_experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA"
         url2 = "/api/experiments/read_experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA, DNE-01-1"
         url3 = "/api/experiments/read_experiment_rna_short_read/?ids=DNE-1, DNE2"
@@ -155,9 +155,16 @@ class ReadRNAShortReadAPITest(APITestCaseWithAuth):
 class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_rna_short_read_api(self):
         url = "/api/experiments/update_experiment_rna_short_read/"
-        experiment1 = {
+        experiment1 =   {
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA",
-            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "library_prep_type": [
+            "rRNA depletion",
+            "globin depletion"
+            ],
+            "experiment_type": [
+            "paired-end",
+            "untargeted"
+            ],
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
@@ -167,23 +174,16 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0,
+            "total_reads": 240349679,
             "percent_rRNA": None,
             "percent_mRNA": None,
             "percent_mtRNA": None,
             "percent_Globin": None,
             "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
             "percent_GC": None,
             "percent_chrX_Y": None,
-            "library_prep_type": [
-                "rRNA depletion",
-                "globin depletion"
-            ],
-            "experiment_type": [
-                "paired-end",
-                "untargeted"
-            ]
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "5prime3prime_bias": None
         }
 
         experiment2 = {
@@ -204,7 +204,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_mtRNA": None,
             "percent_Globin": None,
             "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
+            "5prime3prime_bias": None,
             "percent_GC": None,
             "percent_chrX_Y": None,
             "library_prep_type": [
@@ -220,7 +220,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [experiment1], format='json')
         response_207 = self.client.post(url, [experiment1, experiment2], format='json')
         response_400 = self.client.post(url, [experiment2, experiment2], format='json')
-  
+        
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
