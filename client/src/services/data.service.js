@@ -1,7 +1,6 @@
 // src/services/data.service.js
 
-// import axios from "axios";
-const axios = require("axios");
+import axios from "axios";
 
 const APIDB = process.env.REACT_APP_APIDB;
 
