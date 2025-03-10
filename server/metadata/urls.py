@@ -12,6 +12,11 @@ from metadata.apis import (
     ReadFamilyAPI,
     UpdateFamilyAPI,
     DeleteFamilyAPI,
+
+    CreateGeneticFindingsAPI,
+    ReadGeneticFindingsAPI,
+    UpdateGeneticFindingsAPI,
+    DeleteGeneticFindingsAPI,
 )
 
 urlpatterns = [
@@ -24,4 +29,9 @@ urlpatterns = [
     path("read_families/", ReadFamilyAPI.as_view()),
     path("update_families/", UpdateFamilyAPI.as_view()),
     path("delete_families/", DeleteFamilyAPI.as_view()),
+
+    path("create_genetic_findings/", CreateGeneticFindingsAPI.as_view()),
+    path("read_genetic_findings/", ReadGeneticFindingsAPI.as_view()),
+    path("update_genetic_findings/", UpdateGeneticFindingsAPI.as_view()),
+    path("delete_genetic_findings/", DeleteGeneticFindingsAPI.as_view()),
 ]

@@ -599,7 +599,7 @@ class UpdateFamilyAPI(APIView):
     )
 
     def post(self, request):
-        # Retrieve existing partifamiliescipants in bulk
+        # Retrieve existing families in bulk
         families = bulk_model_retrieve(
             request_data=request.data,
             model_class=Family,
@@ -723,6 +723,353 @@ class DeleteFamilyAPI(APIView):
                             request_status="NOT FOUND",
                             code=404,
                             data="Family not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class CreateGeneticFindingsAPI(APIView):
+    """
+    API view to create Genetic Findings entries.
+
+    This API endpoint accepts a list of genetic findings data objects, checks that
+    the submission does not exist, and creates new entries based on the
+    presence of a 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="create_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successful",
+            400: "Bad request",
+        },
+        tags=["Genetic Findings"],
+    )
+
+    def post(self, request):
+        # Retrieve existing genetic findings in bulk
+        genetic_findings = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=GeneticFindings,
+            id="genetic_findings_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            genetic_findings_id = datum.get("genetic_findings_id")  # Safely retrieve genetic_findings_id
+            if genetic_findings_id and genetic_findings_id in genetic_findings:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            # Handle creating new genetic findings
+            for datum in new_records:
+                return_data, result = create_metadata(
+                    table_name="genetic_findings",
+                    identifier=datum["genetic_findings_id"],
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            # Handle updating existing genetic findings
+            for datum in existing_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum["genetic_findings_id"],
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Genetic Findings already exists",
+                    )
+                )
+                rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("genetic_findings_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class ReadGeneticFindingsAPI(APIView):
+    """
+    API view to read Genetic Findings entries.
+
+    This API endpoint requests a list of genetic findings data objects based on the 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_genetic_findings",
+        operation_description="Retrieve genetic findings details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of genetic findings IDs (e.g., F1, F2, F3)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Genetic Findings"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch genetic_findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
+            id_list=id_list,
+            id_field="genetic_findings_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in genetic_findings:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=genetic_findings[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Genetic Findings not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class UpdateGeneticFindingsAPI(APIView):
+    """
+    API view to create or update Genetic Findings entries.
+
+    This API endpoint accepts a list of genetic_findings data objects, validates
+     them, and either creates new entries or updates existing ones based on
+     the presence of a 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="update_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Genetic Findings"],
+    )
+
+    def post(self, request):
+        # Retrieve existing genetic findings in bulk
+        genetic_findings = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=GeneticFindings,
+            id="genetic_findings_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            genetic_findings_id = datum.get("genetic_findings_id")
+            if genetic_findings_id and genetic_findings_id in genetic_findings:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            # Reject non-existent records (Prevent updates to records that don't exist)
+            for datum in new_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum.get("genetic_findings_id", "UNKNOWN"),
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Genetic Findings does not exist and cannot be updated.",
+                    )
+                )
+                rejected_requests = True
+
+            # Handle updating existing participants
+            for datum in existing_records:
+                genetic_findings_id = datum["genetic_findings_id"]
+                return_data, result = update_metadata(
+                    table_name="genetic_findings",
+                    identifier=genetic_findings_id,
+                    model_instance=genetic_findings.get(genetic_findings_id),
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("genetic_findings_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class DeleteGeneticFindingsAPI(APIView):
+    """
+    API view to create or update Genetic Findings entries.
+
+    This API endpoint accepts a list of genetic findings data objects, validates
+     them, and deletes them based on the 'genetic_findings_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
+        responses={
+            200: "All updates successfull",
+            207: "Some updates were not successfull",
+            400: "Bad request",
+        },
+        tags=["Genetic Findings"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = request.GET.get("ids", "").split(",")
+
+        # Fetch genetic findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
+            id_list=id_list,
+            id_field="genetic_findings_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in genetic_findings:
+                    return_data, result = delete_metadata(
+                        table_name="genetic_findings",
+                        identifier=identifier,
+                        id_field="genetic_findings_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Genetic Findings not found"
                         )
                     )
                     rejected_requests = True
