@@ -12,6 +12,11 @@ from metadata.apis import (
     ReadFamilyAPI,
     UpdateFamilyAPI,
     DeleteFamilyAPI,
+
+    CreateAnalyteAPI,
+    ReadAnalyteAPI,
+    UpdateAnalyteAPI,
+    DeleteAnalyteAPI,
 )
 
 urlpatterns = [
@@ -24,4 +29,9 @@ urlpatterns = [
     path("read_families/", ReadFamilyAPI.as_view()),
     path("update_families/", UpdateFamilyAPI.as_view()),
     path("delete_families/", DeleteFamilyAPI.as_view()),
+
+    path("create_analytes/", CreateAnalyteAPI.as_view()),
+    path("read_analytes/", ReadAnalyteAPI.as_view()),
+    path("update_analytes/", UpdateAnalyteAPI.as_view()),
+    path("delete_analytes/", DeleteAnalyteAPI.as_view()),
 ]
