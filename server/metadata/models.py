@@ -304,7 +304,7 @@ class GeneticFindings(models.Model):
     )
     variant_type = models.JSONField(
         default=list,
-        choices=VariantType.choices, 
+        choices=VariantType.choices,
         help_text="Type of genetic variant"
     )
     sv_type = models.CharField(
@@ -558,7 +558,7 @@ class Analyte(models.Model):
 
     internal_analyte_id = models.CharField(
         max_length=255,
-        blank=True, 
+        blank=True,
         null=True,
         help_text="UCI identifier for an analyte from a primary biosample source",
     )
