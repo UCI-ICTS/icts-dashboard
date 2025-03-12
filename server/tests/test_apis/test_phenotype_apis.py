@@ -13,26 +13,41 @@ class APITestCaseWithAuth(APITestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.force_authenticate(user=self.user)
 
-class CreateAnalyteAPITest(APITestCaseWithAuth):
+class CreatePhenotypeAPITest(APITestCaseWithAuth):
     def test_create_analyte_api(self):
-        url = "/api/metadata/create_analytes/"
+        url = "/api/metadata/create_phenotypes/"
         part1 = {  # Valid submission
-            "analyte_id": "P-101-101-0-D-1",
+            "phenotype_id": "1.10",
             "participant_id": "GREGoR_test-001-001-0",
-            "analyte_type": "frozen whole blood",
-            "primary_biosample": "UBERON:0000178",
+            "term_id": "HP:0002194",
+            "presence": "Present",
+            "ontology": "HPO",
+            "additional_details": "gross motor delay",
+            "onset_age_range": "HP:0011463",
+            "additional_modifiers": [],
+            "syndromic": "non-syndromic"
         }
-        part2 = {  # Valid submission
-            "analyte_id": "P-101-101-0-D-2",
+        part2 = {  # Valid submission 2
+            "phenotype_id": "1.11",
             "participant_id": "GREGoR_test-001-001-0",
-            "analyte_type": "frozen whole blood",
-            "primary_biosample": "UBERON:0000178",
+            "term_id": "HP:0002195",
+            "presence": "Present",
+            "ontology": "HPO",
+            "additional_details": "Dysgenesis of the cerebellar vermis",
+            "onset_age_range": "HP:0011463",
+            "additional_modifiers": [],
+            "syndromic": "non-syndromic"
         }
-        part3 = {  # Invalid submission; analyte_type
-            "analyte_id": "P-101-101-0-D-3",
+        part3 = {  # Invalid submission; missing ontology
+            "phenotype_id": "1.12",
             "participant_id": "GREGoR_test-001-001-0",
-            "analyte_type": "",
-            "primary_biosample": "UBERON:0000178",
+            "term_id": "HP:0002196",
+            "presence": "Present",
+            "ontology": "",
+            "additional_details": "Myelopathy",
+            "onset_age_range": "HP:0011463",
+            "additional_modifiers": [],
+            "syndromic": "non-syndromic"
         }
         response_200 = self.client.post(url, [part1], format='json')
         response_207 = self.client.post(url, [part2, part3], format='json')
@@ -43,11 +58,11 @@ class CreateAnalyteAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
-class ReadAnalyteAPITest(APITestCaseWithAuth):
-    def test_read_analyte_success(self):
-        url1 = "/api/metadata/read_analytes/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2"
-        url2 = "/api/metadata/read_analytes/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2,DNE-01"
-        url3 = "/api/metadata/read_analytes/?ids=DNE-01,DNE-2"
+class ReadPhenotypeAPITest(APITestCaseWithAuth):
+    def test_read_phenotype_success(self):
+        url1 = "/api/metadata/read_phenotypes/?ids=1.2,1.3"
+        url2 = "/api/metadata/read_phenotypes/?ids=1.2,1.3,1.99"
+        url3 = "/api/metadata/read_phenotypes/?ids=1.99,1.100"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -59,20 +74,30 @@ class ReadAnalyteAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[2]["request_status"], "NOT FOUND")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
-class UpdateAnalyteAPITest(APITestCaseWithAuth):
-    def test_update_analyte_api(self):
-        url = "/api/metadata/update_analytes/"
+class UpdatePhenotypeAPITest(APITestCaseWithAuth):
+    def test_update_phenotype_api(self):
+        url = "/api/metadata/update_phenotypes/"
         part1 = {  # Valid submission
-            "analyte_id": "GREGoR_test-001-001-0-R-1",
+            "phenotype_id": "1.2",
             "participant_id": "GREGoR_test-001-001-0",
-            "analyte_type": "frozen whole blood",
-            "primary_biosample": "UBERON:0000178",
+            "term_id": "HP:0002194",
+            "presence": "Present",
+            "ontology": "HPO",
+            "additional_details": "gross motor delay",
+            "onset_age_range": "HP:0011463",
+            "additional_modifiers": ["HP:0025292"],
+            "syndromic": "non-syndromic"
         }
-        part2 = {  # Invalid submission; analyte_type
-            "analyte_id": "GREGoR_test-001-001-0-R-1",
-            "participant_id": "GREGoR_test-001-001-0",
-            "analyte_type": "",
-            "primary_biosample": "UBERON:0000178",
+        part2 = {  # Invalid submission; invalid additional_modifiers
+            "phenotype_id": "1.3",
+            "participant_id": "GREGoR_test-002-001-2",
+            "term_id": "HP:0002076",
+            "presence": "Present",
+            "ontology": "HPO",
+            "additional_details": "migraines",
+            "onset_age_range": "HP:0003621",
+            "additional_modifiers": ["feeding difficulties"],
+            "syndromic": "non-syndromic"
         }
         response_200 = self.client.post(url, [part1], format='json')
         response_207 = self.client.post(url, [part1, part2], format='json')
@@ -83,9 +108,9 @@ class UpdateAnalyteAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
-class DeleteAnalyteAPITest(APITestCaseWithAuth):
-    def test_delete_analyte(self):
-        url = "/api/metadata/delete_analytes/?ids=GREGoR_test-001-001-0-R-1"
+class DeletePhenotypeAPITest(APITestCaseWithAuth):
+    def test_delete_phenotype(self):
+        url = "/api/metadata/delete_phenotypes/?ids=1.2"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

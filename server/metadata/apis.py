@@ -1088,6 +1088,7 @@ class DeleteAnalyteAPI(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
+
 class CreateGeneticFindingsAPI(APIView):
     """
     API view to create Genetic Findings entries.
@@ -1095,7 +1096,6 @@ class CreateGeneticFindingsAPI(APIView):
     This API endpoint accepts a list of genetic findings data objects, checks that
     the submission does not exist, and creates new entries based on the
     presence of a 'genetic_findings_id'.
-
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
     - Returns HTTP 207 if some operations fail.
