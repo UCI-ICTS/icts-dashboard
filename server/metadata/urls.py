@@ -17,6 +17,11 @@ from metadata.apis import (
     ReadAnalyteAPI,
     UpdateAnalyteAPI,
     DeleteAnalyteAPI,
+
+    CreatePhenotypeAPI,
+    ReadPhenotypeAPI,
+    UpdatePhenotypeAPI,
+    DeletePhenotypeAPI,
 )
 
 urlpatterns = [
@@ -34,4 +39,9 @@ urlpatterns = [
     path("read_analytes/", ReadAnalyteAPI.as_view()),
     path("update_analytes/", UpdateAnalyteAPI.as_view()),
     path("delete_analytes/", DeleteAnalyteAPI.as_view()),
+
+    path("create_phenotypes/", CreatePhenotypeAPI.as_view()),
+    path("read_phenotypes/", ReadPhenotypeAPI.as_view()),
+    path("update_phenotypes/", UpdatePhenotypeAPI.as_view()),
+    path("delete_phenotypes/", DeletePhenotypeAPI.as_view()),
 ]
