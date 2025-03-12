@@ -18,10 +18,10 @@ from metadata.apis import (
     UpdateAnalyteAPI,
     DeleteAnalyteAPI,
 
-    CreatePhenotypeAPI,
-    ReadPhenotypeAPI,
-    UpdatePhenotypeAPI,
-    DeletePhenotypeAPI,
+    CreateGeneticFindingsAPI,
+    ReadGeneticFindingsAPI,
+    UpdateGeneticFindingsAPI,
+    DeleteGeneticFindingsAPI,
 )
 
 urlpatterns = [
@@ -40,8 +40,8 @@ urlpatterns = [
     path("update_analytes/", UpdateAnalyteAPI.as_view()),
     path("delete_analytes/", DeleteAnalyteAPI.as_view()),
 
-    path("create_phenotypes/", CreatePhenotypeAPI.as_view()),
-    path("read_phenotypes/", ReadPhenotypeAPI.as_view()),
-    path("update_phenotypes/", UpdatePhenotypeAPI.as_view()),
-    path("delete_phenotypes/", DeletePhenotypeAPI.as_view()),
+    path("create_genetic_findings/", CreateGeneticFindingsAPI.as_view()),
+    path("read_genetic_findings/", ReadGeneticFindingsAPI.as_view()),
+    path("update_genetic_findings/", UpdateGeneticFindingsAPI.as_view()),
+    path("delete_genetic_findings/", DeleteGeneticFindingsAPI.as_view()),
 ]

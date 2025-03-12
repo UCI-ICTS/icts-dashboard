@@ -1088,14 +1088,14 @@ class DeleteAnalyteAPI(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-class CreatePhenotypeAPI(APIView):
+
+class CreateGeneticFindingsAPI(APIView):
     """
-    API view to create Phenotype entries.
+    API view to create Genetic Findings entries.
 
-    This API endpoint accepts a list of phenotype data objects, checks that
+    This API endpoint accepts a list of genetic findings data objects, checks that
     the submission does not exist, and creates new entries based on the
-    presence of a 'phenotype_id'.
-
+    presence of a 'genetic_findings_id'.
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
     - Returns HTTP 207 if some operations fail.
@@ -1106,22 +1106,22 @@ class CreatePhenotypeAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="create_phenotypes",
-        request_body=PhenotypeSerializer(many=True),
+        operation_id="create_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
         responses={
             200: "All updates successfull",
             207: "Some updates were not successful",
             400: "Bad request",
         },
-        tags=["Phenotype"],
+        tags=["Genetic Findings"],
     )
 
     def post(self, request):
-        # Retrieve existing phenotypes in bulk
-        phenotypes = bulk_model_retrieve(
+        # Retrieve existing genetic findings in bulk
+        genetic_findings = bulk_model_retrieve(
             request_data=request.data,
-            model_class=Phenotype,
-            id="phenotype_id"
+            model_class=GeneticFindings,
+            id="genetic_findings_id"
         )
 
         response_data = []
@@ -1133,18 +1133,18 @@ class CreatePhenotypeAPI(APIView):
 
         # Split request data into new and existing records
         for datum in request.data:
-            phenotype_id = datum.get("phenotype_id")  # Safely retrieve phenotype_id
-            if phenotype_id and phenotype_id in phenotypes:
+            genetic_findings_id = datum.get("genetic_findings_id")  # Safely retrieve genetic_findings_id
+            if genetic_findings_id and genetic_findings_id in genetic_findings:
                 existing_records.append(datum)
             else:
                 new_records.append(datum)
 
         try:
-            # Handle creating new phenotypes
+            # Handle creating new genetic findings
             for datum in new_records:
                 return_data, result = create_metadata(
-                    table_name="phenotype",
-                    identifier=datum["phenotype_id"],
+                    table_name="genetic_findings",
+                    identifier=datum["genetic_findings_id"],
                     datum=datum
                 )
                 response_data.append(return_data)
@@ -1153,14 +1153,14 @@ class CreatePhenotypeAPI(APIView):
                 else:
                     rejected_requests = True
 
-            # Handle updating existing phenotypes
+            # Handle updating existing genetic findings
             for datum in existing_records:
                 response_data.append(
                     response_constructor(
-                        identifier=datum["phenotype_id"],
+                        identifier=datum["genetic_findings_id"],
                         request_status="BAD REQUEST",
                         code=400,
-                        data="Phenotype already exists",
+                        data="Genetic Findings already exists",
                     )
                 )
                 rejected_requests = True
@@ -1169,7 +1169,7 @@ class CreatePhenotypeAPI(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            identifier = datum.get("phenotype_id", "UNKNOWN IDENTIFIER")
+            identifier = datum.get("genetic_findings_id", "UNKNOWN IDENTIFIER")
             response_data.insert(0, response_constructor(
                 identifier=identifier,
                 request_status="SERVER ERROR",
@@ -1178,11 +1178,11 @@ class CreatePhenotypeAPI(APIView):
             ))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-class ReadPhenotypeAPI(APIView):
+class ReadGeneticFindingsAPI(APIView):
     """
-    API view to read Phenotype entries.
+    API view to read Genetic Findings entries.
 
-    This API endpoint requests a list of phenotype data objects based on the 'phenotype_id'.
+    This API endpoint requests a list of genetic findings data objects based on the 'genetic_findings_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -1194,13 +1194,13 @@ class ReadPhenotypeAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="read_phenotypes",
-        operation_description="Retrieve phenotype details by their IDs",
+        operation_id="read_genetic_findings",
+        operation_description="Retrieve genetic findings details by their IDs",
         manual_parameters=[
             openapi.Parameter(
                 "ids",
                 openapi.IN_QUERY,
-                description="Comma-separated list of phenotype IDs (e.g., P1, P2, P3)",
+                description="Comma-separated list of genetic findings IDs (e.g., F1, F2, F3)",
                 type=openapi.TYPE_STRING,
             )
         ],
@@ -1210,7 +1210,7 @@ class ReadPhenotypeAPI(APIView):
             207: "Some queries were not successfull",
             400: "Bad request",
         },
-        tags=["Phenotype"],
+        tags=["Genetic Findings"],
     )
 
     def get(self, request):
@@ -1220,22 +1220,22 @@ class ReadPhenotypeAPI(APIView):
 
         id_list = request.GET.get("ids", "").split(",")
 
-        # Fetch phenotypes
-        phenotypes = bulk_retrieve(
-            model_class=Phenotype,
+        # Fetch genetic_findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
             id_list=id_list,
-            id_field="phenotype_id"
+            id_field="genetic_findings_id"
         )
 
         try:
             for identifier in id_list:
-                if identifier in phenotypes:
+                if identifier in genetic_findings:
                     response_data.append(
                         response_constructor(
                             identifier=identifier,
                             request_status="SUCCESS",
                             code=200,
-                            data=phenotypes[identifier]
+                            data=genetic_findings[identifier]
                         )
                     )
                     accepted_requests = True
@@ -1245,7 +1245,7 @@ class ReadPhenotypeAPI(APIView):
                             identifier=identifier,
                             request_status="NOT FOUND",
                             code=404,
-                            data="Phenotype not found"
+                            data="Genetic Findings not found"
                         )
                     )
                     rejected_requests = True
@@ -1264,13 +1264,13 @@ class ReadPhenotypeAPI(APIView):
             )
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-class UpdatePhenotypeAPI(APIView):
+class UpdateGeneticFindingsAPI(APIView):
     """
-    API view to create or update Phenotype entries.
+    API view to create or update Genetic Findings entries.
 
-    This API endpoint accepts a list of phenotype data objects, validates
+    This API endpoint accepts a list of genetic_findings data objects, validates
      them, and either creates new entries or updates existing ones based on
-     the presence of a 'phenotype_id'.
+     the presence of a 'genetic_findings_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -1282,22 +1282,22 @@ class UpdatePhenotypeAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_phenotypes",
-        request_body=PhenotypeSerializer(many=True),
+        operation_id="update_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
         responses={
             200: "All updates successfull",
             207: "Some updates were not successfull",
             400: "Bad request",
         },
-        tags=["Phenotype"],
+        tags=["Genetic Findings"],
     )
 
     def post(self, request):
-        # Retrieve existing phenotypes in bulk
-        phenotypes = bulk_model_retrieve(
+        # Retrieve existing genetic findings in bulk
+        genetic_findings = bulk_model_retrieve(
             request_data=request.data,
-            model_class=Phenotype,
-            id="phenotype_id"
+            model_class=GeneticFindings,
+            id="genetic_findings_id"
         )
 
         response_data = []
@@ -1309,8 +1309,8 @@ class UpdatePhenotypeAPI(APIView):
 
         # Split request data into new and existing records
         for datum in request.data:
-            phenotype_id = datum.get("phenotype_id")
-            if phenotype_id and phenotype_id in phenotypes:
+            genetic_findings_id = datum.get("genetic_findings_id")
+            if genetic_findings_id and genetic_findings_id in genetic_findings:
                 existing_records.append(datum)
             else:
                 new_records.append(datum)
@@ -1320,21 +1320,21 @@ class UpdatePhenotypeAPI(APIView):
             for datum in new_records:
                 response_data.append(
                     response_constructor(
-                        identifier=datum.get("phenotype_id", "UNKNOWN"),
+                        identifier=datum.get("genetic_findings_id", "UNKNOWN"),
                         request_status="BAD REQUEST",
                         code=400,
-                        data="Phenotype does not exist and cannot be updated.",
+                        data="Genetic Findings does not exist and cannot be updated.",
                     )
                 )
                 rejected_requests = True
 
-            # Handle updating existing phenotypes
+            # Handle updating existing participants
             for datum in existing_records:
-                phenotype_id = datum["phenotype_id"]
+                genetic_findings_id = datum["genetic_findings_id"]
                 return_data, result = update_metadata(
-                    table_name="phenotype",
-                    identifier=phenotype_id,
-                    model_instance=phenotypes.get(phenotype_id),
+                    table_name="genetic_findings",
+                    identifier=genetic_findings_id,
+                    model_instance=genetic_findings.get(genetic_findings_id),
                     datum=datum
                 )
                 response_data.append(return_data)
@@ -1347,7 +1347,7 @@ class UpdatePhenotypeAPI(APIView):
             return Response(status=status_code, data=response_data)
 
         except Exception as error:
-            identifier = datum.get("phenotype_id", "UNKNOWN IDENTIFIER")
+            identifier = datum.get("genetic_findings_id", "UNKNOWN IDENTIFIER")
             response_data.insert(0, response_constructor(
                 identifier=identifier,
                 request_status="SERVER ERROR",
@@ -1356,12 +1356,12 @@ class UpdatePhenotypeAPI(APIView):
             ))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
-class DeletePhenotypeAPI(APIView):
+class DeleteGeneticFindingsAPI(APIView):
     """
-    API view to create or update Phenotype entries.
+    API view to create or update Genetic Findings entries.
 
-    This API endpoint accepts a list of phenotype data objects, validates
-     them, and deletes them based on the 'phenotype_id'.
+    This API endpoint accepts a list of genetic findings data objects, validates
+     them, and deletes them based on the 'genetic_findings_id'.
 
     Responses vary based on the results of the submissions:
     - Returns HTTP 200 if all operations are successful.
@@ -1373,14 +1373,14 @@ class DeletePhenotypeAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="delete_phenotypes",
-        request_body=PhenotypeSerializer(many=True),
+        operation_id="delete_genetic_findings",
+        request_body=GeneticFindingsSerializer(many=True),
         responses={
             200: "All updates successfull",
             207: "Some updates were not successfull",
             400: "Bad request",
         },
-        tags=["Phenotype"],
+        tags=["Genetic Findings"],
     )
 
     def delete(self, request):
@@ -1390,19 +1390,19 @@ class DeletePhenotypeAPI(APIView):
 
         id_list = request.GET.get("ids", "").split(",")
 
-        # Fetch phenotypes
-        phenotypes = bulk_retrieve(
-            model_class=Phenotype,
+        # Fetch genetic findings
+        genetic_findings = bulk_retrieve(
+            model_class=GeneticFindings,
             id_list=id_list,
-            id_field="phenotype_id"
+            id_field="genetic_findings_id"
         )
         try:
             for identifier in id_list:
-                if identifier in phenotypes:
+                if identifier in genetic_findings:
                     return_data, result = delete_metadata(
-                        table_name="phenotype",
+                        table_name="genetic_findings",
                         identifier=identifier,
-                        id_field="phenotype_id"
+                        id_field="genetic_findings_id"
                     )
                     response_data.append(return_data)
 
@@ -1416,7 +1416,7 @@ class DeletePhenotypeAPI(APIView):
                             identifier=identifier,
                             request_status="NOT FOUND",
                             code=404,
-                            data="Phenotype not found"
+                            data="Genetic Findings not found"
                         )
                     )
                     rejected_requests = True
