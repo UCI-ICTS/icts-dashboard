@@ -65,7 +65,7 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
 
     # This renames the field in API input/output while keeping it correct in Django ORM
     five_prime_three_prime_bias = serializers.FloatField(required=False, allow_null=True)
-    
+
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
@@ -123,13 +123,69 @@ class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-    
+
     def to_representation(self, instance):
         """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
         data = super().to_representation(instance)
         if "five_prime_three_prime_bias" in data:
             data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
         return data
+
+
+class ExperimentDnaInputSerializer(serializers.ModelSerializer):
+    library_prep_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
+    )
+
+    experiment_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", queryset=ExperimentType.objects.all()
+    )
+
+    class Meta:
+        model = ExperimentDNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new ExperimentDNAShortRead instance using the validated data and set the many-to-many relationships"""
+
+        library_prep_types_data = validated_data.pop("library_prep_type", [])
+        experiment_types_data = validated_data.pop("experiment_type", [])
+
+        experiment_dna_instance = ExperimentDNAShortRead.objects.create(**validated_data)
+        experiment_dna_instance.library_prep_type.set(library_prep_types_data)
+        experiment_dna_instance.experiment_type.set(experiment_types_data)
+
+        return experiment_dna_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        library_prep_types_data = validated_data.pop("library_prep_type", None)
+        experiment_types_data = validated_data.pop("experiment_type", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if library_prep_types_data is not None:
+            instance.library_prep_type.set(library_prep_types_data)
+        if experiment_types_data is not None:
+            instance.experiment_type.set(experiment_types_data)
+
+        instance.save()
+        return instance
+
+
+class ExperimentDnaOutputSerializer(serializers.ModelSerializer):
+    library_prep_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
+    experiment_type = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
+
+    class Meta:
+        model = ExperimentDNAShortRead
+        fields = "__all__"
 
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
@@ -263,13 +319,55 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
+class AlignedRnaShortReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedRNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new AlignedRNAShortRead instance using the validated data and set the many-to-many relationships"""
+        aligned_rna_instance = AlignedRNAShortRead.objects.create(**validated_data)
+
+        return aligned_rna_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class AlignedDnaShortReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedDNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new AlignedDNAShortRead instance using the validated data and set the many-to-many relationships"""
+        aligned_dna_instance = AlignedDNAShortRead.objects.create(**validated_data)
+
+        return aligned_dna_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
 class AlignedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Aligned
         fields = "__all__"
 
     def create(self, validated_data):
-        """Create a new Experiment instance using the validated data"""
+        """Create a new Aligned instance using the validated data"""
 
         aligned_id = validated_data.get("aligned_id")
         aligned, created = Aligned.objects.get_or_create(
@@ -397,10 +495,10 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         }
     }
     table_validator = TableValidator()
-    
+
     if get_analyte(datum["analyte_id"]) is not None:
         participant_id = get_analyte(datum["analyte_id"]).participant_id.participant_id
-    else: 
+    else:
         analyte_id = datum["analyte_id"]
         return response_constructor(
             identifier=identifier,
@@ -415,9 +513,9 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         "id_in_table": identifier,
         "participant_id": participant_id,
     }
-    
+
     experiment_results = ExperimentService.validate_experiment(experiment_data, table_validator)
-    
+
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
@@ -524,11 +622,11 @@ def update_experiment(table_name: str, identifier: str, model_instance, datum: d
             code=400,
             data=error_data,
         ), "rejected_request"
-    
+
 
 def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
     """
-    Delete an existing experiment model instance and the corresponding Experiment object 
+    Delete an existing experiment model instance and the corresponding Experiment object
     based on the provided identifier.
 
     Args:
@@ -559,13 +657,13 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
         instance = model_class.objects.filter(**{id_field: identifier}).first()
         if instance:
             instance.delete()
-            
+
             # Remove the associated entry from the Experiment table
             experiment_id = f"{table_name}.{identifier}"
             experiment_instance = Experiment.objects.filter(pk=experiment_id).first()
             if experiment_instance:
                 experiment_instance.delete()
-            
+
             return response_constructor(
                 identifier=identifier,
                 request_status="DELETED",
@@ -579,7 +677,7 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
                 code=404,
                 data=f"{table_name} {identifier} not found."
             ), "rejected_request"
-    
+
     except Exception as error:
         return response_constructor(
             identifier=identifier,
@@ -640,7 +738,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
             code=400,
             data=f"Experiment {experiment_name} for {identifier} does not exist.",
         ), "rejected_request"
-    
+
     aligned_data = {
         "aligned_id": f"{table_name}.{identifier}",
         "table_name": table_name,
@@ -649,7 +747,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         "aligned_file": datum[f"{table_name}_file"],
         "aligned_index_file": datum[f"{table_name}_index_file"]
     }
-    
+
     aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
 
     if aligned_results['valid']:
@@ -746,7 +844,7 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
 
 def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
     """
-    Delete an existing aligned model instance and the corresponding Aligned object 
+    Delete an existing aligned model instance and the corresponding Aligned object
     based on the provided identifier.
 
     Args:
@@ -777,13 +875,13 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
         instance = model_class.objects.filter(**{id_field: identifier}).first()
         if instance:
             instance.delete()
-            
+
             # Remove the associated entry from the Aligned table
             aligned_id = f"{table_name}.{identifier}"
             aligned_instance = Aligned.objects.filter(pk=aligned_id).first()
             if aligned_instance:
                 aligned_instance.delete()
-            
+
             return response_constructor(
                 identifier=identifier,
                 request_status="DELETED",
@@ -797,7 +895,7 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
                 code=404,
                 data=f"{table_name} {identifier} not found."
             ), "rejected_request"
-    
+
     except Exception as error:
         return response_constructor(
             identifier=identifier,
@@ -805,7 +903,7 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
             code=500,
             data=str(error),
         ), "rejected_request"
-    
+
 
 def create_or_update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
@@ -814,7 +912,7 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
     Args:
         table_name (str): The name of the table (model) to create or update.
         identifier (str): The unique identifier for the model instance.
-        model_instance: The existing model instance to update, or None to create 
+        model_instance: The existing model instance to update, or None to create
             a new instance.
         datum (dict): The data to create or update the model instance with.
 
@@ -822,7 +920,7 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         dict: A response dictionary indicating the status of the operation.
     """
 
-    
+
     table_serializers = {
         "experiment_dna_short_read": {
             "model": ExperimentDNAShortRead,
@@ -850,10 +948,10 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         }
     }
     table_validator = TableValidator()
-    
+
     if get_analyte(datum["analyte_id"]) is not None:
         participant_id = get_analyte(datum["analyte_id"]).participant_id.participant_id
-    else: 
+    else:
         analyte_id = datum["analyte_id"]
         return response_constructor(
             identifier=identifier,
@@ -907,7 +1005,7 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
                 request_status="UPDATED" if model_instance else "CREATED",
                 code=200 if model_instance else 201,
                 message=(
-                    f"{table_name} {identifier} updated." if model_instance 
+                    f"{table_name} {identifier} updated." if model_instance
                     else f"{table_name} {identifier} created."
                 ),
                 data={
@@ -915,7 +1013,7 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
                     "instance": model_output_serializer(updated_instance).data
                 }
             ), "accepted_request"
-            
+
         else:
             error_data = [
                 {item: serializer.errors[item]}
@@ -931,7 +1029,7 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
                 code=400,
                 data=error_data,
             ), "rejected_request"
-        
+
     else:
         return response_constructor(
             identifier=identifier,
@@ -948,7 +1046,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
     Args:
         table_name (str): The name of the table (model) to create or update.
         identifier (str): The unique identifier for the model instance.
-        model_instance: The existing model instance to update, or None to create 
+        model_instance: The existing model instance to update, or None to create
             a new instance.
         datum (dict): The data to create or update the model instance with.
 
@@ -956,7 +1054,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
         dict: A response dictionary indicating the status of the operation.
     """
 
-    
+
     table_serializers = {
         "aligned_dna_short_read": {
             "model": AlignedDNAShortRead,
@@ -989,14 +1087,14 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
     try:
         experiment_object = Experiment.objects.get(id_in_table=datum[experiment_name+"_id"])
         participant_id = experiment_object.participant_id.participant_id
-    except Experiment.DoesNotExist: 
+    except Experiment.DoesNotExist:
         return response_constructor(
             identifier=identifier,
             request_status="BAD REQUEST",
             code=400,
             data=f"Experiment {experiment_name} for {identifier} dose not exist.",
         ), "rejected_request"
-    
+
     aligned_data = {
         "aligned_id": f"{table_name}.{identifier}",
         "table_name": table_name,
@@ -1005,7 +1103,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
         "aligned_file": datum[f"{table_name}_file"],
         "aligned_index_file": datum[f"{table_name}_index_file"]
     }
-    
+
     aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -1015,7 +1113,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
-        datum = remove_na(datum=datum) 
+        datum = remove_na(datum=datum)
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
 
@@ -1046,7 +1144,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
                 request_status="UPDATED" if model_instance else "CREATED",
                 code=200 if model_instance else 201,
                 message=(
-                    f"{table_name} {identifier} updated." if model_instance 
+                    f"{table_name} {identifier} updated." if model_instance
                     else f"{table_name} {identifier} created."
                 ),
                 data={
@@ -1054,7 +1152,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
                     "instance": model_output_serializer(updated_instance).data
                 }
             ), "accepted_request"
-            
+
         else:
             error_data = [
                 {item: serializer.errors[item]}
@@ -1070,7 +1168,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
                 code=400,
                 data=error_data,
             ), "rejected_request"
-        
+
     else:
         return response_constructor(
             identifier=identifier,
