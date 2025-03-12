@@ -69,7 +69,7 @@ class UpdateAnalyteAPITest(APITestCaseWithAuth):
             "primary_biosample": "UBERON:0000178",
         }
         part2 = {  # Invalid submission; analyte_type
-            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "analyte_id": "GREGoR_test-001-001-0-R-1",
             "participant_id": "GREGoR_test-001-001-0",
             "analyte_type": "",
             "primary_biosample": "UBERON:0000178",
@@ -85,8 +85,7 @@ class UpdateAnalyteAPITest(APITestCaseWithAuth):
 
 class DeleteAnalyteAPITest(APITestCaseWithAuth):
     def test_delete_analyte(self):
-        url = "/api/metadata/delete_analytes/?ids=GREGoR_test-001-001-0-R-2"
+        url = "/api/metadata/delete_analytes/?ids=GREGoR_test-001-001-0-R-1"
         response = self.client.delete(url, format='json')
-        import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")
