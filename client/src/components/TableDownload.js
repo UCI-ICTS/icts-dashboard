@@ -22,45 +22,54 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
       console.warn("No data to export.");
       return;
     }
-
+  
     let fileContent = "";
     let fileExtension = "";
     let mimeType = "";
-
+  
     if (exportFormat === "TSV" || exportFormat === "CSV") {
       const delimiter = exportFormat === "TSV" ? "\t" : ",";
       fileExtension = exportFormat.toLowerCase();
       mimeType = `text/${exportFormat.toLowerCase()};charset=utf-8`;
-
+  
+      // Escape function for CSV/TSV values
+      const escapeValue = (value) => {
+        if (Array.isArray(value)) {
+          return `"${value.map(item => item.toString().trim()).join("|")}"`;
+        }
+        if (typeof value === "string") {
+          let trimmedValue = value.trim();
+          if (trimmedValue.includes(delimiter) || trimmedValue.includes('"') || trimmedValue.includes("\n")) {
+            // Wrap in quotes if containing delimiter, quotes, or newlines
+            trimmedValue = `"${trimmedValue.replace(/"/g, '""')}"`;
+          }
+          return trimmedValue;
+        }
+        return value !== undefined ? value : "";
+      };
+  
       // Extract column headers
-      const headers = headCells.map(cell => cell.headerName).join(delimiter);
-
-      // Convert rows to selected format
+      const headers = headCells.map(cell => escapeValue(cell.headerName)).join(delimiter);
+  
+      // Convert rows to formatted CSV/TSV
       const fileRows = rows.map(row =>
-        headCells.map(cell => 
-          Array.isArray(row[cell.field]) 
-            ? row[cell.field].join("|")  // Use "|" if the value is an array
-            : row[cell.field] !== undefined 
-              ? row[cell.field] 
-              : ""
-        ).join(delimiter)
+        headCells.map(cell => escapeValue(row[cell.field])).join(delimiter)
       );
-      
-
-      // Combine headers and row data
+  
+      // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
     } else if (exportFormat === "JSON") {
       fileExtension = "json";
       mimeType = "application/json;charset=utf-8";
-
+  
       // Convert rows to JSON format
       fileContent = JSON.stringify(rows, null, 2);
     }
-
+  
     // Create and trigger download
     const blob = new Blob([fileContent], { type: mimeType });
     const url = URL.createObjectURL(blob);
-
+  
     const a = document.createElement("a");
     a.href = url;
     a.download = `${filename}.${fileExtension}`;
@@ -68,10 +77,11 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
+  
     console.log(`✅ Exported as ${exportFormat}`, rows);
     setOpenDialog(false); // Close dialog after download
   };
+  
 
   return (
     <>
