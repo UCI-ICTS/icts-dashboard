@@ -19,7 +19,7 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_dna_short_read_api(self):
         url = "/api/experiments/create_aligned_dna_short_read/"
 
-        aligned1 = {  # Prior existing entry, should fail
+        aligned1 = {  # Prior existing entry, Is valid
             "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1",
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
             "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-R-1_DNA.cram",
@@ -49,9 +49,9 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
             "quality_issues": None,
         }
 
-        aligned3 =  {  # New entry
+        aligned3 =  {  # New entry, invalid
             "aligned_dna_short_read_id": "UCI_GREGoR_test-001-003-0_DNA_1-Aligned-2",
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-R-1_DNA_1",
+            "experiment_dna_short_read_id": None,  # missing
             "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-2.cram",
             "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-2.crai",
             "md5sum": "db2b05c08732d8fac11f1089a88374cb",
@@ -77,7 +77,7 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         response_200 = self.client.post(url, [aligned2], format='json')
         response_207 = self.client.post(url, [aligned1, aligned3], format='json')
-        response_400 = self.client.post(url, [aligned1, aligned1], format='json')
+        response_400 = self.client.post(url, [aligned3, aligned3], format='json')
 
         #import pdb; pdb.set_trace()
         #Checks for the Aligned table after creation
@@ -89,13 +89,13 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         ).exists()
 
         assert aligned2_exists
-        assert aligned3_exists
+        assert not aligned3_exists
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[1]["request_status"], "CREATED")
-        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -163,21 +163,20 @@ class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Alignment table before deletions
         alignment1_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-1"
         ).exists()
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/delete_aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1,DNE-01-1"
-        url3 = "/api/experiments/delete_aligned_dna_short_read/?ids=DNE-1,DNE2"
+        url2 = "/api/experiments/delete_aligned_dna_short_read/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/delete_aligned_dna_short_read/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')
-        #import pdb; pdb.set_trace()
 
         #Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-1"
         ).exists()
         assert not alignment2_exists
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
