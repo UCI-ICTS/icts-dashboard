@@ -48,146 +48,6 @@ from experiments.services import (
 from experiments.selectors import get_experiment
 
 
-class CreateOrUpdateAlignedPacBio(APIView):
-    """Create or Update Aligned PacBio
-
-        This API endpoint accepts a list of short read PacBio experiment entries,
-    validates them, and either creates new entries or updates existing ones
-    based on the presence of a 'aligned_pac_bio_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="aligned_pac_bio",
-        request_body=AlignedPacBioSerializer(many=True),
-        responses={
-            200: "All submissions of PacBio experiments were successfull",
-            207: "Some submissions of PacBio experiments were not successful.",
-            400: "Bad request",
-        },
-        tags=["CreateOrUpdate"],
-    )
-
-    def post(self, request):
-        # Most efficient query is to pull all ids from request at once
-        aligned_pac_bio = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=AlignedPacBio,
-            id="aligned_pac_bio_id"
-        )
-
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_alignment(
-                    table_name="aligned_pac_bio",
-                    identifier = datum["aligned_pac_bio_id"],
-                    model_instance = aligned_pac_bio.get(datum["aligned_pac_bio_id"]),
-                    datum = datum
-                )
-
-                if result == "accepted_request":
-                    accepted_requests = True
-                elif result == "rejected_request":
-                    rejected_requests = True
-                response_data.append(return_data)
-                continue
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=datum["aligned_pac_bio_id"],
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-
-class CreateOrUpdateExperimentPacBio(APIView):
-    """API view to create or update PacBio experiments.
-
-    This API endpoint accepts a list of PacBio experiment entries,
-    validates them, and either creates new entries or updates existing ones
-    based on the presence of a 'experiment_pac_bio_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="submit_experiment_pac_bio",
-        request_body=ExperimentPacBioSerializer(many=True),
-        responses={
-            200: "All submissions of PacBio experiments were successfull",
-            207: "Some submissions of PacBio experiments were not successful.",
-            400: "Bad request",
-        },
-        tags=["CreateOrUpdate"],
-    )
-
-    def post(self, request):
-        # Most efficient query is to pull all ids from request at once
-        experiment_pac_bio = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=ExperimentPacBio,
-            id="experiment_pac_bio_id"
-        )
-
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_experiment(
-                    table_name="experiment_pac_bio",
-                    identifier = datum["experiment_pac_bio_id"],
-                    model_instance = experiment_pac_bio.get(datum["experiment_pac_bio_id"]),
-                    datum = datum
-                )
-
-                if result == "accepted_request":
-                    accepted_requests = True
-                elif result == "rejected_request":
-                    rejected_requests = True
-                response_data.append(return_data)
-                continue
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=datum["experiment_pac_bio_id"],
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-
 class CreateOrUpdateAlignedNanopore(APIView):
     """Create or Update Aligned Nanopore
 
@@ -320,73 +180,6 @@ class CreateOrUpdateExperimentNanopore(APIView):
             response_data.insert(0,
                 response_constructor(
                     identifier=datum["experiment_nanopore_id"],
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-
-class CreateOrUpdateAlignedRna(APIView):
-    """
-    API view to create or update Aligned RNA entries.
-
-    This API endpoint accepts a list of aligned RNA data objects,
-    validates them, and either creates new entries or updates existing ones
-    based on the presence of a 'aligned_rna_short_read_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    @swagger_auto_schema(
-        operation_id="submit_aligned_rna",
-        request_body=AlignedRnaSerializer(many=True),
-        responses={
-            200: "All submissions of genetic findings were successfull",
-            207: "Some submissions of genetic findings were not successful.",
-            400: "Bad request",
-        },
-        tags=["CreateOrUpdate"],
-    )
-    def post(self, request):
-        # Most efficient query is to pull all ids from request at once
-        aligned_rna = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=AlignedRNAShortRead,
-            id="aligned_rna_short_read_id"
-        )
-
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        try:
-            for index, datum in enumerate(request.data):
-                return_data, result = create_or_update_alignment(
-                    table_name="aligned_rna_short_read",
-                    identifier = datum["aligned_rna_short_read_id"],
-                    model_instance = aligned_rna.get(datum["aligned_rna_short_read_id"]),
-                    datum = datum
-                )
-
-                if result == "accepted_request":
-                    accepted_requests = True
-                elif result == "rejected_request":
-                    rejected_requests = True
-                response_data.append(return_data)
-                continue
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=datum["aligned_rna_short_read_id"],
                     request_status="SERVER ERROR",
                     code=500,
                     data=str(error),
@@ -1784,6 +1577,710 @@ class DeleteAlignedDnaShortRead(APIView):
                             request_status="NOT FOUND",
                             code=404,
                             data="Short read DNA alignment not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateExperimentPacBio(APIView):
+    """API view to create PacBio experiments.
+
+    This API endpoint accepts a list of PacBio experiment entries,
+    validates them, and creates new entries based on the presence of a
+    'experiment_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="create_experiment_pac_bio",
+        request_body=ExperimentPacBioSerializer(many=True),
+        responses={
+            200: "All submissions of PacBio experiments were successfull",
+            207: "Some submissions of PacBio experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment PacBio"],
+    )
+
+    def post(self, request):
+        experiment_pac_bio = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=ExperimentPacBio,
+            id="experiment_pac_bio_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+        for datum in request.data:
+            experiment_pac_bio_id = datum.get("experiment_pac_bio_id")
+            if experiment_pac_bio_id and experiment_pac_bio_id in experiment_pac_bio:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            # Handle creating new objects
+            for datum in new_records:
+                return_data, result = create_experiment(
+                    table_name="experiment_pac_bio",
+                    identifier=datum["experiment_pac_bio_id"],
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            # Handle updating existing objects
+            for datum in existing_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum["experiment_pac_bio_id"],
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="PacBio experiment already exists",
+                    )
+                )
+                rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("experiment_pac_bio_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class ReadExperimentPacBio(APIView):
+    """
+    API view to read PacBio experiments.
+
+    This API endpoint requests a list of PacBio experiment data
+    objects based on the 'experiment_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_experiment_pac_bio",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of PacBio IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Experiment PacBio"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        # Fetch objects
+        experiment_pacbio = bulk_retrieve(
+            model_class=ExperimentPacBio,
+            id_list=id_list,
+            id_field="experiment_pac_bio_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in experiment_pacbio:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=experiment_pacbio[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="PacBio experiment not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class UpdateExperimentPacBio(APIView):
+    """API view to update PacBio experiments.
+
+    This API endpoint accepts a list of PacBio experiment entries,
+    validates them, and update existing entries based on the presence of
+    a 'experiment_pac_bio_id'.
+
+    Responses vary based on the results of the update:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="update_experiment_pacbio",
+        request_body=ExperimentPacBioSerializer(many=True),
+        responses={
+            200: "All updates of PacBio experiments were successfull",
+            207: "Some updates of PacBio experiments were not successful.",
+            400: "Bad request",
+        },
+        tags=["Experiment PacBio"],
+    )
+
+    def post(self, request):
+        experiment_pac_bio = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=ExperimentPacBio,
+            id="experiment_pac_bio_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            experiment_pac_bio_id = datum.get("experiment_pac_bio_id")
+            if experiment_pac_bio_id and experiment_pac_bio_id \
+                in experiment_pac_bio:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+        try:
+            # Reject non-existent records (Prevent updates to records that don't exist)
+            for datum in new_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum.get("experiment_pac_bio_id", "UNKNOWN"),
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="PacBio experiment does not exist and cannot be updated.",
+                    )
+                )
+                rejected_requests = True
+
+            # Handle updating existing records
+            for datum in existing_records:
+                experiment_pac_bio_id = datum["experiment_pac_bio_id"]
+                return_data, result = update_experiment(
+                    table_name="experiment_pac_bio",
+                    identifier=experiment_pac_bio_id,
+                    model_instance=experiment_pac_bio.get(experiment_pac_bio_id),
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("experiment_pac_bio_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class DeleteExperimentPacBio(APIView):
+    """
+    API view to delete PacBio experiments.
+
+    This API endpoint delets a list of PacBio experiments based on
+     the 'experiment_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_experiment_pac_bio",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of object IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries successfully deleted",
+            207: "Some queries were not successfully deleted",
+            400: "Bad request",
+        },
+        tags=["Experiment PacBio"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        experiment_pacbio = bulk_retrieve(
+            model_class=ExperimentPacBio,
+            id_list=id_list,
+            id_field="experiment_pac_bio_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in experiment_pacbio:
+                    return_data, result = delete_experiment(
+                        table_name="experiment_pac_bio",
+                        identifier=identifier,
+                        id_field="experiment_pac_bio_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="PacBio experiment not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class CreateAlignedPacBio(APIView):
+    """API view to create PacBio alignment objects.
+
+    This API endpoint accepts a list of PacBio alignment
+    objects, validates them, and creates new entries based on the presence of a
+    'aligned_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="create_pac_bio_read",
+        request_body=AlignedPacBioSerializer(many=True),
+        responses={
+            200: "All submissions of aligned PacBio objects were "
+            "successfull",
+            207: "Some submissions of aligned PacBio objects were "
+            "not successful.",
+            400: "Bad request",
+        },
+        tags=["Aligned PacBio"],
+    )
+
+    def post(self, request):
+        aligned_pac_bio = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=AlignedPacBio,
+            id="aligned_pac_bio_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+        for datum in request.data:
+            aligned_pac_bio_id = datum.get("aligned_pac_bio_id")
+            if aligned_pac_bio_id and aligned_pac_bio_id in aligned_pac_bio:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+
+        try:
+            for datum in new_records:
+                return_data, result = create_aligned(
+                    table_name="aligned_pac_bio",
+                    identifier=datum["aligned_pac_bio_id"],
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            for datum in existing_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum["aligned_pac_bio_id"],
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Aligned PacBio object already exists",
+                    )
+                )
+                rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("aligned_pac_bio_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class ReadAlignedPacBio(APIView):
+    """
+    API view to read PacBio alignment objects.
+
+    This API endpoint requests a list of PacBio alignment
+    objects based on the 'aligned_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="read_aligned_pac_bio",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of aligned PacBios IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries returned successfull",
+            207: "Some queries were not successfull",
+            400: "Bad request",
+        },
+        tags=["Aligned PacBio"],
+    )
+
+    def get(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        # Fetch objects
+        aligned_pac_bio = bulk_retrieve(
+            model_class=AlignedPacBio,
+            id_list=id_list,
+            id_field="aligned_pac_bio_id"
+        )
+
+        try:
+            for identifier in id_list:
+                if identifier in aligned_pac_bio:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=aligned_pac_bio[identifier]
+                        )
+                    )
+                    accepted_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="PacBio alignment not found"
+                        )
+                    )
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            response_data.insert(0,
+                response_constructor(
+                    identifier=id_list,
+                    request_status="SERVER ERROR",
+                    code=500,
+                    data=str(error),
+                )
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class UpdateAlignedPacBio(APIView):
+    """API view to update PacBio alignment objects.
+
+    This API endpoint accepts a list of PacBio alignment objects,
+    validates them, and update existing entries based on the presence of
+    a 'aligned_pac_bio_id'.
+
+    Responses vary based on the results of the update:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="update_aligned_pac_bio",
+        request_body=AlignedPacBioSerializer(many=True),
+        responses={
+            200: "All updates of aligned PacBio objects were "\
+                "successfull",
+            207: "Some updates of aligned PacBio objects were "\
+                "not successful.",
+            400: "Bad request",
+        },
+        tags=["Aligned PacBio"],
+    )
+
+    def post(self, request):
+        aligned_pac_bio = bulk_model_retrieve(
+            request_data=request.data,
+            model_class=AlignedPacBio,
+            id="aligned_pac_bio_id"
+        )
+
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        new_records = []
+        existing_records = []
+
+        # Split request data into new and existing records
+        for datum in request.data:
+            aligned_pac_bio_id = datum.get("aligned_pac_bio_id")
+            if aligned_pac_bio_id and aligned_pac_bio_id \
+                in aligned_pac_bio:
+                existing_records.append(datum)
+            else:
+                new_records.append(datum)
+        try:
+            # Reject non-existent records (Prevent updates to records that don't exist)
+            for datum in new_records:
+                response_data.append(
+                    response_constructor(
+                        identifier=datum.get("aligned_pac_bio_id", "UNKNOWN"),
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Aligned PacBio object does not exist and cannot be updated.",
+                    )
+                )
+                rejected_requests = True
+
+            # Handle updating existing objects
+            for datum in existing_records:
+                aligned_pac_bio_id = datum["aligned_pac_bio_id"]
+                return_data, result = update_aligned(
+                    table_name="aligned_pac_bio",
+                    identifier=aligned_pac_bio_id,
+                    model_instance=aligned_pac_bio.get(aligned_pac_bio_id),
+                    datum=datum
+                )
+                response_data.append(return_data)
+                if result == "accepted_request":
+                    accepted_requests = True
+                else:
+                    rejected_requests = True
+
+            status_code = response_status(accepted_requests, rejected_requests)
+            return Response(status=status_code, data=response_data)
+
+        except Exception as error:
+            identifier = datum.get("aligned_pac_bio_id", "UNKNOWN IDENTIFIER")
+            response_data.insert(0, response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class DeleteAlignedPacBio(APIView):
+    """
+    API view to delete PacBio alignment objects.
+
+    This API endpoint delets a list of PacBio alignment objects based on
+     the 'aligned_pac_bio_id'.
+
+    Responses vary based on the results of the submissions:
+    - Returns HTTP 200 if all operations are successful.
+    - Returns HTTP 207 if some operations fail.
+    - Returns HTTP 400 for bad input formats or validation failures.
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="delete_pac_bio_read",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of alignment IDs (e.g., P1-0,P2-1,P3-0)",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+
+        responses={
+            200: "All queries successfully deleted",
+            207: "Some queries were not successfully deleted",
+            400: "Bad request",
+        },
+        tags=["Aligned PacBio"],
+    )
+
+    def delete(self, request):
+        response_data = []
+        rejected_requests = False
+        accepted_requests = False
+
+        id_list = [id.strip() for id in request.GET.get("ids", "").split(",") if id.strip()]
+
+        aligned_pac_bio = bulk_retrieve(
+            model_class=AlignedPacBio,
+            id_list=id_list,
+            id_field="aligned_pac_bio_id"
+        )
+        try:
+            for identifier in id_list:
+                if identifier in aligned_pac_bio:
+                    return_data, result = delete_aligned(
+                        table_name="aligned_pac_bio",
+                        identifier=identifier,
+                        id_field="aligned_pac_bio_id"
+                    )
+                    response_data.append(return_data)
+
+                    if result == "accepted_request":
+                        accepted_requests = True
+                    else:
+                        rejected_requests = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=identifier,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="PacBio alignment not found"
                         )
                     )
                     rejected_requests = True
