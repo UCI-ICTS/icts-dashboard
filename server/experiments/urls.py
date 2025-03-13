@@ -32,6 +32,16 @@ from experiments.apis import (
     ReadAlignedPacBio,
     UpdateAlignedPacBio,
     DeleteAlignedPacBio,
+
+    CreateExperimentNanopore,
+    ReadExperimentNanopore,
+    UpdateExperimentNanopore,
+    DeleteExperimentNanopore,
+
+    CreateAlignedNanopore,
+    ReadAlignedNanopore,
+    UpdateAlignedNanopore,
+    DeleteAlignedNanopore,
 )
 
 urlpatterns = [
@@ -64,4 +74,14 @@ urlpatterns = [
     path("read_aligned_pac_bio/", ReadAlignedPacBio.as_view()),
     path("update_aligned_pac_bio/", UpdateAlignedPacBio.as_view()),
     path("delete_aligned_pac_bio/", DeleteAlignedPacBio.as_view()),
+
+    path("create_experiment_nanopore/", CreateExperimentNanopore.as_view()),
+    path("read_experiment_nanopore/", ReadExperimentNanopore.as_view()),
+    path("update_experiment_nanopore/", UpdateExperimentNanopore.as_view()),
+    path("delete_experiment_nanopore/", DeleteExperimentNanopore.as_view()),
+
+    path("create_aligned_nanopore/", CreateAlignedNanopore.as_view()),
+    path("read_aligned_nanopore/", ReadAlignedNanopore.as_view()),
+    path("update_aligned_nanopore/", UpdateAlignedNanopore.as_view()),
+    path("delete_aligned_nanopore/", DeleteAlignedNanopore.as_view()),
 ]
