@@ -3,11 +3,6 @@
 
 from django.urls import path
 from experiments.apis import (
-    CreateOrUpdateAlignedPacBio,
-    CreateOrUpdateExperimentPacBio,
-    CreateOrUpdateAlignedNanopore,
-    CreateOrUpdateExperimentNanopore,
-
     CreateExperimentRnaShortRead,
     ReadExperimentRnaShortRead,
     UpdateExperimentRnaShortRead,
@@ -30,11 +25,6 @@ from experiments.apis import (
 )
 
 urlpatterns = [
-    path("submit_pac_bio/", CreateOrUpdateExperimentPacBio.as_view()),
-    path("submit_aligned_pac_bio/", CreateOrUpdateAlignedPacBio.as_view()),
-    path("submit_experiment_nanopore/", CreateOrUpdateExperimentNanopore.as_view()),
-    path("submit_aligned_nanopore/", CreateOrUpdateAlignedNanopore.as_view()),
-
     path("create_experiment_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
     path("read_experiment_rna_short_read/", ReadExperimentRnaShortRead.as_view()),
     path("update_experiment_rna_short_read/", UpdateExperimentRnaShortRead.as_view()),
