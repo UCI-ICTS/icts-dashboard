@@ -1,8 +1,12 @@
 [Unit]
-Description=GREGoR Dashboard gunicorn socket
+Description=Gunicorn socket for GREGoR Dashboard
 
 [Socket]
 ListenStream=/var/run/gregor.sock
+SocketMode=0660
+DirectoryMode=0750
+User=nginx
+Group=developers
 
 [Install]
 WantedBy=sockets.target
