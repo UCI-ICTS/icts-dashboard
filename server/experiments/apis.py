@@ -116,7 +116,6 @@ class CreateExperimentRnaShortRead(APIView):
                     datum=datum
                 )
                 response_data.append(return_data)
-                response_data.append(return_data)
                 if result == "accepted_request":
                     accepted_requests = True
                 else:
@@ -226,7 +225,6 @@ class ReadExperimentRnaShortRead(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=id_list,
                     identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
@@ -405,7 +403,6 @@ class DeleteExperimentRnaShortRead(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=id_list,
                     identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
@@ -762,7 +759,6 @@ class DeleteAlignedRnaShortRead(APIView):
             response_data.insert(0,
                 response_constructor(
                     identifier=id_list,
-                    identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
                     data=str(error),
@@ -825,7 +821,6 @@ class CreateExperimentDnaShortRead(APIView):
                     identifier=datum["experiment_dna_short_read_id"],
                     datum=datum
                 )
-                response_data.append(return_data)
                 response_data.append(return_data)
                 if result == "accepted_request":
                     accepted_requests = True
@@ -936,7 +931,6 @@ class ReadExperimentDnaShortRead(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=id_list,
                     identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
@@ -1118,7 +1112,6 @@ class DeleteExperimentDnaShortRead(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=id_list,
                     identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
@@ -1424,7 +1417,6 @@ class DeleteAlignedDnaShortRead(APIView):
             207: "Some queries were not successfully deleted",
             400: "Bad request",
         },
-        tags=["Aligned DNA Short Read"],
         tags=["Aligned DNA Short Read"],
     )
 
@@ -1823,7 +1815,6 @@ class DeleteExperimentPacBio(APIView):
         except Exception as error:
             response_data.insert(0,
                 response_constructor(
-                    identifier=id_list,
                     identifier=id_list,
                     request_status="SERVER ERROR",
                     code=500,
