@@ -8,6 +8,11 @@ from experiments.apis import (
     UpdateExperimentRnaShortRead,
     DeleteExperimentRnaShortRead,
 
+    CreateExperimentRnaShortRead,
+    ReadExperimentRnaShortRead,
+    UpdateExperimentRnaShortRead,
+    DeleteExperimentRnaShortRead,
+
     CreateAlignedRnaShortRead,
     ReadAlignedRnaShortRead,
     UpdateAlignedRnaShortRead,
@@ -22,15 +27,27 @@ from experiments.apis import (
     ReadAlignedDnaShortRead,
     UpdateAlignedDnaShortRead,
     DeleteAlignedDnaShortRead,
+
+    CreateExperimentPacBio,
+    ReadExperimentPacBio,
+    UpdateExperimentPacBio,
+    DeleteExperimentPacBio,
+
+    CreateAlignedPacBio,
+    ReadAlignedPacBio,
+    UpdateAlignedPacBio,
+    DeleteAlignedPacBio,
 )
 
 urlpatterns = [
     path("create_experiment_rna_short_read/", CreateExperimentRnaShortRead.as_view()),
     path("read_experiment_rna_short_read/", ReadExperimentRnaShortRead.as_view()),
+    path("read_experiment_rna_short_read/", ReadExperimentRnaShortRead.as_view()),
     path("update_experiment_rna_short_read/", UpdateExperimentRnaShortRead.as_view()),
     path("delete_experiment_rna_short_read/", DeleteExperimentRnaShortRead.as_view()),
 
     path("create_aligned_rna_short_read/", CreateAlignedRnaShortRead.as_view()),
+    path("read_aligned_rna_short_read/", ReadAlignedRnaShortRead.as_view()),
     path("read_aligned_rna_short_read/", ReadAlignedRnaShortRead.as_view()),
     path("update_aligned_rna_short_read/", UpdateAlignedRnaShortRead.as_view()),
     path("delete_aligned_rna_short_read/", DeleteAlignedRnaShortRead.as_view()),
@@ -44,4 +61,14 @@ urlpatterns = [
     path("read_aligned_dna_short_read/", ReadAlignedDnaShortRead.as_view()),
     path("update_aligned_dna_short_read/", UpdateAlignedDnaShortRead.as_view()),
     path("delete_aligned_dna_short_read/", DeleteAlignedDnaShortRead.as_view()),
+
+    path("create_experiment_pac_bio/", CreateExperimentPacBio.as_view()),
+    path("read_experiment_pac_bio/", ReadExperimentPacBio.as_view()),
+    path("update_experiment_pac_bio/", UpdateExperimentPacBio.as_view()),
+    path("delete_experiment_pac_bio/", DeleteExperimentPacBio.as_view()),
+
+    path("create_aligned_pac_bio/", CreateAlignedPacBio.as_view()),
+    path("read_aligned_pac_bio/", ReadAlignedPacBio.as_view()),
+    path("update_aligned_pac_bio/", UpdateAlignedPacBio.as_view()),
+    path("delete_aligned_pac_bio/", DeleteAlignedPacBio.as_view()),
 ]
