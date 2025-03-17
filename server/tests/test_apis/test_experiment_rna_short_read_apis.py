@@ -111,11 +111,11 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
                 "untargeted"
             ]
         }
-  
+
         response_200 = self.client.post(url, [experiment2], format='json')
         response_207 = self.client.post(url, [experiment1, experiment3], format='json')
         response_400 = self.client.post(url, [experiment1, experiment1], format='json')
-        
+
         #Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
@@ -136,7 +136,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
 
 class ReadRNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_experiment_rna_short_read(self):
@@ -216,11 +216,11 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
                 4
             ]
         }
-  
+
         response_200 = self.client.post(url, [experiment1], format='json')
         response_207 = self.client.post(url, [experiment1, experiment2], format='json')
         response_400 = self.client.post(url, [experiment2, experiment2], format='json')
-        
+
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -231,13 +231,13 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
 
 class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_rna_short_read_api(self):
-        
+
         #Checks for the Experiment table before deletion
-        
+
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
         ).exists()
-        
+
         assert experiment1_exists
 
         url2 = "/api/experiments/delete_experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA, DNE-01-1"
@@ -245,7 +245,7 @@ class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')
-        
+
         #Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
