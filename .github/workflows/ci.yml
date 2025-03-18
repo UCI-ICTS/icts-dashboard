@@ -49,7 +49,7 @@ jobs:
           python manage.py test
 
   frontend-tests:
-    name: React Tests
+    name: React Tests 
     runs-on: ubuntu-latest
     needs: backend-tests  
 
