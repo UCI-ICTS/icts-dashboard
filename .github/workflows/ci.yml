@@ -31,6 +31,7 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: config.settings
         run: |
+          cd server
           python manage.py migrate
           python manage.py collectstatic --noinput
 
@@ -38,4 +39,5 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: config.settings
         run: |
+          cd server
           python manage.py test
