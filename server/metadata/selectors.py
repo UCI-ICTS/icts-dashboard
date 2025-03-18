@@ -94,6 +94,7 @@ def participant_parser(participant: dict) -> dict:
         "phenotype_description",
         "reported_race"
     ]
+
     if "reported_race" in participant: 
         if participant["reported_race"] == "Unknown" or participant["reported_race"] == "More than one race":
             participant["reported_race"] = ["NA"]
