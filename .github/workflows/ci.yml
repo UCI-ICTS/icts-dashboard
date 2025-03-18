@@ -1,13 +1,12 @@
-name: Full CI (Django + React + Integration)
+name: Django CI
 
 on: 
   push:
     branches:
-      - main
-      - dev
+      - dev  # Add other branches you want to test
   pull_request:
     branches:
-      - main
+      - dev
 
 jobs:
   backend-tests:
@@ -21,7 +20,7 @@ jobs:
       - name: Set Up Python
         uses: actions/setup-python@v3
         with:
-          python-version: 3.11
+          python-version: 3.11  # Set to your Python version
 
       - name: Install Backend Dependencies
         run: |
@@ -35,12 +34,10 @@ jobs:
           SECRET_KEY: "ci-temp-secret-key"
         run: |
           cd server
-          mkdir -p staticfiles
           python manage.py migrate
           python manage.py collectstatic --noinput
-          python manage.py runserver 0.0.0.0:8000 &
 
-      - name: Run Django Tests
+      - name: Run Tests
         env:
           DJANGO_SETTINGS_MODULE: config.settings
           SECRET_KEY: "ci-temp-secret-key"
@@ -49,9 +46,9 @@ jobs:
           python manage.py test
 
   frontend-tests:
-    name: React Tests 
+    name: React Tests
     runs-on: ubuntu-latest
-    needs: backend-tests  
+    needs: backend-tests 
 
     steps:
       - name: Checkout Repository
@@ -60,7 +57,7 @@ jobs:
       - name: Set Up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: v23.3.0
 
       - name: Install Frontend Dependencies
         run: |
@@ -68,8 +65,6 @@ jobs:
           npm install
 
       - name: Run React Tests (Jest)
-        env:
-          REACT_APP_APIDB: "http://localhost:8000/"
         run: |
           cd client
           npm test -- --ci --watchAll=false
