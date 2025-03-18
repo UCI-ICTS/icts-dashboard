@@ -4,9 +4,9 @@
 """
 URL configuration for GREGoRDB Dashboard. 
 """
-
 from django.conf import settings
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -32,7 +32,14 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
+def api_health_check(request):
+    """Simple API health check"""
+    return JsonResponse({"status": "OK", "message": "Backend is reachable"})
+
+
 urlpatterns = [
+    path("api/health/", api_health_check),
     path("api/auth/", include("authentication.urls")),
     path("api/metadata/", include("metadata.urls")),
     path("api/experiments/", include("experiments.urls")),
