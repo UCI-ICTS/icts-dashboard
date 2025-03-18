@@ -50,12 +50,10 @@ const jsonSchemaToYup = (jsonSchema) => {
         .min(value.minimum || Number.MIN_SAFE_INTEGER)
         .max(value.maximum || Number.MAX_SAFE_INTEGER);
     } else if (value.type === "array" && value.items?.enum) {
-      validator = Yup.array()
-        .of(Yup.string().oneOf(value.items.enum))
-        if (jsonSchema.required?.includes(key)) { // Only require if in required list
-          validator = validator.min(1, `${key} must have at least one selected value`);
-        }
-
+      validator = Yup.array().of(Yup.string().oneOf(value.items.enum));
+      if (jsonSchema.required?.includes(key)) {
+        validator = validator.min(1, `${key} must have at least one selected value`);
+      }
     }
 
     if (jsonSchema.required?.includes(key)) {
@@ -231,15 +229,22 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
           <Formik
             initialValues={initialValues}
             validationSchema={yupSchema}
-            onSubmit={async (values) => {
+            onSubmit={async (values, { setSubmitting, setErrors }) => {
               try {
-                const result = dispatch(updateTable({ table: rowID, data: values, token }));
-                if (result.meta.requestStatus === "fulfilled") onClose();
+                const result = await dispatch(updateTable({ table: rowID, data: values, token }));
+                if (result.meta.requestStatus === "fulfilled") {
+                  onClose();
+                } else {
+                  setErrors({ form: "Submission failed. Please try again." });
+                }
               } catch (error) {
                 console.error("Form error", error);
-                onClose();
+                setErrors({ form: error.message || "An unexpected error occurred." });
+              } finally {
+                setSubmitting(false);
               }
             }}
+            
           >
             {({ values, handleChange, handleBlur, touched, errors }) => (
               <Form>
@@ -254,7 +259,7 @@ const DialogForm = ({ open, onClose, schema, selectedRow, rowID, identifier }) =
                       <Grid item xs>
                         {renderField(
                           key, schema.properties[key], values, handleChange,
-                          handleBlur=false, touched=false, errors=false
+                          handleBlur, touched, errors
                         )}
                       </Grid>
                     ) : (
