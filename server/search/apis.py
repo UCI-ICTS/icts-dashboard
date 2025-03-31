@@ -136,7 +136,14 @@ class DounlaodTablesAPI(APIView):
     """AnVIL upload table generation."""
     authentication_classes = [TokenAuthentication]
     permission_classes = (IsAuthenticated,)
-
+    @swagger_auto_schema(
+        operation_id="get_anvil_tables",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
     def get(self, request):
         zip_buffer = get_anvil_tables()
 
@@ -167,6 +174,7 @@ class SearchTablesAPI(APIView):
     @swagger_auto_schema(
         manual_parameters=[model_name_param, slow_client_param],
         responses={200: "JSON response of model data"},
+        auto_schema=None
     )
     def get(self, request, model_name):
         try:
