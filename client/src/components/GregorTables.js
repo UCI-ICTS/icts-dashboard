@@ -1,7 +1,7 @@
 // src/GregorTables.js
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Table, Form, Button, Input, Space, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch } from "antd";
+import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Resizable } from 'react-resizable';
@@ -78,10 +78,12 @@ const GregorTables = () => {
 
     // add actions to rows
     const columns = useMemo(() => [
-      ...baseColumns,
       {
         title: "Actions",
         key: "actions",
+        width: 100, // or 80, depending on your font size
+        fixed: "left", // optional: keeps it pinned on horizontal scroll
+        align: "center", // or "left" if you prefer
         render: (text, record) => (
           <Button
             type="link"
@@ -89,11 +91,13 @@ const GregorTables = () => {
               setEditRecord(record);
               setAddModalVisible(true);
             }}
+            style={{ padding: 0 }} // optional: remove extra space
           >
             Edit
           </Button>
         ),
       },
+      ...baseColumns,
     ], [baseColumns]);
 
     // Data filtering for search, advanced search, regex search, and download. 
@@ -145,68 +149,90 @@ const GregorTables = () => {
   
   return (
     <>
-    <Space justify="space-between" align="middle" style={{ marginBottom: 16 }}>
-      <Tooltip title="Fetch or refresh the table data">
-        <Button
-          onClick={() => dispatch(getAllTables())}
-          type="primary"
-          style={{ marginBottom: 16 }}
-        >
-          Fetch/Refresh data
-        </Button>
-      </Tooltip>
-      <Tooltip title={`Add a new ${tableView} entry`}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setEditRecord(null);      // Clear any old record
-            form.resetFields();       // Reset the form manually
-            setAddModalVisible(true); // Then open the modal
-          }}        
-        >
-          Add Row
-        </Button>
-      </Tooltip>
-      <Tooltip title={`downlaod`}>
-      <DownloadTSVButton
-        rows={filteredData}
-        rowID={rowID}
-        headCells={columns.map(col => ({
-          headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
-          field: col.dataIndex
-        }))}
-      />
-      </Tooltip>
-      </Space>
-      <Space className="table-header">
-      <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
+    <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+        <Tooltip title="Fetch or refresh the table data">
+          <Button
+            onClick={() => dispatch(getAllTables())}
+            type="primary"
+          >
+            Fetch/Refresh data
+          </Button>
+        </Tooltip>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+        <Tooltip title={`Add a new ${tableView} entry`}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setEditRecord(null);
+              form.resetFields();
+              setAddModalVisible(true);
+            }}
+          >
+            Add Row
+          </Button>
+        </Tooltip>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+        <Tooltip title="Download">
+          <DownloadTSVButton
+            rows={filteredData}
+            rowID={rowID}
+            headCells={columns.map(col => ({
+              headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
+              field: col.dataIndex
+            }))}
+          />
+        </Tooltip>
+      </Col>
+    </Row>
+
+    <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
         <Input
           prefix={<SearchOutlined />}
           placeholder="Search all fields"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
-            width: "300px",
+            width: "100%",
+            maxWidth: 300,
             borderColor: useRegex && regexError ? "red" : undefined,
           }}
           status={useRegex && regexError ? "error" : undefined}
         />
-        {useRegex && regexError && (
+      </Col>
+      {useRegex && regexError && (
+        <Col xs={24}>
           <Typography.Text type="danger">{regexError}</Typography.Text>
-        )}
+        </Col>
+      )}
+      <Col xs={24} sm={12} md={6} lg={4}>
         <Typography.Text strong>{filteredData.length} Records</Typography.Text>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
         <Tooltip title="Advanced Filters">
           <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
-            Filters
+          Advanced Filters
           </Button>
         </Tooltip>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
         <TableSelector />
-
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
         <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
           <Button icon={<SettingOutlined />}>Columns</Button>
         </Dropdown>
-      </Space>
+      </Col>
+    </Row>
 
       {dataStatus === "loading" ? (
         <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: "20px" }}>

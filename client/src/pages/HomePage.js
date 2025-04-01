@@ -65,8 +65,8 @@ const HomePage = () => {
             items={[
               { key: 'patients', icon: <TeamOutlined />, label: 'UDN Patients' },
               { key: 'gregor_data', icon: <TeamOutlined />, label: 'GREGoR Tables' },
-              { key: 'gregor', icon: <TeamOutlined />, label: 'GREGoR Patients' },
-              ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: 'Admin' }] : []),
+              { key: 'gregor', icon: <TeamOutlined />, label: 'Patient Detail' },
+              { key: 'admin', icon: <SettingOutlined />, label: 'Admin' }
             ]}
           />
         </div>
