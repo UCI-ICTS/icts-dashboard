@@ -1,7 +1,7 @@
 // accountSlice
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { setMessage } from "./messageSlice";
+import { message } from "antd";
 import AccountService from "../services/account.service";
 import { jwtDecode } from "jwt-decode";
 
@@ -79,16 +79,25 @@ export const login = createAsyncThunk(
       const data = await AccountService.login(username, password);
       return { data, rememberMe };
     } catch (error) {
-      const message =
-        (error &&
-          error.message) ||
-          error.non_field_errors[0] ||
-        error.toString();
-      thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
+      console.error("Login Error:", error);
+
+      // Extract error message safely
+      let errorMessage = "Login failed. Please try again."; // Default message
+      if (error.response?.data) {
+        // Handle Django DRF-style errors (e.g., { detail: "Invalid credentials" })
+        if (typeof error.response.data === "object") {
+          errorMessage = error.response.data.detail || JSON.stringify(error.response.data);
+        } else {
+          errorMessage = error.response.data;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
+
 
 export const logout = createAsyncThunk(
   "auth/logout",
@@ -97,12 +106,12 @@ export const logout = createAsyncThunk(
       const data = await AccountService.logout(token);
       return { data };
     } catch (error) {
-      const message =
+      const errorMessage =
         (error &&
-          error.message) ||
+          error.errorMessage) ||
           error.non_field_errors[0] ||
         error.toString();
-      thunkAPI.dispatch(setMessage(message));
+      message.error(errorMessage|| "Logout failed. Please try again.");
       return thunkAPI.rejectWithValue();
     }
   }
@@ -126,37 +135,37 @@ export const changePassword = createAsyncThunk(
   async (values, thunkAPI) => {
     try {
       const response = await AccountService.changePassword(values);
-      thunkAPI.dispatch(setMessage("Password changed successfully"));
+      message.success("Password changed successfully");
       return response.data;
     } catch (error) {
-      let message = "An error occurred";
+      let errorMessage = "An error occurred";
 
       if (error.response) {
         const errorData = error.response.data;
 
         // Handle "detail" errors (e.g., token issues)
         if (errorData?.detail) {
-          message = errorData.detail;
+          errorMessage = errorData.detail;
         } 
         // Handle field validation errors (e.g., incorrect password)
         else if (typeof errorData === "object") {
-          message = Object.entries(errorData)
+          errorMessage = Object.entries(errorData)
             .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
             .join(" | "); // Join multiple field errors with " | "
         } 
-        // Generic error message
+        // Generic error errorMessage
         else {
-          message = "Something went wrong";
+          errorMessage = "Something went wrong";
         }
-      } else if (error.message) {
-        message = error.message;
+      } else if (error.errorMessage) {
+        errorMessage = error.errorMessage;
       }
 
-      // Dispatch message to Redux state
-      thunkAPI.dispatch(setMessage(message));
+      // Dispatch errorMessage to Redux state
+      message.error(errorMessage);
 
-      // Reject the request and pass the message
-      return thunkAPI.rejectWithValue(message);
+      // Reject the request and pass the errorMessage
+      return thunkAPI.rejectWithValue(errorMessage);
     }
 
   }
