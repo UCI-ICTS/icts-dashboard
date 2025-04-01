@@ -1,8 +1,23 @@
 // src/services/account.service.js
 
 import axios from "axios";
+import { store } from "../store";
 
 const APIDB = process.env.REACT_APP_APIDB;
+
+const getAuthHeaders = () => {
+  const state = store.getState();
+  const token = state.account.access_token;
+
+  if (!token) {
+    throw new Error("No authentication token found.");
+  }
+
+  return {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
 
 const login = async (username, password) => {
   const response = await axios.post(APIDB + "/api/auth/login/", {
@@ -26,10 +41,7 @@ const changePassword = (values) => {
     new_password: values.new_password,
     confirm_new_password: values.confirm_password
   }, {
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Content-Type": "application/json"
-    }
+    headers: getAuthHeaders(),
   })
 };
 

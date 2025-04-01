@@ -1,298 +1,35 @@
-/* Variables for Consistency */
-:root {
-  --main-bg-color: rgb(250, 249, 246);
-  --accent-bg-color: rgb(186, 209, 234);
-  --font-bold: bold;
-  --title-font-size: 28px;
-  --subtitle-font-size: 24px;
-  --spacing-small: 10px;
-  --spacing-medium: 50px;
-}
+/* src/App.css */
 
-/* 
-#0064a4 UCI Blue
-#ffd200 UCI Gold
-*/
-
-/* Outlet styles */
-.outlet-root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  background-image: url('../public/ICTS-background.jpeg'); /* Adjust the path to your image */
-  background-size: cover;
-  background-position: center;
-}
-
-.outlet-container {
-  display: flex;
-  flex: 1;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  overflow: hidden;
-}
-
-.outlet-main-content,
-.outlet-content {
-  flex: 1;
-  overflow: auto;
+.App {
   text-align: center;
 }
 
-/* NavBar Styles */
-.navbar {
-  background-color: #0064a4 !important; /* Change to your preferred color */
-  color: white !important;
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
-.navbar-right {
-  margin-left: auto; /* Pushes the element to the right */
-  display: flex;
-  align-items: center;
-}
-
-.navbar-menu {
-  padding-left: 5%;
-  flex-grow: 1;
-  display: none;
-}
-
-@media (min-width: 900px) { /* Adjust the breakpoint as needed */
-  .navbar-menu {
-    display: flex;
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
   }
 }
 
-.navbar .navbar-link {
-  color: white !important;
-  text-decoration: none;
-}
-
-.navbar .navbar-link:hover {
-  color: #ffcc00;
-  text-decoration: underline !important;
-}
-
-.navbar .navbar-link:visited {
-  color: white; /* Keep the default color */
-  text-decoration: none; /* No underline */
-}
-
-.button-confirm {
-  background-color: #0064a4; /* UCI Blue */
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.login-box {
-  background-color: #ffffff; /* White background */
-  opacity: 1; /* Fully opaque */
-  padding: 20px; /* Optional: Add some padding */
-  border-radius: 8px; /* Optional: Add rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+.App-link {
+  color: #61dafb;
 }
 
-.container-test {
-  border: 2px solid white; /* Black outline */
-  padding: 20px; /* Optional: Add some padding */
-  border-radius: 8px; /* Optional: Add rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
-}
-/* Homepage Styles */
-.home-root {
-  background-color: var(--main-bg-color);
-  margin: auto;
-  min-height: 100%;
-  padding: var(--spacing-small) 0;
-  min-width: 275px;
-}
-
-.home-bullet {
-  display: inline-block;
-  margin: 0 2px;
-  transform: scale(0.8);
-}
-
-.home-centered {
-  text-align: center;
-  min-width: 275px;
-}
-
-.home-heightened {
-  min-height: 50px;
-}
-
-.home-title {
-  font-size: var(--title-font-size);
-  font-weight: var(--font-bold);
-}
-
-.home-position {
-  margin-bottom: var(--spacing-small);
-}
-
-.home-margintop {
-  margin-top: var(--spacing-medium);
-}
-
-.home-colorBackground {
-  background-color: var(--accent-bg-color);
-}
-
-.home-linkcard,
-.home-supportcard {
-  text-align: center;
-  min-width: 275px;
-}
-
-.home-linkcard {
-  height: 250px;
-  margin-top: 5px;
-}
-
-.home-supportcard {
-  margin-bottom: var(--spacing-small);
-  min-height: 460px;
-}
-
-.home-subtitle {
-  font-size: var(--subtitle-font-size);
-  font-weight: var(--font-bold);
-}
-
-.home-grid-item {
-  width: 100%;
-}
-
-/* Style for the dialog form container */
-.dialog-form-container {
-  width: 1200px;
-  border-radius: 8px;
-  justify-content: center; /* Center the buttons */
-  max-width: 100%;
-  padding: 20px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for better visual separation */
-}
-
-/* Style for the dialog title */
-.dialog-form-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  padding-bottom: 10px;
-}
-
-/* Style for the dialog content */
-.dialog-form-content {
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  max-height: calc(100vh - 200px); /* Prevent the content from overflowing the screen */
-  overflow-y: auto; /* Allows the content to scroll if it's too long */
-}
-
-/* You can also add styles for buttons if needed */
-.dialog-form-actions {
-  position: sticky;
-  top: 0; /* Sticks the buttons to the top of the dialog content */
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  background-color: white; /* Ensure it's solid and non-transparent */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for better visual separation */
-  z-index: 10; /* Ensures the actions stay above other content */
-}
-
-.dialog-form-actions .MuiButton-root {
-  margin: 5px;
-}
-
-/* Centering the Pagination */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.responsive-table-wrapper {
-  display: flex;
-  justify-content: center; /* Centers horizontally */
-  align-items: center; /* Centers vertically */
-  width: 100%;
-  overflow-x: auto; /* Allows scrolling on small screens */
-  padding: 16px; /* Optional padding */
-}
-
-.responsive-table-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 8px;
-  max-width: 1200px; /* Limits the width */
-  width: 100%;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
-  padding: 16px;
-}
-
-/* Responsive Columns */
-@media (min-width: 1200px) {
-  .responsive-table-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-@media (max-width: 1199px) and (min-width: 900px) {
-  .responsive-table-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-@media (max-width: 899px) and (min-width: 600px) {
-  .responsive-table-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 599px) {
-  .responsive-table-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
-}
-
-.table-container {
-  width: 100%;
-  max-width: 1000px; /* Adjust to fit the page */
-  margin: 0 auto; /* Center the container */
-  overflow-x: auto; /* Allow horizontal scrolling for smaller screens */
-  border: 1px solid #ddd; /* Optional: Add a border for the box */
-  padding: 16px; /* Add some padding around the table */
-  background-color: #f9f9f9; /* Optional: Add a light background */
-  border-radius: 8px; /* Optional: Rounded corners */
-}
-
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table-container th,
-.table-container td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.table-container th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-@media (min-width: 600px) { /* sm breakpoint */
-  .home-grid-item {
-    width: 33.3333%;
-  }
-}
-
-/* Animations */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -300,4 +37,212 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+[data-theme="dark"] .site-layout .site-layout-background {
+  background: #141414;
+}
+
+/* 🌍 Global Layout Styles */
+.layout-container {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* 🏠 Sidebar (Sider) */
+.sider-container {
+  background: #001529; /* Dark background for AntD sider */
+}
+
+.sider-header {
+  color: white;
+  margin: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* 🔳 Main Layout Content */
+.site-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.site-header {
+  padding: 0;
+  background: #fff; /* Matches AntD layout background */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 24px;
+}
+
+.site-content {
+  margin: 0 16px;
+  padding: 24px;
+  background: #fff;
+  flex: 1;
+  overflow: auto;
+}
+
+/* Sidebar container - flex layout */
+.sider-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes logout button down */
+  height: 100vh;
+}
+
+/* Wrapper for sidebar menu items */
+.sider-menu-wrapper {
+  flex-grow: 1; /* Fills available space */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Ensures the logout button always stays at the bottom */
+.logout-button-container {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+
+/* 📜 Footer */
+.site-footer {
+  text-align: center;
+  background: #f0f2f5;
+  padding: 16px;
+  border-top: 1px solid #ddd;
+}
+
+/* 🔄 Logout Button */
+.logout-button {
+  width: 100%;
+  max-width: 180px;
+}
+
+/* 🏠 AntD Menu Styling */
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1890ff !important;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.login-form-wrapper {
+  width: 360px;
+  padding: 40px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.login-form-wrapper:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.login-form-wrapper h2 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #2c3e50;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.login-form .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.login-form .ant-input-affix-wrapper {
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.1s ease;
+}
+
+.login-form .ant-input-affix-wrapper:hover,
+.login-form .ant-input-affix-wrapper:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.login-form .ant-input {
+  padding: 12px;
+}
+
+.login-form-button {
+  width: 100%;
+  height: 45px;
+  font-size: 16px;
+  border-radius: 6px;
+  background-color: #1e74f4;
+  border: none;
+  color: white;
+  transition: 0.1s;
+  opacity: 0.6;
+}
+
+.login-form-button:hover {
+  opacity: 1;
+}
+
+/* Container to keep the table within the page */
+.table-container {
+  padding: 16px;
+  height: calc(100vh - 120px); /* Ensures it stays within the page */
+  overflow: hidden; /* Prevents the table from overflowing */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensures the search, filter, and add row button layout is clean */
+.table-header {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Scrollable Table Wrapper */
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* Table scroll settings */
+.ant-table-wrapper .ant-table {
+  overflow: auto;
+}
+
+.ant-table-wrapper .ant-table-container {
+  max-height: calc(100vh - 250px); /* Adjust for dynamic heights */
+}
+
+/* Column Toggle Menu - Ensure it appears horizontally & clearly */
+.column-toggle-menu {
+  background: white; /* ✅ Solid background */
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ✅ Gives a subtle shadow */
+  display: flex; /* ✅ Ensures horizontal layout */
+  flex-wrap: wrap; /* ✅ Prevents items from being cut off */
+}
+
+.column-toggle-item {
+  margin-right: 12px; /* ✅ Adds spacing between items */
+  white-space: nowrap; /* ✅ Prevents line wrapping */
 }

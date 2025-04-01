@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import { Button, Modal, Select, message } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import "../App.css";
+
+const { Option } = Select;
 
 const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data", disabled }) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -19,19 +12,19 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
 
   const handleDownload = () => {
     if (!rows.length || !headCells.length) {
-      console.warn("No data to export.");
+      message.warning("No data to export.");
       return;
     }
-  
+
     let fileContent = "";
     let fileExtension = "";
     let mimeType = "";
-  
+
     if (exportFormat === "TSV" || exportFormat === "CSV") {
       const delimiter = exportFormat === "TSV" ? "\t" : ",";
       fileExtension = exportFormat.toLowerCase();
       mimeType = `text/${exportFormat.toLowerCase()};charset=utf-8`;
-  
+
       // Escape function for CSV/TSV values
       const escapeValue = (value) => {
         if (Array.isArray(value)) {
@@ -47,29 +40,27 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
         }
         return value !== undefined ? value : "";
       };
-  
+
       // Extract column headers
       const headers = headCells.map(cell => escapeValue(cell.headerName)).join(delimiter);
-  
+
       // Convert rows to formatted CSV/TSV
       const fileRows = rows.map(row =>
         headCells.map(cell => escapeValue(row[cell.field])).join(delimiter)
       );
-  
+
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
     } else if (exportFormat === "JSON") {
       fileExtension = "json";
       mimeType = "application/json;charset=utf-8";
-  
-      // Convert rows to JSON format
       fileContent = JSON.stringify(rows, null, 2);
     }
-  
+
     // Create and trigger download
     const blob = new Blob([fileContent], { type: mimeType });
     const url = URL.createObjectURL(blob);
-  
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `${filename}.${fileExtension}`;
@@ -77,46 +68,42 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  
-    console.log(`✅ Exported as ${exportFormat}`, rows);
-    setOpenDialog(false); // Close dialog after download
+
+    message.success(`Exported as ${exportFormat}`);
+    setOpenDialog(false); // Close modal after download
   };
-  
 
   return (
     <>
       {/* Download Button */}
       <Button 
-        variant="contained"
+        type="primary" 
+        icon={<DownloadOutlined />} 
         onClick={() => setOpenDialog(true)} 
-        disabled={disabled}
-        className="button-confirm"
+        // disabled={disabled}
       >
         Download
       </Button>
 
-      {/* Dialog for Selecting Export Format */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Select Export Format</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>Format</InputLabel>
-            <Select
-              value={exportFormat}
-              onChange={(e) => setExportFormat(e.target.value)}
-              label="Format"
-            >
-              <MenuItem value="TSV">TSV</MenuItem>
-              <MenuItem value="CSV">CSV</MenuItem>
-              <MenuItem value="JSON">JSON</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleDownload} variant="contained" color="primary">Download</Button>
-        </DialogActions>
-      </Dialog>
+      {/* Modal for Selecting Export Format */}
+      <Modal
+        title="Select Export Format"
+        open={openDialog}
+        onCancel={() => setOpenDialog(false)}
+        onOk={handleDownload}
+        okText="Download"
+        cancelText="Cancel"
+      >
+        <Select 
+          value={exportFormat} 
+          onChange={setExportFormat} 
+          style={{ width: "100%" }}
+        >
+          <Option value="TSV">TSV</Option>
+          <Option value="CSV">CSV</Option>
+          <Option value="JSON">JSON</Option>
+        </Select>
+      </Modal>
     </>
   );
 };
