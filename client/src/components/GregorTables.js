@@ -71,7 +71,8 @@ const GregorTables = () => {
           onHeaderCell: () => ({}),
         }));
     }, [schema, visibleColumns]);
-    
+
+    // add actions to rows
     const columns = useMemo(() => [
       ...baseColumns,
       {
@@ -90,7 +91,20 @@ const GregorTables = () => {
         ),
       },
     ], [baseColumns]);
-  
+
+    // Data filtering for search and download. 
+    const filteredData = useMemo(() => {
+      if (!searchQuery.trim()) return tableData;
+    
+      const lowerQuery = searchQuery.toLowerCase();
+    
+      return tableData.filter(row =>
+        Object.values(row).some(
+          value => value && String(value).toLowerCase().includes(lowerQuery)
+        )
+      );
+    }, [tableData, searchQuery]);
+    
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -132,7 +146,14 @@ const GregorTables = () => {
         </Button>
       </Tooltip>
       <Tooltip title={`downlaod`}>
-        <DownloadTSVButton rows={tableData} rowID={rowID} headCells={columns} />
+      <DownloadTSVButton
+        rows={filteredData}
+        rowID={rowID}
+        headCells={columns.map(col => ({
+          headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
+          field: col.dataIndex
+        }))}
+      />
       </Tooltip>
       </Space>
       <Space className="table-header">
@@ -143,7 +164,7 @@ const GregorTables = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ width: "300px" }}
         />
-        <Typography.Text strong>{tableData.length} Records</Typography.Text>
+        <Typography.Text strong>{filteredData.length} Records</Typography.Text>
 
         <Tooltip title="Advanced Filters">
           <Button icon={<FilterOutlined />}>Filters</Button>
@@ -164,7 +185,7 @@ const GregorTables = () => {
       ) : (        
         <Table
           columns={columns}
-          dataSource={tableData}
+          dataSource={filteredData}
           rowKey={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
           pagination={{
             current: page,
