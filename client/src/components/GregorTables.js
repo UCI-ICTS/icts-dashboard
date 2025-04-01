@@ -1,7 +1,7 @@
 // src/GregorTables.js
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Table, Form, Button, Input, Space, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Row } from "antd";
+import { Table, Form, Button, Input, Space, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Resizable } from 'react-resizable';
@@ -21,12 +21,15 @@ const GregorTables = () => {
   const dataStatus = useSelector(state => state.data.status);
   const rowID = useSelector(state => state.data['tableID']);
   const schema = schemas[tableView] || { properties: {} };
-  
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [form] = Form.useForm();
   const [editRecord, setEditRecord] = useState(null);
+  const [useRegex, setUseRegex] = useState(false);
+  const [regexError, setRegexError] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     return Object.keys(schema.properties).reduce((acc, key) => {
@@ -42,6 +45,8 @@ const GregorTables = () => {
         return acc;
       }, {});
     });
+    setFilterModalVisible(false);
+    setAdvancedFilters({});
   }, [tableView]);  
 
   // Toggle column visibility
@@ -52,7 +57,6 @@ const GregorTables = () => {
     }));
   };
   
-
   // Generate table columns dynamically
     const baseColumns = useMemo(() => {
       return Object.entries(schema.properties)
@@ -92,19 +96,38 @@ const GregorTables = () => {
       },
     ], [baseColumns]);
 
-    // Data filtering for search and download. 
+    // Data filtering for search, advanced search, regex search, and download. 
     const filteredData = useMemo(() => {
-      if (!searchQuery.trim()) return tableData;
+      let data = [...tableData];
     
-      const lowerQuery = searchQuery.toLowerCase();
-    
-      return tableData.filter(row =>
-        Object.values(row).some(
-          value => value && String(value).toLowerCase().includes(lowerQuery)
-        )
-      );
-    }, [tableData, searchQuery]);
-    
+      if (searchQuery.trim()) {
+        data = data.filter((row) => {
+          return Object.values(row).some((value) => {
+            const strVal = String(value || "");
+            if (useRegex) {
+              try {
+                const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
+                setRegexError(null); // Clear previous errors
+                return regex.test(strVal);
+              } catch (err) {
+                setRegexError("Invalid regular expression");
+                return false; // Invalid regex
+              }
+            }
+            setRegexError(null);
+            return strVal.toLowerCase().includes(searchQuery.toLowerCase());
+          });
+        });
+      }
+      if (advancedFilters && Object.keys(advancedFilters).length > 0) {
+        data = data.filter((row) =>
+          Object.entries(advancedFilters).every(([key, value]) =>
+            value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
+          )
+        );
+      }
+      return data;
+    }, [tableData, searchQuery, advancedFilters, useRegex]);     
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -137,9 +160,9 @@ const GregorTables = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => {
-            setEditRecord(null);               // Clear any old record
-            form.resetFields();               // Reset the form manually
-            setAddModalVisible(true);         // Then open the modal
+            setEditRecord(null);      // Clear any old record
+            form.resetFields();       // Reset the form manually
+            setAddModalVisible(true); // Then open the modal
           }}        
         >
           Add Row
@@ -157,17 +180,26 @@ const GregorTables = () => {
       </Tooltip>
       </Space>
       <Space className="table-header">
+      <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
         <Input
           prefix={<SearchOutlined />}
           placeholder="Search all fields"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: "300px" }}
+          style={{
+            width: "300px",
+            borderColor: useRegex && regexError ? "red" : undefined,
+          }}
+          status={useRegex && regexError ? "error" : undefined}
         />
+        {useRegex && regexError && (
+          <Typography.Text type="danger">{regexError}</Typography.Text>
+        )}
         <Typography.Text strong>{filteredData.length} Records</Typography.Text>
-
         <Tooltip title="Advanced Filters">
-          <Button icon={<FilterOutlined />}>Filters</Button>
+          <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
+            Filters
+          </Button>
         </Tooltip>
         <TableSelector />
 
@@ -186,6 +218,8 @@ const GregorTables = () => {
         <Table
           columns={columns}
           dataSource={filteredData}
+          scroll={{ x: 1500, y: "calc(100vh - 250px)" }} // <-- Ensures layout even with no rows
+          locale={{ emptyText: "No records match your filters or search." }}
           rowKey={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
           pagination={{
             current: page,
@@ -197,7 +231,6 @@ const GregorTables = () => {
             showSizeChanger: true,
             pageSizeOptions: ["10", "25", "50", "100", "All"],
           }}
-          scroll={{ x: "max-content", y: "calc(100vh - 250px)" }}
         />
       )}
       <Modal
@@ -236,6 +269,35 @@ const GregorTables = () => {
             setEditRecord(null);
           }}
         />
+      </Modal>
+      <Modal
+        title="Advanced Filters"
+        open={filterModalVisible}
+        onCancel={() => setFilterModalVisible(false)}
+        footer={[
+          <Button key="clear" onClick={() => setAdvancedFilters({})}>
+            Clear
+          </Button>,
+          <Button key="apply" type="primary" onClick={() => setFilterModalVisible(false)}>
+            Apply
+          </Button>,
+        ]}
+      >
+        <Form layout="vertical">
+          {columns.map((col) => (
+            <Form.Item label={`Filter by ${col.title}`} key={col.key}>
+              <Input
+                value={advancedFilters[col.dataIndex] || ""}
+                onChange={(e) =>
+                  setAdvancedFilters((prev) => ({
+                    ...prev,
+                    [col.dataIndex]: e.target.value,
+                  }))
+                }
+              />
+            </Form.Item>
+          ))}
+        </Form>
       </Modal>
     </>
   );
