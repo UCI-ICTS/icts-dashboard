@@ -9,23 +9,36 @@ import configparser
 from datetime import timedelta
 from django.core.management.utils import get_random_secret_key
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Reading and populating secrets and instance specific information
+# Load secrets file if it exists
 secrets = configparser.ConfigParser()
-secrets.read(BASE_DIR + "/.secrets")
-if secrets["DJANGO_KEYS"]["SECRET_KEY"]:
-    SECRET_KEY = secrets["DJANGO_KEYS"]["SECRET_KEY"]
+secrets_path = os.path.join(BASE_DIR, ".secrets")
+if os.path.exists(secrets_path):
+    secrets.read(secrets_path)
 else:
-    SECRET_KEY = get_random_secret_key()
-DEBUG = secrets["SERVER"]["DEBUG"]
+    secrets.read_dict({
+        "DJANGO_KEYS": {
+            "SECRET_KEY": get_random_secret_key(),
+        },
+        "SERVER": {
+            "DEBUG": "True",
+            "ALLOWED_HOSTS": "localhost,127.0.0.1",
+            "SERVER_VERSION": "dev",
+            "DASHBOARD_URL": "http://localhost:8000",
+            "SCHEMA_VERSION": "dev",
+            "DATABASE": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    })
+
+SECRET_KEY = secrets["DJANGO_KEYS"]["SECRET_KEY"]
+DEBUG = secrets["SERVER"].getboolean("DEBUG")
 ALLOWED_HOSTS = secrets["SERVER"]["ALLOWED_HOSTS"].split(",")
 VERSION = secrets["SERVER"]["SERVER_VERSION"]
 PUBLIC_HOSTNAME = secrets["SERVER"]["DASHBOARD_URL"]
 SCHEMA_VERSION = secrets["SERVER"]["SCHEMA_VERSION"]
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     "corsheaders",
     "django.contrib.admin",
