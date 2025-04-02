@@ -1,24 +1,25 @@
 #!/bin/bash
 
-# Set the output file path in the admin directory
-OUTPUT_FILE="$(dirname "$(dirname "$(dirname "$(realpath "$0")")")")/admin/SELinux_Full_Snapshot.txt"
+# Set the default output directory and file path
+OUTPUT_DIR="/var/www/backups/config"
+OUTPUT_FILE="$OUTPUT_DIR/SELinux_Full_Snapshot.txt"
 
-# Ensure the admin directory exists
-mkdir -p "$(dirname "$OUTPUT_FILE")"
+# Ensure the output directory exists
+mkdir -p "$OUTPUT_DIR"
 
 # Generate the SELinux snapshot
 (
     echo "### SELinux Boolean Settings ###"
     getsebool -a
 
-    echo "### SELinux File Contexts ###"
+    echo -e "\n### SELinux File Contexts ###"
     semanage fcontext -l
 
-    echo "### Installed SELinux Modules ###"
+    echo -e "\n### Installed SELinux Modules ###"
     semodule -l
 
-    echo "### Recent SELinux Denials ###"
-    ausearch -m AVC,USER_AVC -c nginx --raw | audit2allow -M selinux_recent_denials
+    echo -e "\n### Recent SELinux Denials (nginx-related) ###"
+    ausearch -m AVC,USER_AVC -c nginx --raw | audit2allow -M selinux_recent_denials 2>/dev/null || echo "No recent denials found."
 ) > "$OUTPUT_FILE"
 
 echo "✅ SELinux snapshot saved to: $OUTPUT_FILE"

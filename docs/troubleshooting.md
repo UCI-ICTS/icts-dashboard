@@ -67,15 +67,26 @@ This document provides a list of common issues and steps to resolve them during 
      sudo restorecon -v /var/run/gregor.sock
      ```
   3. **Allow NginX Connections in SELinux:**  
-     Create a custom policy module if needed:
-     ```sh
-     sudo ausearch -m AVC,USER_AVC -c nginx --raw | audit2allow -M nginx_gunicorn
-     sudo semodule -i nginx_gunicorn.pp
-     ```
-     And also enable related booleans:
      ```sh
      sudo setsebool -P httpd_can_network_connect on
      sudo setsebool -P httpd_can_network_relay on
+     ```
+  4. **Force and Capture Denials (if needed):**
+     If you're still getting 502 or permission denied errors:
+     ```sh
+     sudo curl -I http://localhost/api/admin
+     sudo ausearch -m AVC,USER_AVC -ts recent | audit2allow -M nginx_gunicorn
+     sudo semodule -i nginx_gunicorn.pp
+     ```
+  5. **Verify socket context and Gunicorn status:**
+     ```sh
+     ls -lahZ /var/run/gregor.sock
+     sudo systemctl status gregor
+     ```
+  6. **Restart services after changes:**
+     ```sh
+     sudo systemctl restart gregor
+     sudo systemctl restart nginx
      ```
 
 ---
@@ -187,3 +198,26 @@ logging commands
 
 Locate where an executable named [PROGRAM] is - which [PROGRAM]
 Example:  which python
+
+**How to Check That .pem and .key Match**
+#### Check private key
+    openssl rsa -noout -modulus -in <private.key> | openssl md5
+    MD5(stdin)= d2537f215983e07e809509f3a3356f1b
+#### Check certificate
+openssl x509 -noout -modulus -in /etc/ssl/certs/icts8001_certificate.pem | openssl md5
+
+- MD5 valuse should match: 
+
+  - MD5(stdin)= d2537f215983e07e809509f3a3356f1b
+  - MD5(stdin)= 042b80d04f95f222e80c399de733f2db
+
+### Test the Cert Chain (Optional)
+- for a single file use it twice
+
+      openssl verify -CAfile /etc/ssl/certs/icts8001_certificate.pem /etc/ssl/certs/icts8001_certificate.pem
+      icts8001_certificate.pem: OK
+
+- for using a separate intermediate
+
+      openssl verify -CAfile /etc/ssl/certs/icts8001_intermediate.pem /etc/ssl/certs/icts8001_certificate.pem
+
