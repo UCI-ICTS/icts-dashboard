@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import update_last_login
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import serializers, status, permissions
+from rest_framework import serializers, status, permissions, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import (
@@ -15,8 +15,84 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+from authentication.services import (
+    UserInputSerializer,
+    UserOutputSerializer
+)
+
 
 User = get_user_model()
+
+class UserViewSet(viewsets.ViewSet):
+    lookup_field = 'username'
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Retrieve all users",
+        responses={200: UserOutputSerializer(many=True)},
+        tags=["User Management"]
+    )
+    def list(self, request):
+        """Retrieve all users (returns only safe fields)."""
+        users = User.objects.all()
+        serializer = UserOutputSerializer(users, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_description="Create a new user",
+        request_body=UserInputSerializer,
+        responses={201: UserOutputSerializer},
+        tags=["User Management"]
+    )
+    def create(self, request):
+        """Create a new user with password hashing."""
+        serializer = UserInputSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = serializer.save()
+                return Response(UserOutputSerializer(user).data, status=status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                print(e)
+                return Response(
+                    {"error": "A user with this email or username already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @swagger_auto_schema(
+        operation_description="Update an existing user",
+        request_body=UserInputSerializer,
+        responses={200: UserOutputSerializer},
+        tags=["User Management"]
+    )
+
+    def update(self, request, username=None):
+        """Update user details (hashes password if provided)."""
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserInputSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UserOutputSerializer(user).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @swagger_auto_schema(
+        operation_description="Delete a user",
+        responses={204: "User deleted"},
+        tags=["User Management"]
+    )
+    def destroy(self, request, username=None):
+        """Delete a user."""
+        try:
+            user = User.objects.get(username=username)
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ChangePasswordSerializer(serializers.Serializer):

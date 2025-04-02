@@ -12,11 +12,21 @@ import schemas from "../schemas/v1.7schemas.json";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
 
+// utils/selectRelatedRecords.js
+export const getRelatedByParticipantId = (fullState, participantId, tableName) => {
+  return (fullState[tableName] || []).filter(
+    (item) => item.participant_id === participantId
+  );
+};
+
+
+
 const GregorParticipants = () => {
   const dispatch = useDispatch();
   const tableView = "participants"; 
   const tableData = useSelector(state => state.data[tableView]) || [];
   const dataStatus = useSelector(state => state.data.status);
+  const fullState = useSelector(state => state.data)
   const rowID = useSelector(state => state.data['tableID']);
   const schema = schemas[tableView] || { properties: {} };
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -25,10 +35,12 @@ const GregorParticipants = () => {
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [form] = Form.useForm();
-  const [editRecord, setEditRecord] = useState(null);
+
+  const [editRecord, setEditRecord] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
   const [regexError, setRegexError] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     return Object.keys(schema.properties).reduce((acc, key) => {
@@ -131,6 +143,40 @@ const GregorParticipants = () => {
     );
   }, [selectedRow, tableData]);
   
+  const selectedAggregateRecord = useMemo(() => {
+    if (!selectedDetail) return null;
+  
+    const { table_name, id_in_table } = selectedDetail;
+    const table = fullState[table_name] || [];
+  
+    const tableIdKey = `${table_name}_id`;
+  
+    return table.find((row) => {
+      return row[tableIdKey] === id_in_table;
+    });
+  }, [selectedDetail, fullState]);  
+  
+  useEffect(() => {
+    if (selectedAggregateRecord) {
+      console.log("Selected record details:", selectedAggregateRecord);
+    }
+  }, [selectedAggregateRecord]);
+  
+  const handleSubmit = (values, tableName) => {
+    console.log(values, editRecord);
+    
+    if (editRecord) {
+      // Update existing record
+      dispatch(updateTable({ table: tableName, data: values }));
+      console.log("Editing row:", tableName, values);
+    } else {
+      // Add new record
+      dispatch(addTable({ table: tableName, data: values }));
+      console.log("Creating new row:", tableName, values);
+    }
+    setEditRecord(null);
+  };  
+
   return (
     <>
     <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
@@ -239,16 +285,13 @@ const GregorParticipants = () => {
           <Typography.Title level={4}>
             Family Group for: {selectedRow[rowID] || selectedRow.participant_id}
           </Typography.Title>
-          <Descriptions bordered size="small" column={1}>
-            {Object.entries(schema.properties).map(([key, value]) => (
-              <Descriptions.Item label={value.label || key} key={key}>
-                {Array.isArray(selectedRow[key])
-                  ? selectedRow[key].join(", ")
-                  : selectedRow[key] || "-"}
-              </Descriptions.Item>
-            ))}
-          </Descriptions>
-          <br/>
+          <Button
+            onClick={() => setSelectedRow(null)}
+            type="link"
+            style={{ marginTop: 8 }}
+          >
+            Clear Details
+          </Button>
           <Table
             dataSource={[
               selectedRow,
@@ -257,9 +300,123 @@ const GregorParticipants = () => {
             rowKey="participant_id"
             size="small"
             columns={[
+              // {
+              //   title: "Actions",
+              //   key: "actions",
+              //   width: 100, // or 80, depending on your font size
+              //   fixed: "left", // optional: keeps it pinned on horizontal scroll
+              //   align: "center", // or "left" if you prefer
+              //   render: (text, record) => (
+              //     <Button
+              //       type="link"
+              //       onClick={() => {
+              //         setEditRecord(true);
+              //         setAddModalVisible(true);
+              //       }}
+              //       style={{ padding: 0 }} // optional: remove extra space
+              //     >
+              //       Edit
+              //     </Button>
+              //   ),
+              // },
               { title: "Participant ID", dataIndex: "participant_id", key: "participant_id" },
               { title: "Relation", dataIndex: "proband_relationship", key: "proband_relationship" },
-              { title: "Age at last observation", dataIndex: "age_at_last_observation", key: "age_at_last_observation" },
+              {
+                title: "Phenotypes",
+                key: "phenotypes",
+                render: (_, record) => {
+                  const phenotypes = getRelatedByParticipantId(fullState, record.participant_id, "phenotypes");
+                  return phenotypes.length ? (
+                    <div>
+                      {phenotypes.map((entry, index) => (
+                        <Button
+                          key={index}
+                          type="link"
+                          style={{ padding: 0 }}
+                          onClick={() => {
+                            setEditRecord(true);
+                            setSelectedDetail(entry);
+                          }}
+                        >
+                          {entry.phenotype_id || "✓"}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : "-";
+                },
+              },
+              {
+                title: "Genetic Findings",
+                key: "genetic_findings",
+                render: (_, record) => {
+                  const genetic_findings = getRelatedByParticipantId(fullState, record.participant_id, "genetic_findings");
+                  return genetic_findings.length ? (
+                    <div>
+                      {genetic_findings.map((entry, index) => (
+                        <Button
+                          key={index}
+                          type="link"
+                          style={{ padding: 0 }}
+                          onClick={() => {
+                            setEditRecord(true);
+                            setSelectedDetail(entry);
+                          }}
+                        >
+                          {entry.genetic_findings_id || "✓"}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : "-";
+                },
+              },
+              {
+                title: "Sequencing",
+                key: "experiments",
+                render: (_, record) => {
+                  const experiments = getRelatedByParticipantId(fullState, record.participant_id, "experiments");
+                  return experiments.length ? (
+                    <div>
+                      {experiments.map((entry, index) => (
+                        <Button
+                          key={index}
+                          type="link"
+                          style={{ padding: 0 }}
+                          onClick={() => {
+                            setEditRecord(true);
+                            setSelectedDetail(entry);
+                          }}
+                        >
+                          {entry.experiment_id || "✓"}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : "-";
+                },
+              },
+              {
+                title: "Alignments",
+                key: "alignments",
+                render: (_, record) => {
+                  const alignments = getRelatedByParticipantId(fullState, record.participant_id, "aligned");
+                  return alignments.length ? (
+                    <div>
+                      {alignments.map((entry, index) => (
+                        <Button
+                          key={index}
+                          type="link"
+                          style={{ padding: 0 }}
+                          onClick={() => {
+                            setEditRecord(true);
+                            setSelectedDetail(entry);
+                          }}
+                        >
+                          {entry.aligned_id || "✓"}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : "-";
+                },
+              }
               // add more if needed
             ]}
             pagination={false}
@@ -267,18 +424,58 @@ const GregorParticipants = () => {
               record.participant_id === selectedRow.participant_id ? "selected-row-highlight" : ""
             }
           />
-
-          <Button
-            onClick={() => setSelectedRow(null)}
-            type="link"
-            style={{ marginTop: 8 }}
+          <Modal
+            title={
+              selectedDetail
+                ? `Details for ${selectedDetail.table_name}`
+                : "Alignment Details"
+            }            
+            open={!!selectedDetail}
+            onCancel={() => setSelectedDetail(null)}
+            footer={null}
+            width={800}
           >
-            Clear Details
-          </Button>
+            {selectedDetail && selectedAggregateRecord ? (
+              <SchemaForm
+                form={form} // Or create a form instance above if needed
+                schema={schemas[selectedDetail.table_name]}
+                initialValues={selectedAggregateRecord}
+                onSubmit={(values) => handleSubmit(values, selectedDetail.table_name)}
+                readOnly={true} // If your SchemaForm supports this
+                onCancel={() => setSelectedDetail(null)}
+              />
+            ) : (
+              selectedDetail ? (
+                selectedDetail.phenotype_id ? (
+                  <SchemaForm
+                    form={form} // Or create a form instance above if needed
+                    schema={schemas["phenotypes"]}
+                    initialValues={selectedDetail}
+                    onSubmit={(values) => handleSubmit(values, "phenotypes")}
+                    readOnly={true} // If your SchemaForm supports this
+                    onCancel={() => setSelectedDetail(null)}
+                  />
+                ) : (
+                  <SchemaForm
+                    form={form} // Or create a form instance above if needed
+                    schema={schemas["genetic_findings"]}
+                    initialValues={selectedDetail}
+                    onSubmit={(values) => handleSubmit(values, "genetic_findings")}
+                    readOnly={true} // If your SchemaForm supports this
+                    onCancel={() => {
+                      form.resetFields();
+                      setEditRecord(false);
+                      setSelectedDetail(null);
+                      console.log(form, editRecord, selectedDetail)
+                    }}
+                  />
+                )
+            ) : null
+            )}
+          </Modal>
+          <br/>
         </div>
       )}
-
-
       <Modal
         title="Advanced Filters"
         open={filterModalVisible}

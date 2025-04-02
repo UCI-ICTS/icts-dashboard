@@ -74,7 +74,7 @@ export const dataSlice = createSlice({
           const collectionName = table === "participants" ? "participants" : 
                                  table === "families" ? "families" : 
                                  table === "genetic_findings" ? "genetic_findings" :
-                                 table === "analytanalytese_id" ? "analytes" :
+                                 table === "analyte" ? "analytes" :
                                  table === "phenotypes" ? "phenotypes" :
                                  table === "experiments" ? "experiments" : 
                                  table === "experiment_dna_short_read" ? "experiment_dna_short_read" :

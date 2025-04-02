@@ -55,7 +55,18 @@
 
 /* 🏠 Sidebar (Sider) */
 .sider-container {
-  background: #001529; /* Dark background for AntD sider */
+  background: #001529;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: 200px;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .sider-header {
@@ -87,14 +98,6 @@
   background: #fff;
   flex: 1;
   overflow: auto;
-}
-
-/* Sidebar container - flex layout */
-.sider-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Pushes logout button down */
-  height: 100vh;
 }
 
 /* Wrapper for sidebar menu items */
