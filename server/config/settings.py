@@ -12,7 +12,7 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Load secrets file if it exists
-secrets = configparser.ConfigParser()
+secrets = configparser.ConfigParser(interpolation=None)
 secrets_path = os.path.join(BASE_DIR, ".secrets")
 if os.path.exists(secrets_path):
     secrets.read(secrets_path)
