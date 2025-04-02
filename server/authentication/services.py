@@ -1,10 +1,66 @@
 #!/usr/bin/env python
 # authentication/services.py
 
+from rest_framework import serializers
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.models import User
+
+
+class UserInputSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'is_superuser', 'is_staff', 'date_joined']
+        extra_kwargs = {
+            'username': {'required': False},  # allow username to be auto-set
+            'date_joined': {'read_only': True},
+        }
+
+    def create(self, validated_data):
+        email = validated_data.get("email")
+        if not email:
+            raise serializers.ValidationError({"email": "This field is required."})
+
+        # Auto-generate username from email (allowing dots, etc.)
+        base_username = email.split("@")[0]
+        username = base_username
+        counter = 1
+
+        # Make sure the username is unique
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}.{counter}"
+            counter += 1
+
+        password = validated_data.pop('password', None)
+        user = User(username=username, **validated_data)
+
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
+
+
+class UserOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'date_joined']
+        read_only_fields = fields
 
 
 class CustomAuthentication(BaseAuthentication):
