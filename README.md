@@ -13,6 +13,7 @@ This repository is composed of two serivce applications. The `server` applicatio
     - WIP: comming soon
 
 ## Development and troubleshooting
+- [Contribution Guide lines](docs/CONTRIBUTING.md)
 - [FAQ and trouble shooting](docs/faq.md)
 - [`.secretes` configuration](docs/config.md)
 - [Testing](docs/testing.md)
