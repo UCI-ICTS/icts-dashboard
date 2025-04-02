@@ -21,14 +21,14 @@ const getAuthHeaders = () => {
 };
 
 const getAllTables = async () => {
-  const response = await axios.get(`${APIDB}/api/search/get_all_tables/`, {
+  const response = await axios.get(`${APIDB}api/search/get_all_tables/`, {
     headers: getAuthHeaders(), 
   });
   return response;
 };
 
 const updateParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/update_participants/", [
+  const response = await axios.post(APIDB + "api/metadata/update_participants/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -37,7 +37,7 @@ const updateParticipant = async (data, token) => {
 }
 
 const updateFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/update_families/", [
+  const response = await axios.post(APIDB + "api/metadata/update_families/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -47,7 +47,7 @@ const updateFamily = async (data, token) => {
 
 
 const updateGeneticFindings = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/update_genetic_findings/", [
+  const response = await axios.post(APIDB + "api/metadata/update_genetic_findings/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -57,7 +57,7 @@ const updateGeneticFindings = async (data, token) => {
 
 
 const updateAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/update_analyte/", [
+  const response = await axios.post(APIDB + "api/metadata/update_analyte/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -67,7 +67,7 @@ const updateAnalyte = async (data, token) => {
 
 
 const updatePhenotype = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/update_phenotype/", [
+  const response = await axios.post(APIDB + "api/metadata/update_phenotype/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -77,7 +77,7 @@ const updatePhenotype = async (data, token) => {
 
 
 const updateExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/submit_experiment/", [
+  const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -87,7 +87,7 @@ const updateExperiment = async (data, token) => {
 
 
 const updateDnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/update_experiment_dna_short_read/", [
+  const response = await axios.post(APIDB + "api/experiments/update_experiment_dna_short_read/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -97,7 +97,7 @@ const updateDnaShortRead = async (data, token) => {
 
 
 const updateRnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/update_experiment_rna_short_read/", [
+  const response = await axios.post(APIDB + "api/experiments/update_experiment_rna_short_read/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -107,7 +107,7 @@ const updateRnaShortRead = async (data, token) => {
 
 
 const updatePacBio = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/update_pac_bio/", [
+  const response = await axios.post(APIDB + "api/experiments/update_pac_bio/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -117,7 +117,7 @@ const updatePacBio = async (data, token) => {
 
 
 const updateNanoPore = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/update_nanopore/", [
+  const response = await axios.post(APIDB + "api/experiments/update_nanopore/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -126,7 +126,7 @@ const updateNanoPore = async (data, token) => {
 }
 
 const createParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/create_participants/", [
+  const response = await axios.post(APIDB + "api/metadata/create_participants/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -135,7 +135,7 @@ const createParticipant = async (data, token) => {
 }
 
 const createFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/create_families/", [
+  const response = await axios.post(APIDB + "api/metadata/create_families/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -145,7 +145,7 @@ const createFamily = async (data, token) => {
 
 
 const createGeneticFindings = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/create_genetic_findings/", [
+  const response = await axios.post(APIDB + "api/metadata/create_genetic_findings/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -155,7 +155,7 @@ const createGeneticFindings = async (data, token) => {
 
 
 const createAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/create_analyte/", [
+  const response = await axios.post(APIDB + "api/metadata/create_analyte/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -165,7 +165,7 @@ const createAnalyte = async (data, token) => {
 
 
 const createPhenotype = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/metadata/create_phenotype/", [
+  const response = await axios.post(APIDB + "api/metadata/create_phenotype/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -175,7 +175,7 @@ const createPhenotype = async (data, token) => {
 
 
 const createExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/submit_experiment/", [
+  const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -185,7 +185,7 @@ const createExperiment = async (data, token) => {
 
 
 const createDnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/create_experiment_dna_short_read/", [
+  const response = await axios.post(APIDB + "api/experiments/create_experiment_dna_short_read/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -195,7 +195,7 @@ const createDnaShortRead = async (data, token) => {
 
 
 const createRnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/create_experiment_rna_short_read/", [
+  const response = await axios.post(APIDB + "api/experiments/create_experiment_rna_short_read/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -205,7 +205,7 @@ const createRnaShortRead = async (data, token) => {
 
 
 const createPacBio = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/create_pac_bio/", [
+  const response = await axios.post(APIDB + "api/experiments/create_pac_bio/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -215,7 +215,7 @@ const createPacBio = async (data, token) => {
 
 
 const createNanoPore = async (data, token) => {
-  const response = await axios.post(APIDB + "/api/experiments/create_nanopore/", [
+  const response = await axios.post(APIDB + "api/experiments/create_nanopore/", [
     data
   ], {
     headers: getAuthHeaders()
