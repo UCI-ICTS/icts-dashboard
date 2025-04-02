@@ -58,7 +58,9 @@ Use descriptive, kebab-case names:
 2. Bump version number and tag (in code or via CI/CD)
 3. Push the branch:
     ```bash
-    git push origin 2025.04`
+   git push origin 2025.04
+   git tag v2025.04.0
+   git push origin v2025.04.0
     ```
 4. All production hotfixes should be PR’d into the release branch (not dev).
 
@@ -75,6 +77,6 @@ CI runs both on all pull requests.
 Your contributions make this project better. 
 
 Don’t hesitate to open issues or suggest improvements:
- - 🐛[Bug report](https://github.com/UCI-GREGoR/GREGor_dashboard/issuesnew?template=bug_report.md)
- - ✨ [Feature Request](https://github.com/UCI-GREGoR/GREGor_dashboard/issuesnew?template=feature_request.md)
- - 📝 [User Story](https://github.com/UCI-GREGoR/GREGor_dashboard/issuesnew?template=user_story.md)
+- 🐛 [Bug Report](https://github.com/UCI-GREGoR/GREGor_dashboard/issues/new?template=bug_report.md)
+- ✨ [Feature Request](https://github.com/UCI-GREGoR/GREGor_dashboard/issues/new?template=feature_request.md)
+- 📝 [User Story](https://github.com/UCI-GREGoR/GREGor_dashboard/issues/new?template=user_story.md)
