@@ -273,8 +273,8 @@ const GregorTables = () => {
           form={form}
           schema={schemas[tableView]}
           initialValues={editRecord || {}}
+          open={addModalVisible}
           onSubmit={(values) => {
-            console.log(schemas[tableView]);
           
             if (editRecord) {
               // Update existing record

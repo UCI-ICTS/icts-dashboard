@@ -1,7 +1,7 @@
 // src/components/SchemaForm.js
 
-import React, { useEffect } from "react"; 
-import { Form, Input, InputNumber, Select, Button, Tooltip } from "antd";
+import React, { useEffect, useState} from "react"; 
+import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
@@ -30,7 +30,7 @@ const getValidationRules = (key, schema, requiredFields = []) => {
   return rules;
 };
 
-const SchemaField = ({ keyName, schema, requiredFields, form }) => {
+const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
   const label = (
     <span>
       {schema.title || keyName}
@@ -49,7 +49,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Select>
           {schema.enum.map((option) => (
-            <Option key={option} value={option}>
+            <Option key={option} value={option} disabled={readOnly}>
               {option}
             </Option>
           ))}
@@ -61,7 +61,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
   if (schema.type === "string") {
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Input />
+        <Input disabled={readOnly}/>
       </Form.Item>
     );
   }
@@ -69,7 +69,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
   if (schema.type === "number" || schema.type === "integer") {
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <InputNumber style={{ width: "100%" }} />
+        <InputNumber style={{ width: "100%" }} disabled={readOnly} />
       </Form.Item>
     );
   }
@@ -79,7 +79,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
     if (schema.items?.enum) {
       return (
         <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-          <Select mode="multiple">
+          <Select disabled={readOnly} mode="multiple">
             {schema.items.enum.map((option) => (
               <Option key={option} value={option}>
                 {option}
@@ -94,6 +94,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Input
+          disabled={readOnly}
           placeholder="Enter comma-separated values"
           onBlur={(e) => {
             const value = e.target.value
@@ -106,20 +107,25 @@ const SchemaField = ({ keyName, schema, requiredFields, form }) => {
       </Form.Item>
     );
   }
-  
-
   return null;
 };
 
 //  initialValues + onCancel as props
-const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form }) => {
-
+const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open }) => {
+  const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
 
   // set form values every time they change
   useEffect(() => {
     form.setFieldsValue(initialValues);
   }, [initialValues, form]);
+
+  // Reset editMode when modal closes
+  useEffect(() => {
+    if (!open) {
+      setEditMode(false);
+    }
+  }, [open]);
 
   const handleFinish = (values) => {
     onSubmit(values);
@@ -132,6 +138,12 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form }) =>
       onFinish={handleFinish}
       style={{ maxWidth: 600 }}
     >
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16 }}>
+        <span style={{ marginRight: 8 }}>Edit Mode</span>
+        <Switch checked={editMode} onChange={setEditMode} />
+      </div>
+      </div>
       {Object.entries(schema.properties || {}).map(([key, value]) => (
         <SchemaField
           key={key}
@@ -139,19 +151,19 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form }) =>
           schema={value}
           requiredFields={requiredFields}
           form={form}
+          readOnly={!editMode}
         />
       ))}
-
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-        {onCancel && (
-          <Button onClick={onCancel} style={{ marginLeft: 8 }}>
-            Cancel
-          </Button>
-        )}
-      </Form.Item>
+      {editMode && (
+        <Form.Item>
+          <Button type="primary" htmlType="submit">Submit</Button>
+          {onCancel && (
+            <Button onClick={onCancel} style={{ marginLeft: 8 }}>
+              Cancel
+            </Button>
+          )}
+        </Form.Item>
+      )}
     </Form>
   );
 };

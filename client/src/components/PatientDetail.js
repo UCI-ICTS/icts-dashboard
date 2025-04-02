@@ -106,7 +106,7 @@ const PatientDetail = ({ patientId }) => {
       <Row gutter={16}>
         <Col span={18}>
           <Tabs defaultActiveKey="1" onChange={handleTabChange} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <TabPane tab="Patient Details" key="1" style={{ flex: 1, overflow: 'auto' }}>
+            <TabPane tab="Participant Details" key="1" style={{ flex: 1, overflow: 'auto' }}>
               <Card
                 title={
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

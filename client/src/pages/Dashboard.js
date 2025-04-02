@@ -1,15 +1,17 @@
+// src/pages/Dashboard.js
+
 import React, { useState, useCallback } from 'react';
 import { Layout, Menu, Button, Spin, Alert, Tooltip } from 'antd';
-import { TeamOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import PatientList from '../components/PatientList';
-import AdminPage from '../components/AdminPage';
-import ChangePasswordForm from '../components/ChangePasswordForm';
+import AdminPage from './AdminPage';
 import GregorParticipants from "../components/GregorParticipants";
 import '../App.css'; // ✅ Importing CSS
 import { logout } from '../slices/accountSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import GregorTables from "../components/GregorTables";
+import ProfilePage from './ProfilePage';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -17,16 +19,17 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState('patients');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
+  const isAdmin = auth?.user?.superuser
+  console.log(isAdmin)
 
   const handleLogout = () => {
-    const token = auth?.user?.refresh_token;
+    const refresh_token = auth?.user?.refresh_token;
     localStorage.removeItem('authToken');
-    dispatch(logout(token));
+    dispatch(logout(refresh_token));
     navigate('/login');
   };
 
@@ -38,16 +41,16 @@ const HomePage = () => {
   const renderContent = () => {
     if (error) return <Alert message={error} type="error" showIcon />;
     switch (selectedMenuItem) {
-      case 'patients':
-        return <PatientList />;
       case 'admin':
         return <AdminPage />;
       case 'gregor_data':
         return <GregorTables />;
       case 'gregor':
         return <GregorParticipants />;
+      case 'profile':
+        return <ProfilePage/> ;
       default:
-        return null;
+        return <ProfilePage/>;
     }
   };
 
@@ -63,10 +66,10 @@ const HomePage = () => {
             mode="inline"
             onClick={handleMenuSelect}
             items={[
-              { key: 'patients', icon: <TeamOutlined />, label: 'UDN Patients' },
               { key: 'gregor_data', icon: <TeamOutlined />, label: 'GREGoR Tables' },
-              { key: 'gregor', icon: <TeamOutlined />, label: 'Patient Detail' },
-              { key: 'admin', icon: <SettingOutlined />, label: 'Admin' }
+              { key: 'gregor', icon: <TeamOutlined />, label: 'Participant Detail' },
+              { key: 'profile', icon: <ProfileOutlined />, label: 'Profile'},
+              ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: 'Admin' }] : []),
             ]}
           />
         </div>
@@ -83,9 +86,7 @@ const HomePage = () => {
         </div>
       </Sider>
       <Layout className="site-layout">
-        {/* <Header className="site-header">
-
-        </Header> */}
+        <Header className="site-header" />
         <Content className="site-content">{renderContent()}</Content>
         <Footer className="site-footer">C3PO ©2024 UCI</Footer>
       </Layout>

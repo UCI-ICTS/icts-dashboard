@@ -8,8 +8,8 @@ import { jwtDecode } from "jwt-decode";
 const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = user
-  ? { isLoggedIn: true, user, loading: false }
-  : { isLoggedIn: false, user: null, loading: false };
+  ? { isLoggedIn: true, user, staff: [], loading: false, error: null }
+  : { isLoggedIn: false, user: null, staff: [], loading: false, error: null };
 
   export const accountSlice = createSlice({
     name: "account",
@@ -69,6 +69,33 @@ const initialState = user
           state.user = null;
 
         })
+        .addCase(fetchUsers.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchUsers.fulfilled, (state, action) => {
+          state.loading = false;
+          state.staff = action.payload;
+        })
+        .addCase(fetchUsers.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+  
+        .addCase(addUser.fulfilled, (state, action) => {
+          const user = action.payload;
+          state.staff.push(user);
+        })
+  
+        .addCase(updateUser.fulfilled, (state, action) => {
+          const updated = action.payload;
+          state.staff.push(updated);
+        })
+  
+        .addCase(deleteUser.fulfilled, (state, action) => {
+          const id = action.payload;
+          state.staff = state.staff.filter((u) => u.id !== id);
+        })
     }
 })
 
@@ -98,12 +125,12 @@ export const login = createAsyncThunk(
   }
 );
 
-
 export const logout = createAsyncThunk(
   "auth/logout",
-  async ({ token }, thunkAPI) => {
+  async (refresh_token, thunkAPI) => {
     try {
-      const data = await AccountService.logout(token);
+      const data = await AccountService.logout(refresh_token);
+      message.success("User logged out successfully");
       return { data };
     } catch (error) {
       const errorMessage =
@@ -134,10 +161,12 @@ export const changePassword = createAsyncThunk(
   "auth/change_password",
   async (values, thunkAPI) => {
     try {
+      console.log("Slice values: ", values)
       const response = await AccountService.changePassword(values);
       message.success("Password changed successfully");
       return response.data;
     } catch (error) {
+      console.log("Slice response: ", error)
       let errorMessage = "An error occurred";
 
       if (error.response) {
@@ -170,5 +199,53 @@ export const changePassword = createAsyncThunk(
 
   }
 );
+
+// --- Users ---
+
+export const fetchUsers = createAsyncThunk("data/fetchUsers", async (_, thunkAPI) => {
+  try {
+    return await AccountService.getUsers();
+  } catch (error) {
+    message.error("Failed to fetch users.");
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+export const addUser = createAsyncThunk("data/addUser", async (userData, thunkAPI) => {
+  try {
+    console.log("Slice ",userData)
+    const res = await AccountService.createUser(userData);
+    message.success("User added successfully!");
+    return res;
+  } catch (error) {
+    console.log(error)
+    let errorMessage = "Login failed. Please try again."; // Default message
+    message.error("Failed to add participant. A participant with that email probably exists");
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+export const updateUser = createAsyncThunk("data/updateUser", async (userData, thunkAPI) => {
+  try {
+    const res = await AccountService.updateUser(userData);
+    message.success("User updated successfully!");
+    return res;
+  } catch (error) {
+    message.error("Failed to update user.");
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+export const deleteUser = createAsyncThunk("data/deleteUser", async (userId, thunkAPI) => {
+  try {
+    console.log(userId)
+    await AccountService.deleteUser(userId);
+    message.success("User deleted successfully!");
+    return userId;
+  } catch (error) {
+    message.error("Failed to delete user.");
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
 
 export const accountReducer = accountSlice.reducer

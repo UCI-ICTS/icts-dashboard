@@ -5,7 +5,7 @@ import { useRoutes, Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import Login from './components/Login';
-import HomePage from './pages/HomePage';
+import Dashboard from './pages/Dashboard';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { message } from 'antd';
 
@@ -53,7 +53,7 @@ useEffect(() => {
   let element = useRoutes([
     {
       path: "/",
-      element: <HomePage />
+      element: <Dashboard />
     },
     {
       path: "/login",
