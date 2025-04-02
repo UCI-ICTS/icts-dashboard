@@ -141,7 +141,9 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16 }}>
         <span style={{ marginRight: 8 }}>Edit Mode</span>
-        <Switch checked={editMode} onChange={setEditMode} />
+        <Tooltip title="Comming Soon!!">
+          <Switch checked={editMode} disabled onChange={setEditMode} />
+        </Tooltip>
       </div>
       </div>
       {Object.entries(schema.properties || {}).map(([key, value]) => (

@@ -14,35 +14,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Reading and populating secrets and instance specific information
 secrets = configparser.ConfigParser()
-
-# Try reading `.secrets`, fallback to environment variables
-secrets_file_path = os.path.join(BASE_DIR, ".secrets")
-if os.path.exists(secrets_file_path):
-    secrets.read(secrets_file_path)
-
-# Handle missing SECRET_KEY in CI (GitHub Actions)
-SECRET_KEY = (
-    secrets.get("DJANGO_KEYS", "SECRET_KEY", fallback=None)
-    or os.getenv("SECRET_KEY")
-    or get_random_secret_key()  # Fallback to a random key in CI
-)
-
-# Handle missing SERVER settings gracefully
-DEBUG = secrets.getboolean("SERVER", "DEBUG", fallback=True)
-ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
-VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
-PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
-SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.7")
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": secrets.get("SERVER", "DATABASE", fallback=os.path.join(BASE_DIR, "db.sqlite3")),
-    }
-}
-
+secrets.read(BASE_DIR + "/.secrets")
+if secrets["DJANGO_KEYS"]["SECRET_KEY"]:
+    SECRET_KEY = secrets["DJANGO_KEYS"]["SECRET_KEY"]
+else:
+    SECRET_KEY = get_random_secret_key()
+DEBUG = secrets["SERVER"]["DEBUG"]
+ALLOWED_HOSTS = secrets["SERVER"]["ALLOWED_HOSTS"].split(",")
+VERSION = secrets["SERVER"]["SERVER_VERSION"]
+PUBLIC_HOSTNAME = secrets["SERVER"]["DASHBOARD_URL"]
+SCHEMA_VERSION = secrets["SERVER"]["SCHEMA_VERSION"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -97,6 +78,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": secrets["SERVER"]["DATABASE"],
+    }
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -131,8 +124,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/api/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/django-static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -143,8 +136,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "https://sub.example.com",
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://127.0.0.1:9000",
+    "https://icts8001.hs.uci.edu",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # https://styria-digital.github.io/django-rest-framework-jwt/
 REST_FRAMEWORK = {
