@@ -17,8 +17,10 @@ secrets = configparser.ConfigParser()
 
 # Try reading `.secrets`, fallback to environment variables
 secrets_file_path = os.path.join(BASE_DIR, ".secrets")
+
 if os.path.exists(secrets_file_path):
     secrets.read(secrets_file_path)
+    SECRET_KEY = secrets.get("DJANGO_KEYS", "SECRET_KEY", fallback=None)
 else:
     # Handle missing SECRET_KEY in CI (GitHub Actions)
     SECRET_KEY = (
@@ -33,6 +35,19 @@ ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
 VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
 SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.7")
+
+CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
+
+backup = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:9000",
+    "https://icts8001.hs.uci.edu",
+    "https://genomics.icts.uci.edu"
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -138,13 +153,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
 
 # https://styria-digital.github.io/django-rest-framework-jwt/
 REST_FRAMEWORK = {
