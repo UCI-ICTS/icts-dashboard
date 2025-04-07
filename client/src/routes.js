@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Dashboard from './pages/Dashboard';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { message } from 'antd';
+import PrivateRout from "./components/PrivateRout";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000; // Convert to seconds
@@ -53,7 +54,11 @@ useEffect(() => {
   let element = useRoutes([
     {
       path: "/",
-      element: <Dashboard />
+      element: (
+        <PrivateRout>
+          <Dashboard />
+        </PrivateRout>
+      )
     },
     {
       path: "/login",

@@ -36,6 +36,18 @@ VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
 SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.7")
 
+EMAIL_BACKEND = secrets.get(
+    "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = secrets.get("EMAIL", "EMAIL_HOST", fallback="")
+EMAIL_PORT = int(secrets.get("EMAIL", "EMAIL_PORT", fallback="25"))
+EMAIL_USE_TLS = secrets.get("EMAIL", "EMAIL_USE_TLS", fallback="False").lower() == "true"
+EMAIL_USE_SSL = secrets.get("EMAIL", "EMAIL_USE_SSL", fallback="False").lower() == "true"
+EMAIL_HOST_USER = secrets.get("EMAIL", "EMAIL_HOST_USER", fallback=None) or None
+EMAIL_HOST_PASSWORD = secrets.get("EMAIL", "EMAIL_HOST_PASSWORD", fallback=None) or None
+DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
+
+
 CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
 
 backup = [
