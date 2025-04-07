@@ -36,7 +36,7 @@ const logout = async (refresh_token) => {
   
 const changePassword = (values) => {
   console.log("service values: ", values)
-  return axios.post(APIDB + "/api/auth/change_password/", {
+  return axios.post(APIDB + "api/auth/change_password/", {
     old_password: values.old_password,
     new_password: values.new_password,
     confirm_new_password: values.confirm_password
