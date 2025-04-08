@@ -141,8 +141,8 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16 }}>
         <span style={{ marginRight: 8 }}>Edit Mode</span>
-        <Tooltip title="Comming Soon!!">
-          <Switch checked={editMode} disabled onChange={setEditMode} />
+        <Tooltip title="Toggle edit mode">
+          <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
       </div>
       </div>

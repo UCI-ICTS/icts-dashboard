@@ -57,7 +57,7 @@ const updateGeneticFindings = async (data, token) => {
 
 
 const updateAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/update_analyte/", [
+  const response = await axios.post(APIDB + "api/metadata/update_analytes/", [
     data
   ], {
     headers: getAuthHeaders()
