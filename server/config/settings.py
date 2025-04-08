@@ -48,7 +48,7 @@ EMAIL_HOST_PASSWORD = secrets.get("EMAIL", "EMAIL_HOST_PASSWORD", fallback=None)
 DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
 
 
-CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
+CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="http://localhost:3000").split(",")
 
 backup = [
     "https://example.com",
