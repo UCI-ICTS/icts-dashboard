@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Checkbox, message } from 'antd';
+import { Form, Input, Button, Checkbox, message, Modal } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../slices/accountSlice';
+import { login, resetPassword } from '../slices/accountSlice';
+
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
+  const [passwordReset, setPasswordReset] = useState(false);
   const { isLoggedIn, loading, error } = useSelector((state) => state.account);
 
   const onFinish = async (values) => {
@@ -20,6 +22,20 @@ const Login = () => {
       .catch((err) => {
         message.error(err || "Login failed. Please check your credentials.");
       });
+  };
+  
+  const showModal = () => {
+    setPasswordReset(true);
+  };
+
+  const submitReset = (values) => {
+    console.log(values);
+    dispatch(resetPassword(values.email))
+    // setPasswordReset(false);
+  };
+  
+  const handleCancel = () => {
+    setPasswordReset(false);
   };
 
   // Redirect after login
@@ -36,9 +52,9 @@ const Login = () => {
         <Form name="login_form" className="login-form" onFinish={onFinish}>
           <Form.Item
             name="username"
-            rules={[{ required: true, message: 'Please input your Email!' }]}
+            rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Email" />
+            <Input prefix={<UserOutlined />} placeholder="Username" />
           </Form.Item>
           <Form.Item
             name="password"
@@ -56,9 +72,39 @@ const Login = () => {
               Log in
             </Button>
           </Form.Item>
+          <Form.Item>
+            <Button
+              onClick={showModal}
+            >Forgot Password</Button>
+          </Form.Item>
         </Form>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
+      <Modal
+        title="Password reset"
+        open={passwordReset}
+        onCancel={handleCancel}
+        footer={null}
+        width={500}
+      >
+        <Form layout="vertical" onFinish={submitReset}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please enter a valid email" }]}
+          >
+            <Input type="email" autoComplete="email" />
+          </Form.Item>
+          <Form.Item>
+            <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

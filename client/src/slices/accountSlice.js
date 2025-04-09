@@ -69,6 +69,19 @@ const initialState = user
           state.user = null;
 
         })
+        
+        .addCase(resetPassword.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(resetPassword.fulfilled, (state, action) => {
+          state.loading = false;
+        })
+        .addCase(resetPassword.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+
         .addCase(fetchUsers.pending, (state) => {
           state.loading = true;
           state.error = null;
@@ -196,9 +209,47 @@ export const changePassword = createAsyncThunk(
       // Reject the request and pass the errorMessage
       return thunkAPI.rejectWithValue(errorMessage);
     }
-
   }
 );
+
+export const resetPassword = createAsyncThunk(
+  "auth/reset_password",
+  async (email, thunkAPI) => {
+    try {
+      console.log("Slice password reset: ", email);
+      const response = await AccountService.resetPassword(email);
+      return response.data;
+    } catch (error) {
+      console.log("Slice password reset error: ", error);
+
+      let errorMessage = "An error occurred";
+
+      if (error.response) {
+        const errorData = error.response.data;
+
+        if (typeof errorData === "string") {
+          // If backend just returns a plain error message
+          errorMessage = errorData;
+        } else if (errorData?.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === "object") {
+          errorMessage = Object.entries(errorData)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(", ") : errors}`)
+            .join(" | ");
+        } else {
+          errorMessage = `Request failed with status ${error.response.status}`;
+        }
+
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 
 // --- Users ---
 
