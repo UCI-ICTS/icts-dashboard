@@ -4,11 +4,12 @@ import React, { useEffect } from 'react';
 import { useRoutes, Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import Login from './components/Login';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { message } from 'antd';
 import PrivateRout from "./components/PrivateRout";
+import PasswordResetConfirm from './pages/PasswordResetConfirm';
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000; // Convert to seconds
@@ -63,6 +64,10 @@ useEffect(() => {
     {
       path: "/login",
       element: <Login />
+    },
+    {
+      path: "/password-reset",
+      element: <PasswordResetConfirm />
     }
   ])
   return element;

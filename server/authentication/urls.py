@@ -4,19 +4,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from authentication.apis import (
-    ChangePasswordView,
     DecoratedTokenObtainPairView,
     DecoratedTokenRefreshView,
     DecoratedTokenVerifyView,
     DecoratedTokenBlacklistView,
-    UserViewSet
+    UserViewSet,
+    PasswordViewSet
 )
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
+router.register(r"password", PasswordViewSet, basename="password")
+
 
 urlpatterns = [
-    path("change_password/", ChangePasswordView.as_view()),
     path("refresh/", DecoratedTokenVerifyView.as_view()),
     path("verify/", DecoratedTokenRefreshView.as_view()),
     path("login/", DecoratedTokenObtainPairView.as_view()),

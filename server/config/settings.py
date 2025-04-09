@@ -31,7 +31,7 @@ else:
 
 # Handle missing SERVER settings gracefully
 DEBUG = secrets.getboolean("SERVER", "DEBUG", fallback=True)
-ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="*").split(",")
+ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="localhost").split(",")
 VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
 SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.7")
@@ -48,7 +48,7 @@ EMAIL_HOST_PASSWORD = secrets.get("EMAIL", "EMAIL_HOST_PASSWORD", fallback=None)
 DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
 
 
-CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="http://localhost:3000").split(",")
+CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "CORS_ALLOWED_ORIGINS", fallback="http://localhost:3000").split(",")
 
 backup = [
     "https://example.com",

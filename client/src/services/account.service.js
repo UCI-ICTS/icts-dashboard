@@ -36,7 +36,7 @@ const logout = async (refresh_token) => {
   
 const changePassword = (values) => {
   console.log("service values: ", values)
-  return axios.post(APIDB + "api/auth/change_password/", {
+  return axios.post(APIDB + "api/auth/password/change/", {
     old_password: values.old_password,
     new_password: values.new_password,
     confirm_new_password: values.confirm_password
@@ -44,6 +44,14 @@ const changePassword = (values) => {
     headers: getAuthHeaders(),
   })
 };
+
+const resetPassword = async (email) => {
+  console.log("Service password reset: ", email);
+  const response = await axios.post(APIDB + "api/auth/password/reset/", {
+    email,
+  });
+  return response.data;
+  };
 
 // ✅ Fetch all users
 const getUsers = async () => {
@@ -72,6 +80,7 @@ const deleteUser = async (userId) => {
     login,
     logout,
     changePassword,
+    resetPassword,
     getUsers,
     createUser,
     updateUser,
