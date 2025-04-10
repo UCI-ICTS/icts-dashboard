@@ -54,7 +54,6 @@ const ManageAdministrators = () => {
       first_name: member?.first_name || "",
       last_name: member?.last_name || "",
       email: member?.email || "",
-      password: "", // Don't preload password
       role: staff?.is_superuser ? "admin" : staff?.is_staff ? "staff" : "staff",
     });
     setIsModalVisible(true);
@@ -66,7 +65,6 @@ const ManageAdministrators = () => {
     console.log(values)
     const updatedValues = {
       ...values,
-      
       is_superuser: values.role === "admin",
       is_staff: values.role === "admin" || values.role === "staff",
     };
@@ -84,7 +82,7 @@ const ManageAdministrators = () => {
   };
 
   const handleDelete = async (id) => {
-    await dispatch(deleteUser(id));
+    dispatch(deleteUser(id));
     message.success("Staff deleted.");
     dispatch(fetchUsers());
   };
@@ -114,34 +112,35 @@ const ManageAdministrators = () => {
     {
       title: "Actions",
       render: (_, record) => {
-        const isSelf = record.username === currentUsername;
-
-        return (<>
-          <Tooltip title="Edit administrator">
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => handleOpenModal(record)}
-              style={{ marginRight: 8 }}
-            />
-          </Tooltip>
-          <Tooltip title={isSelf ? "You cannot delete yourself" : "Delete Administrator"}>
-          <Popconfirm
-            title="Are you sure you want to delete this user?"
-            onConfirm={() => handleDelete(record.username)}
-            okText="Yes"
-            cancelText="No"
-            disabled={isSelf}
-          >
-            <Button
-              icon={<DeleteOutlined />}
-              danger
-              disabled={isSelf}
-            />
-          </Popconfirm>
-        </Tooltip>
-        </>)
+        const isSelf = record?.username && record.username === currentUsername;
+        return (
+          <>
+            <Tooltip title="Edit administrator">
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => handleOpenModal(record)}
+                style={{ marginRight: 8 }}
+              />
+            </Tooltip>
+            <Tooltip title={isSelf ? "You cannot delete yourself" : "Delete Administrator"}>
+              <Popconfirm
+                title="Are you sure you want to delete this user?"
+                onConfirm={() => handleDelete(record?.username)}
+                okText="Yes"
+                cancelText="No"
+                disabled={isSelf}
+              >
+                <Button
+                  icon={<DeleteOutlined />}
+                  danger
+                  disabled={isSelf}
+                />
+              </Popconfirm>
+            </Tooltip>
+          </>
+        );
       },
-    },
+    }    
   ];
 
   return (
@@ -168,7 +167,7 @@ const ManageAdministrators = () => {
         ) : ( null)}
           <Table
             columns={columns}
-            dataSource={staff}
+            dataSource={staff.filter(Boolean)}
             rowKey="username"
             bordered
           />
@@ -199,17 +198,6 @@ const ManageAdministrators = () => {
               rules={[{ required: true, message: "Enter email" }]}
             >
               <Input type="email" />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={
-                editingMember
-                  ? []
-                  : [{ required: true, message: "Enter password" }]
-              }
-            >
-              <Input.Password />
             </Form.Item>
             <Form.Item
               name="role"

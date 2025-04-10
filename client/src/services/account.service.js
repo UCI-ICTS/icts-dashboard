@@ -19,21 +19,24 @@ const getAuthHeaders = () => {
   };
 };
 
+// ✅ user log in
 const login = async (username, password) => {
-  const response = await axios.post(APIDB + "api/auth/login/", {
+  const response = await axios.post(APIDB + "api/auth/token/login/", {
     username,
     password,
   });
   return response.data;
-  };
+};
 
+// ✅ user log out (blacklist token)
 const logout = async (refresh_token) => {
-  const response = await axios.post(APIDB + "api/auth/logout/", {
+  const response = await axios.post(APIDB + "api/auth/token/logout/", {
     refresh: refresh_token
   });
   return response.data;
-  };
+};
   
+// ✅ user change password
 const changePassword = (values) => {
   console.log("service values: ", values)
   return axios.post(APIDB + "api/auth/password/change/", {
@@ -45,13 +48,14 @@ const changePassword = (values) => {
   })
 };
 
+// ✅ password reset received via email
 const resetPassword = async (email) => {
   console.log("Service password reset: ", email);
   const response = await axios.post(APIDB + "api/auth/password/reset/", {
     email,
   });
   return response.data;
-  };
+};
 
 // ✅ Fetch all users
 const getUsers = async () => {
@@ -65,6 +69,17 @@ const createUser = async (userData) => {
   return response.data;
 };
 
+// ✅ activate user/create password received via email
+const createPassword = async ({ uid, token, new_password }) => {
+  console.log("Service password create: ", uid, token, new_password);
+  const response = await axios.post(`${APIDB}api/auth/users/activate/`, {
+    uid,
+    token,
+    new_password,
+  })
+  return response.data;
+};
+
 // ✅ Update an existing user
 const updateUser = async (userData) => {
   const response = await axios.put(APIDB + `api/auth/users/${userData.username}/`, userData, { headers: getAuthHeaders() });
@@ -73,7 +88,9 @@ const updateUser = async (userData) => {
 
 // ✅ Delete a user
 const deleteUser = async (userId) => {
-  await axios.delete(APIDB + `api/auth/users/${userId}/`, { headers: getAuthHeaders() });
+  // handle special characters
+  const encodedUsername = encodeURIComponent(userId);
+  await axios.delete(APIDB + `api/auth/users/${encodedUsername}/`, { headers: getAuthHeaders() });
 };
 
   const accountService = {
@@ -83,6 +100,7 @@ const deleteUser = async (userId) => {
     resetPassword,
     getUsers,
     createUser,
+    createPassword,
     updateUser,
     deleteUser
   };

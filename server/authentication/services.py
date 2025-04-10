@@ -1,12 +1,34 @@
 #!/usr/bin/env python
 # authentication/services.py
 
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User, update_last_login
+from django.conf import settings
+from django.urls import reverse
+from django.core.mail import send_mail
 from rest_framework import serializers
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User, update_last_login
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["user"] = UserOutputSerializer(self.user).data
+        return data
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["first_name"] = user.first_name
+        token["last_name"] = user.last_name
+        token["username"] = user.username
+        token["email"] = user.email
+        token["is_staff"] = user.is_staff
+        token["is_superuser"] = user.is_superuser
+        return token
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
@@ -40,6 +62,17 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.save()
         update_last_login(None, instance)
         return instance
+
+
+class ActivateUserSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(min_length=8)
+
+    def validate(self, data):
+        if not data["uid"] or not data["token"] or not data["new_password"]:
+            raise serializers.ValidationError("All fields are required.")
+        return data
 
 
 class UserInputSerializer(serializers.ModelSerializer):
@@ -89,11 +122,18 @@ class UserInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class UserOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'date_joined']
+        fields = [
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'is_superuser',
+            'is_staff',
+            'date_joined'
+        ]
         read_only_fields = fields
 
 
@@ -101,7 +141,7 @@ class CustomAuthentication(BaseAuthentication):
     """
     Custom JSON Web Token Authentication class that supports different types 
     of tokens including Bearer tokens from various issuers like ORCID, Google,
-    and the BioCompute Portal.
+    and others.
 
     Methods:
     authenticate(self, request): 

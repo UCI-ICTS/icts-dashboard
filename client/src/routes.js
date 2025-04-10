@@ -68,6 +68,10 @@ useEffect(() => {
     {
       path: "/password-reset",
       element: <PasswordResetConfirm />
+    },
+    {
+      path: "/password-create",
+      element: <PasswordResetConfirm />
     }
   ])
   return element;

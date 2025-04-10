@@ -1,9 +1,8 @@
 // src/pages/Dashboard.js
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Layout, Menu, Button, Spin, Alert, Tooltip } from 'antd';
 import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import PatientList from '../components/PatientList';
 import AdminPage from './AdminPage';
 import GregorParticipants from "../components/GregorParticipants";
 import '../App.css'; // ✅ Importing CSS
@@ -23,7 +22,7 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
-  const isAdmin = auth?.user?.superuser
+  const isAdmin = auth?.user?.is_superuser
   console.log(isAdmin)
 
   const handleLogout = () => {
@@ -57,7 +56,7 @@ const HomePage = () => {
   return (
     <Layout className="layout-container">
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} className="sider-container">
-        <h2 className="sider-header">C3PO</h2>  
+        <h2 className="sider-header">UCI ICTS Dashboard</h2>  
         {/* Menu Items */}
         <div className="sider-menu-wrapper">
           <Menu
@@ -88,7 +87,9 @@ const HomePage = () => {
       <Layout className="site-layout">
         <Header className="site-header" />
         <Content className="site-content">{renderContent()}</Content>
-        <Footer className="site-footer">C3PO ©2024 UCI</Footer>
+        <Footer className="site-footer">
+          <div>UCI ICTS Dashboard ©2024 UCI</div>
+        </Footer>
       </Layout>
     </Layout>
   );
