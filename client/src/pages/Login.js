@@ -7,10 +7,11 @@ import { login, resetPassword } from '../slices/accountSlice';
 
 
 const Login = () => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
-  const [passwordReset, setPasswordReset] = useState(false);
+  const [passwordResetModal, setPasswordResetModal] = useState(false);
   const { isLoggedIn, loading, error } = useSelector((state) => state.account);
 
   const onFinish = async (values) => {
@@ -25,17 +26,19 @@ const Login = () => {
   };
   
   const showModal = () => {
-    setPasswordReset(true);
+    setPasswordResetModal(true);
   };
 
   const submitReset = (values) => {
     console.log(values);
     dispatch(resetPassword(values.email))
-    // setPasswordReset(false);
+    form.resetFields();
+    setPasswordResetModal(false);
   };
   
   const handleCancel = () => {
-    setPasswordReset(false);
+    form.resetFields();
+    setPasswordResetModal(false);
   };
 
   // Redirect after login
@@ -48,7 +51,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-form-wrapper">
-        <h2>Welcome to C3PO</h2>
+        <h2>Welcome to the UCI ICTS Dashboard</h2>
         <Form name="login_form" className="login-form" onFinish={onFinish}>
           <Form.Item
             name="username"
@@ -82,7 +85,7 @@ const Login = () => {
       </div>
       <Modal
         title="Password reset"
-        open={passwordReset}
+        open={passwordResetModal}
         onCancel={handleCancel}
         footer={null}
         width={500}

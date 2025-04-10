@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Button, Card, Form, Input, Typography, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import PasswordReset from "../components/PasswordReset";
+import { updateUser } from "../slices/accountSlice";
 import "../App.css";
 
 const ProfilePage = () => {
@@ -16,9 +17,13 @@ const ProfilePage = () => {
 
   const handleSubmit = async (values) => {
     setLoading(true);
+    const payload = {
+      ...values,
+      username: user?.username,
+    };
+
     console.log(values);
-    // dispatch(updateProfile(values));
-    message.success("Profile updated");
+    dispatch(updateUser(payload));
     setLoading(false);
   };
 

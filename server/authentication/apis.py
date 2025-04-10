@@ -3,21 +3,20 @@
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import update_last_login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, permissions, viewsets
 from rest_framework.decorators import action
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import (
-    TokenBlacklistView,
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import (
+    TokenRefreshSerializer,
+    TokenVerifySerializer,
+    TokenBlacklistSerializer,
 )
 
 from authentication.services import (
@@ -25,91 +24,100 @@ from authentication.services import (
     UserOutputSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    CustomTokenObtainPairSerializer,
+    ActivateUserSerializer,
 )
 
 
 User = get_user_model()
 
-
-class DecoratedTokenObtainPairView(TokenObtainPairView):
-
-    class TokenObtainPairResponseSerializer(serializers.Serializer):
-        access = serializers.CharField()
-        refresh = serializers.CharField()
-
-        def create(self, validated_data):
-            raise NotImplementedError()
-
-        def update(self, instance, validated_data):
-            raise NotImplementedError()
-    
-    @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: TokenObtainPairResponseSerializer,
-        },
-        tags=["Account Management"]
-    )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+class TokenObtainPairResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
 
 
 class TokenRefreshResponseSerializer(serializers.Serializer):
     access = serializers.CharField()
 
-    def create(self, validated_data):
-        raise NotImplementedError()
-
-    def update(self, instance, validated_data):
-        raise NotImplementedError()
-
-
-class DecoratedTokenRefreshView(TokenRefreshView):
-    @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: TokenRefreshResponseSerializer,
-        },
-        tags=["Account Management"]
-    )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
 
 class TokenVerifyResponseSerializer(serializers.Serializer):
-    def create(self, validated_data):
-        raise NotImplementedError()
-
-    def update(self, instance, validated_data):
-        raise NotImplementedError()
+    pass
 
 
-class DecoratedTokenVerifyView(TokenVerifyView):
+class TokenBlacklistResponseSerializer(serializers.Serializer):
+    pass
+
+
+class TokenViewSet(viewsets.ViewSet):
+    """
+    Unified Token ViewSet for login, refresh, verify, and logout (blacklist)
+    """
+
+    permission_classes_by_action = {
+        "logout": [permissions.IsAuthenticated],
+        "login": [permissions.AllowAny],
+        "refresh": [permissions.AllowAny],
+        "verify": [permissions.AllowAny],
+    }
+
+    def get_permissions(self):
+        return [
+            perm() for perm in self.permission_classes_by_action.get(self.action, [permissions.AllowAny])
+        ]
+
     @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: TokenVerifyResponseSerializer,
-        },
-        tags=["Account Management"]
+        request_body=CustomTokenObtainPairSerializer,
+        responses={200: openapi.Response("JWT + user info", CustomTokenObtainPairSerializer)},
+        tags=["JWT Auth"]
     )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+    @action(detail=False, methods=["post"], url_path="login")
+    def login(self, request):
+        serializer = CustomTokenObtainPairSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-
-class DecoratedTokenBlacklistView(TokenBlacklistView):
-    class TokenBlacklistResponseSerializer(serializers.Serializer):
-        def create(self, validated_data):
-            raise NotImplementedError()
-
-        def update(self, instance, validated_data):
-            raise NotImplementedError()
     @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: TokenBlacklistResponseSerializer,
-        },
-        tags=["Account Management"]
+        request_body=TokenRefreshSerializer,
+        responses={200: openapi.Response("New access token", TokenRefreshSerializer)},
+        tags=["JWT Auth"]
     )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-    
+    @action(detail=False, methods=["post"], url_path="refresh")
+    def refresh(self, request):
+        serializer = TokenRefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=TokenVerifySerializer,
+        responses={200: openapi.Response("Token is valid")},
+        tags=["JWT Auth"]
+    )
+    @action(detail=False, methods=["post"], url_path="verify")
+    def verify(self, request):
+        serializer = TokenVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({"message": "Token is valid."}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=TokenBlacklistSerializer,
+        responses={200: openapi.Response("Token blacklisted successfully")},
+        tags=["JWT Auth"]
+    )
+    @action(detail=False, methods=["post"], url_path="logout")
+    def logout(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response({"error": "Refresh token required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Token successfully blacklisted."}, status=200)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserViewSet(viewsets.ViewSet):
     lookup_field = 'username'
@@ -127,25 +135,46 @@ class UserViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        operation_description="Create a new user",
-        request_body=UserInputSerializer,
-        responses={201: UserOutputSerializer},
-        tags=["User Management"]
-    )
+    operation_description="Invite a new user. Sends an activation email with a temporary password and reset link.",
+    request_body=UserInputSerializer,
+    responses={200: "Invite email sent"},
+    tags=["User Management"]
+)
     def create(self, request):
-        """Create a new user with password hashing."""
+        """Create a new inactive user and send an activation email with a temp password."""
         serializer = UserInputSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = serializer.save()
-                return Response(UserOutputSerializer(user).data, status=status.HTTP_201_CREATED)
-            except IntegrityError as e:
-                print(e)
-                return Response(
-                    {"error": "A user with this email or username already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"]
+
+        # Set temp password and mark user inactive
+        temp_password = User.objects.make_random_password()
+        validated_data = {
+            **serializer.validated_data,
+            "password": temp_password,
+            "is_active": False
+        }
+
+        user = UserInputSerializer().create(validated_data)
+
+        # Build token and activation URL
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        activation_url = f"{settings.PUBLIC_HOSTNAME}password-create?uid={uid}&token={token}"
+
+        # Email the activation link
+        send_mail(
+            subject="You're invited to C3PO!",
+            message=f"Use this link to activate your account and set a password:\n{activation_url}",
+            from_email=None,
+            recipient_list=[email],
+        )
+
+        return Response({
+            "message": f"Invite sent to {email}.",
+            "user": UserOutputSerializer(user).data
+        }, status=status.HTTP_200_OK)
+
     
     @swagger_auto_schema(
         operation_description="Update an existing user",
@@ -153,7 +182,6 @@ class UserViewSet(viewsets.ViewSet):
         responses={200: UserOutputSerializer},
         tags=["User Management"]
     )
-
     def update(self, request, username=None):
         """Update user details (hashes password if provided)."""
         try:
@@ -181,6 +209,38 @@ class UserViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+    @swagger_auto_schema(
+        method="post",
+        request_body=UserInputSerializer,
+        responses={200: "User activated and password set"},
+        operation_description="Activate a user using UID and token, and set a new password.",
+        tags=["User Management"]
+    )
+    @action(detail=False, methods=["post"], url_path="activate", permission_classes=[permissions.AllowAny])
+    def activate(self, request):
+        serializer = ActivateUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        uid = serializer.validated_data["uid"]
+        token = serializer.validated_data["token"]
+        new_password = serializer.validated_data["new_password"]
+
+        try:
+            user_id = urlsafe_base64_decode(uid).decode()
+            user = User.objects.get(pk=user_id)
+        except (User.DoesNotExist, ValueError, TypeError):
+            return Response({"error": "Invalid user ID"}, status=400)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({"error": "Invalid or expired token"}, status=400)
+
+        user.set_password(new_password)
+        user.is_active = True
+        user.save()
+
+        return Response({"message": "Account activated and password set."}, status=200)
 
 
 class PasswordViewSet(viewsets.ViewSet):

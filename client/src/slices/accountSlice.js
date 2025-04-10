@@ -16,6 +16,7 @@ const initialState = user
     initialState,
     extraReducers: (builder) => {
       builder
+// --- Authentication and Passwords ---
         .addCase(login.pending, (state) => {
           state.loading = true; // Set loading to true when login is pending
         })
@@ -37,6 +38,7 @@ const initialState = user
           state.isLoggedIn = false;
           state.user = null;
         })
+
         .addCase(handleExpiredJWT.fulfilled, (state, action) => {
           state.loading = false; // Set loading to false when login is rejected
           state.isLoggedIn = false;
@@ -49,6 +51,7 @@ const initialState = user
         .addCase(handleExpiredJWT.rejected, (state, action) => {
           console.log("rejected")
         })
+
         .addCase(logout.pending, (state) => {
           console.log("logout pending")
           state.loading = true;
@@ -82,6 +85,19 @@ const initialState = user
           state.error = action.payload;
         })
 
+        .addCase(confirmPasswordReset.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(confirmPasswordReset.fulfilled, (state, action) => {
+          state.loading = false;
+        })
+        .addCase(confirmPasswordReset.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+
+// --- Users ---
         .addCase(fetchUsers.pending, (state) => {
           state.loading = true;
           state.error = null;
@@ -96,22 +112,47 @@ const initialState = user
         })
   
         .addCase(addUser.fulfilled, (state, action) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(addUser.pending, (state, action) => {
           const user = action.payload;
           state.staff.push(user);
+        })
+        .addCase(addUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
         })
   
         .addCase(updateUser.fulfilled, (state, action) => {
           const updated = action.payload;
           state.staff.push(updated);
         })
-  
+        .addCase(updateUser.pending, (state, action) => {
+          const user = action.payload;
+          state.staff.push(user);
+        })
+        .addCase(updateUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+
         .addCase(deleteUser.fulfilled, (state, action) => {
           const id = action.payload;
           state.staff = state.staff.filter((u) => u.id !== id);
         })
+        .addCase(deleteUser.pending, (state, action) => {
+          const user = action.payload;
+          state.staff.push(user);
+        })
+        .addCase(deleteUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
     }
 })
 
+// --- Authentication and Passwords ---
 export const login = createAsyncThunk(
   "auth/login",
   async ({ username, password, rememberMe }, thunkAPI) => {
@@ -218,6 +259,8 @@ export const resetPassword = createAsyncThunk(
     try {
       console.log("Slice password reset: ", email);
       const response = await AccountService.resetPassword(email);
+      console.log(response.message)
+      message.success(response.message)
       return response.data;
     } catch (error) {
       console.log("Slice password reset error: ", error);
@@ -250,10 +293,46 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const confirmPasswordReset = createAsyncThunk(
+  "auth/confirm_password_reset",
+  async ({ uid, token, new_password }, thunkAPI) => {
+    try {
+      const response = await AccountService.confirmPasswordReset({ uid, token, new_password });
+      return response.data;
+    } catch (error) {
+      console.log("Slice confirm reset error:", error);
+
+      let errorMessage = "An error occurred";
+
+      if (error.response) {
+        const errorData = error.response.data;
+
+        if (typeof errorData === "string") {
+          errorMessage = errorData;
+        } else if (errorData?.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === "object") {
+          errorMessage = Object.entries(errorData)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(", ") : errors}`)
+            .join(" | ");
+        } else {
+          errorMessage = `Request failed with status ${error.response.status}`;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
 
 // --- Users ---
 
-export const fetchUsers = createAsyncThunk("data/fetchUsers", async (_, thunkAPI) => {
+export const fetchUsers = createAsyncThunk(
+  "data/fetchUsers", 
+  async (_, thunkAPI) => {
   try {
     return await AccountService.getUsers();
   } catch (error) {
@@ -262,7 +341,9 @@ export const fetchUsers = createAsyncThunk("data/fetchUsers", async (_, thunkAPI
   }
 });
 
-export const addUser = createAsyncThunk("data/addUser", async (userData, thunkAPI) => {
+export const addUser = createAsyncThunk(
+  "data/addUser", 
+  async (userData, thunkAPI) => {
   try {
     console.log("Slice ",userData)
     const res = await AccountService.createUser(userData);
@@ -276,18 +357,57 @@ export const addUser = createAsyncThunk("data/addUser", async (userData, thunkAP
   }
 });
 
-export const updateUser = createAsyncThunk("data/updateUser", async (userData, thunkAPI) => {
+export const activateUserAccount = createAsyncThunk(
+  "auth/activate_account",
+  async ({ uid, token, new_password }, thunkAPI) => {
+    try {
+      const response = await AccountService.createPassword({ uid, token, new_password });
+      return response.data;
+    } catch (error) {
+      console.log("Slice activation error:", error);
+
+      let errorMessage = "An error occurred";
+
+      if (error.response) {
+        const errorData = error.response.data;
+
+        if (typeof errorData === "string") {
+          errorMessage = errorData;
+        } else if (errorData?.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === "object") {
+          errorMessage = Object.entries(errorData)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(", ") : errors}`)
+            .join(" | ");
+        } else {
+          errorMessage = `Request failed with status ${error.response.status}`;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  "data/updateUser",
+  async (userData, thunkAPI) => {
   try {
-    const res = await AccountService.updateUser(userData);
+    const response = await AccountService.updateUser(userData);
     message.success("User updated successfully!");
-    return res;
+    return response;
   } catch (error) {
     message.error("Failed to update user.");
     return thunkAPI.rejectWithValue(error.message);
   }
 });
 
-export const deleteUser = createAsyncThunk("data/deleteUser", async (userId, thunkAPI) => {
+export const deleteUser = createAsyncThunk(
+  "data/deleteUser",
+  async (userId, thunkAPI) => {
   try {
     console.log(userId)
     await AccountService.deleteUser(userId);
