@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState} from "react"; 
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -75,8 +75,8 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
   }
 
   if (schema.type === "array") {
-    // If it's an enum-based array (e.g., multiselect)
     if (schema.items?.enum) {
+      // Render enum-based array as multi-select
       return (
         <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
           <Select disabled={readOnly} mode="multiple">
@@ -90,23 +90,44 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
       );
     }
   
-    // Otherwise, render it as a comma-separated input string
+    // Render free-form text input array using Form.List
     return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Input
-          disabled={readOnly}
-          placeholder="Enter comma-separated values"
-          onBlur={(e) => {
-            const value = e.target.value
-              .split(",")
-              .map((v) => v.trim())
-              .filter((v) => v);
-            form.setFieldsValue({ [keyName]: value });
-          }}
-        />
+      <Form.Item key={keyName} label={label}>
+        <Form.List name={keyName} rules={rules}>
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Form.Item
+                  key={key}
+                  {...restField}
+                  name={name}
+                  rules={[{ required: true, message: "Field cannot be empty" }]}
+                >
+                  <Input
+                    disabled={readOnly}
+                    placeholder="Enter value"
+                    addonAfter={
+                      !readOnly && (
+                        <MinusCircleOutlined onClick={() => remove(name)} />
+                      )
+                    }
+                  />
+                </Form.Item>
+              ))}
+              {!readOnly && (
+                <Form.Item>
+                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    Add item
+                  </Button>
+                </Form.Item>
+              )}
+            </>
+          )}
+        </Form.List>
       </Form.Item>
     );
   }
+  
   return null;
 };
 
