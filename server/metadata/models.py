@@ -578,7 +578,6 @@ class Biobank(models.Model):
         to_field="participant_id",
         db_column="participant_id",
         on_delete=models.CASCADE,
-        related_name="analytes",
         help_text="The participant from whom the biosample was taken",
     )
     collection_date = models.DateField(
@@ -623,12 +622,12 @@ class Biobank(models.Model):
     box_type = models.CharField(
         max_length=50,
         choices=[
-            ("5x5 cryobox", ""),
-            ("9x9 cryobox", ""),
-            ("10x10 cryobox", ""),
-            ("SBS plate", ""),
-            ("Wire rack", ""),
-            ("8x12 metal rack", "")
+            ("5x5 cryobox", "5x5 cryobox"),
+            ("9x9 cryobox", "9x9 cryobox"),
+            ("10x10 cryobox", "10x10 cryobox"),
+            ("SBS plate", "SBS plate"),
+            ("Wire rack", "Wire rack"),
+            ("8x12 metal rack", "8x12 metal rack")
         ],
         blank=True,
         null=True,
@@ -661,17 +660,19 @@ class Biobank(models.Model):
     status = models.CharField(
         max_length=50,
         choices=[
-            ("Pending shipment", "Preparing shipment from remote site"),
-            ("Shipped", "In transit"),
-            ("Received", "Received by biospecimen storage site"),
-            ("Stored", "Accessioned, labelled, and stored in freezer/refrigerator"),
-            ("Replacement requested", "See comments regarding why one is needed"),
-            ("Lost", "See comments regarding what happened"),
-            ("QC issue", "See comments regarding what the issue is")
+            ("Pending shipment", "Pending shipment"),
+            ("Shipped", "Shipped"),
+            ("Received", "Received"),
+            ("Stored", "Stored"),
+            ("Replacement requested", "Replacement requested, see comments"),
+            ("Lost", "Lost, see comments"),
+            ("QC issue", "QC issue, see comments")
         ],
         help_text="Biospecimen status while "
     )
     shipment_date = models.DateField(
+        blank=True,
+        null=True,
         help_text="If the status is shipped, then include a date when it was mailed out."
     )
     child_analytes = models.ForeignKey(
@@ -680,6 +681,8 @@ class Biobank(models.Model):
         db_column="analyte_id",
         on_delete=models.CASCADE,
         related_name="analytes",
+        blank=True,
+        null=True,
         help_text="The analyte(s) derived from this biospecimen",
     )
     comments = models.TextField(
