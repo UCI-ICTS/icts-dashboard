@@ -17,7 +17,7 @@ from metadata.apis import (
     ReadAnalyteAPI,
     UpdateAnalyteAPI,
     DeleteAnalyteAPI,
-    
+
     CreatePhenotypeAPI,
     ReadPhenotypeAPI,
     UpdatePhenotypeAPI,
@@ -27,6 +27,11 @@ from metadata.apis import (
     ReadGeneticFindingsAPI,
     UpdateGeneticFindingsAPI,
     DeleteGeneticFindingsAPI,
+
+    CreateBiobankAPI,
+    ReadBiobankAPI,
+    UpdateBiobankAPI,
+    DeleteBiobankAPI,
 )
 
 urlpatterns = [
@@ -49,9 +54,14 @@ urlpatterns = [
     path("read_phenotypes/", ReadPhenotypeAPI.as_view()),
     path("update_phenotypes/", UpdatePhenotypeAPI.as_view()),
     path("delete_phenotypes/", DeletePhenotypeAPI.as_view()),
-    
+
     path("create_genetic_findings/", CreateGeneticFindingsAPI.as_view()),
     path("read_genetic_findings/", ReadGeneticFindingsAPI.as_view()),
     path("update_genetic_findings/", UpdateGeneticFindingsAPI.as_view()),
     path("delete_genetic_findings/", DeleteGeneticFindingsAPI.as_view()),
+
+    path("create_biobank_entries/", CreateBiobankAPI.as_view()),
+    path("read_biobank_entries/", ReadBiobankAPI.as_view()),
+    path("update_biobank_entries/", UpdateBiobankAPI.as_view()),
+    path("delete_biobank_entries/", DeleteBiobankAPI.as_view()),
 ]

@@ -18,6 +18,7 @@ from metadata.models import (
     InternalProjectId,
     PmidId,
     TwinId,
+    Biobank,
 )
 
 from metadata.selectors import (
@@ -100,6 +101,12 @@ class AnalyteSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         return instance
+
+
+class BiobankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Biobank
+        fields = "__all__"
 
 
 class PhenotypeSerializer(serializers.ModelSerializer):
@@ -291,7 +298,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
     Args:
         table_name (str): The name of the table (model) to create or update.
         identifier (str): The unique identifier for the model instance.
-        model_instance: The existing model instance to update, or None to create 
+        model_instance: The existing model instance to update, or None to create
             a new instance.
         datum (dict): The data to create or update the model instance with.
 
@@ -331,7 +338,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
-        datum = remove_na(datum=datum) 
+        datum = remove_na(datum=datum)
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
@@ -343,7 +350,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
         ) if model_instance else {identifier:"CREATED"}
         #create needed submodules before serialization
         if table_name == "participant":
-            datum = get_or_create_sub_models(datum=datum) 
+            datum = get_or_create_sub_models(datum=datum)
         serializer = model_input_serializer(model_instance, data=datum)
 
         if serializer.is_valid():
@@ -365,7 +372,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
                 request_status="UPDATED" if model_instance else "CREATED",
                 code=200 if model_instance else 201,
                 message=(
-                    f"{table_name} {identifier} updated." if model_instance 
+                    f"{table_name} {identifier} updated." if model_instance
                     else f"{table_name} {identifier} created."
                 ),
                 data={
@@ -373,7 +380,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
                     "instance": model_output_serializer(updated_instance).data
                 }
             ), "accepted_request"
-            
+
         else:
             error_data = [
                 {item: serializer.errors[item]}
@@ -385,7 +392,7 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
                 code=400,
                 data=error_data,
             ), "rejected_request"
-        
+
     else:
         return response_constructor(
             identifier=identifier,
@@ -431,19 +438,19 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
             "output_serializer": PhenotypeSerializer
         }
     }
-    
+
     model_input_serializer = table_serializers[table_name]["input_serializer"]
     model_output_serializer = table_serializers[table_name]["output_serializer"]
-    
+
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
-        datum = remove_na(datum=datum) 
-    
+        datum = remove_na(datum=datum)
+
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
-    
+
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
@@ -511,19 +518,19 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
             "output_serializer": PhenotypeSerializer
         }
     }
-    
+
     model_input_serializer = table_serializers[table_name]["input_serializer"]
     model_output_serializer = table_serializers[table_name]["output_serializer"]
-    
+
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
-        datum = remove_na(datum=datum) 
-    
+        datum = remove_na(datum=datum)
+
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
-    
+
     if results["valid"]:
         serializer = model_input_serializer(model_instance, data=datum)
         if serializer.is_valid():
