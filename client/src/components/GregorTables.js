@@ -160,8 +160,7 @@ const GregorTables = () => {
           </Button>
         </Tooltip>
       </Col>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-      </Col>
+      <Col />
       <Col xs={24} sm={12} md={6} lg={6} xl={3}>
         <Tooltip title={`Add a new ${tableView} entry`}>
           <Button
@@ -178,7 +177,7 @@ const GregorTables = () => {
         </Tooltip>
       </Col>
       <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title="Download">
+        <Tooltip title="Download results in TSV or CSV">
           <DownloadTSVButton
             rows={filteredData}
             rowID={rowID}
@@ -189,8 +188,13 @@ const GregorTables = () => {
           />
         </Tooltip>
       </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Tooltip title="Select GREGoR table">
+          <Typography.Text strong>Select Table</Typography.Text>
+          <TableSelector />
+        </Tooltip>
+      </Col>
     </Row>
-
     <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
       <Col xs={24} sm={12} md={6} lg={4}>
         <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
@@ -224,9 +228,7 @@ const GregorTables = () => {
           </Button>
         </Tooltip>
       </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <TableSelector />
-      </Col>
+ 
       <Col xs={24} sm={12} md={6} lg={4}>
         <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
           <Button icon={<SettingOutlined />}>Columns</Button>
