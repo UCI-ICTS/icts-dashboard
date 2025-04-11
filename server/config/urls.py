@@ -24,7 +24,9 @@ schema_view = get_schema_view(
             "This API documentation describes the ways in which one can access " \
             "the UCI-GREGoR Dashboard database. This database stores metadata "\
             "entries based on the GREGoR data model, provide entry retrieval by " \
-            " using the search APIs, and also output AnVIL-ready submissions."
+            " using the search APIs, and also output AnVIL-ready submissions." \
+            " For instructions on how to use the Swagger and ReDoc pages, see " \
+            " [Swagger Help](https://github.com/UCI-GREGoR/GREGor_dashboard/blob/dev/docs/swagger.md)"
         ),
         terms_of_service="terms_of_service",
         contact=openapi.Contact(email="kingch2@hs.uci.edu"),

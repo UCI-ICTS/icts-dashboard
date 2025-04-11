@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from drf_yasg import openapi
@@ -163,12 +165,21 @@ class UserViewSet(viewsets.ViewSet):
         activation_url = f"{settings.PUBLIC_HOSTNAME}password-create?uid={uid}&token={token}"
 
         # Email the activation link
-        send_mail(
-            subject="You're invited to C3PO!",
-            message=f"Use this link to activate your account and set a password:\n{activation_url}",
-            from_email=None,
-            recipient_list=[email],
-        )
+        # Compose HTML email
+        subject = "You're invited to join UCI ICTS Dashboard!"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_email = email
+
+        context = {
+            "activation_url": activation_url,
+        }
+
+        text_content = f"Use this link to activate your account and set your password: {activation_url}"
+        html_content = render_to_string("emails/invite_email.html", context)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response({
             "message": f"Invite sent to {email}.",
@@ -283,14 +294,21 @@ class PasswordViewSet(viewsets.ViewSet):
         uid = user.pk
         reset_link = f"{settings.PUBLIC_HOSTNAME}password-reset?uid={uid}&token={token}"
 
-        send_mail(
-            subject="Password Reset Request",
-            message=f"Use this link to reset your password: {reset_link}",
-            from_email=None,
-            recipient_list=[email],
-        )
+        context = {"reset_link": reset_link}
+
+        # Email content
+        subject = "Reset your password – UCI ICTS Dashboard"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_email = [email]
+        text_content = f"Use this link to reset your password: {reset_link}"
+        html_content = render_to_string("emails/password_reset_email.html", context)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response({"message": "Password reset link sent."}, status=200)
+
 
     @swagger_auto_schema(
         request_body=PasswordResetConfirmSerializer,

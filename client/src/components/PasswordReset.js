@@ -22,8 +22,8 @@ export default function PasswordReset({ open, setOpen }) {
   const onFinish = (values) => {
     console.log("Dispach values: ", values)
     dispatch(changePassword({ ...values }));
-    // setOpen(false);
-    // form.resetFields();
+    setOpen(false);
+    form.resetFields();
   };
 
   return (
