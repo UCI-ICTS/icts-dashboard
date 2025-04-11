@@ -2,12 +2,14 @@
 # config/urls.py
 
 """
-URL configuration for GREGoRDB Dashboard. 
+Main URL configuration for GREGoRDB Dashboard. 
 """
+
 from django.conf import settings
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -25,7 +27,7 @@ schema_view = get_schema_view(
             " using the search APIs, and also output AnVIL-ready submissions."
         ),
         terms_of_service="terms_of_service",
-        contact=openapi.Contact(email="charles.hadley.king@gmail.com"),
+        contact=openapi.Contact(email="kingch2@hs.uci.edu"),
         license=openapi.License(name="MIT", url="https://github.com/UCI-GREGoR/GREGor_dashboard/blob/main/LICENSE"),
     ),
     public=True,
@@ -33,13 +35,13 @@ schema_view = get_schema_view(
 )
 
 
+@ensure_csrf_cookie
 def api_health_check(request):
-    """Simple API health check"""
-    return JsonResponse({"status": "OK", "message": "Backend is reachable"})
-
+    """Simple API health check and CSRF cookie set."""
+    return JsonResponse({"status": "OK", "message": "Backend is reachable, CSRF cookie is set."})
 
 urlpatterns = [
-    path("api/health/", api_health_check),
+    path("api/health/", api_health_check, name="api-check"),
     path("api/auth/", include("authentication.urls")),
     path("api/metadata/", include("metadata.urls")),
     path("api/experiments/", include("experiments.urls")),

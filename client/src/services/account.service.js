@@ -19,9 +19,33 @@ const getAuthHeaders = () => {
   };
 };
 
+
+const getCSRFToken = async () => {
+  await axios.get("/api/health/"); // sets cookie
+};
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  if (match) return match[2];
+  return null;
+}
+
+// utility to fetch the cookie and inject it into headers
+const postWithCSRF = async (url, data) => {
+  const csrftoken = getCookie("csrftoken");
+  return axios.post(url, data, {
+    headers: {
+      "X-CSRFToken": csrftoken,
+      "Content-Type": "application/json"
+    },
+    withCredentials: true, // ensures browser includes cookies
+  });
+};
+
+
 // ✅ user log in
 const login = async (username, password) => {
-  const response = await axios.post(APIDB + "api/auth/token/login/", {
+  const response = await postWithCSRF(APIDB + "api/auth/token/login/", {
     username,
     password,
   });
@@ -51,7 +75,7 @@ const changePassword = (values) => {
 // ✅ password reset received via email
 const resetPassword = async (email) => {
   console.log("Service password reset: ", email);
-  const response = await axios.post(APIDB + "api/auth/password/reset/", {
+  const response = await postWithCSRF(APIDB + "api/auth/password/reset/", {
     email,
   });
   return response.data;
@@ -94,6 +118,7 @@ const deleteUser = async (userId) => {
 };
 
   const accountService = {
+    getCSRFToken,
     login,
     logout,
     changePassword,
