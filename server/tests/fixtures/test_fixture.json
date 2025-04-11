@@ -4504,5 +4504,47 @@
         "model": "submodels.twinid",
         "pk": "0",
         "fields": {}
+    },
+    {
+        "model": "metadata.biobank",
+        "pk": "GREGoR_test-001-001-0-R-1",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "collection_date": "2025-04-11",
+            "specimen_type": "R",
+            "current_location": "UCI",
+            "freezer_id": "Boris Yeltsin",
+            "shelf_id": "1",
+            "rack_id": "PAX RNA rack 1",
+            "box_id": "12",
+            "box_position": "A1",
+            "tube_barcode": "",
+            "plate_barcode": "",
+            "status": "Stored",
+            "shipment_date": null,
+            "child_analytes": null,
+            "comments": ""
+        }
+    },
+    {
+        "model": "metadata.biobank",
+        "pk": "GREGoR_test-002-001-2-R-1",
+        "fields": {
+            "participant_id": "GREGoR_test-002-001-2",
+            "collection_date": "2025-04-07",
+            "specimen_type": "R",
+            "current_location": "UCI",
+            "freezer_id": "Boris Yeltsin",
+            "shelf_id": "2",
+            "rack_id": "PAX RNA rack 1",
+            "box_id": "5",
+            "box_position": "I9",
+            "tube_barcode": "",
+            "plate_barcode": "",
+            "status": "Stored",
+            "shipment_date": "2025-04-11",
+            "child_analytes": "GREGoR_test-002-001-2-R-1",
+            "comments": ""
+        }
     }
 ]

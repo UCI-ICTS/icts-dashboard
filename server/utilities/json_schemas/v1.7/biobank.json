@@ -5,14 +5,14 @@
     "version": "1.7.1",
     "type": "object",
     "required": [
-        "analyte_id",
+        "biobank_id",
         "collection_date",
         "specimen_type",
         "status"
     ],
     "definitions": {},
     "properties": {
-        "analyte_id": {
+        "biobank_id": {
             "type": "string",
             "description": "primary key, printed on tubes"
         },
@@ -27,12 +27,12 @@
         "specimen_type": {
             "type": "string",
             "enum": [
-                "EDTA in Cryovial",
-                "PAX Tube",
-                "OCD-100",
-                "OGR-675",
-                "Extracted DNA",
-                "Extracted RNA"
+                "D",
+                "R",
+                "SC",
+                "SG",
+                "X",
+                "XR"
             ],
             "description": "Maps to analyte codes: D - EDTA in Cryovial R - PAX Tube SC - OCD-100 buccal collection kit SG - OGR-675 saliva collection kit X - Extracted DNA XR - Extracted RNA"
         },
@@ -72,7 +72,7 @@
             "type": "string",
             "description": "XY positions for boxes and racks. X-axis are numbers (1-12), Y-axis are letters (A-H)"
         },
-        "2d_barcode": {
+        "tube_barcode": {
             "type": "string",
             "description": "For tubes with these barcodes available"
         },
@@ -87,10 +87,6 @@
                 "Shipped",
                 "Received",
                 "Stored",
-                "Accessionied",
-                "Extracted",
-                "Sequenced",
-                "Data Delivered",
                 "Replacement requested",
                 "Lost",
                 "QC Issue-see comments"
@@ -106,13 +102,6 @@
             "items": {
                 "type": "string",
                 "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
-            }
-        },
-        "parent_analytes": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "description": "Zero or many prior analytes and their analyte IDs\n\nNotes: Currently saliva gDNA combines two analytes into one larger DNA pool. This is the only time we pool analytes together. "
             }
         },
         "comments": {

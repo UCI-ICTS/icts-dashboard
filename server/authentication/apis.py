@@ -175,7 +175,7 @@ class UserViewSet(viewsets.ViewSet):
             "user": UserOutputSerializer(user).data
         }, status=status.HTTP_200_OK)
 
-    
+
     @swagger_auto_schema(
         operation_description="Update an existing user",
         request_body=UserInputSerializer,
