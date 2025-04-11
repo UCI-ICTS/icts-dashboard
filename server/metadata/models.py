@@ -565,3 +565,125 @@ class Analyte(models.Model):
 
     def __str__(self):
         return f"Analyte {self.analyte_id} from participant {self.participant_id.participant_id}"
+
+
+class Biobank(models.Model):
+    biobank_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="Identifier for a biosample in repository",
+    )
+    participant_id = models.ForeignKey(
+        Participant,
+        to_field="participant_id",
+        db_column="participant_id",
+        on_delete=models.CASCADE,
+        related_name="analytes",
+        help_text="The participant from whom the biosample was taken",
+    )
+    collection_date = models.DateField(
+        help_text="Date when the biosample was created"
+    )
+    specimen_type = models.CharField(
+        max_length=10,
+        choices=[
+            ("D", "EDTA in Cryovial"),
+            ("R", "PAX Tube"),
+            ("SC", "OCD-100 buccal collection kit"),
+            ("SG", "OGR-675 saliva collection kit"),
+            ("X", "Extracted DNA"),
+            ("XR","Extracted RNA")
+        ],
+        help_text="Analyte codes printed on biospecimen containers"
+    )
+    current_location = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Sample storage location, e.g. UCI, Ambry, CNH"
+    )
+    freezer_id = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Name of freezer or refrigerator the biospecimen is stored in"
+    )
+    shelf_id = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Name of freezer/refrigerator shelf the biospecimen is stored in"
+    )
+    rack_id = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Name of rack the biospecimen is stored in"
+    )
+    box_type = models.CharField(
+        max_length=50,
+        choices=[
+            ("5x5 cryobox", ""),
+            ("9x9 cryobox", ""),
+            ("10x10 cryobox", ""),
+            ("SBS plate", ""),
+            ("Wire rack", ""),
+            ("8x12 metal rack", "")
+        ],
+        blank=True,
+        null=True,
+        help_text="Box type the biospecimen is stored in"
+    )
+    box_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Box name as labelled"
+    )
+    box_position = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="XY coordinates of biospecimens in box or plate, e.g. A01, H12"
+    )
+    tube_barcode = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Barcode on tube if present"
+    )
+    plate_barcode = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Barcode on SBS plate if present or used"
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("Pending shipment", "Preparing shipment from remote site"),
+            ("Shipped", "In transit"),
+            ("Received", "Received by biospecimen storage site"),
+            ("Stored", "Accessioned, labelled, and stored in freezer/refrigerator"),
+            ("Replacement requested", "See comments regarding why one is needed"),
+            ("Lost", "See comments regarding what happened"),
+            ("QC issue", "See comments regarding what the issue is")
+        ],
+        help_text="Biospecimen status while "
+    )
+    shipment_date = models.DateField(
+        help_text="If the status is shipped, then include a date when it was mailed out."
+    )
+    child_analytes = models.ForeignKey(
+        Analyte,
+        to_field="analyte_id",
+        db_column="analyte_id",
+        on_delete=models.CASCADE,
+        related_name="analytes",
+        help_text="The analyte(s) derived from this biospecimen",
+    )
+    comments = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Free text description of any quality issues with biospecimens or adverse events."
+    )
