@@ -274,20 +274,31 @@ const GregorTables = () => {
           schema={schemas[tableView]}
           initialValues={editRecord || {}}
           open={addModalVisible}
-          onSubmit={(values) => {
+          onSubmit={async (values) => {
+            try {
+              let result;
           
-            if (editRecord) {
-              // Update existing record
-              dispatch(updateTable({ table: tableView, data: values }));
-              console.log("Editing row:", tableView, values);
-            } else {
-              // Add new record
-              dispatch(addTable({ table: tableView, data: values }));
-              console.log("Creating new row:", tableView, values);
+              if (editRecord) {
+                result = await dispatch(updateTable({ table: tableView, data: values }));
+                console.log("Editing row:", tableView, values);
+              } else {
+                result = await dispatch(addTable({ table: tableView, data: values }));
+                console.log("Creating new row:", tableView, values);
+              }
+          
+              // Only close the form if the action was fulfilled
+              if (result.meta.requestStatus === "fulfilled") {
+                setAddModalVisible(false);
+                setEditRecord(null);
+                form.resetFields();
+              } else {
+                console.warn("Form submission failed", result);
+                // Optionally show an error message here
+              }
+            } catch (error) {
+              console.error("Error during form submission:", error);
+              // Optionally handle errors more gracefully
             }
-          
-            setAddModalVisible(false);
-            setEditRecord(null);
           }}
           onCancel={() => {
             form.resetFields();
