@@ -42,12 +42,13 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
       };
 
       // Extract column headers
-      const headers = headCells.map(cell => escapeValue(cell.headerName)).join(delimiter);
+      const filteredHeadCells = headCells.filter(cell => cell.field !== "actions");
+      const headers = filteredHeadCells.map(cell => escapeValue(cell.headerName)).join(delimiter);      
 
       // Convert rows to formatted CSV/TSV
       const fileRows = rows.map(row =>
-        headCells.map(cell => escapeValue(row[cell.field])).join(delimiter)
-      );
+        filteredHeadCells.map(cell => escapeValue(row[cell.field])).join(delimiter)
+      );      
 
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
