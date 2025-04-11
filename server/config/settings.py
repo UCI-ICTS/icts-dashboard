@@ -59,6 +59,9 @@ backup = [
     "https://genomics.icts.uci.edu"
 ]
 
+# Required for frontend JS to read it
+CSRF_COOKIE_HTTPONLY = False  
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 
 SHOW_ACTIVATION_LINKS = DEBUG
