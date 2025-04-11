@@ -81,6 +81,16 @@ const resetPassword = async (email) => {
   return response.data;
 };
 
+// ✅ confirm password reset received via email
+const confirmPasswordReset = async ({ uid, token, new_password }) => {
+  const response = await postWithCSRF(APIDB + "api/auth/password/confirm/", {
+    uid,
+    token,
+    new_password,
+  });
+  return response.data;
+};
+
 // ✅ Fetch all users
 const getUsers = async () => {
   const response = await axios.get(APIDB + "api/auth/users/", { headers: getAuthHeaders() });
@@ -123,6 +133,7 @@ const deleteUser = async (userId) => {
     logout,
     changePassword,
     resetPassword,
+    confirmPasswordReset,
     getUsers,
     createUser,
     createPassword,
