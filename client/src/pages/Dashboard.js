@@ -1,8 +1,8 @@
 // src/pages/Dashboard.js
 
 import React, { useState } from 'react';
-import { Layout, Menu, Button, Spin, Alert, Tooltip } from 'antd';
-import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Spin, Alert, Tooltip, Space } from 'antd';
+import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined, ApiOutlined, GithubOutlined } from '@ant-design/icons';
 import AdminPage from './AdminPage';
 import GregorParticipants from "../components/GregorParticipants";
 import '../App.css'; // ✅ Importing CSS
@@ -13,6 +13,7 @@ import GregorTables from "../components/GregorTables";
 import ProfilePage from './ProfilePage';
 
 const { Header, Content, Footer, Sider } = Layout;
+const APIDB = process.env.REACT_APP_APIDB;
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -88,7 +89,31 @@ const HomePage = () => {
         <Header className="site-header" />
         <Content className="site-content">{renderContent()}</Content>
         <Footer className="site-footer">
-          <div>UCI ICTS Dashboard ©2024 UCI</div>
+          <Space >
+            <Tooltip title="UCI ICTS Dashboard"> ©2024 UCI</Tooltip>
+            <br/>
+            <Tooltip title="Swagger API site">
+              <ApiOutlined />
+              <a
+                href={`${APIDB}api/swagger/`} //"https://genomics.icts.uci.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()} // prevent triggering `onClick` from Menu
+                >
+                Swagger API
+              </a>
+            </Tooltip>
+            <br/>
+            <Tooltip title="UCI ICTS Dashboard GitHub">
+              <GithubOutlined />
+              <a
+                href="https://github.com/UCI-GREGoR/GREGor_dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()} // prevent triggering `onClick` from Menu
+              >GitHub</a>
+            </Tooltip>
+          </Space>
         </Footer>
       </Layout>
     </Layout>
