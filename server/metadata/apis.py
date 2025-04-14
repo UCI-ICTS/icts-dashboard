@@ -1803,7 +1803,7 @@ class CreateBiobankAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="create_biobank_entry",
+        operation_id="create_biobank_entries",
         request_body=BiobankSerializer(many=True),
         responses={
             200: "All updates successfull",
@@ -1839,12 +1839,14 @@ class CreateBiobankAPI(APIView):
         try:
             # Handle creating new biobank entry
             for datum in new_records:
+                import pdb; pdb.set_trace()
                 return_data, result = create_metadata(
                     table_name="biobank",
                     identifier=datum["biobank_id"],
                     datum=datum
                 )
                 response_data.append(return_data)
+
                 if result == "accepted_request":
                     accepted_requests = True
                 else:
@@ -1857,7 +1859,7 @@ class CreateBiobankAPI(APIView):
                         identifier=datum["biobank_id"],
                         request_status="BAD REQUEST",
                         code=400,
-                        data="Biobank already exists",
+                        data="Biobank entry already exists",
                     )
                 )
                 rejected_requests = True
@@ -1891,7 +1893,7 @@ class ReadBiobankAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="read_biobank_entry",
+        operation_id="read_biobank_entries",
         operation_description="Retrieve biobank details by their IDs",
         manual_parameters=[
             openapi.Parameter(
@@ -1979,7 +1981,7 @@ class UpdateBiobankAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="update_biobank_entry",
+        operation_id="update_biobank_entries",
         request_body=BiobankSerializer(many=True),
         responses={
             200: "All updates successfull",
@@ -2070,7 +2072,7 @@ class DeleteBiobankAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="delete_biobank_entry",
+        operation_id="delete_biobank_entries",
         request_body=BiobankSerializer(many=True),
         responses={
             200: "All updates successfull",
