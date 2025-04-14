@@ -675,14 +675,10 @@ class Biobank(models.Model):
         null=True,
         help_text="If the status is shipped, then include a date when it was mailed out."
     )
-    child_analytes = models.ForeignKey(
+    child_analytes = models.ManyToManyField(
         Analyte,
-        to_field="analyte_id",
-        db_column="analyte_id",
-        on_delete=models.CASCADE,
         related_name="analytes",
         blank=True,
-        null=True,
         help_text="The analyte(s) derived from this biospecimen",
     )
     comments = models.TextField(

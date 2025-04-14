@@ -1839,7 +1839,6 @@ class CreateBiobankAPI(APIView):
         try:
             # Handle creating new biobank entry
             for datum in new_records:
-                import pdb; pdb.set_trace()
                 return_data, result = create_metadata(
                     table_name="biobank",
                     identifier=datum["biobank_id"],

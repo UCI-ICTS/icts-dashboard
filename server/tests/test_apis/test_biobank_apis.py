@@ -21,18 +21,18 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "participant_id": "GREGoR_test-002-001-2",
             "collection_date": "2025-01-03",
             "specimen_type": "D",
-            "current_location": None,
-            "freezer_id": None,
-            "shelf_id": None,
-            "rack_id": None,
-            "box_type": None,
-            "box_id": None,
-            "box_position": None,
-            "tube_barcode": None,
-            "plate_barcode": None,
+            "current_location": "UCI",
+            "freezer_id": "ULT #1",
+            "shelf_id": "ULT #1 Shelf 1",
+            "rack_id": "PMGRC Blood Rack 2",
+            "box_type": "SBS plate",
+            "box_id": "PMGRC EDTA Blood Plate 1",
+            "box_position": "A12",
+            "tube_barcode": "308109402",
+            "plate_barcode": "A123",
             "status": "Stored",
             "shipment_date": None,
-            "child_analytes": None,
+            "child_analytes": [],
             "comments": None
         }
         part2 = {  # Valid submission
@@ -44,33 +44,33 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "freezer_id": "ULT #1",
             "shelf_id": "ULT #1 Shelf 1",
             "rack_id": "PMGRC Blood Rack 1",
-            "box_type": "9x9 Cryobox",
+            "box_type": "9x9 cryobox",
             "box_id": "PMGRC Box 20",
             "box_position": "A6",
             "tube_barcode": None,
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
-            "child_analytes": None,
+            "child_analytes": [],
             "comments": None
         }
         part3 = {  # Invalid submission; non-existant participant
-            "biobank_id": "D-02-02-2-X-1",
-            "participant_id": "D-02-02-2",
+            "biobank_id": "DNE-002-002-2-X-1",
+            "participant_id": "DNE-002-002-2",
             "collection_date": "2025-01-03",
             "specimen_type": "X",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
             "shelf_id": "ULT #1 Shelf 1",
             "rack_id": "PMGRC DNA Rack 1",
-            "box_type": "9x9 Cryobox",
+            "box_type": "9x9 cryobox",
             "box_id": "PMGRC DNA Box 1",
             "box_position": "I7",
             "tube_barcode": None,
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
-            "child_analytes": None,
+            "child_analytes": [],
             "comments": None
         }
         response_200 = self.client.post(url, [part1], format='json')
@@ -110,14 +110,17 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
             "freezer_id": "ULT #1",
             "shelf_id": "ULT #1 Shelf 1",
             "rack_id": "PAX RNA Rack 1",
-            "box_type": "9x9 Cryobox",
+            "box_type": "9x9 cryobox",
             "box_id": "12",
             "box_position": "A1",
             "tube_barcode": None,
             "plate_barcode": None,
             "status": "Shipped",
             "shipment_date": "2025-03-14",
-            "child_analytes": "GREGoR_test-001-001-0-R-1",
+            "child_analytes": [
+                "GREGoR_test-001-001-0-R-1",
+                "GREGoR_test-001-001-0-R-2"
+            ],
             "comments": None
         }
         part2 = {  # Invalid submission; non-existant biobank_id
@@ -129,14 +132,14 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
             "freezer_id": "ULT #1",
             "shelf_id": "ULT #1 Shelf 1",
             "rack_id": "PAX RNA Rack 1",
-            "box_type": "9x9 Cryobox",
+            "box_type": "9x9 cryobox",
             "box_id": "12",
             "box_position": "A2",
             "tube_barcode": None,
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
-            "child_analytes": None,
+            "child_analytes": [],
             "comments": None
         }
         response_200 = self.client.post(url, [part1], format='json')
@@ -144,8 +147,8 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
         response_400 = self.client.post(url, [part2], format='json')
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
-        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 class DeleteBiobankAPITest(APITestCaseWithAuth):
