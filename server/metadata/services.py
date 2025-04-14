@@ -329,6 +329,10 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer
+        },
+        "biobank": {
+            "input_serializer": BiobankSerializer,
+            "output_serializer": BiobankSerializer
         }
     }
 
@@ -436,6 +440,10 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer
+        },
+        "biobank": {
+            "input_serializer": BiobankSerializer,
+            "output_serializer": BiobankSerializer
         }
     }
 
@@ -516,6 +524,10 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer
+        },
+        "biobank": {
+            "input_serializer": BiobankSerializer,
+            "output_serializer": BiobankSerializer
         }
     }
 
@@ -584,6 +596,7 @@ def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
         "genetic_findings": GeneticFindings,
         "analyte": Analyte,
         "phenotype": Phenotype,
+        "biobank": Biobank
     }
 
     model_class = model_mapping.get(table_name)

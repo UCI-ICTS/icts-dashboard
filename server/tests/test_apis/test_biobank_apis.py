@@ -17,28 +17,28 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
     def test_create_biobank_entry(self):
         url = "/api/metadata/create_biobank_entries/"
         part1 = {  # Valid submission
-            "biobank_id": "GREGoR_test-002-002-2-D-1",
-            "participant_id": "GREGoR_test-002-002-2",
-            "collection_date": "2024-07-07",
+            "biobank_id": "GREGoR_test-002-001-2-D-10",
+            "participant_id": "GREGoR_test-002-001-2",
+            "collection_date": "2025-01-03",
             "specimen_type": "D",
-            "current_location": "UCI",
-            "freezer_id": "ULT #1",
-            "shelf_id": "ULT #1 Shelf 1",
-            "rack_id": "PMGRC Blood Rack 1",
-            "box_type": "9x9 Cryobox",
-            "box_id": "PMGRC Box 20",
-            "box_position": "A5",
+            "current_location": None,
+            "freezer_id": None,
+            "shelf_id": None,
+            "rack_id": None,
+            "box_type": None,
+            "box_id": None,
+            "box_position": None,
             "tube_barcode": None,
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
             "child_analytes": None,
-            "comments": ""
+            "comments": None
         }
         part2 = {  # Valid submission
-            "biobank_id": "GREGoR_test-002-002-2-D-2",
-            "participant_id": "GREGoR_test-002-002-2",
-            "collection_date": "2024-07-07",
+            "biobank_id": "GREGoR_test-002-001-2-D-20",
+            "participant_id": "GREGoR_test-002-001-2",
+            "collection_date": "2025-01-03",
             "specimen_type": "D",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
@@ -52,12 +52,12 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "status": "Stored",
             "shipment_date": None,
             "child_analytes": None,
-            "comments": ""
+            "comments": None
         }
         part3 = {  # Invalid submission; non-existant participant
             "biobank_id": "D-02-02-2-X-1",
             "participant_id": "D-02-02-2",
-            "collection_date": "2024-07-07",
+            "collection_date": "2025-01-03",
             "specimen_type": "X",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
@@ -142,7 +142,6 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format='json')
         response_207 = self.client.post(url, [part1, part2], format='json')
         response_400 = self.client.post(url, [part2], format='json')
-        import pdb; pdb.set_trace()
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")

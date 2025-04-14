@@ -4507,6 +4507,69 @@
     },
     {
         "model": "metadata.biobank",
+        "pk": "GREGoR_test-001-001-0-D-1",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "collection_date": "2025-04-11",
+            "specimen_type": "D",
+            "current_location": "UCI",
+            "freezer_id": "Boris Yeltsin",
+            "shelf_id": "1",
+            "rack_id": "EDTA Frozen Blood rack 1",
+            "box_id": "1",
+            "box_position": "A1",
+            "tube_barcode": null,
+            "plate_barcode": null,
+            "status": "Stored",
+            "shipment_date": null,
+            "child_analytes": null,
+            "comments": null
+        }
+    },
+    {
+        "model": "metadata.biobank",
+        "pk": "GREGoR_test-001-001-0-D-2",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "collection_date": "2025-04-11",
+            "specimen_type": "D",
+            "current_location": "UCI",
+            "freezer_id": "Boris Yeltsin",
+            "shelf_id": "1",
+            "rack_id": "EDTA Frozen Blood rack 1",
+            "box_id": "1",
+            "box_position": "A2",
+            "tube_barcode": null,
+            "plate_barcode": null,
+            "status": "Stored",
+            "shipment_date": null,
+            "child_analytes": null,
+            "comments": null
+        }
+    },
+    {
+        "model": "metadata.biobank",
+        "pk": "GREGoR_test-001-001-0-D-3",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "collection_date": "2025-04-11",
+            "specimen_type": "D",
+            "current_location": "UCI",
+            "freezer_id": "Boris Yeltsin",
+            "shelf_id": "1",
+            "rack_id": "EDTA Frozen Blood rack 1",
+            "box_id": "1",
+            "box_position": "A3",
+            "tube_barcode": "0660723527",
+            "plate_barcode": "A123",
+            "status": "Stored",
+            "shipment_date": null,
+            "child_analytes": null,
+            "comments": null
+        }
+    },
+    {
+        "model": "metadata.biobank",
         "pk": "GREGoR_test-001-001-0-R-1",
         "fields": {
             "participant_id": "GREGoR_test-001-001-0",
@@ -4518,12 +4581,12 @@
             "rack_id": "PAX RNA rack 1",
             "box_id": "12",
             "box_position": "A1",
-            "tube_barcode": "",
-            "plate_barcode": "",
+            "tube_barcode": null,
+            "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
             "child_analytes": null,
-            "comments": ""
+            "comments": null
         }
     },
     {
@@ -4539,12 +4602,12 @@
             "rack_id": "PAX RNA rack 1",
             "box_id": "5",
             "box_position": "I9",
-            "tube_barcode": "",
-            "plate_barcode": "",
+            "tube_barcode": null,
+            "plate_barcode": null,
             "status": "Stored",
             "shipment_date": "2025-04-11",
             "child_analytes": "GREGoR_test-002-001-2-R-1",
-            "comments": ""
+            "comments": null
         }
     }
 ]
