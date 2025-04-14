@@ -4516,13 +4516,14 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "1",
             "rack_id": "EDTA Frozen Blood rack 1",
+            "box_type": "9x9 cryobox",
             "box_id": "1",
             "box_position": "A1",
             "tube_barcode": null,
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
-            "child_analytes": null,
+            "child_analytes": [],
             "comments": null
         }
     },
@@ -4537,13 +4538,14 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "1",
             "rack_id": "EDTA Frozen Blood rack 1",
+            "box_type": "9x9 cryobox",
             "box_id": "1",
             "box_position": "A2",
             "tube_barcode": null,
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
-            "child_analytes": null,
+            "child_analytes": [],
             "comments": null
         }
     },
@@ -4558,13 +4560,14 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "1",
             "rack_id": "EDTA Frozen Blood rack 1",
+            "box_type": "9x9 cryobox",
             "box_id": "1",
             "box_position": "A3",
             "tube_barcode": "0660723527",
             "plate_barcode": "A123",
             "status": "Stored",
             "shipment_date": null,
-            "child_analytes": null,
+            "child_analytes": [],
             "comments": null
         }
     },
@@ -4579,13 +4582,14 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "1",
             "rack_id": "PAX RNA rack 1",
+            "box_type": "8x12 metal rack",
             "box_id": "12",
             "box_position": "A1",
             "tube_barcode": null,
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
-            "child_analytes": null,
+            "child_analytes": [],
             "comments": null
         }
     },
@@ -4600,13 +4604,14 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "2",
             "rack_id": "PAX RNA rack 1",
+            "box_type": "8x12 metal rack",
             "box_id": "5",
             "box_position": "I9",
             "tube_barcode": null,
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": "2025-04-11",
-            "child_analytes": "GREGoR_test-002-001-2-R-1",
+            "child_analytes": ["GREGoR_test-002-001-2-R-1"],
             "comments": null
         }
     }

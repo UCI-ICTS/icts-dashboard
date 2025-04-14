@@ -55,9 +55,9 @@
         "box_type": {
             "type": "string",
             "enum": [
-                "5x5 Cryobox",
-                "9x9 Cryobox",
-                "10x10 Cryobox",
+                "5x5 cryobox",
+                "9x9 cryobox",
+                "10x10 cryobox",
                 "SBS plate",
                 "Wire rack",
                 "8x12 metal rack"

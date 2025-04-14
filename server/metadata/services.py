@@ -18,7 +18,7 @@ from metadata.models import (
     InternalProjectId,
     PmidId,
     TwinId,
-    Biobank,
+    Biobank
 )
 
 from metadata.selectors import (
@@ -104,9 +104,51 @@ class AnalyteSerializer(serializers.ModelSerializer):
 
 
 class BiobankSerializer(serializers.ModelSerializer):
+    child_analytes = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+        required=False,
+        allow_empty=True,
+        help_text="List of downstream analytes and their associated experiments",
+    )
+
     class Meta:
         model = Biobank
         fields = "__all__"
+
+    def create(self, validated_data):
+        child_analyte = validated_data.pop("child_analytes", [])
+
+        try:
+            with transaction.atomic():
+                biobank = Biobank.objects.create(**validated_data)
+                if child_analyte:
+                    self._set_relationship(biobank, Analyte, child_analyte, "child_analytes")
+                biobank.save()
+        except IntegrityError as error:
+            raise serializers.ValidationError(error)
+
+        return biobank
+
+    def update(self, instance, validated_data):
+        child_analyte = validated_data.pop("child_analytes", [])
+
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            self._set_relationship(instance, Analyte, child_analyte, "child_analytes")
+
+        return instance
+
+    def _set_relationship(self, instance, model, ids, related_name):
+        # Setting ManyToMany relations
+        try:
+            manager = getattr(instance, related_name)
+            manager.set(model.objects.filter(pk__in=ids))
+        except Exception as e:
+            print(f"Error setting relationship: {e}")
+            raise
 
 
 class PhenotypeSerializer(serializers.ModelSerializer):
