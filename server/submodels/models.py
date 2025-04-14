@@ -39,7 +39,7 @@ class PmidId(models.Model):
     def __str__(self):
         return str(self.pmid_id)
 
-    
+
 class VariantType(models.TextChoices):
     SNVINDEL = "SNV/INDEL", "Single Nucleotide Variant or Insertion/Deletion"
     SV = "SV", "Structural Variant"
@@ -74,7 +74,6 @@ class GeneDiseaseValidity(models.TextChoices):
     ANIMAL_MODEL_ONLY = "Animal Model Only", "Animal Model Only"
     REFUTED = "Refuted", "Refuted"
     CURATION_IN_PROGRESS = "Curation in progress", "Curation in progress"
-
 
 
 class DiscoveryMethod(models.TextChoices):
@@ -141,7 +140,7 @@ class TwinId(models.Model):
 
     def __str__(self):
         return self.twin_id
-    
+
 
 class ProbandRelationship(models.TextChoices):
     SELF = "Self", _("SELF")
@@ -165,7 +164,7 @@ class ProbandRelationship(models.TextChoices):
     PATERNAL_FIRST_COUSIN = "Paternal 1st Cousin", _("PATERNAL_FIRST_COUSIN")
     OTHER = "Other", _("OTHER")
     UNKNOWN = "Unknown", _("UNKNOWN")
-    
+
 class BiologicalSex(models.TextChoices):
     FEMALE = "Female", _("FEMALE")
     MALE = "Male", _("MALE")
