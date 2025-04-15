@@ -1,5 +1,5 @@
 # #!/usr/bin/env python3
-# # tests/test_apps/test_metadata/test_apis/test_participant_apis.py
+# # tests/test_apps/test_metadata/test_apis/test_biobankn_apis.py
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateBiobankAPITest(APITestCaseWithAuth):
     def test_create_biobank_entry(self):
-        url = "/api/metadata/create_biobank_entries/"
+        url = "/api/metadata/biobank/create/"
         part1 = {  # Valid submission
             "biobank_id": "GREGoR_test-002-001-2-D-10",
             "participant_id": "GREGoR_test-002-001-2",
@@ -84,9 +84,9 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
 
 class ReadBiobankAPITest(APITestCaseWithAuth):
     def test_read_biobank_entry(self):
-        url1 = "/api/metadata/read_biobank_entries/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1"
-        url2 = "/api/metadata/read_biobank_entries/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1,DNE-01"
-        url3 = "/api/metadata/read_biobank_entries/?ids=DNE-01,DNE-2"
+        url1 = "/api/metadata/biobank/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1"
+        url2 = "/api/metadata/biobank/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1,DNE-01"
+        url3 = "/api/metadata/biobank/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -100,7 +100,7 @@ class ReadBiobankAPITest(APITestCaseWithAuth):
 
 class UpdateBiobankAPITest(APITestCaseWithAuth):
     def test_update_biobank_entry(self):
-        url = "/api/metadata/update_biobank_entries/"
+        url = "/api/metadata/biobank/update/"
         part1 = {  # Valid submission, stored sample shipped out
             "biobank_id": "GREGoR_test-001-001-0-R-1",
             "participant_id": "GREGoR_test-001-001-0",
@@ -145,15 +145,16 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format='json')
         response_207 = self.client.post(url, [part1, part2], format='json')
         response_400 = self.client.post(url, [part2], format='json')
+        
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
-        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 class DeleteBiobankAPITest(APITestCaseWithAuth):
     def test_delete_biobank_entry(self):
-        url = "/api/metadata/delete_biobank_entries/?ids=GREGoR_test-002-001-2-R-1"
+        url = "/api/metadata/biobank/delete/?ids=GREGoR_test-002-001-2-R-1"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

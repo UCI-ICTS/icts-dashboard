@@ -3,7 +3,8 @@
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
@@ -33,8 +34,7 @@ from metadata.services import (
     BiobankSerializer,
     create_metadata,
     update_metadata,
-    delete_metadata,
-    create_or_update_metadata
+    delete_metadata
 )
 
 
@@ -1786,349 +1786,145 @@ class DeleteGeneticFindingsAPI(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
-class CreateBiobankAPI(APIView):
-    """
-    API view to create new Biobank entries.
-
-    This API endpoint accepts a list of biobank data objects, checks that
-    the submission does not exist, and creates new entries based on the
-    presence of a 'biobank_id'.
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
+class BiobankViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="create_biobank_entries",
         request_body=BiobankSerializer(many=True),
-        responses={
-            200: "All updates successfull",
-            207: "Some updates were not successful",
-            400: "Bad request",
-        },
-        tags=["Biobank"],
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"]
     )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_biobank(self, request):
+        biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
+        response_data, accepted, rejected = [], False, False
 
-    def post(self, request):
-        # Retrieve existing biobank entries in bulk
-        biobank = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=Biobank,
-            id="biobank_id"
-        )
-
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        new_records = []
-        existing_records = []
-
-        # Split request data into new and existing records
         for datum in request.data:
-            biobank_id = datum.get("biobank_id")  # Safely retrieve biobank_id
+            biobank_id = datum.get("biobank_id")
             if biobank_id and biobank_id in biobank:
-                existing_records.append(datum)
+                response_data.append(response_constructor(
+                    identifier=biobank_id,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data="Biobank entry already exists"
+                ))
+                rejected = True
             else:
-                new_records.append(datum)
+                data, result = create_metadata("biobank", biobank_id, datum)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
 
-        try:
-            # Handle creating new biobank entry
-            for datum in new_records:
-                return_data, result = create_metadata(
-                    table_name="biobank",
-                    identifier=datum["biobank_id"],
-                    datum=datum
-                )
-                response_data.append(return_data)
-
-                if result == "accepted_request":
-                    accepted_requests = True
-                else:
-                    rejected_requests = True
-
-            # Handle updating existing biobank
-            for datum in existing_records:
-                response_data.append(
-                    response_constructor(
-                        identifier=datum["biobank_id"],
-                        request_status="BAD REQUEST",
-                        code=400,
-                        data="Biobank entry already exists",
-                    )
-                )
-                rejected_requests = True
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            identifier = datum.get("biobank_id", "UNKNOWN IDENTIFIER")
-            response_data.insert(0, response_constructor(
-                identifier=identifier,
-                request_status="SERVER ERROR",
-                code=500,
-                data=str(error),
-            ))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class ReadBiobankAPI(APIView):
-    """
-    API view to read Biobank entries.
-
-    This API endpoint requests a list of biobank data objects based on the 'biobank_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+        return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        operation_id="read_biobank_entries",
-        operation_description="Retrieve biobank details by their IDs",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"]
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        biobank = bulk_retrieve(Biobank, ids, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for biobank_id in ids:
+            if biobank_id in biobank:
+                response_data.append(response_constructor(
+                    identifier=biobank_id,
+                    request_status="SUCCESS",
+                    code=200,
+                    data=biobank[biobank_id]
+                ))
+                accepted = True
+            else:
+                response_data.append(response_constructor(
+                    identifier=biobank_id,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data="Not found"
+                ))
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=BiobankSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"]
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_biobank(self, request):
+        biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            biobank_id = datum.get("biobank_id")
+            if biobank_id not in biobank:
+                response_data.append(response_constructor(
+                    identifier=biobank_id,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data="Entry does not exist"
+                ))
+                rejected = True
+            else:
+                data, result = update_metadata(
+                    "biobank", biobank_id, biobank[biobank_id], datum
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_biobank_entries",
+        operation_description="Bulk delete Biobank entries by comma-separated IDs in the `ids` query parameter.",
         manual_parameters=[
             openapi.Parameter(
                 "ids",
                 openapi.IN_QUERY,
-                description="Comma-separated list of biobank IDs (e.g., B1, B2, B3)",
+                description="Comma-separated list of Biobank IDs (e.g., B1,B2,B3)",
+                required=True,
                 type=openapi.TYPE_STRING,
             )
         ],
-
         responses={
-            200: "All queries returned successfull",
-            207: "Some queries were not successfull",
+            200: "All deletions successful",
+            207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Biobank"],
+        tags=["Biobank"]
     )
-
-    def get(self, request):
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        id_list = request.GET.get("ids", "").split(",")
-
-        # Fetch biobank entries
-        biobank = bulk_retrieve(
-            model_class=Biobank,
-            id_list=id_list,
-            id_field="biobank_id"
-        )
-
-        try:
-            for identifier in id_list:
-                if identifier in biobank:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                            request_status="SUCCESS",
-                            code=200,
-                            data=biobank[identifier]
-                        )
-                    )
-                    accepted_requests = True
-                else:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                            request_status="NOT FOUND",
-                            code=404,
-                            data="Biobank entry not found"
-                        )
-                    )
-                    rejected_requests = True
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=id_list,
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class UpdateBiobankAPI(APIView):
-    """
-    API view to update Biobank entries.
-
-    This API endpoint accepts a list of biobank data objects, validates
-     them, and either creates new entries or updates existing ones based on
-     the presence of a 'biobank_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="update_biobank_entries",
-        request_body=BiobankSerializer(many=True),
-        responses={
-            200: "All updates successfull",
-            207: "Some updates were not successfull",
-            400: "Bad request",
-        },
-        tags=["Biobank"],
-    )
-
-    def post(self, request):
-        # Retrieve existing biobank entries in bulk
-        biobank = bulk_model_retrieve(
-            request_data=request.data,
-            model_class=Biobank,
-            id="biobank_id"
-        )
-
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-
-        new_records = []
-        existing_records = []
-
-        # Split request data into new and existing records
-        for datum in request.data:
-            biobank_id = datum.get("biobank_id")
-            if biobank_id and biobank_id in biobank:
-                existing_records.append(datum)
-            else:
-                new_records.append(datum)
-
-        try:
-            # Reject non-existent records (Prevent updates to records that don't exist)
-            for datum in new_records:
-                response_data.append(
-                    response_constructor(
-                        identifier=datum.get("biobank_id", "UNKNOWN"),
-                        request_status="BAD REQUEST",
-                        code=400,
-                        data="Biobank entry does not exist and cannot be updated.",
-                    )
-                )
-                rejected_requests = True
-
-            # Handle updating existing participants
-            for datum in existing_records:
-                biobank_id = datum["biobank_id"]
-                return_data, result = update_metadata(
-                    table_name="biobank",
-                    identifier=biobank_id,
-                    model_instance=biobank.get(biobank_id),
-                    datum=datum
-                )
-                response_data.append(return_data)
-                if result == "accepted_request":
-                    accepted_requests = True
-                else:
-                    rejected_requests = True
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            identifier = datum.get("biobank_id", "UNKNOWN IDENTIFIER")
-            response_data.insert(0, response_constructor(
-                identifier=identifier,
-                request_status="SERVER ERROR",
-                code=500,
-                data=str(error),
-            ))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class DeleteBiobankAPI(APIView):
-    """
-    API view to delete Biobank entries.
-
-    This API endpoint accepts a list of biobank data objects, validates
-     them, and deletes them based on the 'biobank_id'.
-
-    Responses vary based on the results of the submissions:
-    - Returns HTTP 200 if all operations are successful.
-    - Returns HTTP 207 if some operations fail.
-    - Returns HTTP 400 for bad input formats or validation failures.
-    """
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="delete_biobank_entries",
-        request_body=BiobankSerializer(many=True),
-        responses={
-            200: "All updates successfull",
-            207: "Some updates were not successfull",
-            400: "Bad request",
-        },
-        tags=["Biobank"],
-    )
-
+    @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
+        """
+        Bulk delete Biobank entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        biobank = bulk_retrieve(Biobank, ids, "biobank_id")
+        response_data, accepted, rejected = [], False, False
 
-        id_list = request.GET.get("ids", "").split(",")
+        for biobank_id in ids:
+            if biobank_id in biobank:
+                data, result = delete_metadata("biobank", biobank_id, "biobank_id")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(response_constructor(
+                    identifier=biobank_id,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data="Not found"
+                ))
+                rejected = True
 
-        # Fetch biobank entries
-        biobank = bulk_retrieve(
-            model_class=Biobank,
-            id_list=id_list,
-            id_field="biobank_id"
-        )
-        try:
-            for identifier in id_list:
-                if identifier in biobank:
-                    return_data, result = delete_metadata(
-                        table_name="biobank",
-                        identifier=identifier,
-                        id_field="biobank_id"
-                    )
-                    response_data.append(return_data)
-
-                    if result == "accepted_request":
-                        accepted_requests = True
-                    else:
-                        rejected_requests = True
-                else:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                            request_status="NOT FOUND",
-                            code=404,
-                            data="Biobank entry not found"
-                        )
-                    )
-                    rejected_requests = True
-
-            status_code = response_status(accepted_requests, rejected_requests)
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(0,
-                response_constructor(
-                    identifier=id_list,
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                )
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        return Response(response_data, status=response_status(accepted, rejected))

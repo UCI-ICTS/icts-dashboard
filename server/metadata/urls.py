@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # metadata/urls.py
 
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from metadata.apis import (
     CrearteParticipantAPI,
     ReadParticipantAPI,
@@ -28,11 +29,11 @@ from metadata.apis import (
     UpdateGeneticFindingsAPI,
     DeleteGeneticFindingsAPI,
 
-    CreateBiobankAPI,
-    ReadBiobankAPI,
-    UpdateBiobankAPI,
-    DeleteBiobankAPI,
+    BiobankViewSet,
 )
+
+router = DefaultRouter()
+router.register(r'biobank', BiobankViewSet, basename='biobank')
 
 urlpatterns = [
     path("create_participants/", CrearteParticipantAPI.as_view()),
@@ -59,9 +60,6 @@ urlpatterns = [
     path("read_genetic_findings/", ReadGeneticFindingsAPI.as_view()),
     path("update_genetic_findings/", UpdateGeneticFindingsAPI.as_view()),
     path("delete_genetic_findings/", DeleteGeneticFindingsAPI.as_view()),
-
-    path("create_biobank_entries/", CreateBiobankAPI.as_view()),
-    path("read_biobank_entries/", ReadBiobankAPI.as_view()),
-    path("update_biobank_entries/", UpdateBiobankAPI.as_view()),
-    path("delete_biobank_entries/", DeleteBiobankAPI.as_view()),
+    
+    path('', include(router.urls)),
 ]
