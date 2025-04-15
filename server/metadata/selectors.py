@@ -5,8 +5,23 @@
 """
 
 from metadata.models import (
-    Family, Analyte,
+    Family, Analyte, Biobank
 )
+
+
+def get_biobank_records_by_ids(id_list):
+    return {
+        record.biobank_id: record
+        for record in Biobank.objects.filter(biobank_id__in=id_list)
+    }
+
+
+def get_existing_biobank_records(request_data):
+    return {
+        record.biobank_id: record
+        for record in Biobank.objects.filter(biobank_id__in=[d["biobank_id"] for d in request_data if "biobank_id" in d])
+    }
+
 
 def get_analyte(analyte_id: str) -> Family:
     """Retrieve an analyte instance by its ID or return None if not found."""
