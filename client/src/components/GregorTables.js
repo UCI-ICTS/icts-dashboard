@@ -4,13 +4,11 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { Resizable } from 'react-resizable';
 import { getAllTables, updateTable, addTable } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import TableSelector from "./TableSelector";
 import schemas from "../schemas/v1.7schemas.json";
-import { setTableView } from "../slices/dataSlice";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
 

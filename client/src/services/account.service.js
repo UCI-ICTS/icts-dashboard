@@ -21,7 +21,11 @@ const getAuthHeaders = () => {
 
 
 const getCSRFToken = async () => {
-  await axios.get("/api/health/"); // sets cookie
+  try {
+    await axios.get("/api/health/"); // sets cookie
+  } catch (error) {
+    console.warn("⚠️ Failed to get CSRF token:", error.message);
+  }
 };
 
 function getCookie(name) {
