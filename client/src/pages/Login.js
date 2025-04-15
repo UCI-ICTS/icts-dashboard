@@ -57,13 +57,23 @@ const Login = () => {
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Username" />
+            <Input 
+              prefix={<UserOutlined />} 
+              placeholder="Username"
+              autoComplete="username" 
+            />
           </Form.Item>
+
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Please input your Password!' }]}
           >
-            <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
+            <Input 
+              prefix={<LockOutlined />} 
+              type="password" 
+              placeholder="Password"
+              autoComplete="current-password"
+            />
           </Form.Item>
           <Form.Item>
             <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>

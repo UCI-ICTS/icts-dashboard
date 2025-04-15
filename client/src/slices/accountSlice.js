@@ -16,7 +16,8 @@ const initialState = user
     initialState,
     extraReducers: (builder) => {
       builder
-// --- Authentication and Passwords ---
+      
+      // --- Authentication and Passwords ---
         .addCase(login.pending, (state) => {
           state.loading = true; // Set loading to true when login is pending
         })
