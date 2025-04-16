@@ -9,8 +9,16 @@ from django.core.mail import send_mail
 from rest_framework import serializers
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import BasePermission
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class IsSuperUser(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user and request.user.is_authenticated and request.user.is_superuser
+        )
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -53,7 +61,9 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({"old_password": "Incorrect password"})
 
         if data["new_password"] != data["confirm_new_password"]:
-            raise serializers.ValidationError({"confirm_new_password": "Passwords do not match"})
+            raise serializers.ValidationError(
+                {"confirm_new_password": "Passwords do not match"}
+            )
 
         return data
 
@@ -80,10 +90,19 @@ class UserInputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'is_superuser', 'is_staff', 'date_joined']
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "is_superuser",
+            "is_staff",
+            "date_joined",
+        ]
         extra_kwargs = {
-            'username': {'required': False},  # allow username to be auto-set
-            'date_joined': {'read_only': True},
+            "username": {"required": False},  # allow username to be auto-set
+            "date_joined": {"read_only": True},
         }
 
     def create(self, validated_data):
@@ -101,7 +120,7 @@ class UserInputSerializer(serializers.ModelSerializer):
             username = f"{base_username}.{counter}"
             counter += 1
 
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         user = User(username=username, **validated_data)
 
         if password:
@@ -113,7 +132,7 @@ class UserInputSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if password:
@@ -126,34 +145,35 @@ class UserOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'is_superuser',
-            'is_staff',
-            'date_joined'
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_superuser",
+            "is_staff",
+            "date_joined",
         ]
         read_only_fields = fields
 
 
 class CustomAuthentication(BaseAuthentication):
     """
-    Custom JSON Web Token Authentication class that supports different types 
+    Custom JSON Web Token Authentication class that supports different types
     of tokens including Bearer tokens from various issuers like ORCID, Google,
     and others.
 
     Methods:
-    authenticate(self, request): 
+    authenticate(self, request):
         Authenticates the request based on the 'Authorization' header containing
         either 'Bearer' or 'Token' type credentials.
 
     Raises:
         AuthenticationFailed: If the token is invalid, expired, or the issuer is not recognized.
     """
+
     def authenticate(self, request):
         # Extract the token from the Authorization header
-        auth_header = request.headers.get('Authorization')
+        auth_header = request.headers.get("Authorization")
 
         if not auth_header:
             return None  # No authentication performed
@@ -161,7 +181,7 @@ class CustomAuthentication(BaseAuthentication):
         # Ensure the header contains a Bearer token
         try:
             prefix, token = auth_header.split()
-            if prefix.lower() != 'bearer':
+            if prefix.lower() != "bearer":
                 raise AuthenticationFailed("Invalid token prefix.")
         except ValueError:
             raise AuthenticationFailed("Invalid Authorization header format.")
@@ -174,10 +194,10 @@ class CustomAuthentication(BaseAuthentication):
 
         # Retrieve the user associated with the token
         try:
-            user_id = decoded_token.get('user_id')
+            user_id = decoded_token.get("user_id")
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise AuthenticationFailed("User not found.")
-        
+
         # Return the user and the token
         return user, token
