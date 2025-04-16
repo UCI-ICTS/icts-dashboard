@@ -1,6 +1,6 @@
 # Welcome to the UCI ICTS Dashboard User Guide
 
-**Table of content:**
+**Table of contents:**
 - [Getting an Account](#account)
 - [Loggin In & Login Page](#log-in)
 - [GREGoR Tables](#gregor-tables)
