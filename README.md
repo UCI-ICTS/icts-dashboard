@@ -3,6 +3,7 @@ A proof-of-concept for a genomic metadata DB with API access. This database is d
 
 This repository is composed of two serivce applications. The `server` application is a Django API DB and the `client` application is a Redux/React UI.
 
+For general usage see our [User Guide](docs/user_guide.md)
 ## Deployment
 
 - [Local deployment](docs/deployment/localDeployment.md) 
