@@ -1,4 +1,4 @@
-# GREGoR Dashboard
+# ICTS Dashboard
 A proof-of-concept for a genomic metadata DB with API access. This database is designed to be deployed in a variaty of environments. If configurd properly it should work with any external application that presents properly formatted API requests with appropirate aauthentication credentials. 
 
 This repository is composed of two serivce applications. The `server` application is a Django API DB and the `client` application is a Redux/React UI.
