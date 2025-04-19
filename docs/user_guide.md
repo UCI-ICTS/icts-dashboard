@@ -29,7 +29,7 @@
 
 
 <a id="log-in"></a>
-## Loggin In & Login Page
+## Logging In & Login Page
 <img 
   height="500"
   width="530"
@@ -52,7 +52,50 @@ Above is a diagram of the log in page and the portions that a user can interact 
 
 <a id="gregor-tables"></a>
 ## GREGoR Tables
-Details of using the table entry page
+
+### Participants Table
+
+<img
+  width="600"
+  alt="Screenshot of Participants table"
+  src="https://github.com/user-attachments/assets/8a8b11dd-6428-4c91-94fc-2fe6e7ced10b"
+/>
+#### New Participant Entry
+To populate the table, use the **Fetch/Refresh data** button. 
+To enter new participants, click on the **+ Add Row** button.
+  Participant information can come from services such as RedCAP. 
+
+<img
+  width="600"
+  alt="Add New participants window"
+  src="https://github.com/user-attachments/assets/0bcb3ec6-6287-4080-aedb-4f3d799b24a6"
+/>
+
+Toggle the **Edit Mode** to begin entering fields. 
+Fields with a * are mandatory while fields with a **ⓘ** can provide information on what each field is for.
+Do not navigate away while entering details or your entries may be lost. 
+To save your changes, scroll to the bottom and click **Submit**.
+
+#### Collecting cohorts
+
+Cohorts can be collected using the search bar and the **Enable Regex** toggle to the left.
+The search bar applies to all fields in the selected table. To search only specific columns, use the **ᗊ Advanced Filters**
+
+Some examples for common queries that can use regex pattern matching include:
+- `^PMGRC-.*-0$` to find all probands. The search applies to all fields in the participant table.
+  - The syntax is as follows:
+    - `^PMGRC-` denotes the field must begin with `PMGRC-`
+    - `.*` is a wildcard and represents 0 or many unknown characters.
+      - Alternatively, `.+` may be used to represent 1 or many unknown characters.
+    - `-0$` denotes the field must end with `-0`
+- `^PMGRC-.*-500-.?$` to find all family members of family `500`.
+  - Alternatively families can be filtered by the **Advanced Filters** tab.
+- `(?=.*CMA)|(?=.*WES)` to find all participants with prior testing with `CMA` or `WES`.
+- `(?=.*CMA)(?=.*WES)` to find all participants with prior testing with both `CMA` and `WES`. 
+- These queries can often be shortened to remove redundant filters based on known constant values, like the `PMGRC` prefix. 
+
+Alternatively, the **Participants** table can be downloaded as a tab-separated value (TSV) table with the **📥 Download** button. The TSV table can then be processed with your preferred spreadsheet editor (MS Excel, LibreOffice Calc, Google Sheets, etc.)
+- Do not export the tables as comma-separated value (CSV) tables as free-text fields such as prior_testing often have commas present which will interfere with column parsing.
 
 <a id="participant-detail"></a>
 ## Participant Detail
