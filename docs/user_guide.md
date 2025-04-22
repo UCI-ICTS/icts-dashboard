@@ -56,7 +56,7 @@ Above is a diagram of the log in page and the portions that a user can interact 
 ### Participants Table
 
 <img
-  width="600"
+  width="1000"
   alt="Screenshot of Participants table"
   src="https://github.com/user-attachments/assets/8a8b11dd-6428-4c91-94fc-2fe6e7ced10b"
 />
@@ -66,7 +66,7 @@ To enter new participants, click on the **+ Add Row** button.
   Participant information can come from services such as RedCAP. 
 
 <img
-  width="600"
+  width="1000"
   alt="Add New participants window"
   src="https://github.com/user-attachments/assets/0bcb3ec6-6287-4080-aedb-4f3d799b24a6"
 />
@@ -99,7 +99,16 @@ Alternatively, the **Participants** table can be downloaded as a tab-separated v
 
 <a id="participant-detail"></a>
 ## Participant Detail
-Details of using the participant detail page
+
+Most queries around participants and families can be done through this page instead of GREGoR Tables. 
+
+To get details about a participant's relatives and conditions, click on the participant row. This will return a **Family Group** table with attributes for family members, their relations, HPO identifiers, genetic finding identifiers, sequencing experiment identifiers, and alignment identifiers (i.e. BAMs/CRAMs).
+
+<img
+  width="1000"
+  alt="Participant Detail"
+  src="https://github.com/user-attachments/assets/65889351-1af0-4ea7-b179-724f3e1c1d0d"
+/>
 
 <a id="profile"></a>
 ## Profile
