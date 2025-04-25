@@ -588,6 +588,7 @@ class Biobank(models.Model):
         choices=[
             ("D", "EDTA in Cryovial"),
             ("R", "PAX Tube"),
+            ("OG", "OGR-500 saliva collection kit"),
             ("SC", "OCD-100 buccal collection kit"),
             ("SG", "OGR-675 saliva collection kit"),
             ("X", "Extracted DNA"),
