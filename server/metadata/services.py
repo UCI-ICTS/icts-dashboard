@@ -7,7 +7,7 @@ from config.selectors import (
     remove_na,
     response_constructor,
     compare_data,
-    TableValidator
+    TableValidator,
 )
 from metadata.models import (
     Analyte,
@@ -18,12 +18,13 @@ from metadata.models import (
     InternalProjectId,
     PmidId,
     TwinId,
-    Biobank
+    Biobank,
 )
 
 from metadata.selectors import (
     participant_parser,
-    genetic_findings_parser
+    genetic_findings_parser,
+    biobank_parser,
 )
 
 from submodels.models import ReportedRace
@@ -35,10 +36,9 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
     2. Create/update the main instance with the remaining fields
     3. Use .set() to assign the ManyToMany relation
     """
+
     additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(
-        queryset=Participant.objects.all(),
-        many=True,
-        required=False
+        queryset=Participant.objects.all(), many=True, required=False
     )
 
     experiment_id = serializers.JSONField(required=False)
@@ -55,24 +55,31 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
         """
         Create a new GeneticFindings instance using the validated data
         """
-        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])
+        additional_family_members = validated_data.pop(
+            "additional_family_members_with_variant", []
+        )
         genetic_findings_instance = GeneticFindings.objects.create(**validated_data)
         if additional_family_members:
-            genetic_findings_instance.additional_family_members_with_variant.set(additional_family_members)
+            genetic_findings_instance.additional_family_members_with_variant.set(
+                additional_family_members
+            )
         genetic_findings_instance.save()
         return genetic_findings_instance
-
 
     def update(self, instance, validated_data):
         """
         Update each attribute of the instance with validated data
         """
-        additional_family_members = validated_data.pop('additional_family_members_with_variant', [])
+        additional_family_members = validated_data.pop(
+            "additional_family_members_with_variant", []
+        )
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if additional_family_members:
             instance.additional_family_members_with_variant.clear()
-            instance.additional_family_members_with_variant.set(additional_family_members)
+            instance.additional_family_members_with_variant.set(
+                additional_family_members
+            )
         instance.save()
 
         return instance
@@ -123,7 +130,9 @@ class BiobankSerializer(serializers.ModelSerializer):
             with transaction.atomic():
                 biobank = Biobank.objects.create(**validated_data)
                 if child_analyte:
-                    self._set_relationship(biobank, Analyte, child_analyte, "child_analytes")
+                    self._set_relationship(
+                        biobank, Analyte, child_analyte, "child_analytes"
+                    )
                 biobank.save()
         except IntegrityError as error:
             raise serializers.ValidationError(error)
@@ -200,7 +209,7 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         required=False,
         allow_empty=True,
-        help_text="List of prior testing entries"
+        help_text="List of prior testing entries",
     )
 
     internal_project_id = serializers.ListField(
@@ -260,7 +269,9 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
                 if twin_id:
                     self._set_relationship(participant, TwinId, twin_id, "twin_id")
                 if reported_race:
-                    self._set_relationship(participant, ReportedRace, reported_race, "reported_race")
+                    self._set_relationship(
+                        participant, ReportedRace, reported_race, "reported_race"
+                    )
                 participant.save()
         except IntegrityError as error:
             raise serializers.ValidationError(error)
@@ -277,10 +288,14 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            self._set_relationship(instance, InternalProjectId, internal_project_id, "internal_project_id")
+            self._set_relationship(
+                instance, InternalProjectId, internal_project_id, "internal_project_id"
+            )
             self._set_relationship(instance, PmidId, pmid_id, "pmid_id")
             self._set_relationship(instance, TwinId, twin_id, "twin_id")
-            self._set_relationship(instance, ReportedRace, reported_race, "reported_race")
+            self._set_relationship(
+                instance, ReportedRace, reported_race, "reported_race"
+            )
 
         return instance
 
@@ -333,7 +348,9 @@ def get_or_create_sub_models(datum: dict) -> dict:
     return datum
 
 
-def create_or_update_metadata(table_name: str, identifier: str, model_instance, datum: dict):
+def create_or_update_metadata(
+    table_name: str, identifier: str, model_instance, datum: dict
+):
     """
     Create or update a model instance based on the provided data.
 
@@ -348,34 +365,36 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
         dict: A response dictionary indicating the status of the operation.
     """
 
-
     table_serializers = {
         "participant": {
             "input_serializer": ParticipantInputSerializer,
             "output_serializer": ParticipantOutputSerializer,
-            "parsed_data": lambda datum: participant_parser(participant=datum)
+            "parsed_data": lambda datum: participant_parser(participant=datum),
         },
-        "family":{
+        "family": {
             "input_serializer": FamilySerializer,
-            "output_serializer": FamilySerializer
+            "output_serializer": FamilySerializer,
         },
         "genetic_findings": {
             "input_serializer": GeneticFindingsSerializer,
             "output_serializer": GeneticFindingsSerializer,
-            "parsed_data": lambda datum: genetic_findings_parser(genetic_findings=datum)
+            "parsed_data": lambda datum: genetic_findings_parser(
+                genetic_findings=datum
+            ),
         },
         "analyte": {
             "input_serializer": AnalyteSerializer,
-            "output_serializer": AnalyteSerializer
+            "output_serializer": AnalyteSerializer,
         },
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
-            "output_serializer": PhenotypeSerializer
+            "output_serializer": PhenotypeSerializer,
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
-            "output_serializer": BiobankSerializer
-        }
+            "output_serializer": BiobankSerializer,
+            "parsed_data": lambda datum: biobank_parser(biobank=datum),
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -390,11 +409,14 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
     results = table_validator.get_validation_results()
 
     if results["valid"]:
-        changes = compare_data(
-            old_data=model_output_serializer(model_instance).data,
-            new_data=datum
-        ) if model_instance else {identifier:"CREATED"}
-        #create needed submodules before serialization
+        changes = (
+            compare_data(
+                old_data=model_output_serializer(model_instance).data, new_data=datum
+            )
+            if model_instance
+            else {identifier: "CREATED"}
+        )
+        # create needed submodules before serialization
         if table_name == "participant":
             datum = get_or_create_sub_models(datum=datum)
         serializer = model_input_serializer(model_instance, data=datum)
@@ -402,50 +424,60 @@ def create_or_update_metadata(table_name: str, identifier: str, model_instance, 
         if serializer.is_valid():
             updated_instance = serializer.save()
             if not changes:
-                return response_constructor(
-                    identifier=identifier,
-                    request_status="SUCCESS",
-                    code=200,
-                    message=f"{table_name} {identifier} had no changes.",
-                    data={
-                        "updates": None,
-                        "instance": model_output_serializer(updated_instance).data
-                    }
-                ), "accepted_request"
+                return (
+                    response_constructor(
+                        identifier=identifier,
+                        request_status="SUCCESS",
+                        code=200,
+                        message=f"{table_name} {identifier} had no changes.",
+                        data={
+                            "updates": None,
+                            "instance": model_output_serializer(updated_instance).data,
+                        },
+                    ),
+                    "accepted_request",
+                )
 
-            return response_constructor(
-                identifier=identifier,
-                request_status="UPDATED" if model_instance else "CREATED",
-                code=200 if model_instance else 201,
-                message=(
-                    f"{table_name} {identifier} updated." if model_instance
-                    else f"{table_name} {identifier} created."
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="UPDATED" if model_instance else "CREATED",
+                    code=200 if model_instance else 201,
+                    message=(
+                        f"{table_name} {identifier} updated."
+                        if model_instance
+                        else f"{table_name} {identifier} created."
+                    ),
+                    data={
+                        "updates": changes,
+                        "instance": model_output_serializer(updated_instance).data,
+                    },
                 ),
-                data={
-                    "updates": changes,
-                    "instance": model_output_serializer(updated_instance).data
-                }
-            ), "accepted_request"
+                "accepted_request",
+            )
 
         else:
-            error_data = [
-                {item: serializer.errors[item]}
-                for item in serializer.errors
-            ]
-            return response_constructor(
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"],
-        ), "rejected_request"
+                data=results["errors"],
+            ),
+            "rejected_request",
+        )
 
 
 def create_metadata(table_name: str, identifier: str, datum: dict):
@@ -464,29 +496,32 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         "participant": {
             "input_serializer": ParticipantInputSerializer,
             "output_serializer": ParticipantOutputSerializer,
-            "parsed_data": lambda datum: participant_parser(participant=datum)
+            "parsed_data": lambda datum: participant_parser(participant=datum),
         },
         "family": {
             "input_serializer": FamilySerializer,
-            "output_serializer": FamilySerializer
+            "output_serializer": FamilySerializer,
         },
         "genetic_findings": {
             "input_serializer": GeneticFindingsSerializer,
             "output_serializer": GeneticFindingsSerializer,
-            "parsed_data": lambda datum: genetic_findings_parser(genetic_findings=datum)
+            "parsed_data": lambda datum: genetic_findings_parser(
+                genetic_findings=datum
+            ),
         },
         "analyte": {
             "input_serializer": AnalyteSerializer,
-            "output_serializer": AnalyteSerializer
+            "output_serializer": AnalyteSerializer,
         },
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
-            "output_serializer": PhenotypeSerializer
+            "output_serializer": PhenotypeSerializer,
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
-            "output_serializer": BiobankSerializer
-        }
+            "output_serializer": BiobankSerializer,
+            "parsed_data": lambda datum: biobank_parser(biobank=datum),
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -505,30 +540,37 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
             new_instance = serializer.save()
-            return response_constructor(
-                identifier=identifier,
-                request_status="CREATED",
-                code=201,
-                message=f"{table_name} {identifier} created.",
-                data={
-                    "instance": model_output_serializer(new_instance).data
-                }
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="CREATED",
+                    code=201,
+                    message=f"{table_name} {identifier} created.",
+                    data={"instance": model_output_serializer(new_instance).data},
+                ),
+                "accepted_request",
+            )
         else:
             error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-            return response_constructor(
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"],
-        ), "rejected_request"
+                data=results["errors"],
+            ),
+            "rejected_request",
+        )
 
 
 def update_metadata(table_name: str, identifier: str, model_instance, datum: dict):
@@ -548,29 +590,32 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         "participant": {
             "input_serializer": ParticipantInputSerializer,
             "output_serializer": ParticipantOutputSerializer,
-            "parsed_data": lambda datum: participant_parser(participant=datum)
+            "parsed_data": lambda datum: participant_parser(participant=datum),
         },
         "family": {
             "input_serializer": FamilySerializer,
-            "output_serializer": FamilySerializer
+            "output_serializer": FamilySerializer,
         },
         "genetic_findings": {
             "input_serializer": GeneticFindingsSerializer,
             "output_serializer": GeneticFindingsSerializer,
-            "parsed_data": lambda datum: genetic_findings_parser(genetic_findings=datum)
+            "parsed_data": lambda datum: genetic_findings_parser(
+                genetic_findings=datum
+            ),
         },
         "analyte": {
             "input_serializer": AnalyteSerializer,
-            "output_serializer": AnalyteSerializer
+            "output_serializer": AnalyteSerializer,
         },
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
-            "output_serializer": PhenotypeSerializer
+            "output_serializer": PhenotypeSerializer,
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
-            "output_serializer": BiobankSerializer
-        }
+            "output_serializer": BiobankSerializer,
+            "parsed_data": lambda datum: biobank_parser(biobank=datum),
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -590,34 +635,42 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         if serializer.is_valid():
             updated_instance = serializer.save()
             changes = compare_data(
-                old_data=model_output_serializer(model_instance).data,
-                new_data=datum
+                old_data=model_output_serializer(model_instance).data, new_data=datum
             )
-            return response_constructor(
-                identifier=identifier,
-                request_status="UPDATED",
-                code=200,
-                message=f"{table_name} {identifier} updated.",
-                data={
-                    "updates": changes,
-                    "instance": model_output_serializer(updated_instance).data
-                }
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="UPDATED",
+                    code=200,
+                    message=f"{table_name} {identifier} updated.",
+                    data={
+                        "updates": changes,
+                        "instance": model_output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
         else:
             error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-            return response_constructor(
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"],
-        ), "rejected_request"
+                data=results["errors"],
+            ),
+            "rejected_request",
+        )
 
 
 def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
@@ -638,40 +691,52 @@ def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
         "genetic_findings": GeneticFindings,
         "analyte": Analyte,
         "phenotype": Phenotype,
-        "biobank": Biobank
+        "biobank": Biobank,
     }
 
     model_class = model_mapping.get(table_name)
     if not model_class:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Invalid table name: {table_name}",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Invalid table name: {table_name}",
+            ),
+            "rejected_request",
+        )
 
     try:
         instance = model_class.objects.filter(**{id_field: identifier}).first()
         if instance:
             instance.delete()
-            return response_constructor(
-                identifier=identifier,
-                request_status="DELETED",
-                code=200,
-                data=f"{table_name} {identifier} deleted successfully."
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="DELETED",
+                    code=200,
+                    data=f"{table_name} {identifier} deleted successfully.",
+                ),
+                "accepted_request",
+            )
         else:
-            return response_constructor(
-                identifier=identifier,
-                request_status="NOT FOUND",
-                code=404,
-                data=f"{table_name} {identifier} not found."
-            ), "rejected_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data=f"{table_name} {identifier} not found.",
+                ),
+                "rejected_request",
+            )
 
     except Exception as error:
-        return response_constructor(
-            identifier=identifier,
-            request_status="SERVER ERROR",
-            code=500,
-            data=str(error),
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ),
+            "rejected_request",
+        )
