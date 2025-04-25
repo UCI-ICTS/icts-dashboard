@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # metadata/selectors.py
 
-"""Metadata Selectors
-"""
+"""Metadata Selectors"""
 
-from metadata.models import (
-    Family, Analyte, Biobank
-)
+from metadata.models import Family, Analyte, Biobank
 
 
 def get_biobank_records_by_ids(id_list):
@@ -19,7 +16,9 @@ def get_biobank_records_by_ids(id_list):
 def get_existing_biobank_records(request_data):
     return {
         record.biobank_id: record
-        for record in Biobank.objects.filter(biobank_id__in=[d["biobank_id"] for d in request_data if "biobank_id" in d])
+        for record in Biobank.objects.filter(
+            biobank_id__in=[d["biobank_id"] for d in request_data if "biobank_id" in d]
+        )
     }
 
 
@@ -33,15 +32,15 @@ def get_analyte(analyte_id: str) -> Family:
 
 
 def genetic_findings_parser(genetic_findings: dict) -> dict:
-    """
-    """
+    """ """
     from config.selectors import multi_value_split
+
     multi_value = [
         "experiment_id",
         "variant_type",
-        "gene_of_interest", 
+        "gene_of_interest",
         "condition_inheritance",
-        "method_of_discovery"
+        "method_of_discovery",
     ]
 
     for key, value in genetic_findings.items():
@@ -67,12 +66,14 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
             and type(genetic_findings[key]) == str
         ):
             genetic_findings[key] = [value]
-        
+
         split_findings = multi_value_split(genetic_findings)
-        
+
         for value in multi_value:
             try:
-                if value in split_findings and not isinstance(split_findings[value], list):
+                if value in split_findings and not isinstance(
+                    split_findings[value], list
+                ):
                     split_findings[value] = [split_findings[value]]
             except Exception as error:
                 oops = error
@@ -102,16 +103,21 @@ def participant_parser(participant: dict) -> dict:
     - 'age_at_last_observation' and 'age_at_enrollment': Converts the string to a float. Sets to 0 if conversion fails.
     """
     from config.selectors import multi_value_split
+
     multi_value = [
         "pmid_id",
         "twin_id",
-        "internal_project_id", "prior_testing",
+        "internal_project_id",
+        "prior_testing",
         "phenotype_description",
-        "reported_race"
+        "reported_race",
     ]
 
-    if "reported_race" in participant: 
-        if participant["reported_race"] == "Unknown" or participant["reported_race"] == "More than one race":
+    if "reported_race" in participant:
+        if (
+            participant["reported_race"] == "Unknown"
+            or participant["reported_race"] == "More than one race"
+        ):
             participant["reported_race"] = ["NA"]
     if "reported_ethnicity" in participant:
         if participant["reported_ethnicity"] == "Unknown":
@@ -132,10 +138,30 @@ def participant_parser(participant: dict) -> dict:
 
     for key in multi_value:
         try:
-            if key in split_participant and not isinstance(split_participant[key], list):
+            if key in split_participant and not isinstance(
+                split_participant[key], list
+            ):
                 split_participant[key] = [split_participant[key]]
         except Exception as error:
             oops = error
             split_participant[key] = [oops]
 
     return split_participant
+
+
+def biobank_parser(biobank: dict) -> dict:
+    """ """
+    from config.selectors import multi_value_split
+
+    multi_value = ["child_analytes"]
+    split_biobank = multi_value_split(biobank)
+
+    for key in multi_value:
+        try:
+            if key in split_biobank and not isinstance(split_biobank[key], list):
+                split_biobank[key] = [split_biobank[key]]
+        except Exception as error:
+            oops = error
+            split_biobank[key] = [oops]
+
+    return split_biobank
