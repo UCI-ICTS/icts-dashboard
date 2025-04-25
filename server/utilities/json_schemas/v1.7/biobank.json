@@ -29,12 +29,13 @@
             "enum": [
                 "D",
                 "R",
+                "OG",
                 "SC",
                 "SG",
                 "X",
                 "XR"
             ],
-            "description": "Maps to analyte codes: D - EDTA in Cryovial R - PAX Tube SC - OCD-100 buccal collection kit SG - OGR-675 saliva collection kit X - Extracted DNA XR - Extracted RNA"
+            "description": "Maps to analyte codes: D - EDTA in Cryovial R - PAX Tube OG - OGR-500 saliva collection kit SC - OCD-100 buccal collection kit SG - OGR-675 saliva collection kit X - Extracted DNA XR - Extracted RNA"
         },
         "current_location": {
             "type": "string",
