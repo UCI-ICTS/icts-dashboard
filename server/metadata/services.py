@@ -400,6 +400,8 @@ def get_or_create_sub_models(datum: dict) -> dict:
         "internal_project_id": (InternalProjectId, "internal_project_id"),
         "pmid_id": (PmidId, "pmid_id"),
         "twin_id": (TwinId, "twin_id"),
+        "experiment_id": (ExperimentId, "experiment_id"),
+        "aligned_id": (AlignedId, "aligned_id"),
     }
     for key, (model, field_name) in mapping.items():
         if isinstance(datum.get(key), list):  # Handles list fields differently

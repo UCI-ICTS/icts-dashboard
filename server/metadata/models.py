@@ -592,7 +592,7 @@ class Biobank(models.Model):
             ("R", "PAX Tube"),
             ("OG", "OGR-500 saliva collection kit"),
             ("SC", "OCD-100 buccal collection kit"),
-            ("SG", "OGR-675 saliva collection kit"),
+            ("SG", "OGR-675 buccal collection kit"),
             ("X", "Extracted DNA"),
             ("XR","Extracted RNA")
         ],
@@ -721,8 +721,9 @@ class ExperimentStage(models.Model):
         choices=[
             ("D", "EDTA in Cryovial"),
             ("R", "PAX Tube"),
+            ("OG", "OGR-500 saliva collection kit"),
             ("SC", "OCD-100 buccal collection kit"),
-            ("SG", "OGR-675 saliva collection kit"),
+            ("SG", "OGR-675 buccal collection kit"),
             ("X", "Extracted DNA"),
             ("XR", "Extracted RNA"),
         ],
@@ -760,13 +761,13 @@ class ExperimentStage(models.Model):
         null=True,
         help_text="Fedex tracking number if available",
     )
-    experiments_list = models.ManyToManyField(
+    experiments = models.ManyToManyField(
         ExperimentId,
         related_name="experiment",
         blank=True,
         help_text="List of associated sr-gs, pacbio, nanopore, etc. experiment objects",
     )
-    alignments_list = models.ManyToManyField(
+    alignments = models.ManyToManyField(
         AlignedId,
         related_name="aligned",
         blank=True,
