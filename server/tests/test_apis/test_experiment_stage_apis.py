@@ -31,8 +31,8 @@ class CreateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Shipped",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments_list": [],
-            "alignments_list": [],
+            "experiments": [],
+            "alignments": [],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
@@ -48,8 +48,8 @@ class CreateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Sequenced",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments_list": [],
-            "alignments_list": [],
+            "experiments": [],
+            "alignments": [],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
@@ -65,8 +65,8 @@ class CreateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Shipped",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments_list": [],
-            "alignments_list": [],
+            "experiments": [],
+            "alignments": [],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
@@ -74,7 +74,6 @@ class CreateExperimentStageAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_207 = self.client.post(url, [part2, part3], format="json")
         response_400 = self.client.post(url, [part3], format="json")
-        #import pdb; pdb.set_trace()
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
@@ -84,8 +83,8 @@ class CreateExperimentStageAPITest(APITestCaseWithAuth):
 
 class ReadExperimentStageAPITest(APITestCaseWithAuth):
     def test_read_experiment_stage_entry(self):
-        url1 = "/api/metadata/experiment_stage/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1"
-        url2 = "/api/metadata/experiment_stage/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-002-001-2-R-1,DNE-01"
+        url1 = "/api/metadata/experiment_stage/?ids=GREGoR_test-001-001-0-D-1,GREGoR_test-002-001-2-D-1"
+        url2 = "/api/metadata/experiment_stage/?ids=GREGoR_test-001-001-0-D-1,GREGoR_test-002-001-2-D-1,DNE-01"
         url3 = "/api/metadata/experiment_stage/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format="json")
@@ -103,8 +102,8 @@ class UpdateExperimentStageAPITest(APITestCaseWithAuth):
     def test_update_experiment_stage_entry(self):
         url = "/api/metadata/experiment_stage/update/"
         part1 = {  # Valid submission, stored sample shipped out
-            "experiment_stage_id": "GREGoR_test-001-001-0-D-2",
-            "analyte_id": "GREGoR_test-001-001-0-D-2",
+            "experiment_stage_id": "GREGoR_test-001-001-0-D-1",
+            "analyte_id": "GREGoR_test-001-001-0-D-1",
             "test_indication": "Research",
             "requested_test": "10500",
             "collection_date": "2025-01-03",
@@ -113,8 +112,8 @@ class UpdateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Shipped",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments_list": [],
-            "alignments_list": [],
+            "experiments": [],
+            "alignments": [],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
@@ -130,8 +129,8 @@ class UpdateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Shipped",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments_list": [],
-            "alignments_list": [],
+            "experiments": [],
+            "alignments": [],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
@@ -141,8 +140,8 @@ class UpdateExperimentStageAPITest(APITestCaseWithAuth):
         response_400 = self.client.post(url, [part2], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
-        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
