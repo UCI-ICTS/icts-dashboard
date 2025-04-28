@@ -30,10 +30,12 @@ from metadata.apis import (
     DeleteGeneticFindingsAPI,
 
     BiobankViewSet,
+    ExperimentStageViewSet
 )
 
 router = DefaultRouter()
 router.register(r'biobank', BiobankViewSet, basename='biobank')
+router.register(r"experiment_stage", ExperimentStageViewSet, basename="experiment_stage")
 
 urlpatterns = [
     path("create_participants/", CrearteParticipantAPI.as_view()),
@@ -60,6 +62,6 @@ urlpatterns = [
     path("read_genetic_findings/", ReadGeneticFindingsAPI.as_view()),
     path("update_genetic_findings/", UpdateGeneticFindingsAPI.as_view()),
     path("delete_genetic_findings/", DeleteGeneticFindingsAPI.as_view()),
-    
+
     path('', include(router.urls)),
 ]

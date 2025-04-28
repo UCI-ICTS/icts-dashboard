@@ -176,3 +176,25 @@ class ReportedEthnicity(models.TextChoices):
         "HISPANIC",
     )
     NON_HISPANIC = "Not Hispanic or Latino", _("NON_HISPANIC")
+
+
+class ExperimentId(models.Model):
+    experiment_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="From experiments table. Includes sr-gs, pacbio, nanopore, etc. experiments",
+    )
+
+    def __str__(self):
+        return self.experiment_id
+
+
+class AlignedId(models.Model):
+    aligned_id = models.CharField(
+        max_length=255,
+        primary_key=True,
+        help_text="From aligned table. Includes sr-gs, pacbio, nanopore, etc. alignments",
+    )
+
+    def __str__(self):
+        return self.aligned_id

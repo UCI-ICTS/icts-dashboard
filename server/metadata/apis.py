@@ -22,7 +22,8 @@ from metadata.models import (
     Family,
     GeneticFindings,
     Phenotype,
-    Biobank
+    Biobank,
+    ExperimentStage
 )
 
 from metadata.services import (
@@ -32,6 +33,7 @@ from metadata.services import (
     FamilySerializer,
     PhenotypeSerializer,
     BiobankSerializer,
+    ExperimentStageSerializer,
     create_metadata,
     update_metadata,
     delete_metadata
@@ -1925,6 +1927,162 @@ class BiobankViewSet(viewsets.ViewSet):
                     code=404,
                     data="Not found"
                 ))
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class ExperimentStageViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=ExperimentStageSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentStage"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_experiment_stage(self, request):
+        experiment_stage = bulk_model_retrieve(request.data, ExperimentStage, "experiment_stage_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            experiment_stage_id = datum.get("experiment_stage_id")
+            if experiment_stage_id and experiment_stage_id in experiment_stage:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_stage_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="ExperimentStage entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("experiment_stage", experiment_stage_id, datum)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentStage"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        experiment_stage = bulk_retrieve(ExperimentStage, ids, "experiment_stage_id")
+        response_data, accepted, rejected = [], False, False
+
+        for experiment_stage_id in ids:
+            if experiment_stage_id in experiment_stage:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_stage_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=experiment_stage[experiment_stage_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_stage_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=ExperimentStageSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentStage"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_experiment_stage(self, request):
+        experiment_stage = bulk_model_retrieve(request.data, ExperimentStage, "experiment_stage_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            experiment_stage_id = datum.get("experiment_stage_id")
+            if experiment_stage_id not in experiment_stage:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_stage_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_metadata(
+                    "experiment_stage", experiment_stage_id, experiment_stage[experiment_stage_id], datum
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_experiment_stage_entries",
+        operation_description="Bulk delete ExperimentStage entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of ExperimentStage IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["ExperimentStage"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete ExperimentStage entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        experiment_stage = bulk_retrieve(ExperimentStage, ids, "experiment_stage_id")
+        response_data, accepted, rejected = [], False, False
+
+        for experiment_stage_id in ids:
+            if experiment_stage_id in experiment_stage:
+                data, result = delete_metadata("experiment_stage", experiment_stage_id, "experiment_stage_id")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_stage_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
