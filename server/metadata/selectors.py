@@ -3,7 +3,7 @@
 
 """Metadata Selectors"""
 
-from metadata.models import Family, Analyte, Biobank
+from metadata.models import Family, Analyte, Biobank, ExperimentStage
 
 
 def get_biobank_records_by_ids(id_list):
@@ -18,6 +18,22 @@ def get_existing_biobank_records(request_data):
         record.biobank_id: record
         for record in Biobank.objects.filter(
             biobank_id__in=[d["biobank_id"] for d in request_data if "biobank_id" in d]
+        )
+    }
+
+
+def get_experiment_stage_records_by_ids(id_list):
+    return {
+        record.experiment_stage_id: record
+        for record in ExperimentStage.objects.filter(experiment_stage_id__in=id_list)
+    }
+
+
+def get_existing_experiment_stage_records(request_data):
+    return {
+        record.experiment_stage_id: record
+        for record in ExperimentStage.objects.filter(
+            experiment_stage_id__in=[d["experiment_stage_id"] for d in request_data if "experiment_stage_id" in d]
         )
     }
 
