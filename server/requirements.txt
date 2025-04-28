@@ -1,4 +1,4 @@
-gsgiref==3.7.2
+asgiref==3.7.2
 attrs==23.2.0
 black==24.4.2
 cachetools==5.3.3
