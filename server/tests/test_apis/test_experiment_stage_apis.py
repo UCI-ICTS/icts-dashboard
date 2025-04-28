@@ -101,7 +101,7 @@ class ReadExperimentStageAPITest(APITestCaseWithAuth):
 class UpdateExperimentStageAPITest(APITestCaseWithAuth):
     def test_update_experiment_stage_entry(self):
         url = "/api/metadata/experiment_stage/update/"
-        part1 = {  # Valid submission, stored sample shipped out
+        part1 = {  # Valid submission, stored sample shipped out. New experiment created.
             "experiment_stage_id": "GREGoR_test-001-001-0-D-1",
             "analyte_id": "GREGoR_test-001-001-0-D-1",
             "test_indication": "Research",
@@ -112,8 +112,8 @@ class UpdateExperimentStageAPITest(APITestCaseWithAuth):
             "status": "Shipped",
             "current_location": "Ambry",
             "tracking_number": "123456789123",
-            "experiments": [],
-            "alignments": [],
+            "experiments": ["GREGoR_test-001-001-0-D-1.PB"],
+            "alignments": ["GREGoR_test-001-001-0-D-1.PB.aligned"],
             "external_id": None,
             "comments": None,
             "internal_analysis": None,
