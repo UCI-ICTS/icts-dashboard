@@ -2985,6 +2985,72 @@
         "pk": "GREGoR_test-001-001-0-R-1",
         "fields": {
             "participant_id": "GREGoR_test-001-001-0",
+            "analyte_type": "RNA",
+            "analyte_processing_details": null,
+            "primary_biosample": "UBERON:0000178",
+            "primary_biosample_id": null,
+            "primary_biosample_details": null,
+            "tissue_affected_status": "No",
+            "age_at_collection": null,
+            "participant_drugs_intake": null,
+            "participant_special_diet": null,
+            "hours_since_last_meal": null,
+            "passage_number": null,
+            "time_to_freeze": null,
+            "sample_transformation_detail": null,
+            "quality_issues": null,
+            "internal_analyte_id": null
+        }
+    },
+    {
+        "model": "metadata.analyte",
+        "pk": "GREGoR_test-001-001-0-D-1",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "analyte_type": "DNA",
+            "analyte_processing_details": null,
+            "primary_biosample": "UBERON:0000178",
+            "primary_biosample_id": null,
+            "primary_biosample_details": null,
+            "tissue_affected_status": "No",
+            "age_at_collection": null,
+            "participant_drugs_intake": null,
+            "participant_special_diet": null,
+            "hours_since_last_meal": null,
+            "passage_number": null,
+            "time_to_freeze": null,
+            "sample_transformation_detail": null,
+            "quality_issues": null,
+            "internal_analyte_id": null
+        }
+    },
+    {
+        "model": "metadata.analyte",
+        "pk": "GREGoR_test-001-001-0-D-2",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "analyte_type": "DNA",
+            "analyte_processing_details": null,
+            "primary_biosample": "UBERON:0000178",
+            "primary_biosample_id": null,
+            "primary_biosample_details": null,
+            "tissue_affected_status": "No",
+            "age_at_collection": null,
+            "participant_drugs_intake": null,
+            "participant_special_diet": null,
+            "hours_since_last_meal": null,
+            "passage_number": null,
+            "time_to_freeze": null,
+            "sample_transformation_detail": null,
+            "quality_issues": null,
+            "internal_analyte_id": null
+        }
+    },
+    {
+        "model": "metadata.analyte",
+        "pk": "GREGoR_test-001-001-0-D-3",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
             "analyte_type": "DNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
@@ -3029,7 +3095,7 @@
         "pk": "GREGoR_test-001-002-0-R-1",
         "fields": {
             "participant_id": "GREGoR_test-001-002-0",
-            "analyte_type": "DNA",
+            "analyte_type": "RNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
@@ -3051,7 +3117,7 @@
         "pk": "GREGoR_test-001-002-0-R-2",
         "fields": {
             "participant_id": "GREGoR_test-001-002-0",
-            "analyte_type": "DNA",
+            "analyte_type": "RNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
@@ -3073,7 +3139,7 @@
         "pk": "GREGoR_test-001-003-0-R-1",
         "fields": {
             "participant_id": "GREGoR_test-001-003-0",
-            "analyte_type": "DNA",
+            "analyte_type": "RNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
@@ -3117,7 +3183,7 @@
         "pk": "GREGoR_test-001-003-0-R-3",
         "fields": {
             "participant_id": "GREGoR_test-001-003-0",
-            "analyte_type": "DNA",
+            "analyte_type": "RNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
@@ -3139,7 +3205,7 @@
         "pk": "GREGoR_test-002-001-2-R-1",
         "fields": {
             "participant_id": "GREGoR_test-002-001-2",
-            "analyte_type": "DNA",
+            "analyte_type": "RNA",
             "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
@@ -3163,6 +3229,28 @@
             "participant_id": "GREGoR_test-002-001-2",
             "analyte_type": "RNA",
             "analyte_processing_details": "PAXgene Tube",
+            "primary_biosample": "UBERON:0000178",
+            "primary_biosample_id": null,
+            "primary_biosample_details": null,
+            "tissue_affected_status": "No",
+            "age_at_collection": null,
+            "participant_drugs_intake": null,
+            "participant_special_diet": null,
+            "hours_since_last_meal": null,
+            "passage_number": null,
+            "time_to_freeze": null,
+            "sample_transformation_detail": null,
+            "quality_issues": null,
+            "internal_analyte_id": null
+        }
+    },
+    {
+        "model": "metadata.analyte",
+        "pk": "GREGoR_test-002-001-2-D-1",
+        "fields": {
+            "participant_id": "GREGoR_test-002-001-2",
+            "analyte_type": "DNA",
+            "analyte_processing_details": null,
             "primary_biosample": "UBERON:0000178",
             "primary_biosample_id": null,
             "primary_biosample_details": null,
@@ -4506,6 +4594,16 @@
         "fields": {}
     },
     {
+        "model": "submodels.experimentid",
+        "pk": "GREGoR_test-002-001-2-D-1.PB",
+        "fields": {}
+    },
+    {
+        "model": "submodels.alignedid",
+        "pk": "GREGoR_test-002-001-2-D-1.PB.aligned",
+        "fields": {}
+    },
+    {
         "model": "metadata.biobank",
         "pk": "GREGoR_test-001-001-0-D-1",
         "fields": {
@@ -4613,6 +4711,46 @@
             "shipment_date": "2025-04-11",
             "child_analytes": ["GREGoR_test-002-001-2-R-1"],
             "comments": null
+        }
+    },
+    {
+        "model": "metadata.experimentstage",
+        "pk": "GREGoR_test-001-001-0-D-1",
+        "fields": {
+            "analyte_id": "GREGoR_test-001-001-0-D-1",
+            "test_indication": null,
+            "requested_test": null,
+            "collection_date": "2025-01-03",
+            "specimen_type": "D",
+            "shipment_date": "2025-04-14",
+            "status": "Stored",
+            "current_location": "UCI",
+            "tracking_number": null,
+            "experiments": [],
+            "alignments": [],
+            "external_id": null,
+            "comments": null,
+            "internal_analysis": null
+        }
+    },
+    {
+        "model": "metadata.experimentstage",
+        "pk": "GREGoR_test-002-001-2-D-1",
+        "fields": {
+            "analyte_id": "GREGoR_test-002-001-2-D-1",
+            "test_indication": "Research",
+            "requested_test": "10500",
+            "collection_date": "2025-04-07",
+            "specimen_type": "D",
+            "shipment_date": "2025-04-11",
+            "status": "Shipped",
+            "current_location": "Ambry",
+            "tracking_number": "777888999111",
+            "experiments": ["GREGoR_test-002-001-2-D-1.PB"],
+            "alignments": ["GREGoR_test-002-001-2-D-1.PB.aligned"],
+            "external_id": "25-123456",
+            "comments": null,
+            "internal_analysis": "PacBio HiFi=human-WGS-WDL v2.1.0"
         }
     }
 ]
