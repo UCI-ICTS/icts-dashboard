@@ -3,27 +3,36 @@
 
 from django.test import TestCase
 from experiments.models import (
-    Experiment, Aligned, ExperimentDNAShortRead, AlignedDNAShortRead,
-    ExperimentRNAShortRead, AlignedRNAShortRead, ExperimentNanopore, AlignedNanopore,
-    ExperimentPacBio, AlignedPacBio
+    Experiment,
+    Aligned,
+    ExperimentDNAShortRead,
+    AlignedDNAShortRead,
+    ExperimentRNAShortRead,
+    AlignedRNAShortRead,
+    ExperimentNanopore,
+    AlignedNanopore,
+    ExperimentPacBio,
+    AlignedPacBio,
 )
 from metadata.models import Participant, Analyte
 
+
 class ExperimentModelTest(TestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.participant = Participant.objects.first()
+        # import pdb; pdb.set_trace()
         self.analyte_1, self.analyte_2 = Analyte.objects.filter(
             participant_id=self.participant.participant_id
-        )
+        )[:2]
 
     def test_experiment_creation(self):
         experiment = Experiment.objects.create(
             experiment_id="EXP001",
             table_name="experiment_dna_short_read",
             id_in_table="DNA_001",
-            participant_id=self.participant
+            participant_id=self.participant,
         )
         self.assertEqual(str(experiment), "experiment_dna_short_read - EXP001")
 
@@ -33,7 +42,7 @@ class ExperimentModelTest(TestCase):
             id_in_table="ALIGNED_001",
             participant_id=self.participant,
             aligned_file="path/to/aligned.bam",
-            aligned_index_file="path/to/aligned.bai"
+            aligned_index_file="path/to/aligned.bai",
         )
         aligned.save()
         self.assertEqual(aligned.aligned_id, "aligned_dna_short_read.ALIGNED_001")
@@ -45,18 +54,20 @@ class ExperimentModelTest(TestCase):
             analyte_id=self.analyte_1,
             experiment_sample_id="SAMPLE001",
             read_length=150,
-            experiment_type="genome"
+            experiment_type="genome",
         )
 
-        self.assertEqual(str(experiment), f"ExperimentDNAShortRead object ({identifier})")
-    
+        self.assertEqual(
+            str(experiment), f"ExperimentDNAShortRead object ({identifier})"
+        )
+
     def test_aligned_dna_short_read_creation(self):
         experiment = ExperimentDNAShortRead.objects.create(
             experiment_dna_short_read_id="DNA002",
             analyte_id=self.analyte_1,
             experiment_sample_id="SAMPLE002",
             read_length=100,
-            experiment_type="exome"
+            experiment_type="exome",
         )
         aligned = AlignedDNAShortRead.objects.create(
             aligned_dna_short_read_id="ALIGNED_DNA002",
@@ -65,7 +76,7 @@ class ExperimentModelTest(TestCase):
             aligned_dna_short_read_index_file="path/to/aligned_dna.bai",
             md5sum="abcdef123456",
             reference_assembly="GRCh38",
-            alignment_software="BWA"
+            alignment_software="BWA",
         )
         self.assertEqual(str(aligned), "ALIGNED_DNA002")
 
@@ -75,7 +86,7 @@ class ExperimentModelTest(TestCase):
             analyte_id=self.analyte_2,
             experiment_sample_id="SAMPLE_RNA001",
             read_length=100,
-            sequencing_platform="Illumina"
+            sequencing_platform="Illumina",
         )
         self.assertEqual(str(experiment), "RNA001")
 
@@ -85,7 +96,7 @@ class ExperimentModelTest(TestCase):
             analyte_id=self.analyte_2,
             experiment_sample_id="SAMPLE_RNA002",
             read_length=150,
-            sequencing_platform="Illumina"
+            sequencing_platform="Illumina",
         )
         aligned = AlignedRNAShortRead.objects.create(
             aligned_rna_short_read_id="ALIGNED_RNA002",
@@ -93,6 +104,6 @@ class ExperimentModelTest(TestCase):
             aligned_rna_short_read_file="path/to/aligned_rna.bam",
             aligned_rna_short_read_index_file="path/to/aligned_rna.bai",
             md5sum="123456abcdef",
-            reference_assembly="GRCh37"
+            reference_assembly="GRCh37",
         )
         self.assertEqual(str(aligned), "ALIGNED_RNA002")
