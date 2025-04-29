@@ -4,25 +4,31 @@
 from django.test import TestCase
 from experiments.models import ExperimentRNAShortRead
 from experiments.services import (
-    ExperimentRnaInputSerializer, ExperimentRnaOutputSerializer, ExperimentSerializer, AlignedRnaSerializer
+    ExperimentRnaInputSerializer,
+    ExperimentRnaOutputSerializer,
+    ExperimentSerializer,
+    AlignedRnaSerializer,
 )
 from metadata.models import Analyte, Participant
 
+
 class ExperimentServiceTest(TestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
-    
+    fixtures = ["tests/fixtures/test_fixture.json"]
+
     def setUp(self):
         self.participant = Participant.objects.first()
-        self.analyte_1, self.analyte_2 = Analyte.objects.filter(
+        analyte_list = Analyte.objects.filter(
             participant_id=self.participant.participant_id
         )
+        self.analyte_1 = analyte_list[0]
+        self.analyte_2 = analyte_list[1]
 
     def test_create_experiment(self):
         data = {
             "experiment_id": "EXP001",
             "table_name": "experiment_dna_short_read",
             "id_in_table": "DNA_001",
-            "participant_id": self.participant.participant_id
+            "participant_id": self.participant.participant_id,
         }
         serializer = ExperimentSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
@@ -37,9 +43,9 @@ class ExperimentServiceTest(TestCase):
             "read_length": 100,
             "sequencing_platform": "Illumina",
             "library_prep_type": ["rRNA depletion"],
-            "experiment_type": ["paired-end","untargeted"],
+            "experiment_type": ["paired-end", "untargeted"],
             "single_or_paired_ends": "paired-end",
-            "within_site_batch_name": "RNA 234A"
+            "within_site_batch_name": "RNA 234A",
         }
         serializer = ExperimentRnaInputSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
@@ -52,7 +58,7 @@ class ExperimentServiceTest(TestCase):
             analyte_id=self.analyte_2,
             experiment_sample_id="SAMPLE_RNA002",
             read_length=150,
-            sequencing_platform="Illumina"
+            sequencing_platform="Illumina",
         )
         data = {
             "aligned_rna_short_read_id": "ALIGNED_RNA002",
@@ -64,7 +70,7 @@ class ExperimentServiceTest(TestCase):
             "alignment_software": "STARv2.7.10a",
             "gene_annotation": "GENCODEv41",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "gene_annotation_details": "gencode_comprehensive_chr"
+            "gene_annotation_details": "gencode_comprehensive_chr",
         }
         serializer = AlignedRnaSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
