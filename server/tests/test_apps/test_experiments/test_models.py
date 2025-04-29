@@ -22,10 +22,11 @@ class ExperimentModelTest(TestCase):
 
     def setUp(self):
         self.participant = Participant.objects.first()
-        # import pdb; pdb.set_trace()
-        self.analyte_1, self.analyte_2 = Analyte.objects.filter(
+        analyte_list = Analyte.objects.filter(
             participant_id=self.participant.participant_id
-        )[:2]
+        )
+        self.analyte_1 = analyte_list[0]
+        self.analyte_2 = analyte_list[1]
 
     def test_experiment_creation(self):
         experiment = Experiment.objects.create(
