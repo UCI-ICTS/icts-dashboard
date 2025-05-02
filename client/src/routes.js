@@ -1,4 +1,4 @@
-// src/routes.js 
+// src/routes.js
 
 import React, { useEffect } from 'react';
 import { useRoutes, Navigate, useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ import AccountService from "./services/account.service";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000; // Convert to seconds
-  const timeUntilExpiration = expirationTime - currentTime; 
+  const timeUntilExpiration = expirationTime - currentTime;
 
   if (timeUntilExpiration > 0) {
     setTimeout(onExpireCallback, timeUntilExpiration * 1000);
@@ -30,7 +30,7 @@ const AppRoutes = () => {
   const isLoggedIn = useSelector((state) => state.account.isLoggedIn);
   const token = useSelector((state) => state.account.user?.access_token);
   console.log("isLoggedIn", isLoggedIn)
-    
+
   useEffect(() => {
       if (token) {
         try {

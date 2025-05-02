@@ -7,7 +7,6 @@
     "required": [
         "experiment_stage_id",
         "analyte_id",
-        "shipment_date",
         "status",
         "current_location"
     ],

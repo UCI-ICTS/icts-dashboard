@@ -33,7 +33,7 @@ const { Option } = Select;
 
 const ManageAdministrators = () => {
   const dispatch = useDispatch();
-  const currentUsername = useSelector((state) => state.account.user?.username); 
+  const currentUsername = useSelector((state) => state.account.user?.username);
   const { staff = [], loading, error } = useSelector(
     (state) => state.account || {}
   );
@@ -58,7 +58,7 @@ const ManageAdministrators = () => {
     });
     setIsModalVisible(true);
   };
-  
+
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
@@ -68,15 +68,15 @@ const ManageAdministrators = () => {
       is_superuser: values.role === "admin",
       is_staff: values.role === "admin" || values.role === "staff",
     };
-  
+
     delete updatedValues.role;
-  
+
     if (editingMember) {
       dispatch(updateUser({ id: editingMember.username, ...updatedValues }));
     } else {
       dispatch(addUser(updatedValues));
     }
-  
+
     setIsModalVisible(false);
     dispatch(fetchUsers());
   };
@@ -99,7 +99,7 @@ const ManageAdministrators = () => {
       render: (text, record) => `${record.last_name}`,
     },
     { title: "Email", dataIndex: "email" },
-    { 
+    {
       title: "Role",
       render: (_, record) => (record.is_superuser ? "Admin" : record.is_staff ? "Staff" : "User"),
       dataIndex: "role"
@@ -140,7 +140,7 @@ const ManageAdministrators = () => {
           </>
         );
       },
-    }    
+    }
   ];
 
   return (

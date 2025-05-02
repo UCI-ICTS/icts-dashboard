@@ -16,7 +16,7 @@ const initialState = user
     initialState,
     extraReducers: (builder) => {
       builder
-      
+
       // --- Authentication and Passwords ---
         .addCase(login.pending, (state) => {
           state.loading = true; // Set loading to true when login is pending
@@ -73,7 +73,7 @@ const initialState = user
           state.user = null;
 
         })
-        
+
         .addCase(resetPassword.pending, (state) => {
           state.loading = true;
           state.error = null;
@@ -111,7 +111,7 @@ const initialState = user
           state.loading = false;
           state.error = action.payload;
         })
-  
+
         .addCase(addUser.fulfilled, (state, action) => {
           state.loading = true;
           state.error = null;
@@ -124,7 +124,7 @@ const initialState = user
           state.loading = false;
           state.error = action.payload;
         })
-  
+
         .addCase(updateUser.fulfilled, (state, action) => {
           const updated = action.payload;
           state.staff.push(updated);
@@ -230,13 +230,13 @@ export const changePassword = createAsyncThunk(
         // Handle "detail" errors (e.g., token issues)
         if (errorData?.detail) {
           errorMessage = errorData.detail;
-        } 
+        }
         // Handle field validation errors (e.g., incorrect password)
         else if (typeof errorData === "object") {
           errorMessage = Object.entries(errorData)
             .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
             .join(" | "); // Join multiple field errors with " | "
-        } 
+        }
         // Generic error errorMessage
         else {
           errorMessage = "Something went wrong";
@@ -332,7 +332,7 @@ export const confirmPasswordReset = createAsyncThunk(
 // --- Users ---
 
 export const fetchUsers = createAsyncThunk(
-  "data/fetchUsers", 
+  "data/fetchUsers",
   async (_, thunkAPI) => {
   try {
     return await AccountService.getUsers();
@@ -343,7 +343,7 @@ export const fetchUsers = createAsyncThunk(
 });
 
 export const addUser = createAsyncThunk(
-  "data/addUser", 
+  "data/addUser",
   async (userData, thunkAPI) => {
   try {
     console.log("Slice ",userData)

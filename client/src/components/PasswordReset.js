@@ -59,7 +59,7 @@ export default function PasswordReset({ open, setOpen }) {
           }}
         />
         </Form.Item>
-        
+
         <Form.Item
           label="Old Password"
           name="old_password"
