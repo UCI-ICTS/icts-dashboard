@@ -23,7 +23,7 @@ export const getRelatedByParticipantId = (fullState, participantId, tableName) =
 
 const GregorParticipants = () => {
   const dispatch = useDispatch();
-  const tableView = "participants"; 
+  const tableView = "participants";
   const tableData = useSelector(state => state.data[tableView]) || [];
   const dataStatus = useSelector(state => state.data.status);
   const fullState = useSelector(state => state.data)
@@ -58,7 +58,7 @@ const GregorParticipants = () => {
     });
     setFilterModalVisible(false);
     setAdvancedFilters({});
-  }, [tableView]);  
+  }, [tableView]);
 
   // Toggle column visibility
   const toggleColumnVisibility = (key) => {
@@ -67,7 +67,7 @@ const GregorParticipants = () => {
       [key]: !prev[key],
     }));
   };
-  
+
   // Generate table columns dynamically
     const columns = useMemo(() => {
       return Object.entries(schema.properties)
@@ -87,10 +87,10 @@ const GregorParticipants = () => {
         }));
     }, [schema, visibleColumns]);
 
-    // Data filtering for search, advanced search, regex search, and download. 
+    // Data filtering for search, advanced search, regex search, and download.
     const filteredData = useMemo(() => {
       let data = [...tableData];
-    
+
       if (searchQuery.trim()) {
         data = data.filter((row) => {
           return Object.values(row).some((value) => {
@@ -118,7 +118,7 @@ const GregorParticipants = () => {
         );
       }
       return data;
-    }, [tableData, searchQuery, advancedFilters, useRegex]);     
+    }, [tableData, searchQuery, advancedFilters, useRegex]);
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -132,39 +132,39 @@ const GregorParticipants = () => {
       </Checkbox>
     ),
   }));
-  
+
   const familyMembers = useMemo(() => {
     if (!selectedRow?.family_id) return [];
-  
+
     return tableData.filter(
       member =>
         member.family_id === selectedRow.family_id &&
         member.participant_id !== selectedRow.participant_id
     );
   }, [selectedRow, tableData]);
-  
+
   const selectedAggregateRecord = useMemo(() => {
     if (!selectedDetail) return null;
-  
+
     const { table_name, id_in_table } = selectedDetail;
     const table = fullState[table_name] || [];
-  
+
     const tableIdKey = `${table_name}_id`;
-  
+
     return table.find((row) => {
       return row[tableIdKey] === id_in_table;
     });
-  }, [selectedDetail, fullState]);  
-  
+  }, [selectedDetail, fullState]);
+
   useEffect(() => {
     if (selectedAggregateRecord) {
       console.log("Selected record details:", selectedAggregateRecord);
     }
   }, [selectedAggregateRecord]);
-  
+
   const handleSubmit = (values, tableName) => {
     console.log(values, editRecord);
-    
+
     if (editRecord) {
       // Update existing record
       dispatch(updateTable({ table: tableName, data: values }));
@@ -175,7 +175,7 @@ const GregorParticipants = () => {
       console.log("Creating new row:", tableName, values);
     }
     setEditRecord(null);
-  };  
+  };
 
   return (
     <>
@@ -248,7 +248,7 @@ const GregorParticipants = () => {
           <Button icon={<SettingOutlined />}>Columns</Button>
         </Dropdown>
       </Col>
-      
+
     </Row>
 
       {dataStatus === "loading" ? (
@@ -429,7 +429,7 @@ const GregorParticipants = () => {
               selectedDetail
                 ? `Details for ${selectedDetail.table_name}`
                 : "Alignment Details"
-            }            
+            }
             open={!!selectedDetail}
             onCancel={() => setSelectedDetail(null)}
             footer={null}

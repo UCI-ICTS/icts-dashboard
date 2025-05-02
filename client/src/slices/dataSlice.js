@@ -13,11 +13,13 @@ const initialState = {
   families: [],
   genetic_findings: [],
   analytes: [],
+  biobank_entries: [],
   phenotypes: [],
   experiments: [],
+  experiment_stages: [],
   experiment_dna_short_read: [],
   experiment_rna_short_read: [],
-  experiment_pac_bio: [], 
+  experiment_pac_bio: [],
   experiment_nanopore: [],
   aligned: [],
   aligned_dna_short_read: [],
@@ -49,12 +51,12 @@ export const dataSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
-        const { 
-          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore,  aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read
+        const {
+          participants, families, genetic_findings, analytes, biobank_entries, phenotypes, experiments, experiment_stages, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore,  aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read
         } = action.payload;
-        
-        Object.assign(state, { 
-          participants, families, genetic_findings, analytes, phenotypes, experiments, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read, status: "fulfilled" 
+
+        Object.assign(state, {
+          participants, families, genetic_findings, analytes, biobank_entries, phenotypes, experiments, experiment_stages, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read, status: "fulfilled"
         });
       })
       .addCase(updateTable.fulfilled, (state, action) => {
@@ -62,7 +64,7 @@ export const dataSlice = createSlice({
         const { table, response, noChanges } = action.payload;
         // Return early if no changes
         if (noChanges) {
-          return; 
+          return;
         }
         // Extract the updated object from the response
         const updatedObject = response[0]?.data?.instance;
@@ -71,25 +73,27 @@ export const dataSlice = createSlice({
           // Extract the identifier value dynamically using the table name
           const identifier = updatedObject[table];
           // Dynamically determine the collection to update based on the table name
-          const collectionName = table === "participants" ? "participants" : 
-                                 table === "families" ? "families" : 
+          const collectionName = table === "participants" ? "participants" :
+                                 table === "families" ? "families" :
                                  table === "genetic_findings" ? "genetic_findings" :
                                  table === "analyte" ? "analytes" :
+                                 table === "biobank_entries" ? "biobank_entries" :
                                  table === "phenotypes" ? "phenotypes" :
-                                 table === "experiments" ? "experiments" : 
+                                 table === "experiments" ? "experiments" :
+                                 table === "experiment_stages" ? "experiment_stages" :
                                  table === "experiment_dna_short_read" ? "experiment_dna_short_read" :
                                  table === "experiment_rna_short_read" ? "experiment_rna_short_read" :
-                                 table === "experiment_nanopore" ? "experiment_nanopore" : 
+                                 table === "experiment_nanopore" ? "experiment_nanopore" :
                                  table === "aligned" ? "aligned" :
-                                 table === "aligned_dna_short_read" ? "aligned_dna_short_read" : 
-                                 table === "aligned_nanopore" ? "aligned_nanopore" : 
-                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" : 
+                                 table === "aligned_dna_short_read" ? "aligned_dna_short_read" :
+                                 table === "aligned_nanopore" ? "aligned_nanopore" :
+                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" :
                                  table === "aligned_rna_short_read" ? "aligned_rna_short_read" : null
-      
+
           if (collectionName && state[collectionName]) {
             // Find the object to update in the relevant collection
             const objectToUpdate = state[collectionName].find(item => item[table] === identifier);
-      
+
             if (objectToUpdate) {
               // Update the object in the state
               Object.assign(objectToUpdate, updatedObject);
@@ -108,7 +112,7 @@ export const dataSlice = createSlice({
         const { table, response, noChanges } = action.payload;
         // Return early if no changes
         if (noChanges) {
-          return; 
+          return;
         }
         // Extract the addd object from the response
         const adddObject = response[0]?.data?.instance;
@@ -117,25 +121,27 @@ export const dataSlice = createSlice({
           // Extract the identifier value dynamically using the table name
           const identifier = adddObject[table];
           // Dynamically determine the collection to add based on the table name
-          const collectionName = table === "participants" ? "participants" : 
-                                 table === "families" ? "families" : 
+          const collectionName = table === "participants" ? "participants" :
+                                 table === "families" ? "families" :
                                  table === "genetic_findings" ? "genetic_findings" :
-                                 table === "analytanalytese_id" ? "analytes" :
+                                 table === "analytes" ? "analytes" :
+                                 table === "biobank_entries" ? "biobank_entries" :
                                  table === "phenotypes" ? "phenotypes" :
-                                 table === "experiments" ? "experiments" : 
+                                 table === "experiments" ? "experiments" :
+                                 table === "experiment_stages" ? "experiment_stages" :
                                  table === "experiment_dna_short_read" ? "experiment_dna_short_read" :
                                  table === "experiment_rna_short_read" ? "experiment_rna_short_read" :
-                                 table === "experiment_nanopore" ? "experiment_nanopore" : 
+                                 table === "experiment_nanopore" ? "experiment_nanopore" :
                                  table === "aligned" ? "aligned" :
-                                 table === "aligned_dna_short_read" ? "aligned_dna_short_read" : 
-                                 table === "aligned_nanopore" ? "aligned_nanopore" : 
-                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" : 
+                                 table === "aligned_dna_short_read" ? "aligned_dna_short_read" :
+                                 table === "aligned_nanopore" ? "aligned_nanopore" :
+                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" :
                                  table === "aligned_rna_short_read" ? "aligned_rna_short_read" : null
-      
+
           if (collectionName && state[collectionName]) {
             // Find the object to add in the relevant collection
             const objectToUpdate = state[collectionName].find(item => item[table] === identifier);
-      
+
             if (objectToUpdate) {
               // Update the object in the state
               Object.assign(objectToUpdate, adddObject);
@@ -182,8 +188,14 @@ export const addTable = createAsyncThunk(
       if (table === "analytes") {
         return dataService.createAnalyte(data);
       }
+      if (table === "biobank_entries") {
+        return dataService.createBiobankEntries(data);
+      }
       if (table === "phenotypes") {
         return dataService.createPhenotype(data);
+      }
+      if (table === "experiment_stage") {
+        return dataService.createExperimentStage(data);
       }
       if (table === "experiment_dna_short_read_id") {
         console.log("stuff")
@@ -215,12 +227,12 @@ export const addTable = createAsyncThunk(
 
     } catch (error) {
       let errorMessage = "";
-      
+
       // Check if there's a top-level errorMessage.
       if (error.response && error.response.message) {
         errorMessage = error.response.message;
         console.log("Top-level message:", errorMessage);
-      } 
+      }
       // Otherwise, if error.response.data is an array and has at least one element:
       else if (
         error.response &&
@@ -234,28 +246,28 @@ export const addTable = createAsyncThunk(
           errorMessage = firstError.data
             .map(err => `${err.field}: ${err.error}`)
             .join(", ");
-        } 
+        }
         // Otherwise, if the first element itself has 'field' and 'error', use those.
         else if (firstError.field && firstError.error) {
           errorMessage = `${firstError.field}: ${firstError.error}`;
-        } 
+        }
         // Otherwise, fall back to stringifying the first element.
         else {
           errorMessage = JSON.stringify(firstError);
         }
         console.log("Constructed message from response data:", errorMessage);
-      } 
+      }
       // Fallback generic message.
       else {
         errorMessage = "An unknown error occurred.";
         console.log("Fallback message:", errorMessage);
       }
-      
+
       console.log("ERROR! ", error.response.data);
       message.error(errorMessage);
       return thunkAPI.rejectWithValue();
     }
-    
+
   }
 )
 
@@ -275,8 +287,14 @@ export const updateTable = createAsyncThunk(
       if (table === "analytes") {
         return dataService.updateAnalyte(data);
       }
+      if (table === "biobank_entries") {
+        return dataService.updateBiobankEntries(data);
+      }
       if (table === "phenotypes") {
         return dataService.updatePhenotype(data);
+      }
+      if (table === "experiment_stages") {
+        return dataService.updateExperimentStage(data);
       }
       if (table === "experiment_dna_short_read_id") {
         console.log("stuff")
@@ -308,12 +326,12 @@ export const updateTable = createAsyncThunk(
 
     } catch (error) {
       let errorMessage = "";
-      
+
       // Check if there's a top-level errorMessage.
       if (error.response && error.response.message) {
         errorMessage = error.response.message;
         console.log("Top-level message:", errorMessage);
-      } 
+      }
       // Otherwise, if error.response.data is an array and has at least one element:
       else if (
         error.response &&
@@ -327,28 +345,28 @@ export const updateTable = createAsyncThunk(
           errorMessage = firstError.data
             .map(err => `${err.field}: ${err.error}`)
             .join(", ");
-        } 
+        }
         // Otherwise, if the first element itself has 'field' and 'error', use those.
         else if (firstError.field && firstError.error) {
           errorMessage = `${firstError.field}: ${firstError.error}`;
-        } 
+        }
         // Otherwise, fall back to stringifying the first element.
         else {
           errorMessage = JSON.stringify(firstError);
         }
         console.log("Constructed message from response data:", errorMessage);
-      } 
+      }
       // Fallback generic message.
       else {
         errorMessage = "An unknown error occurred.";
         console.log("Fallback message:", errorMessage);
       }
-      
+
       console.log("ERROR! ", error.response.data);
       message.error(errorMessage);
       return thunkAPI.rejectWithValue();
     }
-    
+
   }
 )
 

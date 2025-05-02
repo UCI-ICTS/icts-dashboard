@@ -24,7 +24,7 @@ const Login = () => {
         message.error(err || "Login failed. Please check your credentials.");
       });
   };
-  
+
   const showModal = () => {
     setPasswordResetModal(true);
   };
@@ -35,7 +35,7 @@ const Login = () => {
     form.resetFields();
     setPasswordResetModal(false);
   };
-  
+
   const handleCancel = () => {
     form.resetFields();
     setPasswordResetModal(false);
@@ -57,10 +57,10 @@ const Login = () => {
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input 
-              prefix={<UserOutlined />} 
+            <Input
+              prefix={<UserOutlined />}
               placeholder="Username"
-              autoComplete="username" 
+              autoComplete="username"
             />
           </Form.Item>
 
@@ -68,9 +68,9 @@ const Login = () => {
             name="password"
             rules={[{ required: true, message: 'Please input your Password!' }]}
           >
-            <Input 
-              prefix={<LockOutlined />} 
-              type="password" 
+            <Input
+              prefix={<LockOutlined />}
+              type="password"
               placeholder="Password"
               autoComplete="current-password"
             />

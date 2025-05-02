@@ -24,12 +24,14 @@ serializer_mapping ={
     'participant':"ParticipantInputSerializer",
     'phenotype': "PhenotypeSerializer",
     'geneticfindings' : "GeneticFindingsSerializer",
-    'analyte': "AnalyteSerializer"
+    'analyte': "AnalyteSerializer",
+    'biobankentry': "BiobankSerializer",
+    'experimentstage': "ExperimentStageSerializer",
 }
 
 def get_anvil_tables():
     files = {}
-    metadata_list = ['family', 'participant', 'phenotype', 'geneticfindings', 'analyte']
+    metadata_list = ['family', 'participant', 'phenotype', 'geneticfindings', 'analyte', 'biobankentry', 'experimentstage']
     experiments_list = ['experiment', 'aligned', 'experimentdnashortread', 'aligneddnashortread', 'experimentrnashortread', 'alignedrnashortread', 'experimentnanopore', 'alignednanopore', 'experimentpacbio', 'alignedpacbio']
     experiments_models = apps.all_models['experiments']
     experiments_serializer_module = importlib.import_module('experiments.services')
@@ -42,7 +44,7 @@ def get_anvil_tables():
                 queryset = experiments_models[key].objects.all()
                 serializer = SerializerClass(queryset, many=True)
                 serialized_data = serializer.data
-                tsv_content = generate_tsv(serialized_data)     
+                tsv_content = generate_tsv(serialized_data)
                 files[f"{key.lower()}.tsv"]  = tsv_content
             except KeyError as error:
                 print(error)
@@ -53,11 +55,11 @@ def get_anvil_tables():
                 queryset = metadata_models[key].objects.all()
                 serializer = SerializerClass(queryset, many=True)
                 serialized_data = serializer.data
-                tsv_content = generate_tsv(serialized_data)     
+                tsv_content = generate_tsv(serialized_data)
                 files[f"{key.lower()}.tsv"]  = tsv_content
             except KeyError as error:
                 print(error)
-            
+
     zip_buffer = generate_zip(files)
 
     return zip_buffer

@@ -2677,6 +2677,211 @@
                 "description": "describe if there are any QC issues that would be important to note"
             }
         }
+    },
+    "biobank_entries": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/PMGRC_data_model_with_extensions - biobank.json",
+        "title": "PMGRC_data_model_with_extensions - biobank",
+        "version": "1.7.1",
+        "type": "object",
+        "required": [
+            "biobank_id",
+            "collection_date",
+            "specimen_type",
+            "status"
+        ],
+        "definitions": {},
+        "properties": {
+            "biobank_id": {
+                "type": "string",
+                "description": "primary key, printed on tubes"
+            },
+            "participant_id": {
+                "type": "string",
+                "description": "printed on tube, automatically reference with participant table"
+            },
+            "collection_date": {
+                "type": "string",
+                "description": "8-digit date as MM/DD/YYYY, printed on tube"
+            },
+            "specimen_type": {
+                "type": "string",
+                "enum": [
+                    "D",
+                    "R",
+                    "OG",
+                    "SC",
+                    "SG",
+                    "X",
+                    "XR"
+                ],
+                "description": "Maps to analyte codes: D - EDTA in Cryovial R - PAX Tube OG - OGR-500 saliva collection kit SC - OCD-100 buccal collection kit SG - OGR-675 saliva collection kit X - Extracted DNA XR - Extracted RNA"
+            },
+            "current_location": {
+                "type": "string",
+                "description": "Sample storage locations"
+            },
+            "freezer_id": {
+                "type": "string",
+                "description": "Freezer name in the Vilain Lab"
+            },
+            "shelf_id": {
+                "type": "string",
+                "description": "Shelf number from top to bottom"
+            },
+            "rack_id": {
+                "type": "string",
+                "description": "Rack name"
+            },
+            "box_type": {
+                "type": "string",
+                "enum": [
+                    "5x5 cryobox",
+                    "9x9 cryobox",
+                    "10x10 cryobox",
+                    "SBS plate",
+                    "Wire rack",
+                    "8x12 metal rack"
+                ],
+                "description": "Current box types in our freezer. This affects the valid box map positions"
+            },
+            "box_id": {
+                "type": "string",
+                "description": "Box names"
+            },
+            "box_position": {
+                "type": "string",
+                "description": "XY positions for boxes and racks. X-axis are numbers (1-12), Y-axis are letters (A-H)"
+            },
+            "tube_barcode": {
+                "type": "string",
+                "description": "For tubes with these barcodes available"
+            },
+            "plate_barcode": {
+                "type": "string",
+                "description": "For SBS plates with barcodes"
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "Pending shipment",
+                    "Shipped",
+                    "Received",
+                    "Stored",
+                    "Replacement requested",
+                    "Lost",
+                    "QC Issue-see comments"
+                ],
+                "description": "Notes: See participant_sample_status table in retool"
+            },
+            "shipment_date": {
+                "type": "string",
+                "description": "8-digit date MM/DD/YYYY"
+            },
+            "child_analytes": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
+                }
+            },
+            "comments": {
+                "type": "string",
+                "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+            }
+        }
+    },
+    "experiment_stages": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/PMGRC_data_model_with_extensions - experiment_stage.json",
+        "title": "PMGRC_data_model_with_extensions - experiment_stage",
+        "version": "1.7.1",
+        "type": "object",
+        "required": [
+            "experiment_stage_id",
+            "analyte_id",
+            "status",
+            "current_location"
+        ],
+        "definitions": {},
+        "properties": {
+            "experiment_stage_id": {
+                "type": "string",
+                "description": "Analyte ID for tracking experiments once they start"
+            },
+            "analyte_id": {
+                "type": "string",
+                "description": "Identifier for the analyte used in the experiment."
+            },
+            "test_indication": {
+                "type": "string",
+                "description": "Ambry shipping manifest requirement. Research or Clinical"
+            },
+            "requested_test": {
+                "type": "string",
+                "description": "Ambry test code. 10500 for LR-WGS. 10525 for WTS"
+            },
+            "collection_date": {
+                "type": "string",
+                "description": "8-digit date as MM/DD/YYYY, printed on tube. For Ambry shipping manifest"
+            },
+            "specimen_type": {
+                "type": "string",
+                "description": "From Analyte table"
+            },
+            "shipment_date": {
+                "type": "string",
+                "description": "Date when an analyte was shipped out to a sequencing provider"
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "Pending shipment",
+                    "Shipped",
+                    "Received",
+                    "Accessioned",
+                    "Extracted",
+                    "Sequenced",
+                    "Data delivered",
+                    "Replacement requested",
+                    "QC Issue-see comments"
+                ],
+                "description": "Notes: See participant_sample_status table in retool"
+            },
+            "current_location": {
+                "type": "string",
+                "description": "Current analyte location. i.e. UCI, Ambry, etc."
+            },
+            "tracking_number": {
+                "type": "string",
+                "description": "Fedex tracking number if available"
+            },
+            "experiments_list": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. experiment objects"
+                }
+            },
+            "alignments_list": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. alignment objects"
+                }
+            },
+            "external_id": {
+                "type": "string",
+                "description": "Ambry identifier or similar"
+            },
+            "comments": {
+                "type": "string",
+                "description": "Freetext (limited characters) to concisely describe if there are any\nQC issues that would be important to note"
+            },
+            "internal_analysis": {
+                "type": "string",
+                "description": "Freetext to describe what analysis pipelines have been done on this case"
+            }
+        }
     }
-    
 }

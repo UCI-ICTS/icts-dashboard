@@ -22,7 +22,7 @@ const getAuthHeaders = () => {
 
 const getAllTables = async () => {
   const response = await axios.get(`${APIDB}api/search/get_all_tables/`, {
-    headers: getAuthHeaders(), 
+    headers: getAuthHeaders(),
   });
   return response;
 };
@@ -66,6 +66,16 @@ const updateAnalyte = async (data, token) => {
 }
 
 
+const updateBiobankEntries = async (data, token) => {
+  const response = await axios.post(APIDB + "api/metadata/biobank/update/", [
+    data
+  ], {
+    headers: getAuthHeaders()
+  });
+  return response;
+}
+
+
 const updatePhenotype = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/update_phenotype/", [
     data
@@ -78,6 +88,16 @@ const updatePhenotype = async (data, token) => {
 
 const updateExperiment = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
+    data
+  ], {
+    headers: getAuthHeaders()
+  });
+  return response;
+}
+
+
+const updateExperimentStage = async (data, token) => {
+  const response = await axios.post(APIDB + "api/metadata/experiment_stage/update/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -155,7 +175,17 @@ const createGeneticFindings = async (data, token) => {
 
 
 const createAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/create_analyte/", [
+  const response = await axios.post(APIDB + "api/metadata/create_analytes/", [
+    data
+  ], {
+    headers: getAuthHeaders()
+  });
+  return response;
+}
+
+
+const createBiobankEntries = async (data, token) => {
+  const response = await axios.post(APIDB + "api/metadata/biobank/create/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -176,6 +206,16 @@ const createPhenotype = async (data, token) => {
 
 const createExperiment = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
+    data
+  ], {
+    headers: getAuthHeaders()
+  });
+  return response;
+}
+
+
+const createExperimentStage = async (data, token) => {
+  const response = await axios.post(APIDB + "api/metadata/experiment_stage/create/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -228,14 +268,18 @@ const dataService = {
   updatePacBio,
   updateRnaShortRead,
   updateDnaShortRead,
+  updateExperimentStage,
   updateExperiment,
   updatePhenotype,
+  updateBiobankEntries,
   updateAnalyte,
   updateGeneticFindings,
-  updateFamily,  
+  updateFamily,
   updateParticipant,
   createAnalyte,
+  createBiobankEntries,
   createDnaShortRead,
+  createExperimentStage,
   createExperiment,
   createFamily,
   createGeneticFindings,

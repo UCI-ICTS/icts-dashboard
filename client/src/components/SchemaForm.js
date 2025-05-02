@@ -1,6 +1,6 @@
 // src/components/SchemaForm.js
 
-import React, { useEffect, useState} from "react"; 
+import React, { useEffect, useState} from "react";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -89,7 +89,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
         </Form.Item>
       );
     }
-  
+
     // Render free-form text input array using Form.List
     return (
       <Form.Item key={keyName} label={label}>
@@ -127,7 +127,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
       </Form.Item>
     );
   }
-  
+
   return null;
 };
 
