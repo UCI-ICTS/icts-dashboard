@@ -43,12 +43,12 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
 
       // Extract column headers
       const filteredHeadCells = headCells.filter(cell => cell.field !== "actions");
-      const headers = filteredHeadCells.map(cell => escapeValue(cell.headerName)).join(delimiter);      
+      const headers = filteredHeadCells.map(cell => escapeValue(cell.headerName)).join(delimiter);
 
       // Convert rows to formatted CSV/TSV
       const fileRows = rows.map(row =>
         filteredHeadCells.map(cell => escapeValue(row[cell.field])).join(delimiter)
-      );      
+      );
 
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
@@ -77,10 +77,10 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
   return (
     <>
       {/* Download Button */}
-      <Button 
-        type="primary" 
-        icon={<DownloadOutlined />} 
-        onClick={() => setOpenDialog(true)} 
+      <Button
+        type="primary"
+        icon={<DownloadOutlined />}
+        onClick={() => setOpenDialog(true)}
         // disabled={disabled}
       >
         Download
@@ -95,9 +95,9 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
         okText="Download"
         cancelText="Cancel"
       >
-        <Select 
-          value={exportFormat} 
-          onChange={setExportFormat} 
+        <Select
+          value={exportFormat}
+          onChange={setExportFormat}
           style={{ width: "100%" }}
         >
           <Option value="TSV">TSV</Option>

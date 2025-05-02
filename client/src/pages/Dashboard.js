@@ -57,7 +57,7 @@ const HomePage = () => {
   return (
     <Layout className="layout-container">
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} className="sider-container">
-        <h2 className="sider-header">UCI ICTS Dashboard</h2>  
+        <h2 className="sider-header">UCI ICTS Dashboard</h2>
         {/* Menu Items */}
         <div className="sider-menu-wrapper">
           <Menu
@@ -75,9 +75,9 @@ const HomePage = () => {
         </div>
         <div className="logout-button-container">
           <Tooltip title="Logout">
-            <Button 
+            <Button
               onClick={handleLogout}
-              icon={<LogoutOutlined />} 
+              icon={<LogoutOutlined />}
               className="logout-button"
               >
               {!collapsed && "Logout"} {/* Hide text when sidebar is collapsed */}

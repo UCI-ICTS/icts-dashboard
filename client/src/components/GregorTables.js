@@ -45,7 +45,7 @@ const GregorTables = () => {
     });
     setFilterModalVisible(false);
     setAdvancedFilters({});
-  }, [tableView]);  
+  }, [tableView]);
 
   // Toggle column visibility
   const toggleColumnVisibility = (key) => {
@@ -54,7 +54,7 @@ const GregorTables = () => {
       [key]: !prev[key],
     }));
   };
-  
+
   // Generate table columns dynamically
     const baseColumns = useMemo(() => {
       return Object.entries(schema.properties)
@@ -98,10 +98,10 @@ const GregorTables = () => {
       ...baseColumns,
     ], [baseColumns]);
 
-    // Data filtering for search, advanced search, regex search, and download. 
+    // Data filtering for search, advanced search, regex search, and download.
     const filteredData = useMemo(() => {
       let data = [...tableData];
-    
+
       if (searchQuery.trim()) {
         data = data.filter((row) => {
           return Object.values(row).some((value) => {
@@ -129,7 +129,7 @@ const GregorTables = () => {
         );
       }
       return data;
-    }, [tableData, searchQuery, advancedFilters, useRegex]);     
+    }, [tableData, searchQuery, advancedFilters, useRegex]);
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -143,8 +143,8 @@ const GregorTables = () => {
       </Checkbox>
     ),
   }));
-  
-  
+
+
   return (
     <>
     <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
@@ -226,7 +226,7 @@ const GregorTables = () => {
           </Button>
         </Tooltip>
       </Col>
- 
+
       <Col xs={24} sm={12} md={6} lg={4}>
         <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
           <Button icon={<SettingOutlined />}>Columns</Button>
@@ -240,7 +240,7 @@ const GregorTables = () => {
         </Spin>
       ) : dataStatus === "error" ? (
         <Alert message="Error loading data" type="error" showIcon />
-      ) : (        
+      ) : (
         <Table
           columns={columns}
           dataSource={filteredData}
@@ -265,7 +265,7 @@ const GregorTables = () => {
         onCancel={() => {
           form.resetFields();
           setAddModalVisible(false);
-        }}      
+        }}
         footer={null}
         width={800}
       >
@@ -277,7 +277,7 @@ const GregorTables = () => {
           onSubmit={async (values) => {
             try {
               let result;
-          
+
               if (editRecord) {
                 result = await dispatch(updateTable({ table: tableView, data: values }));
                 console.log("Editing row:", tableView, values);
@@ -285,7 +285,7 @@ const GregorTables = () => {
                 result = await dispatch(addTable({ table: tableView, data: values }));
                 console.log("Creating new row:", tableView, values);
               }
-          
+
               // Only close the form if the action was fulfilled
               if (result.meta.requestStatus === "fulfilled") {
                 setAddModalVisible(false);

@@ -21,6 +21,8 @@ from metadata.models import (
     GeneticFindings,
     Phenotype,
     Analyte,
+    Biobank,
+    ExperimentStage,
 )
 
 from metadata.services import (
@@ -29,7 +31,9 @@ from metadata.services import (
     FamilySerializer,
     GeneticFindingsSerializer,
     AnalyteSerializer,
-    PhenotypeSerializer
+    PhenotypeSerializer,
+    BiobankSerializer,
+    ExperimentStageSerializer,
 )
 
 from experiments.models import (
@@ -77,10 +81,12 @@ class GetAllTablesAPI(APIView):
         try:
             # Metadata Models
             serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
-            serilized_families = FamilySerializer(Family.objects.all(), many=True)
+            serialized_families = FamilySerializer(Family.objects.all(), many=True)
             serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
             serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
-            serilized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
+            serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
+            serialized_biobank_entries = BiobankSerializer(Biobank.objects.all(), many=True)
+            serialized_experiment_stages = ExperimentStageSerializer(ExperimentStage.objects.all(), many=True)
 
             # Experiment Models
             serialized_aligned_experiments = AlignedSerializer(
@@ -103,15 +109,17 @@ class GetAllTablesAPI(APIView):
             serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
             serialized_pacbio = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
             serialized_rna = ExperimentRnaOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
-            
+
 
             serilized_return_data = {
                 # Metadata Tables
                 'participants': serialized_participants.data,
-                'families': serilized_families.data,
-                'genetic_findings': serilized_genetic_findings.data,
+                'families': serialized_families.data,
+                'genetic_findings': serialized_genetic_findings.data,
                 'analytes': serialized_analytes.data,
                 'phenotypes': serialized_phenotypes.data,
+                'biobank_entries': serialized_biobank_entries.data,
+                'experiment_stages': serialized_experiment_stages.data,
                 # Experiment Tables
                 'experiments': serialized_experiments.data,
                 'experiment_dna_short_read' : serialized_dna.data,
