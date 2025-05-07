@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreatePacBioAPITest(APITestCaseWithAuth):
     def test_create_pac_bio_api(self):
-        url = "/api/experiments/create_experiment_pac_bio/"
+        url = "/api/experiments/experiment_pac_bio/create/"
 
         experiment1 = {  # Valid
             "experiment_pac_bio_id": "UCI_GREGoR_test-001-002-0-R-20_PB",
@@ -134,9 +134,9 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
 
 class ReadPacBioPITest(APITestCaseWithAuth):
     def test_read_experiment_pac_bio(self):
-        url1 = "/api/experiments/read_experiment_pac_bio/?ids=UCI_GREGoR_test-001-002-0-R-2_PB"
-        url2 = "/api/experiments/read_experiment_pac_bio/?ids=UCI_GREGoR_test-002-002-2-R-2_PB, DNE-01-1"
-        url3 = "/api/experiments/read_experiment_pac_bio/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-001-002-0-R-2_PB"
+        url2 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-002-002-2-R-2_PB, DNE-01-1"
+        url3 = "/api/experiments/experiment_pac_bio/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -148,7 +148,7 @@ class ReadPacBioPITest(APITestCaseWithAuth):
 
 class UpdatePacBioAPITest(APITestCaseWithAuth):
     def test_update_pac_bio_api(self):
-        url = "/api/experiments/update_experiment_pac_bio/"
+        url = "/api/experiments/experiment_pac_bio/update/"
         experiment1 = {  # Valid
             "experiment_pac_bio_id": "UCI_GREGoR_test-001-002-0-R-2_PB",
             "analyte_id": "GREGoR_test-001-002-0-R-2",
@@ -230,8 +230,8 @@ class DeletePacBioAPITest(APITestCaseWithAuth):
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/delete_experiment_pac_bio/?ids=UCI_GREGoR_test-001-002-0-R-2_PB, DNE-01-1"
-        url3 = "/api/experiments/delete_experiment_pac_bio/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/experiment_pac_bio/delete/?ids=UCI_GREGoR_test-001-002-0-R-2_PB, DNE-01-1"
+        url3 = "/api/experiments/experiment_pac_bio/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')

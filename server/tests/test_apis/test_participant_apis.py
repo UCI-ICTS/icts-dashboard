@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateParticipantAPITest(APITestCaseWithAuth):
     def test_create_participant_api(self):
-        url = "/api/metadata/create_participants/"
+        url = "/api/metadata/participant/create/"
         part1 = {  # Valid submission
             "participant_id": "P-002-101-0",
             "gregor_center": "UCI",
@@ -83,9 +83,9 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
 
 class ReadParticipantAPITest(APITestCaseWithAuth):
     def test_read_participant(self):
-        url1 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2"
-        url2 = "/api/metadata/read_participants/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2,DNE-01-1"
-        url3 = "/api/metadata/read_participants/?ids=DNE-01-1,DNE-2-2"
+        url1 = "/api/metadata/participant/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2"
+        url2 = "/api/metadata/participant/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2,DNE-01-1"
+        url3 = "/api/metadata/participant/?ids=DNE-01-1,DNE-2-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -99,9 +99,9 @@ class ReadParticipantAPITest(APITestCaseWithAuth):
 
 class UpdateParticipantAPITest(APITestCaseWithAuth):
     def test_update_participant(self):
-        url = "/api/metadata/update_participants/"
+        url = "/api/metadata/participant/update/"
 
-        part1= {
+        part1= {  # Valid case.
             "participant_id": "GREGoR_test-001-002-0",
             "consent_code": "HMB",
             "gregor_center": "UCI",
@@ -116,7 +116,7 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
             "age_at_enrollment": 20,
             "missing_variant_case": "No"
         }
-        part2 = {
+        part2 = {  # Non-existant case; should fail.
             "participant_id": "GREGoR_test-001-000-0",
             "consent_code": "HMB",
             "gregor_center": "UCI",
@@ -139,13 +139,13 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
-        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 class DeleteParticipantAPITest(APITestCaseWithAuth):
     def test_delete_participant(self):
-        url = "/api/metadata/delete_participants/?ids=GREGoR_test-001-002-0"
+        url = "/api/metadata/participant/delete/?ids=GREGoR_test-001-002-0"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # import pdb; pdb.set_trace()

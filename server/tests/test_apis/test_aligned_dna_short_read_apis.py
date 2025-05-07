@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_dna_short_read_api(self):
-        url = "/api/experiments/create_aligned_dna_short_read/"
+        url = "/api/experiments/aligned_dna_short_read/create/"
 
         aligned1 = {  # Prior existing entry, Is valid
             "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1",
@@ -101,9 +101,9 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
 class ReadAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_aligned_dna_short_read(self):
-        url1 = "/api/experiments/read_aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1"
-        url2 = "/api/experiments/read_aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/read_aligned_dna_short_read/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1"
+        url2 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_dna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -115,7 +115,7 @@ class ReadAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
 class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_aligned_dna_short_read_api(self):
-        url = "/api/experiments/update_aligned_dna_short_read/"
+        url = "/api/experiments/aligned_dna_short_read/update/"
 
         aligned1 = {  # Valid, added mean_coverage
             "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1",
@@ -168,8 +168,8 @@ class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/delete_aligned_dna_short_read/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/delete_aligned_dna_short_read/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/aligned_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_dna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')
