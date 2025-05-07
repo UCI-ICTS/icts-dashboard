@@ -194,7 +194,7 @@ export const addTable = createAsyncThunk(
       if (table === "phenotypes") {
         return dataService.createPhenotype(data);
       }
-      if (table === "experiment_stage") {
+      if (table === "experiment_stages") {
         return dataService.createExperimentStage(data);
       }
       if (table === "experiment_dna_short_read_id") {

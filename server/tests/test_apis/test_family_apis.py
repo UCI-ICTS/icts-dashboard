@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateFamilyAPITest(APITestCaseWithAuth):
     def test_create_family_api(self):
-        url = "/api/metadata/create_families/"
+        url = "/api/metadata/family/create/"
         part1 = {  # Valid submission
             "family_id": "P-101",
             "consanguinity": "Unknown",
@@ -52,9 +52,9 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
 
 class ReadFamilyAPITest(APITestCaseWithAuth):
     def test_read_family_success(self):
-        url1 = "/api/metadata/read_families/?ids=GREGoR_test-001,GREGoR_test-002"
-        url2 = "/api/metadata/read_families/?ids=GREGoR_test-001,GREGoR_test-002,DNE-01"
-        url3 = "/api/metadata/read_families/?ids=DNE-01,DNE-2"
+        url1 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-002"
+        url2 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-002,DNE-01"
+        url3 = "/api/metadata/family/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -68,7 +68,7 @@ class ReadFamilyAPITest(APITestCaseWithAuth):
 
 class UpdateFamilyAPITest(APITestCaseWithAuth):
     def test_update_family_api(self):
-        url = "/api/metadata/update_families/"
+        url = "/api/metadata/family/update/"
         part1 = {  # Valid submission
             "family_id": "GREGoR_test-001",
             "consanguinity": "Present",
@@ -97,7 +97,7 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
 
 class DeleteFamilyAPITest(APITestCaseWithAuth):
     def test_delete_family_api(self):
-        url = "/api/metadata/delete_families/?ids=GREGoR_test-001"
+        url = "/api/metadata/family/delete/?ids=GREGoR_test-001"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

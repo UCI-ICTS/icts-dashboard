@@ -4,10 +4,10 @@
 from django.test import TestCase
 from experiments.models import ExperimentRNAShortRead
 from experiments.services import (
-    ExperimentRnaInputSerializer,
-    ExperimentRnaOutputSerializer,
+    ExperimentRNAInputSerializer,
+    ExperimentRNAOutputSerializer,
     ExperimentSerializer,
-    AlignedRnaSerializer,
+    AlignedRNASerializer,
 )
 from metadata.models import Analyte, Participant
 
@@ -47,7 +47,7 @@ class ExperimentServiceTest(TestCase):
             "single_or_paired_ends": "paired-end",
             "within_site_batch_name": "RNA 234A",
         }
-        serializer = ExperimentRnaInputSerializer(data=data)
+        serializer = ExperimentRNAInputSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
         self.assertEqual(instance.experiment_rna_short_read_id, "RNA001")
@@ -72,7 +72,7 @@ class ExperimentServiceTest(TestCase):
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
             "gene_annotation_details": "gencode_comprehensive_chr",
         }
-        serializer = AlignedRnaSerializer(data=data)
+        serializer = AlignedRNASerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
         self.assertEqual(instance.aligned_rna_short_read_id, "ALIGNED_RNA002")
