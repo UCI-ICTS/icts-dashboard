@@ -27,7 +27,7 @@ from metadata.models import (
 from metadata.selectors import (
     participant_parser,
     genetic_findings_parser,
-    biobank_parser
+    biobank_parser,
 )
 
 from submodels.models import ReportedRace
@@ -241,6 +241,7 @@ class PhenotypeSerializer(serializers.ModelSerializer):
         """Update each attribute of the instance with validated data"""
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+            instance.save()
         return instance
 
 
@@ -466,8 +467,8 @@ def create_or_update_metadata(
         },
         "experiment_stage": {
             "input_serializer": ExperimentStageSerializer,
-            "output_serializer": ExperimentStageSerializer
-        }
+            "output_serializer": ExperimentStageSerializer,
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -597,7 +598,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         },
         "experiment_stage": {
             "input_serializer": ExperimentStageSerializer,
-            "output_serializer": ExperimentStageSerializer
+            "output_serializer": ExperimentStageSerializer,
         },
     }
 
@@ -695,7 +696,7 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         },
         "experiment_stage": {
             "input_serializer": ExperimentStageSerializer,
-            "output_serializer": ExperimentStageSerializer
+            "output_serializer": ExperimentStageSerializer,
         },
     }
 
@@ -712,36 +713,40 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
     results = table_validator.get_validation_results()
 
     if results["valid"]:
-        serializer = model_input_serializer(model_instance, data=datum)
-        if serializer.is_valid():
-            updated_instance = serializer.save()
-            changes = compare_data(
-                old_data=model_output_serializer(model_instance).data, new_data=datum
-            )
-            return (
-                response_constructor(
-                    identifier=identifier,
-                    request_status="UPDATED",
-                    code=200,
-                    message=f"{table_name} {identifier} updated.",
-                    data={
-                        "updates": changes,
-                        "instance": model_output_serializer(updated_instance).data,
-                    },
-                ),
-                "accepted_request",
-            )
-        else:
-            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-            return (
-                response_constructor(
-                    identifier=identifier,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data=error_data,
-                ),
-                "rejected_request",
-            )
+        with transaction.atomic():
+            serializer = model_input_serializer(model_instance, data=datum)
+            if serializer.is_valid():
+                updated_instance = serializer.save()
+                changes = compare_data(
+                    old_data=model_output_serializer(model_instance).data,
+                    new_data=datum,
+                )
+                return (
+                    response_constructor(
+                        identifier=identifier,
+                        request_status="UPDATED",
+                        code=200,
+                        message=f"{table_name} {identifier} updated.",
+                        data={
+                            "updates": changes,
+                            "instance": model_output_serializer(updated_instance).data,
+                        },
+                    ),
+                    "accepted_request",
+                )
+            else:
+                error_data = [
+                    {item: serializer.errors[item]} for item in serializer.errors
+                ]
+                return (
+                    response_constructor(
+                        identifier=identifier,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data=error_data,
+                    ),
+                    "rejected_request",
+                )
     else:
         return (
             response_constructor(
