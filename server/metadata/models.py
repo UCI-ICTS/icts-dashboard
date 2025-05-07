@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # metadata/models.py
 
-"""
-"""
+""" """
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -271,12 +270,15 @@ class Phenotype(models.Model):
             ("HP:0034198", "Second Decade"),
             ("HP:0034197", "Third Decade"),
             ("HP:0011462", "First Decade"),
+            ("unknown", "unknown"),
         ],
         default="unknown",
         help_text="Age range at the onset of the phenotype",
     )
     additional_modifiers = models.JSONField(
-        default=list, blank=True, help_text="List of additional modifiers (HPO/MONDO terms)"
+        default=list,
+        blank=True,
+        help_text="List of additional modifiers (HPO/MONDO terms)",
     )
     syndromic = models.CharField(
         max_length=50,
@@ -305,9 +307,7 @@ class GeneticFindings(models.Model):
         help_text="The experiment table and experiment ID(s) in which discovery was identified",
     )
     variant_type = models.JSONField(
-        default=list,
-        choices=VariantType.choices,
-        help_text="Type of genetic variant"
+        default=list, choices=VariantType.choices, help_text="Type of genetic variant"
     )
     sv_type = models.CharField(
         max_length=50, blank=True, help_text="Type of structural variant if applicable"
@@ -582,9 +582,7 @@ class Biobank(models.Model):
         on_delete=models.CASCADE,
         help_text="The participant from whom the biosample was taken",
     )
-    collection_date = models.DateField(
-        help_text="Date when the biosample was created"
-    )
+    collection_date = models.DateField(help_text="Date when the biosample was created")
     specimen_type = models.CharField(
         max_length=10,
         choices=[
@@ -594,33 +592,33 @@ class Biobank(models.Model):
             ("SC", "OCD-100 buccal collection kit"),
             ("SG", "OGR-675 buccal collection kit"),
             ("X", "Extracted DNA"),
-            ("XR","Extracted RNA")
+            ("XR", "Extracted RNA"),
         ],
-        help_text="Analyte codes printed on biospecimen containers"
+        help_text="Analyte codes printed on biospecimen containers",
     )
     current_location = models.CharField(
         max_length=100,
         null=True,
         blank=True,
-        help_text="Sample storage location, e.g. UCI, Ambry, CNH"
+        help_text="Sample storage location, e.g. UCI, Ambry, CNH",
     )
     freezer_id = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="Name of freezer or refrigerator the biospecimen is stored in"
+        help_text="Name of freezer or refrigerator the biospecimen is stored in",
     )
     shelf_id = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="Name of freezer/refrigerator shelf the biospecimen is stored in"
+        help_text="Name of freezer/refrigerator shelf the biospecimen is stored in",
     )
     rack_id = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="Name of rack the biospecimen is stored in"
+        help_text="Name of rack the biospecimen is stored in",
     )
     box_type = models.CharField(
         max_length=50,
@@ -630,35 +628,29 @@ class Biobank(models.Model):
             ("10x10 cryobox", "10x10 cryobox"),
             ("SBS plate", "SBS plate"),
             ("Wire rack", "Wire rack"),
-            ("8x12 metal rack", "8x12 metal rack")
+            ("8x12 metal rack", "8x12 metal rack"),
         ],
         blank=True,
         null=True,
-        help_text="Box type the biospecimen is stored in"
+        help_text="Box type the biospecimen is stored in",
     )
     box_id = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="Box name as labelled"
+        max_length=100, blank=True, null=True, help_text="Box name as labelled"
     )
     box_position = models.CharField(
         max_length=10,
         blank=True,
         null=True,
-        help_text="XY coordinates of biospecimens in box or plate, e.g. A01, H12"
+        help_text="XY coordinates of biospecimens in box or plate, e.g. A01, H12",
     )
     tube_barcode = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Barcode on tube if present"
+        max_length=50, blank=True, null=True, help_text="Barcode on tube if present"
     )
     plate_barcode = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="Barcode on SBS plate if present or used"
+        help_text="Barcode on SBS plate if present or used",
     )
     status = models.CharField(
         max_length=50,
@@ -669,14 +661,14 @@ class Biobank(models.Model):
             ("Stored", "Stored"),
             ("Replacement requested", "Replacement requested, see comments"),
             ("Lost", "Lost, see comments"),
-            ("QC issue", "QC issue, see comments")
+            ("QC issue", "QC issue, see comments"),
         ],
-        help_text="Biospecimen status while "
+        help_text="Biospecimen status while ",
     )
     shipment_date = models.DateField(
         blank=True,
         null=True,
-        help_text="If the status is shipped, then include a date when it was mailed out."
+        help_text="If the status is shipped, then include a date when it was mailed out.",
     )
     child_analytes = models.ManyToManyField(
         Analyte,
@@ -687,7 +679,7 @@ class Biobank(models.Model):
     comments = models.TextField(
         blank=True,
         null=True,
-        help_text="Free text description of any quality issues with biospecimens or adverse events."
+        help_text="Free text description of any quality issues with biospecimens or adverse events.",
     )
 
 
