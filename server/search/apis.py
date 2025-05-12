@@ -54,12 +54,12 @@ from experiments.services import (
     AlignedDNAShortReadSerializer,
     AlignedNanoporeSerializer,
     AlignedPacBioSerializer,
-    AlignedRnaSerializer,
+    AlignedRNASerializer,
     ExperimentSerializer,
     ExperimentShortReadSerializer,
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
-    ExperimentRnaOutputSerializer
+    ExperimentRNAOutputSerializer
 )
 
 class GetAllTablesAPI(APIView):
@@ -101,14 +101,14 @@ class GetAllTablesAPI(APIView):
             serialized_aligned_pacbio = AlignedPacBioSerializer(
                 AlignedPacBio.objects.all(), many=True
             )
-            serialized_aligned_rna = AlignedRnaSerializer(
+            serialized_aligned_rna = AlignedRNASerializer(
                 AlignedRNAShortRead.objects.all(), many=True
             )
             serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
             serialized_dna = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
             serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
             serialized_pacbio = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
-            serialized_rna = ExperimentRnaOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
+            serialized_rna = ExperimentRNAOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
 
 
             serilized_return_data = {

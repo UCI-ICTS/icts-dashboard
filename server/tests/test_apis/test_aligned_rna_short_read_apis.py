@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_rna_short_read_api(self):
-        url = "/api/experiments/create_aligned_rna_short_read/"
+        url = "/api/experiments/aligned_rna_short_read/create/"
 
         aligned1 = {   # Existing entry, should fail
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-1",
@@ -111,16 +111,16 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
-        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[1]["request_status"], "CREATED")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
     def test_read_aligned_rna_short_read(self):
-        url1 = "/api/experiments/read_aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
-        url2 = "/api/experiments/read_aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/read_aligned_rna_short_read/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
+        url2 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_rna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -132,7 +132,7 @@ class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
 class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_aligned_rna_short_read_api(self):
-        url = "/api/experiments/update_aligned_rna_short_read/"
+        url = "/api/experiments/aligned_rna_short_read/update/"
 
         aligned1 = {
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-1",
@@ -204,8 +204,8 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response_207.data[1]["request_status"], "UPDATED")
-        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
 
@@ -220,8 +220,8 @@ class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/delete_aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/delete_aligned_rna_short_read/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/aligned_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_rna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')
