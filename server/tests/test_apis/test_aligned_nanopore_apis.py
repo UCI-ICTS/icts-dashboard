@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateAlignedNanoporeAPITest(APITestCaseWithAuth):
     def test_create_aligned_nanopore_api(self):
-        url = "/api/experiments/create_aligned_nanopore/"
+        url = "/api/experiments/aligned_nanopore/create/"
 
         aligned1 = {   # Existing entry, should fail
             "aligned_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1",
@@ -123,16 +123,16 @@ class CreateAlignedNanoporeAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
-        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[1]["request_status"], "CREATED")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ReadAlignedNanoporeAPITest(APITestCaseWithAuth):
     def test_read_aligned_nanopore(self):
-        url1 = "/api/experiments/read_aligned_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1"
-        url2 = "/api/experiments/read_aligned_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/read_aligned_nanopore/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/aligned_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1"
+        url2 = "/api/experiments/aligned_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_nanopore/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -144,7 +144,7 @@ class ReadAlignedNanoporeAPITest(APITestCaseWithAuth):
 
 class UpdateAlignedNanoporeAPITest(APITestCaseWithAuth):
     def test_update_aligned_nanopore_api(self):
-        url = "/api/experiments/update_aligned_nanopore/"
+        url = "/api/experiments/aligned_nanopore/update/"
 
         aligned1 = {  # Valid
             "aligned_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1",
@@ -244,8 +244,8 @@ class DeleteAlignedNanoporeAPITest(APITestCaseWithAuth):
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/delete_aligned_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1, DNE-01-1"
-        url3 = "/api/experiments/delete_aligned_nanopore/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/aligned_nanopore/delete/?ids=UCI_GREGoR_test-001-003-0_NANO_1-Aligned-1, DNE-01-1"
+        url3 = "/api/experiments/aligned_nanopore/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')

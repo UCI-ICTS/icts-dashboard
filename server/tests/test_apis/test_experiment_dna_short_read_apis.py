@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateDNAShortReadAPITest(APITestCaseWithAuth):
     def test_create_dna_short_read_api(self):
-        url = "/api/experiments/create_experiment_dna_short_read/"
+        url = "/api/experiments/experiment_dna_short_read/create/"
 
         experiment1 = {  # Valid
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_10",
@@ -85,16 +85,16 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_207.data[0]["request_status"], "CREATED")
-        self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[1]["request_status"], "CREATED")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ReadDNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_experiment_dna_short_read(self):
-        url1 = "/api/experiments/read_experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1"
-        url2 = "/api/experiments/read_experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1, DNE-01-1"
-        url3 = "/api/experiments/read_experiment_dna_short_read/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1"
+        url2 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1, DNE-01-1"
+        url3 = "/api/experiments/experiment_dna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -106,7 +106,7 @@ class ReadDNAShortReadAPITest(APITestCaseWithAuth):
 
 class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_dna_short_read_api(self):
-        url = "/api/experiments/update_experiment_dna_short_read/"
+        url = "/api/experiments/experiment_dna_short_read/update/"
         experiment1 = {  # Valid
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
             "analyte_id": "GREGoR_test-001-001-0-R-1",
@@ -160,8 +160,8 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/delete_experiment_dna_short_read/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1, DNE-01-1"
-        url3 = "/api/experiments/delete_experiment_dna_short_read/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1, DNE-01-1"
+        url3 = "/api/experiments/experiment_dna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')

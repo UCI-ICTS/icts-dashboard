@@ -54,7 +54,7 @@ class ExperimentTypeSerializer(serializers.ModelSerializer):
         fields = ["name"]
 
 
-class ExperimentRnaInputSerializer(serializers.ModelSerializer):
+class ExperimentRNAInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
     )
@@ -120,7 +120,7 @@ class ExperimentRnaInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
+class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -140,7 +140,7 @@ class ExperimentRnaOutputSerializer(serializers.ModelSerializer):
         return data
 
 
-class ExperimentDnaInputSerializer(serializers.ModelSerializer):
+class ExperimentDNAInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
     )
@@ -183,7 +183,7 @@ class ExperimentDnaInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ExperimentDnaOutputSerializer(serializers.ModelSerializer):
+class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -327,7 +327,7 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
-class AlignedRnaShortReadSerializer(serializers.ModelSerializer):
+class AlignedRNAShortReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
@@ -348,7 +348,7 @@ class AlignedRnaShortReadSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AlignedDnaShortReadSerializer(serializers.ModelSerializer):
+class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedDNAShortRead
         fields = "__all__"
@@ -408,7 +408,7 @@ class AlignedNanoporeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedRnaSerializer(serializers.ModelSerializer):
+class AlignedRNASerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
@@ -497,8 +497,8 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
-            "input_serializer": ExperimentRnaInputSerializer,
-            "output_serializer": ExperimentRnaOutputSerializer,
+            "input_serializer": ExperimentRNAInputSerializer,
+            "output_serializer": ExperimentRNAOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         }
     }
@@ -599,8 +599,8 @@ def update_experiment(table_name: str, identifier: str, model_instance, datum: d
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
-            "input_serializer": ExperimentRnaInputSerializer,
-            "output_serializer": ExperimentRnaOutputSerializer,
+            "input_serializer": ExperimentRNAInputSerializer,
+            "output_serializer": ExperimentRNAOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         }
     }
@@ -728,8 +728,8 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRnaSerializer,
-            "output_serializer": AlignedRnaSerializer,
+            "input_serializer": AlignedRNASerializer,
+            "output_serializer": AlignedRNASerializer,
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
         }
     }
@@ -819,8 +819,8 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRnaSerializer,
-            "output_serializer": AlignedRnaSerializer
+            "input_serializer": AlignedRNASerializer,
+            "output_serializer": AlignedRNASerializer
         }
     }
     serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
@@ -950,8 +950,8 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
-            "input_serializer": ExperimentRnaInputSerializer,
-            "output_serializer": ExperimentRnaOutputSerializer,
+            "input_serializer": ExperimentRNAInputSerializer,
+            "output_serializer": ExperimentRNAOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum)
         }
     }
@@ -1084,8 +1084,8 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRnaSerializer,
-            "output_serializer": AlignedRnaSerializer,
+            "input_serializer": AlignedRNASerializer,
+            "output_serializer": AlignedRNASerializer,
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
         }
     }

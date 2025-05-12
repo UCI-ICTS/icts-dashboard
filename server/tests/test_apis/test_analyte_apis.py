@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateAnalyteAPITest(APITestCaseWithAuth):
     def test_create_analyte_api(self):
-        url = "/api/metadata/create_analytes/"
+        url = "/api/metadata/analyte/create/"
         part1 = {  # Valid submission
             "analyte_id": "P-101-101-0-D-1",
             "participant_id": "GREGoR_test-001-001-0",
@@ -45,9 +45,9 @@ class CreateAnalyteAPITest(APITestCaseWithAuth):
 
 class ReadAnalyteAPITest(APITestCaseWithAuth):
     def test_read_analyte_success(self):
-        url1 = "/api/metadata/read_analytes/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2"
-        url2 = "/api/metadata/read_analytes/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2,DNE-01"
-        url3 = "/api/metadata/read_analytes/?ids=DNE-01,DNE-2"
+        url1 = "/api/metadata/analyte/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2"
+        url2 = "/api/metadata/analyte/?ids=GREGoR_test-001-001-0-R-1,GREGoR_test-001-001-0-R-2,DNE-01"
+        url3 = "/api/metadata/analyte/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -61,7 +61,7 @@ class ReadAnalyteAPITest(APITestCaseWithAuth):
 
 class UpdateAnalyteAPITest(APITestCaseWithAuth):
     def test_update_analyte_api(self):
-        url = "/api/metadata/update_analytes/"
+        url = "/api/metadata/analyte/update/"
         part1 = {  # Valid submission
             "analyte_id": "GREGoR_test-001-001-0-R-1",
             "participant_id": "GREGoR_test-001-001-0",
@@ -85,7 +85,7 @@ class UpdateAnalyteAPITest(APITestCaseWithAuth):
 
 class DeleteAnalyteAPITest(APITestCaseWithAuth):
     def test_delete_analyte(self):
-        url = "/api/metadata/delete_analytes/?ids=GREGoR_test-001-001-0-R-1"
+        url = "/api/metadata/analyte/delete/?ids=GREGoR_test-001-001-0-R-1"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

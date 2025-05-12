@@ -15,7 +15,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
     def test_create_analyte_api(self):
-        url = "/api/metadata/create_genetic_findings/"
+        url = "/api/metadata/genetic_findings/create/"
         part1 = {  # Valid submission
             "genetic_findings_id": "10_73792185_GREGoR_test-001-001-0",
             "participant_id": "GREGoR_test-001-001-0",
@@ -147,9 +147,9 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
 
 class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
     def test_read_analyte_success(self):
-        url1 = "/api/metadata/read_genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-001-003-0"
-        url2 = "/api/metadata/read_genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-001-003-0,DNE-01"
-        url3 = "/api/metadata/read_genetic_findings/?ids=DNE-01,DNE-2"
+        url1 = "/api/metadata/genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-001-003-0"
+        url2 = "/api/metadata/genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-001-003-0,DNE-01"
+        url3 = "/api/metadata/genetic_findings/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -163,7 +163,7 @@ class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
 
 class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
     def test_update_analyte_api(self):
-        url = "/api/metadata/update_genetic_findings/"
+        url = "/api/metadata/genetic_findings/update/"
         part1 = {  # Valid submission
             "genetic_findings_id": "10_73792184_GREGoR_test-001-001-0",
             "participant_id": "GREGoR_test-001-001-0",
@@ -255,7 +255,7 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
 
 class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
     def test_delete_analyte(self):
-        url = "/api/metadata/delete_genetic_findings/?ids=2_6849938_GREGoR_test-001-001-0"
+        url = "/api/metadata/genetic_findings/delete/?ids=2_6849938_GREGoR_test-001-001-0"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

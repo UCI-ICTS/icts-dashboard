@@ -17,7 +17,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreateNanoporeAPITest(APITestCaseWithAuth):
     def test_create_nanopore_api(self):
-        url = "/api/experiments/create_experiment_nanopore/"
+        url = "/api/experiments/experiment_nanopore/create/"
 
         experiment1 = {  # Valid
             "experiment_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_2",
@@ -95,9 +95,9 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
 
 class ReadNanoporePITest(APITestCaseWithAuth):
     def test_read_experiment_nanopore(self):
-        url1 = "/api/experiments/read_experiment_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1"
-        url2 = "/api/experiments/read_experiment_nanopore/?ids=UCI_GREGoR_test-003-003-2_NANO_1, DNE-01-1"
-        url3 = "/api/experiments/read_experiment_nanopore/?ids=DNE-1, DNE2"
+        url1 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1"
+        url2 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-003-003-2_NANO_1, DNE-01-1"
+        url3 = "/api/experiments/experiment_nanopore/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
         response_207 = self.client.get(url2, format='json')
@@ -109,7 +109,7 @@ class ReadNanoporePITest(APITestCaseWithAuth):
 
 class UpdateNanoporeAPITest(APITestCaseWithAuth):
     def test_update_nanopore_api(self):
-        url = "/api/experiments/update_experiment_nanopore/"
+        url = "/api/experiments/experiment_nanopore/update/"
         experiment1 = {  # Valid
             "experiment_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_1",
             "analyte_id": "GREGoR_test-001-003-0-R-3",
@@ -165,8 +165,8 @@ class DeleteNanoporeAPITest(APITestCaseWithAuth):
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/delete_experiment_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1, DNE-01-1"
-        url3 = "/api/experiments/delete_experiment_nanopore/?ids=DNE-1, DNE2"
+        url2 = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-003-0_NANO_1, DNE-01-1"
+        url3 = "/api/experiments/experiment_nanopore/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')

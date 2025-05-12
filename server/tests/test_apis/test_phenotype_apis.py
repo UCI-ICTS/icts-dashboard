@@ -19,7 +19,7 @@ class APITestCaseWithAuth(APITestCase):
 
 class CreatePhenotypeAPITest(APITestCaseWithAuth):
     def test_create_analyte_api(self):
-        url = "/api/metadata/create_phenotype/"
+        url = "/api/metadata/phenotype/create/"
         part1 = {  # Valid submission
             "phenotype_id": "1.10",
             "participant_id": "GREGoR_test-001-001-0",
@@ -65,9 +65,9 @@ class CreatePhenotypeAPITest(APITestCaseWithAuth):
 
 class ReadPhenotypeAPITest(APITestCaseWithAuth):
     def test_read_phenotype_success(self):
-        url1 = "/api/metadata/read_phenotype/?ids=1.2,1.3"
-        url2 = "/api/metadata/read_phenotype/?ids=1.2,1.3,1.99"
-        url3 = "/api/metadata/read_phenotype/?ids=1.99,1.100"
+        url1 = "/api/metadata/phenotype/?ids=1.2,1.3"
+        url2 = "/api/metadata/phenotype/?ids=1.2,1.3,1.99"
+        url3 = "/api/metadata/phenotype/?ids=1.99,1.100"
 
         response_200 = self.client.get(url1, format="json")
         response_207 = self.client.get(url2, format="json")
@@ -82,7 +82,7 @@ class ReadPhenotypeAPITest(APITestCaseWithAuth):
 
 class UpdatePhenotypeAPITest(APITestCaseWithAuth):
     def test_update_phenotype_api(self):
-        url = "/api/metadata/update_phenotype/"
+        url = "/api/metadata/phenotype/update/"
         part1 = {  # Valid submission
             "phenotype_id": "1.2",
             "participant_id": "GREGoR_test-001-001-0",
@@ -118,7 +118,8 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
 
 class DeletePhenotypeAPITest(APITestCaseWithAuth):
     def test_delete_phenotype(self):
-        url = "/api/metadata/delete_phenotype/?ids=1.2"
-        response = self.client.delete(url, format="json")
+        url = "/api/metadata/phenotype/delete/?ids=1.2"
+        response = self.client.delete(url, format='json')
+    
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")
