@@ -28,7 +28,7 @@ const getAllTables = async () => {
 };
 
 const updateParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/participants/update/", [
+  const response = await axios.post(APIDB + "api/metadata/participant/update/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -37,7 +37,7 @@ const updateParticipant = async (data, token) => {
 }
 
 const updateFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/families/update/", [
+  const response = await axios.post(APIDB + "api/metadata/family/update/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -57,7 +57,7 @@ const updateGeneticFindings = async (data, token) => {
 
 
 const updateAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/analytes/update/", [
+  const response = await axios.post(APIDB + "api/metadata/analyte/update/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -146,7 +146,7 @@ const updateNanoPore = async (data, token) => {
 }
 
 const createParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/participants/create/", [
+  const response = await axios.post(APIDB + "api/metadata/participant/create/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -155,7 +155,7 @@ const createParticipant = async (data, token) => {
 }
 
 const createFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/families/create/", [
+  const response = await axios.post(APIDB + "api/metadata/family/create/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -175,7 +175,7 @@ const createGeneticFindings = async (data, token) => {
 
 
 const createAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/analytes/create/", [
+  const response = await axios.post(APIDB + "api/metadata/analyte/create/", [
     data
   ], {
     headers: getAuthHeaders()
