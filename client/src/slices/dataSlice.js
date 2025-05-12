@@ -114,12 +114,12 @@ export const dataSlice = createSlice({
         if (noChanges) {
           return;
         }
-        // Extract the addd object from the response
-        const adddObject = response[0]?.data?.instance;
+        // Extract the added object from the response
+        const addedObject = response[0]?.data?.instance;
 
-        if (adddObject && table) {
+        if (addedObject && table) {
           // Extract the identifier value dynamically using the table name
-          const identifier = adddObject[table];
+          const identifier = addedObject[table];
           // Dynamically determine the collection to add based on the table name
           const collectionName = table === "participants" ? "participants" :
                                  table === "families" ? "families" :
@@ -144,7 +144,7 @@ export const dataSlice = createSlice({
 
             if (objectToUpdate) {
               // Update the object in the state
-              Object.assign(objectToUpdate, adddObject);
+              Object.assign(objectToUpdate, addedObject);
             }
           }
         }
@@ -222,7 +222,7 @@ export const addTable = createAsyncThunk(
         // Return a payload with a flag indicating no change
         return { response: [], table, noChanges: true };
       }
-      message.success(`${payload.table} ${response.data[0].identifier} addd successfuly`);
+      message.success(`${payload.table} ${response.data[0].identifier} added successfuly`);
       return payload
 
     } catch (error) {
