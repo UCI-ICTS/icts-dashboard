@@ -17,7 +17,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
     def test_create_biobank_entry(self):
         url = "/api/metadata/biobank/create/"
         part1 = {  # Valid submission
-            "biobank_id": "GREGoR_test-002-001-2-D-10",
+            "biobank_id": "GREGoR_test-002-001-2-D-3",
             "participant_id": "GREGoR_test-002-001-2",
             "collection_date": "2025-01-03",
             "specimen_type": "D",
@@ -29,10 +29,16 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "box_id": "PMGRC EDTA Blood Plate 1",
             "box_position": "A12",
             "tube_barcode": "308109402",
-            "plate_barcode": "A123",
+            "plate_barcode": "47609194",
             "status": "Stored",
             "shipment_date": None,
+            "tracking_number": None,
+            "testing_indication": None,
+            "requested_test": None,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "internal_analysis": None,
             "comments": None
         }
         part2 = {  # Valid submission
@@ -51,7 +57,13 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
+            "tracking_number": None,
+            "testing_indication": None,
+            "requested_test": None,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "internal_analysis": None,
             "comments": None
         }
         part3 = {  # Invalid submission; non-existant participant
@@ -70,7 +82,13 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
+            "tracking_number": None,
+            "testing_indication": None,
+            "requested_test": None,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "internal_analysis": None,
             "comments": None
         }
         response_200 = self.client.post(url, [part1], format='json')
@@ -117,10 +135,16 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
             "plate_barcode": None,
             "status": "Shipped",
             "shipment_date": "2025-03-14",
+            "tracking_number": None,
+            "testing_indication": None,
+            "requested_test": None,
             "child_analytes": [
-                "GREGoR_test-001-001-0-R-1",
-                "GREGoR_test-001-001-0-R-2"
+                "GREGoR_test-001-001-0-XR-1",
+                "GREGoR_test-001-001-0-XR-2"
             ],
+            "experiments": [],
+            "alignments": [],
+            "internal_analysis": None,
             "comments": None
         }
         part2 = {  # Invalid submission; non-existant biobank_id
@@ -139,7 +163,13 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
             "plate_barcode": None,
             "status": "Stored",
             "shipment_date": None,
+            "tracking_number": None,
+            "testing_indication": None,
+            "requested_test": None,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "internal_analysis": None,
             "comments": None
         }
         response_200 = self.client.post(url, [part1], format='json')

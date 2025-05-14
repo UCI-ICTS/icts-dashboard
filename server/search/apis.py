@@ -21,8 +21,7 @@ from metadata.models import (
     GeneticFindings,
     Phenotype,
     Analyte,
-    Biobank,
-    ExperimentStage,
+    Biobank
 )
 
 from metadata.services import (
@@ -32,8 +31,7 @@ from metadata.services import (
     GeneticFindingsSerializer,
     AnalyteSerializer,
     PhenotypeSerializer,
-    BiobankSerializer,
-    ExperimentStageSerializer,
+    BiobankSerializer
 )
 
 from experiments.models import (
@@ -86,7 +84,6 @@ class GetAllTablesAPI(APIView):
             serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
             serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
             serialized_biobank_entries = BiobankSerializer(Biobank.objects.all(), many=True)
-            serialized_experiment_stages = ExperimentStageSerializer(ExperimentStage.objects.all(), many=True)
 
             # Experiment Models
             serialized_aligned_experiments = AlignedSerializer(
@@ -119,7 +116,6 @@ class GetAllTablesAPI(APIView):
                 'analytes': serialized_analytes.data,
                 'phenotypes': serialized_phenotypes.data,
                 'biobank_entries': serialized_biobank_entries.data,
-                'experiment_stages': serialized_experiment_stages.data,
                 # Experiment Tables
                 'experiments': serialized_experiments.data,
                 'experiment_dna_short_read' : serialized_dna.data,

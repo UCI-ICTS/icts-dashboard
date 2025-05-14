@@ -11,7 +11,6 @@ from metadata.models import (
     GeneticFindings,
     Analyte,
     Biobank,
-    ExperimentStage,
 )
 
 
@@ -45,9 +44,6 @@ class AnalyteAdmin(admin.ModelAdmin):
 class BiobankAdmin(admin.ModelAdmin):
     list_display = ["biobank_id"]
 
-class ExperimentStageAdmin(admin.ModelAdmin):
-    list_display = ["experiment_stage_id"]
-
 
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(InternalProjectId, InternalProjectIdAdmin)
@@ -57,4 +53,3 @@ admin.site.register(Phenotype, PhenotypeAdmin)
 admin.site.register(GeneticFindings, GeneticFindingsAdmin)
 admin.site.register(Analyte, AnalyteAdmin)
 admin.site.register(Biobank, BiobankAdmin)
-admin.site.register(ExperimentStage, ExperimentStageAdmin)
