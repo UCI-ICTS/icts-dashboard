@@ -5,7 +5,6 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from metadata.apis import (
 
-    ExperimentStageViewSet,
     BiobankViewSet,
     ParticipantViewSet,
     FamilyViewSet,
@@ -21,7 +20,6 @@ router.register(r'analyte', AnalyteViewSet, basename='analyte')
 router.register(r'phenotype', PhenotypeViewSet, basename='phenotype')
 router.register(r'genetic_findings', GeneticFindingsViewSet, basename='genetic_findings')
 router.register(r'biobank', BiobankViewSet, basename='biobank')
-router.register(r'experiment_stage', ExperimentStageViewSet, basename='experiment_stage')
 
 urlpatterns = [
     path('', include(router.urls)),

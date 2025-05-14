@@ -653,15 +653,16 @@ class Biobank(models.Model):
         help_text="Barcode on SBS plate if present or used",
     )
     status = models.CharField(
-        max_length=50,
+        max_length=100,
         choices=[
             ("Pending shipment", "Pending shipment"),
             ("Shipped", "Shipped"),
             ("Received", "Received"),
             ("Stored", "Stored"),
-            ("Replacement requested", "Replacement requested, see comments"),
-            ("Lost", "Lost, see comments"),
             ("QC issue", "QC issue, see comments"),
+            ("Data delivered", "Data delivered"),
+            ("Lost", "Lost, see comments"),
+            ("Replacement requested", "Replacement requested"),
         ],
         help_text="Biospecimen status while ",
     )
@@ -670,30 +671,11 @@ class Biobank(models.Model):
         null=True,
         help_text="If the status is shipped, then include a date when it was mailed out.",
     )
-    child_analytes = models.ManyToManyField(
-        Analyte,
-        related_name="analytes",
-        blank=True,
-        help_text="The analyte(s) derived from this biospecimen",
-    )
-    comments = models.TextField(
+    tracking_number = models.CharField(
+        max_length=50,
         blank=True,
         null=True,
-        help_text="Free text description of any quality issues with biospecimens or adverse events.",
-    )
-
-
-class ExperimentStage(models.Model):
-    experiment_stage_id = models.CharField(
-        max_length=255,
-        primary_key=True,
-        help_text="Analyte ID for tracking experiments once they start",
-    )
-    analyte_id = models.ForeignKey(
-        Analyte,
-        to_field="analyte_id",
-        on_delete=models.CASCADE,
-        help_text="Identifier for the analyte used in the experiment.",
+        help_text="Fedex tracking number if available",
     )
     test_indication = models.CharField(
         max_length=100,
@@ -707,51 +689,11 @@ class ExperimentStage(models.Model):
         null=True,
         help_text="Ambry test code. 10500 for LR-WGS. 10525 for WTS",
     )
-    collection_date = models.DateField(help_text="Date when the biosample was created")
-    specimen_type = models.CharField(
-        max_length=10,
-        choices=[
-            ("D", "EDTA in Cryovial"),
-            ("R", "PAX Tube"),
-            ("OG", "OGR-500 saliva collection kit"),
-            ("SC", "OCD-100 buccal collection kit"),
-            ("SG", "OGR-675 buccal collection kit"),
-            ("X", "Extracted DNA"),
-            ("XR", "Extracted RNA"),
-        ],
-        help_text="Analyte codes printed on biospecimen containers",
-    )
-    shipment_date = models.DateField(
+    child_analytes = models.ManyToManyField(
+        Analyte,
+        related_name="analytes",
         blank=True,
-        null=True,
-        help_text="Date when an analyte was shipped out to a sequencing provider",
-    )
-    status = models.CharField(
-        max_length=100,
-        choices=[
-            ("Pending shipment", "Pending shipment"),
-            ("Shipped", "Shipped"),
-            ("Received", "Received"),
-            ("Accessioned", "Accessioned"),
-            ("Extracted", "Extracted"),
-            ("Sequenced", "Sequenced"),
-            ("Data delivered", "Data delivered"),
-            ("Replacement requested", "Replacement requested"),
-            ("QC Issue", "QC Issue - see comments"),
-        ],
-        help_text="Notes: See participant_sample_status table in retool",
-    )
-    current_location = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="Current analyte location. i.e. UCI, Ambry, etc.",
-    )
-    tracking_number = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Fedex tracking number if available",
+        help_text="The analyte(s) derived from this biospecimen",
     )
     experiments = models.ManyToManyField(
         ExperimentId,
@@ -768,13 +710,13 @@ class ExperimentStage(models.Model):
     external_id = models.CharField(
         max_length=100, blank=True, null=True, help_text="Ambry identifier or similar"
     )
-    comments = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Freetext (limited characters) to concisely describe if there are any\nQC issues that would be important to note",
-    )
     internal_analysis = models.TextField(
         blank=True,
         null=True,
         help_text="Freetext to describe what analysis pipelines have been done on this case",
+    )
+    comments = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Free text description of any quality issues with biospecimens or adverse events.",
     )

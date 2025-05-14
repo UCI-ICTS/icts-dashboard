@@ -3510,19 +3510,19 @@
     },
     {
         "model": "experiments.experiment",
-        "pk": "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA_1",
+        "pk": "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1",
         "fields": {
             "table_name": "experiment_dna_short_read",
-            "id_in_table": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
+            "id_in_table": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
             "participant_id": "GREGoR_test-001-001-0"
         }
     },
     {
         "model": "experiments.experiment",
-        "pk": "experiment_dna_short_read.UCI_GREGoR_test-001-002-0-R-1_DNA_1",
+        "pk": "experiment_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1",
         "fields": {
             "table_name": "experiment_dna_short_read",
-            "id_in_table": "UCI_GREGoR_test-001-002-0-R-1_DNA_1",
+            "id_in_table": "UCI_GREGoR_test-001-002-0-D-1_DNA_1",
             "participant_id": "GREGoR_test-001-002-0"
         }
     },
@@ -3609,20 +3609,20 @@
     },
     {
         "model": "experiments.experiment",
-        "pk": "experiment_pac_bio.UCI_GREGoR_test-001-002-0-R-2_PB",
+        "pk": "experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB",
         "fields": {
             "table_name": "experiment_pac_bio",
-            "id_in_table": "UCI_GREGoR_test-001-002-0-R-2_PB",
-            "participant_id": "GREGoR_test-001-002-0"
+            "id_in_table": "UCI_GREGoR_test-001-001-0-D-2_PB",
+            "participant_id": "GREGoR_test-001-001-0"
         }
     },
     {
         "model": "experiments.experiment",
-        "pk": "experiment_pac_bio.UCI_GREGoR_test-002-002-2-R-2_PB",
+        "pk": "experiment_pac_bio.UCI_GREGoR_test-002-001-2-D-2_PB",
         "fields": {
             "table_name": "experiment_pac_bio",
-            "id_in_table": "UCI_GREGoR_test-002-002-2-R-2_PB",
-            "participant_id": "GREGoR_test-003-002-1"
+            "id_in_table": "UCI_GREGoR_test-002-001-2-D-2_PB",
+            "participant_id": "GREGoR_test-002-001-2"
         }
     },
     {
@@ -3645,10 +3645,10 @@
     },
     {
         "model": "experiments.aligned",
-        "pk": "aligned_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1",
+        "pk": "aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1",
         "fields": {
             "table_name": "aligned_dna_short_read",
-            "id_in_table": "UCI_GREGoR_test-001-001-0-R-1_DNA-Aligned-1",
+            "id_in_table": "UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1",
             "participant_id": "GREGoR_test-001-001-0",
             "aligned_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-R-1_DNA.cram",
             "aligned_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-R-1_DNA.crai"
@@ -3766,21 +3766,21 @@
     },
     {
         "model": "experiments.aligned",
-        "pk": "aligned_pac_bio.UCI_GREGoR_test-001-002-0-R-2_PB-Aligned-1",
+        "pk": "aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
         "fields": {
             "table_name": "aligned_pac_bio",
-            "id_in_table": "UCI_GREGoR_test-001-002-0-R-2_PB-Aligned-1",
-            "participant_id": "GREGoR_test-001-002-0",
-            "aligned_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-002-0.bam",
-            "aligned_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-002-0.bai"
+            "id_in_table": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
+            "participant_id": "GREGoR_test-001-001-0",
+            "aligned_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bam",
+            "aligned_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bai"
         }
     },
     {
         "model": "experiments.aligned",
-        "pk": "aligned_pac_bio.UCI_GREGoR_test-002-002-2-R-2_PB-Aligned-1",
+        "pk": "aligned_pac_bio.UCI_GREGoR_test-002-002-2-D-2_PB-Aligned-1",
         "fields": {
             "table_name": "aligned_pac_bio",
-            "id_in_table": "UCI_GREGoR_test-002-002-2-R-2_PB-Aligned-1",
+            "id_in_table": "UCI_GREGoR_test-002-002-2-D-2_PB-Aligned-1",
             "participant_id": "GREGoR_test-003-002-1",
             "aligned_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-002-2.bam",
             "aligned_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-002-2.bai"
@@ -3810,10 +3810,10 @@
     },
     {
         "model": "experiments.experimentdnashortread",
-        "pk": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
+        "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
         "fields": {
-            "analyte_id": "GREGoR_test-001-001-0-R-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
+            "analyte_id": "GREGoR_test-001-001-0-D-1",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
             "experiment_type": "genome",
@@ -4014,11 +4014,11 @@
     },
     {
         "model": "experiments.aligneddnashortread",
-        "pk": "UCI_GREGoR_test-001-001-0-R-1_DNA_1-Aligned-1",
+        "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1",
         "fields": {
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-R-1_DNA.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-R-1_DNA.crai",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA.crai",
             "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
@@ -4377,9 +4377,9 @@
     },
     {
         "model": "experiments.experimentpacbio",
-        "pk": "UCI_GREGoR_test-001-002-0-R-2_PB",
+        "pk": "UCI_GREGoR_test-001-001-0-D-2_PB",
         "fields": {
-            "analyte_id": "GREGoR_test-001-002-0-R-2",
+            "analyte_id": "GREGoR_test-001-001-0-D-2",
             "experiment_sample_id": "UCI-014",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
             "fragmentation_method": "",
@@ -4470,9 +4470,9 @@
     },
     {
         "model": "experiments.alignedpacbio",
-        "pk": "UCI_GREGoR_test-001-002-0-R-2_PB-Aligned-1",
+        "pk": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
         "fields": {
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-002-0-R-2_PB",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-002-0.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-002-0.bai",
             "md5sum": "6e06cbe92700dfc5cd7ad07d7f6d3b8a",
@@ -4594,35 +4594,61 @@
         "fields": {}
     },
     {
-        "model": "submodels.experimentid",
-        "pk": "GREGoR_test-002-001-2-D-1.PB",
-        "fields": {}
-    },
-    {
-        "model": "submodels.alignedid",
-        "pk": "GREGoR_test-002-001-2-D-1.PB.aligned",
-        "fields": {}
-    },
-    {
         "model": "metadata.biobank",
         "pk": "GREGoR_test-001-001-0-D-1",
         "fields": {
             "participant_id": "GREGoR_test-001-001-0",
-            "collection_date": "2025-04-11",
+            "collection_date": "2022-04-11",
             "specimen_type": "D",
-            "current_location": "UCI",
-            "freezer_id": "Boris Yeltsin",
-            "shelf_id": "1",
-            "rack_id": "EDTA Frozen Blood rack 1",
-            "box_type": "9x9 cryobox",
-            "box_id": "1",
-            "box_position": "A1",
-            "tube_barcode": null,
-            "plate_barcode": null,
-            "status": "Stored",
-            "shipment_date": null,
-            "child_analytes": [],
-            "comments": null
+            "current_location": "Invitae",
+            "freezer_id": null,
+            "shelf_id": null,
+            "rack_id": null,
+            "box_type": null,
+            "box_id": null,
+            "box_position": null,
+            "tube_barcode": "35340259",
+            "plate_barcode": "47609194",
+            "status": "Data delivered",
+            "shipment_date": "2023-04-11",
+            "tracking_number": "937310997039",
+            "test_indication": "Research",
+            "requested_test": "Invitae WGS",
+            "child_analytes": ["GREGoR_test-001-001-0-D-1"],
+            "experiments": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1"],
+            "alignments": ["UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1"],
+            "external_id": "LS50704895",
+            "internal_analysis": "Invitae WGS calling v1.0",
+            "comments": "43.0X coverage"
+        }
+    },
+    {
+        "model": "metadata.biobank",
+        "pk": "GREGoR_test-001-001-0-D-2",
+        "fields": {
+            "participant_id": "GREGoR_test-001-001-0",
+            "collection_date": "2022-04-11",
+            "specimen_type": "D",
+            "current_location": "Ambry",
+            "freezer_id": null,
+            "shelf_id": null,
+            "rack_id": null,
+            "box_type": null,
+            "box_id": null,
+            "box_position": null,
+            "tube_barcode": "83795728",
+            "plate_barcode": "47609194",
+            "status": "Data delivered",
+            "shipment_date": "2025-04-11",
+            "tracking_number": "909891393663",
+            "test_indication": "Research",
+            "requested_test": "10500",
+            "child_analytes": ["GREGoR_test-001-001-0-D-2"],
+            "experiments": ["UCI_GREGoR_test-001-001-0-D-2_PB"],
+            "alignments": ["UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1"],
+            "external_id": "25-737040",
+            "internal_analysis": "PacBio HiFi-human-WGS-WDL v1.2.0",
+            "comments": "37.0X coverage"
         }
     },
     {
@@ -4643,7 +4669,14 @@
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
+            "tracking_number": null,
+            "test_indication": null,
+            "requested_test": null,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "external_id": null,
+            "internal_analysis": null,
             "comments": null
         }
     },
@@ -4658,14 +4691,21 @@
             "freezer_id": "Boris Yeltsin",
             "shelf_id": "1",
             "rack_id": "EDTA Frozen Blood rack 1",
-            "box_type": "9x9 cryobox",
-            "box_id": "1",
-            "box_position": "A3",
-            "tube_barcode": "0660723527",
-            "plate_barcode": "A123",
+            "box_type": "SBS plate",
+            "box_id": "Frozen blood plate 1",
+            "box_position": "E09",
+            "tube_barcode": "72506378",
+            "plate_barcode": "35790282",
             "status": "Stored",
             "shipment_date": null,
+            "tracking_number": null,
+            "test_indication": null,
+            "requested_test": null,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "external_id": null,
+            "internal_analysis": null,
             "comments": null
         }
     },
@@ -4687,7 +4727,14 @@
             "plate_barcode": null,
             "status": "Stored",
             "shipment_date": null,
+            "tracking_number": null,
+            "test_indication": null,
+            "requested_test": null,
             "child_analytes": [],
+            "experiments": [],
+            "alignments": [],
+            "external_id": null,
+            "internal_analysis": null,
             "comments": null
         }
     },
@@ -4707,50 +4754,17 @@
             "box_position": "I9",
             "tube_barcode": null,
             "plate_barcode": null,
-            "status": "Stored",
+            "status": "Pending",
             "shipment_date": "2025-04-11",
-            "child_analytes": ["GREGoR_test-002-001-2-R-1"],
-            "comments": null
-        }
-    },
-    {
-        "model": "metadata.experimentstage",
-        "pk": "GREGoR_test-001-001-0-D-1",
-        "fields": {
-            "analyte_id": "GREGoR_test-001-001-0-D-1",
+            "tracking_number": null,
             "test_indication": null,
             "requested_test": null,
-            "collection_date": "2025-01-03",
-            "specimen_type": "D",
-            "shipment_date": "2025-04-14",
-            "status": "Stored",
-            "current_location": "UCI",
-            "tracking_number": null,
+            "child_analytes": ["GREGoR_test-002-001-2-R-1"],
             "experiments": [],
             "alignments": [],
             "external_id": null,
-            "comments": null,
-            "internal_analysis": null
-        }
-    },
-    {
-        "model": "metadata.experimentstage",
-        "pk": "GREGoR_test-002-001-2-D-1",
-        "fields": {
-            "analyte_id": "GREGoR_test-002-001-2-D-1",
-            "test_indication": "Research",
-            "requested_test": "10500",
-            "collection_date": "2025-04-07",
-            "specimen_type": "D",
-            "shipment_date": "2025-04-11",
-            "status": "Shipped",
-            "current_location": "Ambry",
-            "tracking_number": "777888999111",
-            "experiments": ["GREGoR_test-002-001-2-D-1.PB"],
-            "alignments": ["GREGoR_test-002-001-2-D-1.PB.aligned"],
-            "external_id": "25-123456",
-            "comments": null,
-            "internal_analysis": "PacBio HiFi=human-WGS-WDL v2.1.0"
+            "internal_analysis": null,
+            "comments": null
         }
     }
 ]
