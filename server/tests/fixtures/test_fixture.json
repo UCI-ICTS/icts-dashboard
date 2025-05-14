@@ -4594,6 +4594,26 @@
         "fields": {}
     },
     {
+        "model": "submodels.experimentid",
+        "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+        "fields": {}
+    },
+    {
+        "model": "submodels.experimentid",
+        "pk": "UCI_GREGoR_test-001-001-0-D-2_PB",
+        "fields": {}
+    },
+    {
+        "model": "submodels.alignedid",
+        "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1",
+        "fields": {}
+    },
+    {
+        "model": "submodels.alignedid",
+        "pk": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
+        "fields": {}
+    },
+    {
         "model": "metadata.biobank",
         "pk": "GREGoR_test-001-001-0-D-1",
         "fields": {
