@@ -127,6 +127,8 @@ class BiobankSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         child_analyte = validated_data.pop("child_analytes", [])
+        experiment = validated_data.pop("experiments", [])
+        aligned = validated_data.pop("alignments", [])
 
         try:
             with transaction.atomic():
@@ -134,6 +136,14 @@ class BiobankSerializer(serializers.ModelSerializer):
                 if child_analyte:
                     self._set_relationship(
                         biobank, Analyte, child_analyte, "child_analytes"
+                    )
+                if experiment:
+                    self._set_relationship(
+                        biobank, ExperimentId, experiment, "experiments"
+                    )
+                if aligned:
+                    self._set_relationship(
+                        biobank, AlignedId, aligned, "alignments"
                     )
                 biobank.save()
         except IntegrityError as error:
@@ -143,12 +153,16 @@ class BiobankSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         child_analyte = validated_data.pop("child_analytes", [])
+        experiment = validated_data.pop("experiments", [])
+        aligned = validated_data.pop("alignments", [])
 
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
             self._set_relationship(instance, Analyte, child_analyte, "child_analytes")
+            self._set_relationship(instance, ExperimentId, experiment, "experiments")
+            self._set_relationship(instance, AlignedId, aligned, "alignments")
 
         return instance
 
