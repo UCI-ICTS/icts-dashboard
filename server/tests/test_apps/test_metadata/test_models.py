@@ -56,7 +56,7 @@ class GeneticFindingsModelTest(TestCase):
             "condition_inheritance": "INHERIT1|INHERIT2"
         }
         parsed_data = genetic_findings_parser(test_data)
-        
+
         self.assertIsInstance(parsed_data["experiment_id"], list)
         self.assertEqual(parsed_data["pos"], 100.0)
         self.assertEqual(parsed_data["allele_balance_or_heteroplasmy_percentage"], 50)
