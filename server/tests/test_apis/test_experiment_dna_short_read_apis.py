@@ -20,9 +20,9 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_dna_short_read/create/"
 
         experiment1 = {  # Valid
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_10",
-            "analyte_id": "GREGoR_test-001-001-0-R-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_10",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_10",
+            "analyte_id": "GREGoR_test-001-001-0-D-1",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_10",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
             "experiment_type": "genome",
@@ -35,9 +35,9 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Valid 2
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-R-1_DNA_11",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_11",
             "analyte_id": "GREGoR_test-001-002-0-R-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-002-0-R-1_DNA_11",
+            "experiment_sample_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_11",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
             "experiment_type": "genome",
@@ -51,7 +51,7 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
 
         experiment3 = {  # Valid 3
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-003-0_DNA_12",
-            "analyte_id": "GREGoR_test-001-003-0-R-1",
+            "analyte_id": "GREGoR_test-001-003-0-D-1",
             "experiment_sample_id": "UCI_GREGoR_test-001-003-0_DNA_12",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
@@ -70,10 +70,10 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA_10"
+            pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_10"
         ).exists()
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_dna_short_read.UCI_GREGoR_test-001-002-0-R-1_DNA_11"
+            pk="experiment_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_11"
         ).exists()
         experiment3_exists = Experiment.objects.filter(
             pk="experiment_dna_short_read.UCI_GREGoR_test-001-003-0_DNA_12"
@@ -92,8 +92,8 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
 
 class ReadDNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_experiment_dna_short_read(self):
-        url1 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1"
-        url2 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_DNA_1, DNE-01-1"
+        url1 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+        url2 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_dna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -108,9 +108,9 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_dna_short_read_api(self):
         url = "/api/experiments/experiment_dna_short_read/update/"
         experiment1 = {  # Valid
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_1",
-            "analyte_id": "GREGoR_test-001-001-0-R-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_DNA_10",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+            "analyte_id": "GREGoR_test-001-001-0-D-1",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_10",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
             "experiment_type": "genome",
@@ -123,9 +123,9 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Invalid, missing target_insert_size
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-R-1_DNA_1",
-            "analyte_id": "GREGoR_test-001-002-0-R-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-002-0-R-1_DNA_11",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_1",
+            "analyte_id": "GREGoR_test-001-002-0-D-1",
+            "experiment_sample_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_11",
             "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
             "read_length": 150,
             "experiment_type": "genome",
@@ -155,12 +155,12 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
         #Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA_1"
+            pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
         ).exists()
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-R-1_DNA_1, DNE-01-1"
+        url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-D-1_DNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_dna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -168,7 +168,7 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_dna_short_read.UCI_GREGoR_test-001-002-0-R-1_DNA_1"
+            pk="experiment_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1"
         ).exists()
         assert not experiment2_exists
 
