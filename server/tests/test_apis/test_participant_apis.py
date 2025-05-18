@@ -83,8 +83,8 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
 
 class ReadParticipantAPITest(APITestCaseWithAuth):
     def test_read_participant(self):
-        url1 = "/api/metadata/participant/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2"
-        url2 = "/api/metadata/participant/?ids=GREGoR_test-001-002-0,GREGoR_test-002-001-2,DNE-01-1"
+        url1 = "/api/metadata/participant/?ids=GREGoR_test-001-001-0,GREGoR_test-002-001-2"
+        url2 = "/api/metadata/participant/?ids=GREGoR_test-001-001-0,GREGoR_test-002-001-2,DNE-01-1"
         url3 = "/api/metadata/participant/?ids=DNE-01-1,DNE-2-2"
 
         response_200 = self.client.get(url1, format='json')
@@ -102,7 +102,7 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
         url = "/api/metadata/participant/update/"
 
         part1= {  # Valid case.
-            "participant_id": "GREGoR_test-001-002-0",
+            "participant_id": "GREGoR_test-001-001-0",
             "consent_code": "HMB",
             "gregor_center": "UCI",
             "family_id": "GREGoR_test-001",
@@ -145,7 +145,7 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
 
 class DeleteParticipantAPITest(APITestCaseWithAuth):
     def test_delete_participant(self):
-        url = "/api/metadata/participant/delete/?ids=GREGoR_test-001-002-0"
+        url = "/api/metadata/participant/delete/?ids=GREGoR_test-001-001-0"
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # import pdb; pdb.set_trace()

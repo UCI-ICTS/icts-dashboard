@@ -20,9 +20,9 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/aligned_rna_short_read/create/"
 
         aligned1 = {   # Existing entry, should fail
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-1",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -37,13 +37,13 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
         aligned2 = {   # New entry
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-2",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -58,13 +58,13 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
         aligned3 =  {   # New entry
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-3",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -79,17 +79,17 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
         #Checks for the Aligned table before creation
         aligned1_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         ).exists()
         assert aligned1_exists
 
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-2"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2"
         ).exists()
         assert not aligned2_exists
 
@@ -99,10 +99,10 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-2"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2"
         ).exists()
         aligned3_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-3"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3"
         ).exists()
 
         assert aligned2_exists
@@ -118,8 +118,8 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
 class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
     def test_read_aligned_rna_short_read(self):
-        url1 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
-        url2 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
+        url1 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
+        url2 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_rna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -135,9 +135,9 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/aligned_rna_short_read/update/"
 
         aligned1 = {
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-1",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -152,13 +152,13 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
         aligned2 = {
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-2",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -173,13 +173,13 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
         aligned3 =  {
-            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA-Aligned-3",
-            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram",
-            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0_RNA-Aligned.cram.crai",
+            "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
+            "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
+            "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
@@ -194,7 +194,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA"
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         }
 
 
@@ -215,12 +215,12 @@ class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         #Checks for the Alignment table before deletion
 
         alignment1_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         ).exists()
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/aligned_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0_RNA-Aligned-1, DNE-01-1"
+        url2 = "/api/experiments/aligned_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_rna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -228,7 +228,7 @@ class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
-            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0_RNA-Aligned-1"
+            pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         ).exists()
 
         assert not alignment2_exists

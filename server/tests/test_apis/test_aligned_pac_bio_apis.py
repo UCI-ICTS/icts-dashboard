@@ -20,8 +20,8 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
         url = "/api/experiments/aligned_pac_bio/create/"
 
         aligned1 = {   # Existing entry, should fail
-            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bai",
             "md5sum": "6e06cbe92700dfc5cd7ad07d7f6d3b8a",
@@ -44,10 +44,10 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
         }
 
         aligned2 = {   # New entry
-            "aligned_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-2_PB-Aligned-2",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-2_PB",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-002-1.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-002-1.bai",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_2",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
+            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bam",
+            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bai",
             "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",
             "reference_assembly": "GRCh38_noalt",
             "alignment_software": "pbmm2 v1.10.0",
@@ -68,8 +68,8 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
         }
 
         aligned3 =  {   # New entry
-            "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB-Aligned-2",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_2",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bai",
             "md5sum": "727f9869058ef757cc3ff66503f1e036",
@@ -93,12 +93,12 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
 
         #Checks for the Aligned table before creation
         aligned1_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1"
+            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
         ).exists()
         assert aligned1_exists
 
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-003-002-1-D-2_PB-Aligned-2"
+            pk="aligned_pac_bio.UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_2"
         ).exists()
         assert not aligned2_exists
 
@@ -108,10 +108,10 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
 
         #Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-003-002-1-D-2_PB-Aligned-2"
+            pk="aligned_pac_bio.UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_2"
         ).exists()
         aligned3_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-002-001-2-D-2_PB-Aligned-2"
+            pk="aligned_pac_bio.UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_2"
         ).exists()
 
         assert aligned2_exists
@@ -127,8 +127,8 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
 
 class ReadAlignedPacBioAPITest(APITestCaseWithAuth):
     def test_read_aligned_pac_bio(self):
-        url1 = "/api/experiments/aligned_pac_bio/?ids=UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1"
-        url2 = "/api/experiments/aligned_pac_bio/?ids=UCI_GREGoR_test-003-002-1-D-2_PB-Aligned-1, DNE-01-1"
+        url1 = "/api/experiments/aligned_pac_bio/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+        url2 = "/api/experiments/aligned_pac_bio/?ids=UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_pac_bio/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -144,8 +144,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
         url = "/api/experiments/aligned_pac_bio/update/"
 
         aligned1 = {  # Valid
-            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bai",
             "md5sum": "6e06cbe92700dfc5cd7ad07d7f6d3b8a",
@@ -168,10 +168,10 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
         }
 
         aligned2 = {  # Valid
-            "aligned_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-2_PB-Aligned-1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-2_PB",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-002-1.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-002-1.bai",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
+            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bam",
+            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bai",
             "md5sum": "727f9869058ef757cc3ff66503f1e036",
             "reference_assembly": "GRCh38_noalt",
             "alignment_software": "pbmm2 v2.0",  # changed
@@ -192,8 +192,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
         }
 
         aligned3 =  {  # Invalid, missing alignment_software
-            "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB-Aligned-1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bai",
             "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",
@@ -216,8 +216,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
         }
 
         aligned4 =  {  # Invalid, swaps md5sum with a different sample
-            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB",
+            "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
             "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bam",
             "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bai",
             "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",  # changed but already exists in db.
@@ -258,12 +258,12 @@ class DeleteAlignedPacBioAPITest(APITestCaseWithAuth):
         #Checks for the Alignment table before deletion
 
         alignment1_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1"
+            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
         ).exists()
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/aligned_pac_bio/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1, DNE-01-1"
+        url2 = "/api/experiments/aligned_pac_bio/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_pac_bio/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -271,7 +271,7 @@ class DeleteAlignedPacBioAPITest(APITestCaseWithAuth):
 
         #Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
-            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB-Aligned-1"
+            pk="aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
         ).exists()
 
         assert not alignment2_exists

@@ -20,9 +20,9 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_nanopore/create/"
 
         experiment1 = {  # Valid
-            "experiment_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_2",
-            "analyte_id": "GREGoR_test-001-003-0-R-3",
-            "experiment_sample_id": "UCI_GREGoR_test-001-003-0_NANO_1",
+            "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_2",
+            "analyte_id": "GREGoR_test-001-001-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_2",
             "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": None,
             "experiment_type": "genome",
@@ -36,9 +36,9 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Valid 2
-            "experiment_nanopore_id": "UCI_GREGoR_test-003-003-2_NANO_2",
-            "analyte_id": "GREGoR_test-003-003-2-R-3",
-            "experiment_sample_id": "UCI_GREGoR_test-003-003-2_NANO_1",
+            "experiment_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_2",
+            "analyte_id": "GREGoR_test-004-004-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_2",
             "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": None,
             "experiment_type": "genome",
@@ -52,9 +52,9 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
         }
 
         experiment3 = {  # Invalid, missing experiment_type
-            "experiment_nanopore_id": "UCI_GREGoR_test-003-003-2_NANO_3",
-            "analyte_id": "GREGoR_test-003-003-2-R-3",
-            "experiment_sample_id": "UCI_GREGoR_test-003-003-2_NANO_1",
+            "experiment_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_2",
+            "analyte_id": "GREGoR_test-006-006-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_2",
             "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": None,
             "experiment_type": None,  # changed
@@ -73,13 +73,13 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-001-003-0_NANO_2"
+            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_2"
         ).exists()
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-003-003-2_NANO_2"
+            pk="experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_2"
         ).exists()
         experiment3_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-003-003-2_NANO_3"
+            pk="experiment_nanopore.UCI_GREGoR_test-006-006-0-D-3_NANO_2"
         ).exists()
         assert experiment1_exists
         assert experiment2_exists
@@ -95,8 +95,8 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
 
 class ReadNanoporePITest(APITestCaseWithAuth):
     def test_read_experiment_nanopore(self):
-        url1 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-001-003-0_NANO_1"
-        url2 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-003-003-2_NANO_1, DNE-01-1"
+        url1 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-001-001-0-D-3_NANO_1"
+        url2 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-004-004-0-D-3_NANO_1, DNE-01-1"
         url3 = "/api/experiments/experiment_nanopore/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -111,9 +111,9 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
     def test_update_nanopore_api(self):
         url = "/api/experiments/experiment_nanopore/update/"
         experiment1 = {  # Valid
-            "experiment_nanopore_id": "UCI_GREGoR_test-001-003-0_NANO_1",
-            "analyte_id": "GREGoR_test-001-003-0-R-3",
-            "experiment_sample_id": "UCI_GREGoR_test-001-003-0_NANO_1",
+            "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
+            "analyte_id": "GREGoR_test-001-001-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
             "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": "Covaris g-TUBE",
             "experiment_type": "genome",
@@ -127,9 +127,9 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Invalid, missing was_barcoded
-            "experiment_nanopore_id": "UCI_GREGoR_test-003-003-2_NANO_1",
-            "analyte_id": "GREGoR_test-003-003-2-R-3",
-            "experiment_sample_id": "UCI_GREGoR_test-003-003-2_NANO_1",
+            "experiment_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
+            "analyte_id": "GREGoR_test-004-004-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
             "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": None,
             "experiment_type": "genome",
@@ -157,23 +157,23 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
 class DeleteNanoporeAPITest(APITestCaseWithAuth):
     def test_delete_nanopore_api(self):
 
-        #Checks for the Experiment table before deletion
+        # Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-001-003-0_NANO_1"
+            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1"
         ).exists()
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-003-0_NANO_1, DNE-01-1"
+        url2 = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-001-0-D-3_NANO_1, DNE-01-1"
         url3 = "/api/experiments/experiment_nanopore/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
         response_400 = self.client.delete(url3, format='json')
 
-        #Checks for the Experiment table after deletion
+        # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-001-003-0_NANO_1"
+            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1"
         ).exists()
         assert not experiment2_exists
 

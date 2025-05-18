@@ -52,8 +52,8 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
 
 class ReadFamilyAPITest(APITestCaseWithAuth):
     def test_read_family_success(self):
-        url1 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-002"
-        url2 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-002,DNE-01"
+        url1 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-004"
+        url2 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-004,DNE-01"
         url3 = "/api/metadata/family/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format='json')
@@ -78,7 +78,7 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": ""
         }
         part2 = {  # Invalid submission; missing consanguinity
-            "family_id": "GREGoR_test-002",
+            "family_id": "GREGoR_test-004",
             "consanguinity": "",
             "consanguinity_detail": "",
             "pedigree_file": "",

@@ -160,7 +160,7 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-D-1_DNA_1, DNE-01-1"
+        url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_dna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -168,7 +168,7 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1"
+            pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
         ).exists()
         assert not experiment2_exists
 
