@@ -24,10 +24,10 @@ SCHEMA_VERSION = settings.SCHEMA_VERSION
 
 class TableValidator:
     """
-    The Table Validator class is used to validate JSON objects against 
+    The Table Validator class is used to validate JSON objects against
     predefined JSON schemas.
 
-    Methods: 
+    Methods:
         validate_json(self, json_object: dict, table_name: str):
             Validates a JSON object against a specified schema
 
@@ -82,24 +82,22 @@ class TableValidator:
         """
         Returns the validation results as a dictionary.
 
-        This method provides the results of the JSON validation process. The 
-        returned dictionary contains two keys: 'valid' and 'errors'. The 
-        'valid' key holds a boolean indicating whether the JSON object passed 
-        validation, and the 'errors' key holds a list of error messages if 
+        This method provides the results of the JSON validation process. The
+        returned dictionary contains two keys: 'valid' and 'errors'. The
+        'valid' key holds a boolean indicating whether the JSON object passed
+        validation, and the 'errors' key holds a list of error messages if
         any validation errors were encountered.
 
         Returns:
             dict: A dictionary with 'valid' (bool) and 'errors' (list) keys.
         """
-
         error_data = [
             {
-                "field": error.split(":")[0]
-                .strip("[]' ")
-                .title(),  # Extract and clean up the field name, then capitalize
-                "error": error.split(":")[
-                    1
-                ].strip(),  # Extract and clean up the error message
+                error
+                #"field": error.split(":")[0]
+                #.strip("[]' ")
+                #.title(),  # Extract and clean up the field name, then capitalize
+                #"error": error.split(":")[1].strip(),  # Extract and clean up the error message
             }
             for error in self.errors
         ]
@@ -122,7 +120,7 @@ def remove_na(datum: dict) -> dict:
     """
 
     parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""], None, [None])}
-    
+
     return parsed_datum
 
 
@@ -252,7 +250,7 @@ def validate_url(url):
         raise ValidationError(f"'{url}' is not a valid URL.")
 
     prepared_request = PreparedRequest()
-    
+
     try:
         prepared_request.prepare_url(url, None)
     except Exception as exc:
@@ -312,15 +310,15 @@ def compare_data(old_data:dict, new_data:dict) -> dict:
 
     Args:
         old_data (dict): The original data dictionary.
-        new_data (dict): The new data dictionary to compare against the 
+        new_data (dict): The new data dictionary to compare against the
         original.
 
     Returns:
-        dict: A dictionary containing the changes. The keys are the attributes 
-        that have changed, and the values are strings describing the change 
+        dict: A dictionary containing the changes. The keys are the attributes
+        that have changed, and the values are strings describing the change
         (e.g., "old_value to new_value").
-        If an attribute is not found in old_data, the change is noted as "NA 
-        to new_value". If an error occurs during comparison, the change is 
+        If an attribute is not found in old_data, the change is noted as "NA
+        to new_value". If an error occurs during comparison, the change is
         noted as "Error with attr: error_message".
     """
     changes = {}
@@ -363,7 +361,7 @@ def bulk_model_retrieve(request_data: list, model_class, id: str) -> dict:
         model_dict = model_class.objects.in_bulk(ids)
     except Exception as e:
         return {"error": str(e)}
-    
+
     return model_dict
 
 

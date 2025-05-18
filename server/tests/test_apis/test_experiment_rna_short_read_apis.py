@@ -20,9 +20,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_rna_short_read/create/"
 
         experiment1 = {
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
@@ -51,9 +51,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA_2",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_2",
             "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
@@ -82,9 +82,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         experiment3 = {
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA_3",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_3",
             "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
@@ -118,13 +118,13 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         ).exists()
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA_2"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_2"
         ).exists()
         experiment3_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA_3"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_3"
         ).exists()
         assert experiment1_exists
         assert experiment2_exists
@@ -140,8 +140,8 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
 
 class ReadRNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_experiment_rna_short_read(self):
-        url1 = "/api/experiments/experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA"
-        url2 = "/api/experiments/experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0_RNA, DNE-01-1"
+        url1 = "/api/experiments/experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+        url2 = "/api/experiments/experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_rna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -156,7 +156,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_rna_short_read_api(self):
         url = "/api/experiments/experiment_rna_short_read/update/"
         experiment1 =   {
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "library_prep_type": [
             "rRNA depletion",
             "globin depletion"
@@ -165,7 +165,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "paired-end",
             "untargeted"
             ],
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
@@ -187,9 +187,9 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0_RNA_2",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_2",
             "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0_RNA",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
@@ -235,12 +235,12 @@ class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
         #Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         ).exists()
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/experiment_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0_RNA, DNE-01-1"
+        url2 = "/api/experiments/experiment_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_rna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -248,7 +248,7 @@ class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0_RNA"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         ).exists()
         assert not experiment2_exists
 
