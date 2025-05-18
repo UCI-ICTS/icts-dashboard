@@ -19,12 +19,12 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_dna_short_read_api(self):
         url = "/api/experiments/aligned_dna_short_read/create/"
 
-        aligned1 = {  # New entry to be entered twice. Is valid
-            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-2",
+        aligned1 = {  # New entry to be entered twice. Is valid the first time but not the second time
+            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_2",
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA.crai",
-            "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
+            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_2.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_2.crai",
+            "md5sum": "b63b127ac900d3bb8b4c524e10fa9856",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
             "reference_assembly_details": "GRCh38, no alts",
@@ -35,11 +35,11 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         aligned2 = {  # New entry
-            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-2",
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned-2.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned-2.crai",
-            "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
+            "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
+            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2.crai",
+            "md5sum": "a6259dd28e30aec1cc5f1110b6153fd4",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
             "reference_assembly_details": "GRCh38, no alts",
@@ -50,11 +50,11 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         aligned3 =  {  # New entry, invalid
-            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-003-0_DNA_1-Aligned-2",
+            "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1_DNA_1-Aligned_2",
             "experiment_dna_short_read_id": None,  # missing
-            "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-2.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned-2.crai",
-            "md5sum": "db2b05c08732d8fac11f1089a88374cb",
+            "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned_2.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned_2.crai",
+            "md5sum": "3bd30bc935cc335552d5d8bc5c272201",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
             "reference_assembly_details": "GRCh38, no alts",
@@ -66,12 +66,12 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Aligned table before creation
         aligned1_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
         assert aligned1_exists
 
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-2"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2"
         ).exists()
         assert not aligned2_exists
 
@@ -82,10 +82,10 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         #import pdb; pdb.set_trace()
         #Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-2"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2"
         ).exists()
         aligned3_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-003-0_DNA_1-Aligned-2"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-003-001-1_DNA_1-Aligned_2"
         ).exists()
 
         assert aligned2_exists
@@ -101,8 +101,8 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
 class ReadAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_aligned_dna_short_read(self):
-        url1 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1"
-        url2 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1, DNE-01-1"
+        url1 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+        url2 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -118,10 +118,10 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/aligned_dna_short_read/update/"
 
         aligned1 = {  # Valid, added mean_coverage
-            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-1",
+            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1",
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-2.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA-Aligned-2.crai",
+            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.crai",
             "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
@@ -133,11 +133,11 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         aligned2 = {  # Invalid, missing reference assembly, uri, and details
-            "aligned_dna_short_read_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-1",
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-001-002-0-D-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned-2.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned-2.crai",
-            "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
+            "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
+            "experiment_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
+            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.cram",
+            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.crai",
+            "md5sum": "70754026de72938744accd00e32ea0dd",
             "reference_assembly": None,  # missing
             "reference_assembly_uri": None,
             "reference_assembly_details": None,
@@ -163,12 +163,12 @@ class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Alignment table before deletions
         alignment1_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-1"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
 
         assert alignment1_exists
 
-        url2 = "/api/experiments/aligned_dna_short_read/delete/?ids=UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-1, DNE-01-1"
+        url2 = "/api/experiments/aligned_dna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -176,7 +176,7 @@ class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
 
         #Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
-            pk="aligned_dna_short_read.UCI_GREGoR_test-001-002-0-D-1_DNA_1-Aligned-1"
+            pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
         assert not alignment2_exists
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)

@@ -20,7 +20,7 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_pac_bio/create/"
 
         experiment1 = {  # Valid
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-20_PB",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-20_PB_1",
             "analyte_id": "GREGoR_test-001-001-0-D-2",
             "experiment_sample_id": "UCI-014",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -49,8 +49,8 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Valid 2
-            "experiment_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-20_PB",
-            "analyte_id": "GREGoR_test-003-002-1-D-2",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-20_PB_1",
+            "analyte_id": "GREGoR_test-003-001-1-D-2",
             "experiment_sample_id": "UCI-068",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
             "fragmentation_method": "",
@@ -78,7 +78,7 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
         }
 
         experiment3 = {  # Invalid, missing experiment_type
-            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-20_PB",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-20_PB_1",
             "analyte_id": "GREGoR_test-002-001-2-D-2",
             "experiment_sample_id": "UCI-056",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -112,13 +112,13 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-20_PB"
+            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-20_PB_1"
         ).exists()
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_pac_bio.UCI_GREGoR_test-003-002-1-D-20_PB"
+            pk="experiment_pac_bio.UCI_GREGoR_test-003-001-1-D-20_PB_1"
         ).exists()
         experiment3_exists = Experiment.objects.filter(
-            pk="experiment_pac_bio.UCI_GREGoR_test-002-001-2-D-20_PB"
+            pk="experiment_pac_bio.UCI_GREGoR_test-002-001-2-D-20_PB_1"
         ).exists()
         assert experiment1_exists
         assert experiment2_exists
@@ -134,8 +134,8 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
 
 class ReadPacBioPITest(APITestCaseWithAuth):
     def test_read_experiment_pac_bio(self):
-        url1 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-001-001-0-D-2_PB"
-        url2 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-003-002-1-D-2_PB, DNE-01-1"
+        url1 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1"
+        url2 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-003-001-1-D-2_PB_1, DNE-01-1"
         url3 = "/api/experiments/experiment_pac_bio/?ids=DNE-1, DNE2"
 
         response_200 = self.client.get(url1, format='json')
@@ -150,7 +150,7 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
     def test_update_pac_bio_api(self):
         url = "/api/experiments/experiment_pac_bio/update/"
         experiment1 = {  # Valid
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
             "analyte_id": "GREGoR_test-001-001-0-D-2",
             "experiment_sample_id": "UCI-014",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -179,8 +179,8 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
         }
 
         experiment2 = {  # Invalid, missing experiment_type
-            "experiment_pac_bio_id": "UCI_GREGoR_test-003-002-1-D-2_PB",
-            "analyte_id": "GREGoR_test-003-002-1-D-2",
+            "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
+            "analyte_id": "GREGoR_test-003-001-1-D-2",
             "experiment_sample_id": "UCI-068",
             "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
             "fragmentation_method": "",
@@ -225,12 +225,12 @@ class DeletePacBioAPITest(APITestCaseWithAuth):
         #Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
-            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB"
+            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1"
         ).exists()
 
         assert experiment1_exists
 
-        url2 = "/api/experiments/experiment_pac_bio/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB, DNE-01-1"
+        url2 = "/api/experiments/experiment_pac_bio/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1, DNE-01-1"
         url3 = "/api/experiments/experiment_pac_bio/delete/?ids=DNE-1, DNE2"
 
         response_207 = self.client.delete(url2, format='json')
@@ -238,7 +238,7 @@ class DeletePacBioAPITest(APITestCaseWithAuth):
 
         #Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB"
+            pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1"
         ).exists()
         assert not experiment2_exists
 
