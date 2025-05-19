@@ -13,7 +13,7 @@ from config.selectors import (
 
 class TableValidatorTests(TestCase):
     """Tests for TableValidator class."""
-    
+
     fixtures = ['tests/fixtures/test_fixture.json']  # Auto-load fixture
 
     def setUp(self):
@@ -41,7 +41,7 @@ class TableValidatorTests(TestCase):
     def test_validate_json_missing_schema(self):
         """Tests handling of a missing schema file."""
         self.validator.validate_json({"name": "Alice"}, "invalid file")
-        
+
         self.assertFalse(self.validator.valid)
         self.assertIn("Schema file not found", self.validator.errors[0])
 
@@ -52,7 +52,7 @@ class TableValidatorTests(TestCase):
         results = self.validator.get_validation_results()
         self.assertFalse(results["valid"])
         self.assertEqual(results["errors"][0]["field"], "Consanguinity")
-        self.assertEqual(results["errors"][0]["error"], 
+        self.assertEqual(results["errors"][0]["error"],
             "'Nope' is not one of ['None suspected', 'Suspected', 'Present', 'Unknown']"
         )
 
@@ -67,7 +67,7 @@ class UtilityFunctionTests(TestCase):
             ({"key1": ["NA"], "key2": "something"}, {"key2": "something"}),
             ({"key1": "test", "key2": "NA"}, {"key1": "test"})
         ]
-        
+
         for input_data, expected_output in test_cases:
             self.assertEqual(remove_na(input_data), expected_output)
 
@@ -78,7 +78,7 @@ class UtilityFunctionTests(TestCase):
             ({"key1": "single"}, {"key1": "single"}),
             ({"key1": ["existing"]}, {"key1": ["existing"]})
         ]
-        
+
         for input_data, expected_output in test_cases:
             self.assertEqual(multi_value_split(input_data), expected_output)
 
@@ -90,14 +90,14 @@ class UtilityFunctionTests(TestCase):
             (True, True, status.HTTP_207_MULTI_STATUS),
             (True, False, status.HTTP_200_OK),
         ]
-        
+
         for accepted, rejected, expected_status in test_cases:
             self.assertEqual(response_status(accepted, rejected), expected_status)
 
     def test_response_constructor(self):
         """Tests constructing standardized API responses."""
         response = response_constructor("123", "success", 200, "All good", {"data": "test"})
-        
+
         self.assertEqual(response["identifier"], "123")
         self.assertEqual(response["request_status"], "success")
         self.assertEqual(response["status_code"], 200)
@@ -128,7 +128,7 @@ class UtilityFunctionTests(TestCase):
         """Tests ZIP file generation."""
         files = {"file1.txt": "Hello World", "file2.txt": "Python Testing"}
         zip_buffer = generate_zip(files)
-        
+
         with zipfile.ZipFile(zip_buffer, "r") as zip_file:
             self.assertIn("file1.txt", zip_file.namelist())
             self.assertEqual(zip_file.read("file1.txt").decode(), "Hello World")
@@ -147,7 +147,7 @@ class BulkModelRetrieveTestCase(TestCase):
     def setUp(self):
         """Retrieve existing families from the fixture instead of creating duplicates."""
         self.family_1 = Family.objects.get(family_id="GREGoR_test-001")
-        self.family_2 = Family.objects.get(family_id="GREGoR_test-002")
+        self.family_2 = Family.objects.get(family_id="GREGoR_test-004")
 
 
     def test_bulk_model_retrieve_valid_ids(self):
@@ -155,54 +155,54 @@ class BulkModelRetrieveTestCase(TestCase):
         result = bulk_model_retrieve(
             [
                 {"family_id": "GREGoR_test-001"},
-                {"family_id": "GREGoR_test-002"}
+                {"family_id": "GREGoR_test-004"}
             ], Family, "family_id")
 
         self.assertIn("GREGoR_test-001", result)
-        self.assertIn("GREGoR_test-002", result)
+        self.assertIn("GREGoR_test-004", result)
         self.assertEqual(result["GREGoR_test-001"], self.family_1)
-        self.assertEqual(result["GREGoR_test-002"], self.family_2)
-    
+        self.assertEqual(result["GREGoR_test-004"], self.family_2)
+
     def test_bulk_model_retrieve_invalid_ids(self):
         """Tests retrieving objects with non-existent IDs."""
         result = bulk_model_retrieve(
             [{"family_id": "GREGoR_test-999"}], Family, "family_id")
         self.assertEqual(result, {})
-    
+
     def test_bulk_model_retrieve_empty_list(self):
         """Tests retrieving objects with an empty ID list."""
         result = bulk_model_retrieve([], Family, "family_id")
         self.assertEqual(result, {})
-    
+
     def test_bulk_model_retrieve_invalid_field(self):
         """Tests retrieving objects with an invalid field name."""
         result = bulk_model_retrieve(
             [{"family_id": "GREGoR_test-001"}], Family, "invalid_field")
         self.assertIn("error", result)
 
-        
+
 class BulkRetrieveTestCase(TestCase):
     fixtures = ['tests/fixtures/test_fixture.json']
 
     def test_bulk_retrieve_valid_ids(self):
         """Tests retrieving objects using valid IDs."""
-        result = bulk_retrieve(Family, ["GREGoR_test-001", "GREGoR_test-002"], "family_id")
+        result = bulk_retrieve(Family, ["GREGoR_test-001", "GREGoR_test-004"], "family_id")
 
         self.assertIn("GREGoR_test-001", result)
-        self.assertIn("GREGoR_test-002", result)
+        self.assertIn("GREGoR_test-004", result)
         self.assertEqual(result["GREGoR_test-001"]["family_id"], "GREGoR_test-001")
-        self.assertEqual(result["GREGoR_test-002"]["family_id"], "GREGoR_test-002")
-    
+        self.assertEqual(result["GREGoR_test-004"]["family_id"], "GREGoR_test-004")
+
     def test_bulk_retrieve_invalid_ids(self):
         """Tests retrieving objects with non-existent IDs."""
         result = bulk_retrieve(Family, ["GREGoR_test-999"], "family_id")
         self.assertEqual(result, {})
-    
+
     def test_bulk_retrieve_empty_list(self):
         """Tests retrieving objects with an empty ID list."""
         result = bulk_retrieve(Family, [], "family_id")
         self.assertEqual(result, {})
-    
+
     def test_bulk_retrieve_invalid_field(self):
         """Tests retrieving objects with an invalid field name."""
         result = bulk_retrieve(Family, ["GREGoR_test-001"], "invalid_field")
