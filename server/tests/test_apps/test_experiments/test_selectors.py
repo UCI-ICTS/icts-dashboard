@@ -60,7 +60,7 @@ class ExperimentSelectorsTest(TestCase):
 
     def test_get_experiment(self):
         not_experiment = get_experiment(experiment_id="EXP001")
-        experiment = get_experiment(experiment_id="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-R-1_DNA_1")
+        experiment = get_experiment(experiment_id="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1")
         self.assertIsNone(not_experiment)
         self.assertIsNotNone(experiment)
 
