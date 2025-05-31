@@ -1,0 +1,50 @@
+{
+    "title": "Allele Specific ATAC Short Read",
+    "type": "object",
+    "properties": {
+      "asc_atac_short_read_id": {
+        "type": "string",
+        "description": "Unique key for table (anvil requirement)."
+      },
+      "called_peaks_atac_short_read_id": {
+        "type": "string",
+        "description": "Identifier for called peaks."
+      },
+      "asc_file": {
+        "type": "string",
+        "description": "Name and path of the tsv file with allele-specific chromatin accessibility measures (logFC) at heterozygous sites after QC and significance testing.",
+        "format": "uri"
+      },
+      "asc_md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for called_peaks_file."
+      },
+      "peak_set_type": {
+        "type": "string",
+        "enum": ["narrowPeak", "gappedPeak", "IDR"],
+        "description": "Peak set type, according to ENCODE descriptors."
+      },
+      "het_sites_file": {
+        "type": "string",
+        "description": "VCF file containing prefiltered heterozygous sites used for reference alignment bias testing and calling allele-specific chromatin accessibility events.",
+        "format": "uri"
+      },
+      "het_sites_md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for het_sites_file."
+      },
+      "analysis_details": {
+        "type": "string",
+        "description": "Brief description of the analysis pipeline used for producing the asc_file."
+      }
+    },
+    "required": [
+      "called_peaks_atac_short_read_id",
+      "asc_file",
+      "asc_md5sum",
+      "peak_set_type",
+      "het_sites_file",
+      "het_sites_md5sum"
+    ]
+  }
+  

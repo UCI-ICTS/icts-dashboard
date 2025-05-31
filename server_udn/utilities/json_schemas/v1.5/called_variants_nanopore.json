@@ -1,0 +1,51 @@
+{
+    "title": "Called Variants Nanopore",
+    "type": "object",
+    "properties": {
+      "called_variants_nanopore_id": {
+        "type": "string",
+        "description": "Unique key for table (anvil requirement)."
+      },
+      "aligned_nanopore_set_id": {
+        "type": "string",
+        "description": "Identifier for experiment set. This refers to IDs from the aligned_nanopore_set table."
+      },
+      "called_variants_dna_file": {
+        "type": "string",
+        "description": "Name and path of the file with variant calls. This is stored as a unique bucket path.",
+        "examples": [
+          "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.vcf",
+          "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SNV.gvcf",
+          "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.EH.vcf"
+        ]
+      },
+      "md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for file, computed prior to upload to verify file integrity.",
+        "examples": ["129c28163df082"]
+      },
+      "caller_software": {
+        "type": "string",
+        "description": "Variant calling software used including version number.",
+        "examples": ["pepper-margin-deepvariant-r0.8", "sniffles-v2.0.7", "pbsv-2.8.0", "pav-v2.0.1"]
+      },
+      "variant_types": {
+        "type": "string",
+        "description": "Types of variants called, separated by '|'. Can include types such as SNV, INDEL, SV, CNV, RE, and MEI.",
+        "examples": ["SNV|INDEL"]
+      },
+      "analysis_details": {
+        "type": "string",
+        "description": "Brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or GitHub repository."
+      }
+    },
+    "required": [
+      "called_variants_nanopore_id",
+      "aligned_nanopore_set_id",
+      "called_variants_dna_file",
+      "md5sum",
+      "caller_software",
+      "variant_types"
+    ]
+  }
+  

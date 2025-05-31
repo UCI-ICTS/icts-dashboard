@@ -1,0 +1,176 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned_pac_bio.json",
+    "title": "aligned_pac_bio",
+    "version": "1.7",
+    "type": "object",
+    "required": [
+        "aligned_pac_bio_id",
+        "experiment_pac_bio_id",
+        "aligned_pac_bio_file",
+        "aligned_pac_bio_index_file",
+        "md5sum",
+        "reference_assembly",
+        "alignment_software",
+        "methylation_called"
+    ],
+    "definitions": {},
+    "properties": {
+        "aligned_pac_bio_id": {
+            "type": "string",
+            "description": "identifier for aligned_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
+        },
+        "experiment_pac_bio_id": {
+            "type": "string",
+            "description": "identifier for experiment"
+        },
+        "aligned_pac_bio_file": {
+            "type": "string",
+            "description": "name and path of file with aligned reads",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.bam"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "aligned_pac_bio_index_file": {
+            "type": "string",
+            "description": "name and path of index file corresponding to aligned reads file",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.bam.bai"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "md5sum": {
+            "type": "string",
+            "description": "md5 checksum for file",
+            "examples": [
+                "129c28163df082"
+            ]
+        },
+        "reference_assembly": {
+            "type": "string",
+            "enum": [
+                "chm13",
+                "GRCh38_noalt",
+                "GRCh38",
+                "GRCh37",
+                "NCBI36",
+                "NCBI35",
+                "NCBI34"
+            ],
+            "examples": [
+                "GRCh38"
+            ]
+        },
+        "alignment_software": {
+            "type": "string",
+            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "Minimap2-2.24"
+            ]
+        },
+        "analysis_details": {
+            "type": "string",
+            "description": "brief description of the analysis pipeline used for producing the file; perhaps a DOI or link to something like a WDL file or github repository",
+            "examples": [
+                "DOI:10.5281/zenodo.4469317"
+            ]
+        },
+        "mean_coverage": {
+            "type": "number",
+            "description": "Mean coverage of either the genome or the targeted regions\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "100"
+            ]
+        },
+        "genome_coverage": {
+            "type": "integer",
+            "description": "e.g. \u226590% at 10x or 20x; per consortium decision",
+            "examples": [
+                "93"
+            ]
+        },
+        "contamination": {
+            "type": "number",
+            "description": "Contamination level estimate., e.g. <1% (display raw fraction not percent)",
+            "examples": [
+                "0.01"
+            ]
+        },
+        "sex_concordance": {
+            "type": "boolean",
+            "description": "Comparison between reported sex vs genotype sex; Other if ploidy NOT XX or XY and Other if sex at birth is not known, thus unable to perform sex concordance",
+            "examples": [
+                true
+            ]
+        },
+        "num_reads": {
+            "type": "number",
+            "description": "Total reads (before/ignoring alignment)\n\nNotes: float type required for large number, but value entered should be an integer",
+            "examples": [
+                "11946552"
+            ]
+        },
+        "num_bases": {
+            "type": "number",
+            "description": "Number of bases (before/ignoring alignment)\n\nNotes: float type required for large number, but value entered should be an integer",
+            "examples": [
+                "101126719147"
+            ]
+        },
+        "read_length_mean": {
+            "type": "number",
+            "description": "Mean length of all reads (before/ignoring alignment)",
+            "examples": [
+                "18232"
+            ]
+        },
+        "num_aligned_reads": {
+            "type": "number",
+            "description": "Total aligned reads\n\nNotes: float type required for large number, but value entered should be an integer",
+            "examples": [
+                "10751896"
+            ]
+        },
+        "num_aligned_bases": {
+            "type": "number",
+            "description": "Number of bases in aligned reads\n\nNotes: float type required for large number, but value entered should be an integer",
+            "examples": [
+                "91014047232"
+            ]
+        },
+        "aligned_read_length_mean": {
+            "type": "number",
+            "description": "Mean length of aligned reads",
+            "examples": [
+                "18104"
+            ]
+        },
+        "read_error_rate": {
+            "type": "number",
+            "description": "Mean empirical per-base error rate of aligned reads",
+            "examples": [
+                "0.01"
+            ]
+        },
+        "mapped_reads_pct": {
+            "type": "number",
+            "description": "Number between 1 and 100, na",
+            "examples": [
+                "90"
+            ]
+        },
+        "methylation_called": {
+            "type": "boolean",
+            "description": "Indicates whether 5mC methylation has been called and annotated in the BAM file's MM and ML tags",
+            "examples": [
+                true
+            ]
+        }
+    }
+}
