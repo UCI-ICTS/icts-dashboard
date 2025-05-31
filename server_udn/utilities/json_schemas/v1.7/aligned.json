@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned.json",
+    "title": "aligned",
+    "version": "1.7",
+    "type": "object",
+    "required": [
+        "aligned_id",
+        "table_name",
+        "id_in_table",
+        "participant_id"
+    ],
+    "definitions": {},
+    "properties": {
+        "aligned_id": {
+            "type": "string",
+            "description": "table_name.aligned_id_in_table",
+            "examples": [
+                "aligned_dna_short_read.BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
+        },
+        "table_name": {
+            "type": "string",
+            "enum": [
+                "aligned_dna_short_read",
+                "aligned_rna_short_read",
+                "aligned_nanopore",
+                "aligned_pac_bio",
+                "aligned_atac_short_read"
+            ],
+            "examples": [
+                "aligned_dna_short_read"
+            ]
+        },
+        "id_in_table": {
+            "type": "string",
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
+        },
+        "participant_id": {
+            "type": "string",
+            "examples": [
+                "BCM_H7YG5DSX2"
+            ]
+        },
+        "aligned_file": {
+            "type": "string",
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "aligned_index_file": {
+            "type": "string",
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        }
+    }
+}

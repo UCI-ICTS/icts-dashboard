@@ -1,0 +1,105 @@
+{
+    "title": "Aligned Nanopore",
+    "type": "object",
+    "properties": {
+      "aligned_nanopore_id": {
+        "type": "string",
+        "description": "Identifier for aligned_nanopore (primary key)."
+      },
+      "experiment_nanopore_id": {
+        "type": "string",
+        "description": "Identifier for experiment, referencing the experiment_nanopore_id from the experiment_nanopore table."
+      },
+      "aligned_nanopore_file": {
+        "type": "string",
+        "description": "Name and path of file with aligned reads. This must be a unique path."
+      },
+      "aligned_nanopore_index_file": {
+        "type": "string",
+        "description": "Name and path of index file corresponding to aligned reads file. This must be a unique path."
+      },
+      "md5sum": {
+        "type": "string",
+        "description": "MD5 checksum for the file, ensuring file integrity."
+      },
+      "reference_assembly": {
+        "type": "string",
+        "enum": ["chm13", "GRCh38_noalt", "GRCh38", "GRCh37", "NCBI36", "NCBI35", "NCBI34"],
+        "description": "Reference assembly used for the alignment."
+      },
+      "alignment_software": {
+        "type": "string",
+        "description": "Software including version number used for alignment."
+      },
+      "analysis_details": {
+        "type": "string",
+        "description": "Brief description of the analysis pipeline used for producing the file."
+      },
+      "mean_coverage": {
+        "type": "number",
+        "description": "Mean coverage of either the genome or the targeted regions."
+      },
+      "genome_coverage": {
+        "type": "number",
+        "description": "Percentage of the genome covered at a certain depth (e.g., >=90% at 10x or 20x)."
+      },
+      "contamination": {
+        "type": "number",
+        "description": "Contamination level estimate, e.g., <1% (display raw fraction not percent)."
+      },
+      "sex_concordance": {
+        "type": "boolean",
+        "description": "Comparison between reported sex vs genotype sex."
+      },
+      "num_reads": {
+        "type": "integer",
+        "description": "Total reads before ignoring alignment."
+      },
+      "num_bases": {
+        "type": "integer",
+        "description": "Number of bases before ignoring alignment."
+      },
+      "read_length_mean": {
+        "type": "integer",
+        "description": "Mean length of all reads before ignoring alignment."
+      },
+      "num_aligned_reads": {
+        "type": "integer",
+        "description": "Total aligned reads."
+      },
+      "num_aligned_bases": {
+        "type": "integer",
+        "description": "Number of bases in aligned reads."
+      },
+      "aligned_read_length_mean": {
+        "type": "integer",
+        "description": "Mean length of aligned reads."
+      },
+      "read_error_rate": {
+        "type": "number",
+        "description": "Mean empirical per-base error rate of aligned reads."
+      },
+      "mapped_reads_pct": {
+        "type": "number",
+        "description": "Percentage of reads that mapped to the reference."
+      },
+      "methylation_called": {
+        "type": "boolean",
+        "description": "Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags."
+      },
+      "quality_issues": {
+        "type": "string",
+        "description": "Describe if there are any QC issues that would be important to note."
+      }
+    },
+    "required": [
+      "aligned_nanopore_id",
+      "experiment_nanopore_id",
+      "aligned_nanopore_file",
+      "aligned_nanopore_index_file",
+      "md5sum",
+      "reference_assembly",
+      "alignment_software"
+    ]
+  }
+  

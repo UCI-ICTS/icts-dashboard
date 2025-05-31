@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/family.json",
+    "title": "family",
+    "version": "1.7",
+    "type": "object",
+    "required": [
+        "family_id",
+        "consanguinity"
+    ],
+    "definitions": {},
+    "properties": {
+        "family_id": {
+            "type": "string",
+            "description": "Identifier for family (primary key)\n\nNotes: Needs to be Unique across centers, use participant.gregor_center as ID prefix.",
+            "examples": [
+                "CNH-I_fam89052",
+                "UW_CRDR_Family_2"
+            ]
+        },
+        "consanguinity": {
+            "type": "string",
+            "enum": [
+                "None suspected",
+                "Suspected",
+                "Present",
+                "Unknown"
+            ],
+            "description": "Indicate if consanguinity is present or suspected within a family"
+        },
+        "consanguinity_detail": {
+            "type": "string",
+            "description": "Free text description of any additional consanguinity details",
+            "examples": [
+                "Parents are second cousins once removed"
+            ]
+        },
+        "pedigree_file": {
+            "type": "string",
+            "description": "name of file (renamed from pedigree_image because it can contain a PED file or image)\n\nNotes: pedigree file should be deposited to upload workspace",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/FamilyID_CMG_Site_PhsID_ConsentGroup_YYYYMMDD_YXQX.pdf",
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/FamilyID_CMG_Site_PhsID_ConsentGroup_YYYYMMDD_YXQX.ped"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "pedigree_file_detail": {
+            "type": "string",
+            "description": "Free text description of other family structure/pedigree file caption or legend.\n\nNotes: clarifying purpose: sometimes no PED file is available and the effort involved to encode a full pedigree is high when an image is already available (i.e. legacy publication describing the family)",
+            "examples": [
+                "Additional informative family members not sequenced. Sequenced individuals indicated with sample_ID."
+            ]
+        },
+        "family_history_detail": {
+            "type": "string",
+            "description": "Details about family history that do not fit into structured fields. Family relationship terms should be relative to the proband.\n\nNotes: useful if extended family history suggestive of mode of inheritance"
+        }
+    }
+}

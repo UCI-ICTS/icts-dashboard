@@ -1,0 +1,158 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Participant",
+    "description": "Schema for the Participant table, detailing all aspects of participant data management in the GREGoR research project.",
+    "type": "object",
+    "properties": {
+      "participant_id": {
+        "type": "string",
+        "description": "Subject/Participant Identifier (primary key). Anticipate using RC-assigned ID prefixed by gregor_center value.",
+        "examples": ["BCM_Subject_1", "BROAD_subj89054"]
+      },
+      "internal_project_id": {
+        "type": "array",
+        "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
+        "items": {
+          "type": "string"
+        },
+        "examples": ["UWCDR_uwcmg_distal_arthrogryposis_type 1_212", "UWCDR_uwcmg_sponastrime_dysplasia_487"]
+      },
+      "gregor_center": {
+        "type": "string",
+        "description": "GREGoR Center to which the participant is originally associated",
+        "enum": ["BCM", "BROAD", "CNH_I", "UCI", "UW_CRDR", "GSS", "UW_DCC"]
+      },
+      "consent_code": {
+        "type": "string",
+        "description": "Consent group pertaining to this participant's data",
+        "enum": ["GRU", "HMB"]
+      },
+      "recontactable": {
+        "type": "string",
+        "description": "Is the originating GREGoR Center likely able to recontact this participant",
+        "enum": ["Yes", "No"],
+        "default": "No"
+      },
+      "prior_testing": {
+        "type": "array",
+        "description": "Text description of any genetic testing for individual conducted prior to enrollment",
+        "items": {
+          "type": "string"
+        },
+        "examples": ["Normal karyotype", "FBN2 screened clinically"]
+      },
+      "pmid_id": {
+        "type": "array",
+        "description": "Case specific PubMed ID if applicable",
+        "items": {
+          "type": "string"
+        },
+        "examples": ["25683120"]
+      },
+      "family_id": {
+        "type": "string",
+        "description": "Identifier for family",
+        "examples": ["CNH-I_fam89052", "UW_CRDR_Family_2"]
+      },
+      "paternal_id": {
+        "type": "string",
+        "description": "participant_id for father; 0 if not available",
+        "examples": ["BCM_Subject_1", "0"]
+      },
+      "maternal_id": {
+        "type": "string",
+        "description": "participant_id for mother; 0 if not available",
+        "examples": ["BROAD_subj89054", "0"]
+      },
+      "twin_id": {
+        "type": "array",
+        "description": "participant_id for twins, triplets, etc; 0 if not available",
+        "items": {
+          "type": "string"
+        },
+        "examples": ["BROAD_subj89054|BROAD_subj89055"]
+      },
+      "proband_relationship": {
+        "type": "string",
+        "description": "Text description of individual relationship to proband in family, especially useful to capture relationships when connecting distant relatives and connecting relatives not studied",
+        "enum": ["Self", "Mother", "Father", "Sibling", "Child", "Maternal Half Sibling", "Paternal Half Sibling", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Maternal Aunt", "Maternal Uncle", "Paternal Aunt", "Paternal Uncle", "Niece", "Nephew", "Maternal 1st Cousin", "Paternal 1st Cousin", "Other", "Unknown"]
+      },
+      "proband_relationship_detail": {
+        "type": "string",
+        "description": "Other proband relationship not captured in enumeration above"
+      },
+      "sex": {
+        "type": "string",
+        "description": "Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the phenotype information section.",
+        "enum": ["Female", "Male", "Unknown"]
+      },
+      "sex_detail": {
+        "type": "string",
+        "description": "Optional free-text field to describe known discrepancies between 'sex' value (female=>XX, male=>XY) and actual sex chromosome karyotype"
+      },
+      "reported_race": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or Other Pacific Islander", "Middle Eastern or North African", "White"]
+        },  
+        "description": "Self/submitter-reported race (OMB categories)"
+      },
+      "reported_ethnicity": {
+        "type": "string",
+        "description": "Self/submitter-reported ethnicity (OMB categories)"
+      },
+      "ancestry_detail": {
+        "type": "string",
+        "description": "Additional specific ancestry description free text beyond what is captured by OMB race/ethnicity categories"
+      },
+      "age_at_last_observation": {
+        "type": "number",
+        "description": "Age at last observation, aka age in years at the last time the center can vouch for the accuracy phenotype data. For conditions with later age of onset, this field lets users know if individuals marked as unaffected were younger or older than the age when the phenotype is expected to appear"
+      },
+      "affected_status": {
+        "type": "string",
+        "description": "Indicate affected status of individual (overall with respect to primary phenotype in the family). Note: Affected participants must have entry in phenotype table.",
+        "enum": ["Affected", "Unaffected", "Possibly affected", "Unknown"]
+      },
+      "phenotype_description": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband."
+      },
+      "age_at_enrollment": {
+        "type": "number",
+        "description": "age in years at which consent was originally obtained"
+      },
+      "solve_status": {
+        "type": "string",
+        "description": "Indication of whether the submitting RC considers this case 'solved'",
+        "enum": ["Solved", "Partially solved", "Probably solved", "Unsolved", "Unaffected"]
+      },
+      "missing_variant_case": {
+        "type": "string",
+        "description": "Indication of whether this is known to be a missing variant case, see notes for a description of the Missing Variant Project and inclusion criteria.",
+        "enum": ["Yes", "No", "Unknown"]
+      },
+      "missing_variant_details": {
+        "type": "string",
+        "description": "For missing variant cases, indicate gene(s) or region of interest and reason for inclusion in MVP."
+      }
+    },
+    "required": [
+      "participant_id",
+      "gregor_center",
+      "consent_code",
+      "family_id",
+      "paternal_id",
+      "maternal_id",
+      "proband_relationship",
+      "sex",
+      "affected_status",
+      "solve_status",
+      "missing_variant_case"
+    ]
+  }
+  

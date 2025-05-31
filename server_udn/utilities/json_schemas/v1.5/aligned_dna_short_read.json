@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AlignedDNAShortRead",
+    "type": "object",
+    "properties": {
+      "aligned_dna_short_read_id": {
+        "type": "string",
+        "description": "identifier for aligned_short_read (primary key)",
+        "examples": ["BCM_H7YG5DSX2-3-IDUDI0014-1"]
+      },
+      "experiment_dna_short_read_id": {
+        "type": "string",
+        "description": "identifier for experiment"
+      },
+      "aligned_dna_short_read_file": {
+        "type": "string",
+        "description": "name and path of file with aligned reads",
+        "pattern": "^gs://"
+      },
+      "aligned_dna_short_read_index_file": {
+        "type": "string",
+        "description": "name and path of index file corresponding to aligned reads file",
+        "pattern": "^gs://"
+      },
+      "md5sum": {
+        "type": "string",
+        "description": "md5 checksum for file"
+      },
+      "reference_assembly": {
+        "type": "string",
+        "enum": ["GRCh38", "GRCh37", "NCBI36", "NCBI35", "NCBI34"],
+        "description": "Reference genome assembly used"
+      },
+      "reference_assembly_uri": {
+        "type": "string",
+        "description": "URI for reference assembly"
+      },
+      "reference_assembly_details": {
+        "type": "string",
+        "description": "Details about the reference assembly"
+      },
+      "alignment_software": {
+        "type": "string",
+        "description": "Software including version number used for alignment"
+      },
+      "mean_coverage": {
+        "type": "number",
+        "description": "Mean coverage of the aligned DNA reads"
+      },
+      "analysis_details": {
+        "type": "string",
+        "description": "Details about the analysis pipeline used"
+      },
+      "quality_issues": {
+        "type": "string",
+        "description": "Any QC issues that are important to note"
+      }
+    },
+    "required": [
+      "aligned_dna_short_read_id",
+      "experiment_dna_short_read_id",
+      "aligned_dna_short_read_file",
+      "aligned_dna_short_read_index_file",
+      "md5sum",
+      "reference_assembly",
+      "alignment_software"
+    ]
+  }
+  

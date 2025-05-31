@@ -1,0 +1,19 @@
+{
+    "title": "AlignedPacBioSet",
+    "type": "object",
+    "properties": {
+      "aligned_pac_bio_set_id": {
+        "type": "string",
+        "description": "identifier for a set of experiments (primary key)"
+      },
+      "aligned_pac_bio_id": {
+        "type": "string",
+        "description": "the identifier for a single-sample aligned_pac_bio included in the read set"
+      }
+    },
+    "required": [
+      "aligned_pac_bio_set_id",
+      "aligned_pac_bio_id"
+    ]
+  }
+  
