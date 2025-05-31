@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Experiment Nanopore",
+    "description": "Schema for nanopore sequencing experiments.",
+    "type": "object",
+    "properties": {
+      "experiment_nanopore_id": {
+        "type": "string",
+        "description": "Identifier for experiment_nanopore (primary key)."
+      },
+      "analyte_id": {
+        "type": "string",
+        "description": "Identifier for the analyte used in the experiment."
+      },
+      "experiment_sample_id": {
+        "type": "string",
+        "description": "Identifier used in the data file."
+      },
+      "seq_library_prep_kit_method": {
+        "type": "string",
+        "enum": ["LSK109", "LSK110", "LSK111", "Kit 14", "Rapid", "Rapid kit 14", "Unknown"],
+        "description": "Library prep kit used."
+      },
+      "fragmentation_method": {
+        "type": "string",
+        "description": "Method used for shearing/fragmentation."
+      },
+      "experiment_type": {
+        "type": "string",
+        "enum": ["targeted", "genome"],
+        "description": "Type of experiment."
+      },
+      "targeted_regions_method": {
+        "type": "string",
+        "description": "Capture method used."
+      },
+      "targeted_region_bed_file": {
+        "type": "string",
+        "description": "Name and path of bed file uploaded to workspace."
+      },
+      "date_data_generation": {
+        "type": "string",
+        "format": "date",
+        "description": "Date of data generation."
+      },
+      "sequencing_platform": {
+        "type": "string",
+        "enum": ["Oxford Nanopore PromethION 48", "Oxford Nanopore PromethION 24", "Oxford Nanopore PromethION P2", "Oxford Nanopore PromethION P2 Solo", "Oxford Nanopore MinION Mk1C", "Oxford Nanopore MinION Mk1B", "Oxford Nanopore Flongle"],
+        "description": "Sequencing platform used for the experiment."
+      },
+      "chemistry_type": {
+        "type": "string",
+        "enum": ["R9.4.1", "R10.4.1"],
+        "description": "Chemistry type used for the experiment."
+      },
+      "was_barcoded": {
+        "type": "boolean",
+        "description": "Indicates whether samples were barcoded on this flowcell."
+      },
+      "barcode_kit": {
+        "type": "string",
+        "description": "Name of the kit used for barcoding."
+      }
+    },
+    "required": [
+      "experiment_nanopore_id",
+      "analyte_id",
+      "experiment_sample_id",
+      "seq_library_prep_kit_method",
+      "experiment_type",
+      "date_data_generation",
+      "sequencing_platform",
+      "chemistry_type",
+      "was_barcoded"
+    ]
+  }
+  

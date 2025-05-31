@@ -1,0 +1,129 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ExperimentRNAShortRead",
+    "description": "Schema for RNA short read experiments.",
+    "type": "object",
+    "properties": {
+      "experiment_rna_short_read_id": {
+        "type": "string",
+        "description": "Identifier for experiment_rna_short_read (primary key)."
+      },
+      "analyte_id": {
+        "type": "string",
+        "description": "Identifier of the analyte used in the experiment."
+      },
+      "experiment_sample_id": {
+        "type": "string",
+        "description": "Identifier used in the data file."
+      },
+      "seq_library_prep_kit_method": {
+        "type": "string",
+        "description": "Library prep kit used."
+      },
+      "library_prep_type": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "stranded poly-A pulldown",
+              "stranded total RNA",
+              "rRNA depletion",
+              "globin depletion"
+            ]
+          },
+          "description": "Types of library prep."
+      },
+      "experiment_type": {
+        "type": "array",
+        "items":  {
+          "type": "string",
+          "enum": [
+            "single-end",
+            "paired-end",
+            "targeted",
+            "untargeted"
+          ]
+        },
+        "description": "Type of experiment."
+      },
+      "read_length": {
+        "type": "integer",
+        "description": "Sequenced read length in bp."
+      },
+      "single_or_paired_ends": {
+        "type": "string",
+        "enum": ["single-end", "paired-end"],
+        "description": "Single or paired end."
+      },
+      "date_data_generation": {
+        "type": "string",
+        "format": "date",
+        "description": "Date of data generation."
+      },
+      "sequencing_platform": {
+        "type": "string",
+        "description": "Sequencing platform used for the experiment."
+      },
+      "within_site_batch_name": {
+        "type": "string",
+        "description": "Batch number for the site."
+      },
+      "RIN": {
+        "type": "number",
+        "description": "RIN number for quality of sample."
+      },
+      "estimated_library_size": {
+        "type": "number",
+        "description": "Estimated library size."
+      },
+      "total_reads": {
+        "type": "number",
+        "description": "Total number of reads."
+      },
+      "percent_rRNA": {
+        "type": "number",
+        "description": "% rRNA."
+      },
+      "percent_mRNA": {
+        "type": "number",
+        "description": "% mRNA."
+      },
+      "percent_mtRNA": {
+        "type": "number",
+        "description": "% mtRNA."
+      },
+      "percent_Globin": {
+        "type": "number",
+        "description": "% Globin."
+      },
+      "percent_UMI": {
+        "type": "number",
+        "description": "% UMI."
+      },
+      "5prime3prime_bias": {
+        "type": "number",
+        "description": "5'3' bias."
+      },
+      "percent_GC": {
+        "type": "number",
+        "description": "% GC."
+      },
+      "percent_chrX_Y": {
+        "type": "number",
+        "description": "% chrX/Y."
+      }
+    },
+    "required": [
+      "experiment_rna_short_read_id",
+      "analyte_id",
+      "experiment_sample_id",
+      "seq_library_prep_kit_method",
+      "library_prep_type",
+      "experiment_type",
+      "read_length",
+      "single_or_paired_ends",
+      "sequencing_platform",
+      "within_site_batch_name"
+    ]
+  }
+  
