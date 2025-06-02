@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+10819	BAD REQUEST		"[{'field': '', 'error': ""'primary_biosample' is a required property""}, {'field': 'Analyte_Type', 'error': ""'Buccal' is not one of ['DNA', 'RNA', 'cDNA', 'blood plasma', 'frozen whole blood', 'high molecular weight DNA', 'urine', 'PBMC']""}]"
+10778	BAD REQUEST		"[{'field': '', 'error': ""'primary_biosample' is a required property""}, {'field': 'Analyte_Type', 'error': ""'Blood' is not one of ['DNA', 'RNA', 'cDNA', 'blood plasma', 'frozen whole blood', 'high molecular weight DNA', 'urine', 'PBMC']""}]"
+10777	BAD REQUEST		"[{'field': '', 'error': ""'primary_biosample' is a required property""}, {'field': 'Analyte_Type', 'error': ""'Blood' is not one of ['DNA', 'RNA', 'cDNA', 'blood plasma', 'frozen whole blood', 'high molecular weight DNA', 'urine', 'PBMC']""}]"
+10776	BAD REQUEST		"[{'field': '', 'error': ""'primary_biosample' is a required property""}, {'field': 'Analyte_Type', 'error': ""'Blood' is not one of ['DNA', 'RNA', 'cDNA', 'blood plasma', 'frozen whole blood', 'high molecular weight DNA', 'urine', 'PBMC']""}]"
+10818	BAD REQUEST		"[{'field': '', 'error': ""'primary_biosample' is a required property""}, {'field': 'Analyte_Type', 'error': ""'Buccal' is not one of ['DNA', 'RNA', 'cDNA', 'blood plasma', 'frozen whole blood', 'high molecular weight DNA', 'urine', 'PBMC']""}]"

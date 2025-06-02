@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+UDN246341	BAD REQUEST		"[{'field': '', 'error': ""'gregor_center' is a required property""}, {'field': 'Sex', 'error': ""'F' is not one of ['Female', 'Male', 'Unknown']""}]"
+UDN443554	BAD REQUEST		"[{'field': '', 'error': ""'gregor_center' is a required property""}, {'field': 'Sex', 'error': ""'F' is not one of ['Female', 'Male', 'Unknown']""}]"
+UDN831894	BAD REQUEST		"[{'field': '', 'error': ""'gregor_center' is a required property""}, {'field': 'Sex', 'error': ""'M' is not one of ['Female', 'Male', 'Unknown']""}]"
+UDN926567	BAD REQUEST		"[{'field': '', 'error': ""'gregor_center' is a required property""}, {'field': 'Sex', 'error': ""'M' is not one of ['Female', 'Male', 'Unknown']""}, {'field': 'Solve_Status', 'error': ""'Probable solve' is not one of ['Solved', 'Partially solved', 'Probably solved', 'Unsolved', 'Unaffected']""}]"
+UDN969754	BAD REQUEST		"[{'field': '', 'error': ""'gregor_center' is a required property""}, {'field': 'Sex', 'error': ""'M' is not one of ['Female', 'Male', 'Unknown']""}]"

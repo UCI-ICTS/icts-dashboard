@@ -1,0 +1,6 @@
+biobank_id	participant_id	collection_date	specimen_type	current_location	freezer_id	shelf_id	rack_id	box_type	box_id	box_position	tube_barcode	plate_barcode	status	shipment_date	tracking_number	test_indication	requested_test	child_analytes	experiments	alignments	external_id	comments	internal_analysis
+10819	UDN246341		X	Baylor College of Medicine									Data delivered	2025-03-17	772695365710		Duo	10819	3223545-UDN246341	3223545-UDN246341			
+10778	UDN443554		X	Baylor College of Medicine									Data delivered	2025-03-17	772695365710		Trio	10778	3223558-UDN443554	3223558-UDN443554			
+10777	UDN831894		X	Baylor College of Medicine									Data delivered	2025-03-17	772695365710		Trio	10777	3223560-UDN831894	3223560-UDN831894			
+10776	UDN926567		X	Baylor College of Medicine									Data delivered	2025-03-17	772695365710		Trio	10776	3223557-UDN926567	3223557-UDN926567			
+10818	UDN969754		X	Baylor College of Medicine									Data delivered	2025-03-17	772695365710		Duo	10818	3223544-UDN969754	3223544-UDN969754			
