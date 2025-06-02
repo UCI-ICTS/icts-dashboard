@@ -47,8 +47,8 @@ for FILE in "$DIR"/*.tsv; do
     fi
 
     echo "Processing file: $FILE"
-    python utilities/data_converter.py -t "$FILE"
-    
+    python utilities/data_converter.py -t "$FILE" -n "$(basename ${FILE%.tsv})"
+
     # Check if the command was successful
     if [ $? -ne 0 ]; then
         echo "Error processing $FILE"

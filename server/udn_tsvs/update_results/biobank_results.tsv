@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+10819	BAD REQUEST		"[{'field': '', 'error': ""'collection_date' is a required property""}, {'field': 'Experiments', 'error': ""'3223545-UDN246341' is not of type 'array'""}, {'field': 'Alignments', 'error': ""'3223545-UDN246341' is not of type 'array'""}]"
+10778	BAD REQUEST		"[{'field': '', 'error': ""'collection_date' is a required property""}, {'field': 'Experiments', 'error': ""'3223558-UDN443554' is not of type 'array'""}, {'field': 'Alignments', 'error': ""'3223558-UDN443554' is not of type 'array'""}]"
+10777	BAD REQUEST		"[{'field': '', 'error': ""'collection_date' is a required property""}, {'field': 'Experiments', 'error': ""'3223560-UDN831894' is not of type 'array'""}, {'field': 'Alignments', 'error': ""'3223560-UDN831894' is not of type 'array'""}]"
+10776	BAD REQUEST		"[{'field': '', 'error': ""'collection_date' is a required property""}, {'field': 'Experiments', 'error': ""'3223557-UDN926567' is not of type 'array'""}, {'field': 'Alignments', 'error': ""'3223557-UDN926567' is not of type 'array'""}]"
+10818	BAD REQUEST		"[{'field': '', 'error': ""'collection_date' is a required property""}, {'field': 'Experiments', 'error': ""'3223544-UDN969754' is not of type 'array'""}, {'field': 'Alignments', 'error': ""'3223544-UDN969754' is not of type 'array'""}]"

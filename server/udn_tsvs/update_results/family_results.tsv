@@ -1,0 +1,3 @@
+identifier	request_status	updates	validation errors
+30004734	BAD REQUEST		[{'family_id': [ErrorDetail(string='family with this family id already exists.', code='unique')]}]
+30004771	BAD REQUEST		[{'family_id': [ErrorDetail(string='family with this family id already exists.', code='unique')]}]
