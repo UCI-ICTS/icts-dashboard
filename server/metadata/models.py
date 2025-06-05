@@ -407,13 +407,13 @@ class GeneticFindings(models.Model):
         choices=GeneDiseaseValidity.choices,
         help_text="Validity assessment of the gene-disease relationship",
     )
-    public_database_other = models.CharField(
-        max_length=255,
+    public_database_other = models.JSONField(
+        default=list,
         blank=True,
         help_text="Public databases that this variant in this participant has been submitted by the RC",
     )
-    public_database_ID_other = models.CharField(
-        max_length=255, blank=True, help_text="Public database variant/case ID"
+    public_database_ID_other = models.JSONField(
+        default=list, blank=True, help_text="Public database variant/case ID"
     )
     phenotype_contribution = models.CharField(
         max_length=50,

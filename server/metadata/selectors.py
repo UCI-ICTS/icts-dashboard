@@ -40,6 +40,8 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
         "variant_type",
         "gene_of_interest",
         "condition_inheritance",
+        "public_database_other",
+        "public_database_ID_other",
         "method_of_discovery",
     ]
 
