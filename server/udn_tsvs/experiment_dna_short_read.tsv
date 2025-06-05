@@ -1,6 +1,6 @@
 experiment_dna_short_read_id	analyte_id	experiment_sample_id	seq_library_prep_kit_method	read_length	experiment_type	targeted_regions_method	targeted_region_bed_file	date_data_generation	target_insert_size	sequencing_platform	sequencing_event_details
-3223545-UDN246341	10819	3223545-UDN246341	PCR-free WGS	151	WGS			2025-04-07		Illumina Novaseq	
-3223558-UDN443554	10778	3223558-UDN443554	PCR-free WGS	151	WGS			2025-04-08		Illumina Novaseq	
-3223560-UDN831894	10777	3223560-UDN831894	PCR-free WGS	151	WGS			2025-04-09		Illumina Novaseq	
-3223557-UDN926567	10776	3223557-UDN926567	PCR-free WGS	151	WGS					Illumina Novaseq	
-3223544-UDN969754	10818	3223544-UDN969754	PCR-free WGS	151	WGS					Illumina Novaseq	
+3223545-UDN246341	10819	3223545-UDN246341	PCR-free WGS	151	genome			2025-04-07		Illumina Novaseq	
+3223558-UDN443554	10778	3223558-UDN443554	PCR-free WGS	151	genome			2025-04-08		Illumina Novaseq	
+3223560-UDN831894	10777	3223560-UDN831894	PCR-free WGS	151	genome			2025-04-09		Illumina Novaseq	
+3223557-UDN926567	10776	3223557-UDN926567	PCR-free WGS	151	genome					Illumina Novaseq	
+3223544-UDN969754	10818	3223544-UDN969754	PCR-free WGS	151	genome					Illumina Novaseq	
