@@ -754,18 +754,18 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "public_database_other",
-                    models.CharField(
+                    models.JSONField(
                         blank=True,
+                        default=list,
                         help_text="Public databases that this variant in this participant has been submitted by the RC",
-                        max_length=255,
                     ),
                 ),
                 (
                     "public_database_ID_other",
-                    models.CharField(
+                    models.JSONField(
                         blank=True,
+                        default=list,
                         help_text="Public database variant/case ID",
-                        max_length=255,
                     ),
                 ),
                 (

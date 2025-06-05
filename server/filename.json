@@ -8,7 +8,7 @@
         "additional_details": "Global developmental delay",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0004322",
@@ -19,7 +19,7 @@
         "additional_details": "Short stature",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0002829",
@@ -30,7 +30,7 @@
         "additional_details": "Arthralgia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0001386",
@@ -41,7 +41,7 @@
         "additional_details": "Joint swelling",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0001935",
@@ -52,7 +52,7 @@
         "additional_details": "Microcytic anemia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0001931",
@@ -63,7 +63,7 @@
         "additional_details": "Hypochromic anemia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0011123",
@@ -74,7 +74,7 @@
         "additional_details": "Inflammatory abnormality of the skin",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0007018",
@@ -85,7 +85,7 @@
         "additional_details": "Attention deficit hyperactivity disorder",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN926567_HP:0000988",
@@ -96,7 +96,7 @@
         "additional_details": "Skin rash",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0002597",
@@ -107,7 +107,7 @@
         "additional_details": "Abnormality of vasculature",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001627",
@@ -118,7 +118,7 @@
         "additional_details": "Abnormal heart morphology",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0031628",
@@ -129,7 +129,7 @@
         "additional_details": "Aborted sudden cardiac death",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001649",
@@ -140,7 +140,7 @@
         "additional_details": "Tachycardia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0011712",
@@ -151,7 +151,7 @@
         "additional_details": "Right bundle branch block",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0006677",
@@ -162,7 +162,7 @@
         "additional_details": "Prolonged QRS complex",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001336",
@@ -173,7 +173,7 @@
         "additional_details": "Myoclonus",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001250",
@@ -184,7 +184,7 @@
         "additional_details": "Seizure",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0002181",
@@ -195,7 +195,7 @@
         "additional_details": "Cerebral Edema",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0002015",
@@ -206,7 +206,7 @@
         "additional_details": "Dysphagia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0000020",
@@ -217,7 +217,7 @@
         "additional_details": "Urinary incontinence",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0002607",
@@ -228,7 +228,7 @@
         "additional_details": "Bowel incontinence",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001260",
@@ -239,7 +239,7 @@
         "additional_details": "Dysarthria",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001288",
@@ -250,7 +250,7 @@
         "additional_details": "Gait disturbance",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0002353",
@@ -261,7 +261,7 @@
         "additional_details": "EEG abnormality",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0000545",
@@ -272,7 +272,7 @@
         "additional_details": "Myopia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001259",
@@ -283,7 +283,7 @@
         "additional_details": "Coma",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0031843",
@@ -294,7 +294,7 @@
         "additional_details": "Abnormally slow thought process",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0010808",
@@ -305,7 +305,7 @@
         "additional_details": "Protruding tongue",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001276",
@@ -316,7 +316,7 @@
         "additional_details": "Hypertonia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0025406",
@@ -327,7 +327,7 @@
         "additional_details": "Asthenia",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     },
     {
         "phenotype_id": "UDN969754_HP:0001310",
@@ -338,6 +338,6 @@
         "additional_details": "Dysmetria",
         "onset_age_range": "",
         "additional_modifiers": "",
-        "syndromic": "No"
+        "syndromic": "non-syndromic"
     }
 ]

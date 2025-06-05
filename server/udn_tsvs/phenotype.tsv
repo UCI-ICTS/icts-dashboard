@@ -1,32 +1,32 @@
 phenotype_id	participant_id	term_id	presence	ontology	additional_details	onset_age_range	additional_modifiers	syndromic
-UDN926567_HP:0001263	UDN926567	HP:0001263	Present	HPO	Global developmental delay			No
-UDN926567_HP:0004322	UDN926567	HP:0004322	Present	HPO	Short stature			No
-UDN926567_HP:0002829	UDN926567	HP:0002829	Present	HPO	Arthralgia			No
-UDN926567_HP:0001386	UDN926567	HP:0001386	Present	HPO	Joint swelling			No
-UDN926567_HP:0001935	UDN926567	HP:0001935	Present	HPO	Microcytic anemia			No
-UDN926567_HP:0001931	UDN926567	HP:0001931	Present	HPO	Hypochromic anemia			No
-UDN926567_HP:0011123	UDN926567	HP:0011123	Present	HPO	Inflammatory abnormality of the skin			No
-UDN926567_HP:0007018	UDN926567	HP:0007018	Present	HPO	Attention deficit hyperactivity disorder			No
-UDN926567_HP:0000988	UDN926567	HP:0000988	Present	HPO	Skin rash			No
-UDN969754_HP:0002597	UDN969754	HP:0002597	Present	HPO	Abnormality of vasculature			No
-UDN969754_HP:0001627	UDN969754	HP:0001627	Present	HPO	Abnormal heart morphology			No
-UDN969754_HP:0031628	UDN969754	HP:0031628	Present	HPO	Aborted sudden cardiac death			No
-UDN969754_HP:0001649	UDN969754	HP:0001649	Present	HPO	Tachycardia			No
-UDN969754_HP:0011712	UDN969754	HP:0011712	Present	HPO	Right bundle branch block			No
-UDN969754_HP:0006677	UDN969754	HP:0006677	Present	HPO	Prolonged QRS complex			No
-UDN969754_HP:0001336	UDN969754	HP:0001336	Present	HPO	Myoclonus			No
-UDN969754_HP:0001250	UDN969754	HP:0001250	Present	HPO	Seizure			No
-UDN969754_HP:0002181	UDN969754	HP:0002181	Present	HPO	Cerebral Edema			No
-UDN969754_HP:0002015	UDN969754	HP:0002015	Present	HPO	Dysphagia			No
-UDN969754_HP:0000020	UDN969754	HP:0000020	Present	HPO	Urinary incontinence			No
-UDN969754_HP:0002607	UDN969754	HP:0002607	Present	HPO	Bowel incontinence			No
-UDN969754_HP:0001260	UDN969754	HP:0001260	Present	HPO	Dysarthria			No
-UDN969754_HP:0001288	UDN969754	HP:0001288	Present	HPO	Gait disturbance			No
-UDN969754_HP:0002353	UDN969754	HP:0002353	Present	HPO	EEG abnormality			No
-UDN969754_HP:0000545	UDN969754	HP:0000545	Present	HPO	Myopia			No
-UDN969754_HP:0001259	UDN969754	HP:0001259	Present	HPO	Coma			No
-UDN969754_HP:0031843	UDN969754	HP:0031843	Present	HPO	Abnormally slow thought process			No
-UDN969754_HP:0010808	UDN969754	HP:0010808	Present	HPO	Protruding tongue			No
-UDN969754_HP:0001276	UDN969754	HP:0001276	Present	HPO	Hypertonia			No
-UDN969754_HP:0025406	UDN969754	HP:0025406	Present	HPO	Asthenia			No
-UDN969754_HP:0001310	UDN969754	HP:0001310	Present	HPO	Dysmetria			No
+UDN926567_HP:0001263	UDN926567	HP:0001263	Present	HPO	Global developmental delay			non-syndromic
+UDN926567_HP:0004322	UDN926567	HP:0004322	Present	HPO	Short stature			non-syndromic
+UDN926567_HP:0002829	UDN926567	HP:0002829	Present	HPO	Arthralgia			non-syndromic
+UDN926567_HP:0001386	UDN926567	HP:0001386	Present	HPO	Joint swelling			non-syndromic
+UDN926567_HP:0001935	UDN926567	HP:0001935	Present	HPO	Microcytic anemia			non-syndromic
+UDN926567_HP:0001931	UDN926567	HP:0001931	Present	HPO	Hypochromic anemia			non-syndromic
+UDN926567_HP:0011123	UDN926567	HP:0011123	Present	HPO	Inflammatory abnormality of the skin			non-syndromic
+UDN926567_HP:0007018	UDN926567	HP:0007018	Present	HPO	Attention deficit hyperactivity disorder			non-syndromic
+UDN926567_HP:0000988	UDN926567	HP:0000988	Present	HPO	Skin rash			non-syndromic
+UDN969754_HP:0002597	UDN969754	HP:0002597	Present	HPO	Abnormality of vasculature			non-syndromic
+UDN969754_HP:0001627	UDN969754	HP:0001627	Present	HPO	Abnormal heart morphology			non-syndromic
+UDN969754_HP:0031628	UDN969754	HP:0031628	Present	HPO	Aborted sudden cardiac death			non-syndromic
+UDN969754_HP:0001649	UDN969754	HP:0001649	Present	HPO	Tachycardia			non-syndromic
+UDN969754_HP:0011712	UDN969754	HP:0011712	Present	HPO	Right bundle branch block			non-syndromic
+UDN969754_HP:0006677	UDN969754	HP:0006677	Present	HPO	Prolonged QRS complex			non-syndromic
+UDN969754_HP:0001336	UDN969754	HP:0001336	Present	HPO	Myoclonus			non-syndromic
+UDN969754_HP:0001250	UDN969754	HP:0001250	Present	HPO	Seizure			non-syndromic
+UDN969754_HP:0002181	UDN969754	HP:0002181	Present	HPO	Cerebral Edema			non-syndromic
+UDN969754_HP:0002015	UDN969754	HP:0002015	Present	HPO	Dysphagia			non-syndromic
+UDN969754_HP:0000020	UDN969754	HP:0000020	Present	HPO	Urinary incontinence			non-syndromic
+UDN969754_HP:0002607	UDN969754	HP:0002607	Present	HPO	Bowel incontinence			non-syndromic
+UDN969754_HP:0001260	UDN969754	HP:0001260	Present	HPO	Dysarthria			non-syndromic
+UDN969754_HP:0001288	UDN969754	HP:0001288	Present	HPO	Gait disturbance			non-syndromic
+UDN969754_HP:0002353	UDN969754	HP:0002353	Present	HPO	EEG abnormality			non-syndromic
+UDN969754_HP:0000545	UDN969754	HP:0000545	Present	HPO	Myopia			non-syndromic
+UDN969754_HP:0001259	UDN969754	HP:0001259	Present	HPO	Coma			non-syndromic
+UDN969754_HP:0031843	UDN969754	HP:0031843	Present	HPO	Abnormally slow thought process			non-syndromic
+UDN969754_HP:0010808	UDN969754	HP:0010808	Present	HPO	Protruding tongue			non-syndromic
+UDN969754_HP:0001276	UDN969754	HP:0001276	Present	HPO	Hypertonia			non-syndromic
+UDN969754_HP:0025406	UDN969754	HP:0025406	Present	HPO	Asthenia			non-syndromic
+UDN969754_HP:0001310	UDN969754	HP:0001310	Present	HPO	Dysmetria			non-syndromic
