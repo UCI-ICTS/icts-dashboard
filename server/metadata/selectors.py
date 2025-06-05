@@ -42,6 +42,8 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
         "condition_inheritance",
         "public_database_other",
         "public_database_ID_other",
+        "partial_contribution_explained",
+        "additional_family_members_with_variant",
         "method_of_discovery",
     ]
 
