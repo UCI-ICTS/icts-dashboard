@@ -26,6 +26,7 @@ from metadata.models import (
 from metadata.selectors import (
     participant_parser,
     genetic_findings_parser,
+    phenotype_parser,
     biobank_parser,
 )
 
@@ -408,6 +409,7 @@ def create_or_update_metadata(
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
@@ -535,6 +537,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
@@ -629,6 +632,7 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
