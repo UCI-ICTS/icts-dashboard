@@ -56,7 +56,7 @@ class TableValidator:
         Returns:
             None
         """
-
+        #import pdb; pdb.set_trace()
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
             with open(schema_path, "r") as schema_file:
@@ -94,11 +94,10 @@ class TableValidator:
         """
         error_data = [
             {
-                error
-                #"field": error.split(":")[0]
-                #.strip("[]' ")
-                #.title(),  # Extract and clean up the field name, then capitalize
-                #"error": error.split(":")[1].strip(),  # Extract and clean up the error message
+                "field": error.split(":")[0]
+                .strip("[]' ")
+                .title(),  # Extract and clean up the field name, then capitalize
+                "error": error.split(":")[1].strip(),  # Extract and clean up the error message
             }
             for error in self.errors
         ]
