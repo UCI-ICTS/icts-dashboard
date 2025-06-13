@@ -177,9 +177,8 @@ def biobank_parser(biobank: dict) -> dict:
     """ """
     from config.selectors import multi_value_split
 
-    multi_value = ["child_analytes"]
+    multi_value = ["child_analytes", "experiments", "alignments"]
     split_biobank = multi_value_split(biobank)
-
     for key in multi_value:
         try:
             if key in split_biobank and not isinstance(split_biobank[key], list):

@@ -132,13 +132,13 @@ class BiobankSerializer(serializers.ModelSerializer):
     )
     experiments = serializers.SlugRelatedField(
         many=True,
-        slug_field="id_in_table",
+        slug_field="experiment_id",  # Fully-qualified ID like "experiment_dna_short_read.UCI_GREGoR_..."
         queryset=Experiment.objects.all(),
         required=False,
     )
     alignments = serializers.SlugRelatedField(
         many=True,
-        slug_field="id_in_table",
+        slug_field="aligned_id",  # Fully-qualified
         queryset=Aligned.objects.all(),
         required=False,
     )
@@ -556,7 +556,6 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
     results = table_validator.get_validation_results()
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
-        # import pdb; pdb.set_trace()
         if serializer.is_valid():
             new_instance = serializer.save()
             return (
