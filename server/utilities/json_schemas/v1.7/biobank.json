@@ -143,6 +143,10 @@
         "comments": {
             "type": "string",
             "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+        },
+        "completed": {
+            "type": "boolean",
+            "description": "Whether the full pipeline is complete for this sample"
         }
     }
 }
