@@ -31,6 +31,26 @@ def get_analyte(analyte_id: str) -> Family:
         return None
 
 
+def phenotype_parser(phenotype: dict) -> dict:
+    """"""
+    from config.selectors import multi_value_split
+
+    multi_value = ["additional_modifiers"]
+
+    split_modifiers = multi_value_split(phenotype)
+
+    for value in multi_value:
+        try:
+            if value in split_modifiers and not isinstance(
+                split_modifiers[value], list
+            ):
+                split_modifiers[value] = [split_modifiers[value]]
+        except Exception as error:
+            oops = error
+            split_modifiers[value] = [oops]
+    return split_modifiers
+
+
 def genetic_findings_parser(genetic_findings: dict) -> dict:
     """ """
     from config.selectors import multi_value_split
@@ -40,6 +60,10 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
         "variant_type",
         "gene_of_interest",
         "condition_inheritance",
+        "public_database_other",
+        "public_database_ID_other",
+        "partial_contribution_explained",
+        "additional_family_members_with_variant",
         "method_of_discovery",
     ]
 
@@ -153,9 +177,8 @@ def biobank_parser(biobank: dict) -> dict:
     """ """
     from config.selectors import multi_value_split
 
-    multi_value = ["child_analytes"]
+    multi_value = ["child_analytes", "experiments", "alignments"]
     split_biobank = multi_value_split(biobank)
-
     for key in multi_value:
         try:
             if key in split_biobank and not isinstance(split_biobank[key], list):

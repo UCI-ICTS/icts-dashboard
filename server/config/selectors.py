@@ -56,6 +56,7 @@ class TableValidator:
         Returns:
             None
         """
+        #import pdb; pdb.set_trace()
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
             with open(schema_path, "r") as schema_file:

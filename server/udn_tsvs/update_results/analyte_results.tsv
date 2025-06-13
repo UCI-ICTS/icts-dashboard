@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+10819	BAD REQUEST		[{'analyte_id': [ErrorDetail(string='analyte with this analyte id already exists.', code='unique')]}]
+10778	BAD REQUEST		[{'analyte_id': [ErrorDetail(string='analyte with this analyte id already exists.', code='unique')]}]
+10777	BAD REQUEST		[{'analyte_id': [ErrorDetail(string='analyte with this analyte id already exists.', code='unique')]}]
+10776	BAD REQUEST		[{'analyte_id': [ErrorDetail(string='analyte with this analyte id already exists.', code='unique')]}]
+10818	BAD REQUEST		[{'analyte_id': [ErrorDetail(string='analyte with this analyte id already exists.', code='unique')]}]

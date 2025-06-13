@@ -19,13 +19,14 @@ from metadata.models import (
     PmidId,
     TwinId,
     Biobank,
-    ExperimentId,
-    AlignedId,
 )
+
+from experiments.models import Experiment, Aligned
 
 from metadata.selectors import (
     participant_parser,
     genetic_findings_parser,
+    phenotype_parser,
     biobank_parser,
 )
 
@@ -113,67 +114,64 @@ class AnalyteSerializer(serializers.ModelSerializer):
 
 
 class BiobankSerializer(serializers.ModelSerializer):
-    child_analytes = serializers.ListField(
-        child=serializers.CharField(),
-        write_only=True,
+    """
+    Serializer for the Biobank model.
+    Handles full serialization and deserialization of nested ManyToMany and ForeignKey fields.
+    """
+
+    participant_id = serializers.SlugRelatedField(
+        source="participant",
+        slug_field="participant_id",
+        queryset=Participant.objects.all(),
+    )
+    child_analytes = serializers.SlugRelatedField(
+        many=True,
+        slug_field="analyte_id",
+        queryset=Analyte.objects.all(),
         required=False,
-        allow_empty=True,
-        help_text="List of downstream analytes and their associated experiments",
+    )
+    experiments = serializers.SlugRelatedField(
+        many=True,
+        slug_field="experiment_id",  # Fully-qualified ID like "experiment_dna_short_read.UCI_GREGoR_..."
+        queryset=Experiment.objects.all(),
+        required=False,
+    )
+    alignments = serializers.SlugRelatedField(
+        many=True,
+        slug_field="aligned_id",  # Fully-qualified
+        queryset=Aligned.objects.all(),
+        required=False,
     )
 
     class Meta:
         model = Biobank
-        fields = "__all__"
-
-    def create(self, validated_data):
-        child_analyte = validated_data.pop("child_analytes", [])
-        experiment = validated_data.pop("experiments", [])
-        aligned = validated_data.pop("alignments", [])
-
-        try:
-            with transaction.atomic():
-                biobank = Biobank.objects.create(**validated_data)
-                if child_analyte:
-                    self._set_relationship(
-                        biobank, Analyte, child_analyte, "child_analytes"
-                    )
-                if experiment:
-                    self._set_relationship(
-                        biobank, ExperimentId, experiment, "experiments"
-                    )
-                if aligned:
-                    self._set_relationship(
-                        biobank, AlignedId, aligned, "alignments"
-                    )
-                biobank.save()
-        except IntegrityError as error:
-            raise serializers.ValidationError(error)
-
-        return biobank
-
-    def update(self, instance, validated_data):
-        child_analyte = validated_data.pop("child_analytes", [])
-        experiment = validated_data.pop("experiments", [])
-        aligned = validated_data.pop("alignments", [])
-
-        with transaction.atomic():
-            for attr, value in validated_data.items():
-                setattr(instance, attr, value)
-            instance.save()
-            self._set_relationship(instance, Analyte, child_analyte, "child_analytes")
-            self._set_relationship(instance, ExperimentId, experiment, "experiments")
-            self._set_relationship(instance, AlignedId, aligned, "alignments")
-
-        return instance
-
-    def _set_relationship(self, instance, model, ids, related_name):
-        # Setting ManyToMany relations
-        try:
-            manager = getattr(instance, related_name)
-            manager.set(model.objects.filter(pk__in=ids))
-        except Exception as e:
-            print(f"Error setting relationship: {e}")
-            raise
+        fields = [
+            "biobank_id",
+            "participant_id",
+            "collection_date",
+            "specimen_type",
+            "current_location",
+            "freezer_id",
+            "shelf_id",
+            "rack_id",
+            "box_type",
+            "box_id",
+            "box_position",
+            "tube_barcode",
+            "plate_barcode",
+            "status",
+            "shipment_date",
+            "tracking_number",
+            "test_indication",
+            "requested_test",
+            "external_id",
+            "internal_analysis",
+            "comments",
+            "child_analytes",
+            "experiments",
+            "alignments",
+            "completed",
+        ]
 
 
 class PhenotypeSerializer(serializers.ModelSerializer):
@@ -408,12 +406,13 @@ def create_or_update_metadata(
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
             "output_serializer": BiobankSerializer,
             "parsed_data": lambda datum: biobank_parser(biobank=datum),
-        }
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -535,12 +534,13 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
             "output_serializer": BiobankSerializer,
             "parsed_data": lambda datum: biobank_parser(biobank=datum),
-        }
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -554,7 +554,6 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
     table_validator = TableValidator()
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
-
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
@@ -629,12 +628,13 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         "phenotype": {
             "input_serializer": PhenotypeSerializer,
             "output_serializer": PhenotypeSerializer,
+            "parsed_data": lambda datum: phenotype_parser(phenotype=datum),
         },
         "biobank": {
             "input_serializer": BiobankSerializer,
             "output_serializer": BiobankSerializer,
             "parsed_data": lambda datum: biobank_parser(biobank=datum),
-        }
+        },
     }
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
@@ -714,7 +714,7 @@ def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
         "genetic_findings": GeneticFindings,
         "analyte": Analyte,
         "phenotype": Phenotype,
-        "biobank": Biobank
+        "biobank": Biobank,
     }
 
     model_class = model_mapping.get(table_name)

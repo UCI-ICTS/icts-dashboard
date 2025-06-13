@@ -6,7 +6,7 @@ This module provides a class to convert tabular data (CSV/TSV) into JSON objects
 and then call an existing API function (create_or_update) to create or update model instances.
 If a header column is found that starts with "entity:", its value is used as the table/entity identifier.
 An internal mapping (SCHEMA_MAPPING) is available to locate the schema file if needed,
-but in this version we assume that the create_or_update function handles validation.
+but in this version we assume that the create function handles validation.
 """
 
 import os
@@ -20,7 +20,7 @@ import csv
 import argparse
 import json
 from config.selectors import bulk_model_retrieve
-from metadata.services import create_or_update_metadata
+from metadata.services import create_metadata
 from metadata.models import (
     Participant,
     Family,
@@ -30,7 +30,7 @@ from metadata.models import (
     Biobank,
 )
 
-from experiments.services import create_or_update_alignment, create_or_update_experiment
+from experiments.services import create_aligned, create_experiment
 from experiments.models import (
     ExperimentDNAShortRead,
     ExperimentRNAShortRead,
@@ -46,7 +46,7 @@ from experiments.models import (
 class TableConverter:
     """
     Class for converting tabular data (CSV/TSV) to JSON objects and then
-    calling create_or_update for each record.
+    calling create for each record.
     """
 
     @staticmethod
@@ -95,7 +95,7 @@ class TableConverter:
     def process_table(self, table_file: str, table_name: str = None) -> None:
         """
         Converts the table file into a list of JSON objects and for each record
-        calls the create_or_update function.
+        calls the create function.
 
         If table_name is not provided, it is determined from the TSV header (the value of the column starting with "entity:").
 
@@ -161,11 +161,11 @@ class TableConverter:
         )
 
         if table_name in metadata_models:
-            create_or_update = create_or_update_metadata
+            create = create_metadata
         if table_name in experiment_models:
-            create_or_update = create_or_update_experiment
+            create = create_experiment
         if table_name in alignment_models:
-            create_or_update = create_or_update_alignment
+            create = create_aligned
 
         results = []
 
@@ -186,26 +186,21 @@ class TableConverter:
             #     }
             #     results.append(result_entry)
             # else:
-            response, status = create_or_update(
-                table_name, identifier, model_instance, record
+            response, status = create(
+                table_name, identifier, record
             )
             result_entry = {
                 "identifier": identifier,
                 "request_status": (
                     "NO CHANGE"
-                    if response["request_status"] == "SUCCESS"
+                    if response["request_status"] == "CREATED"
                     else response.get("request_status", "UNKNOWN")
-                ),
-                "updates": (
-                    response["data"].get("updates", [])
-                    if response.get("request_status") == "UPDATED"
-                    else []
                 ),
                 "validation_fails": response["data"],
             }
             results.append(result_entry)
-            # if result_entry['request_status'] == "SUCCESS":
-            # import pdb; pdb.set_trace()
+            #if result_entry['request_status'] == "CREATED":
+            #import pdb; pdb.set_trace()
         self.write_results(table_file.split(".")[0], results)
 
     def write_results(self, table_file: str, results: list):

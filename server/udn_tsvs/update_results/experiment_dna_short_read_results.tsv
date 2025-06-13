@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+3223545-UDN246341	BAD REQUEST		[{'experiment_dna_short_read_id': [ErrorDetail(string='experiment dna short read with this experiment dna short read id already exists.', code='unique')]}]
+3223558-UDN443554	BAD REQUEST		[{'experiment_dna_short_read_id': [ErrorDetail(string='experiment dna short read with this experiment dna short read id already exists.', code='unique')]}]
+3223560-UDN831894	BAD REQUEST		[{'experiment_dna_short_read_id': [ErrorDetail(string='experiment dna short read with this experiment dna short read id already exists.', code='unique')]}]
+3223557-UDN926567	BAD REQUEST		[{'experiment_dna_short_read_id': [ErrorDetail(string='experiment dna short read with this experiment dna short read id already exists.', code='unique')]}]
+3223544-UDN969754	BAD REQUEST		[{'experiment_dna_short_read_id': [ErrorDetail(string='experiment dna short read with this experiment dna short read id already exists.', code='unique')]}]
