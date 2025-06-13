@@ -22,8 +22,6 @@ from submodels.models import (
     ProbandRelationship,
     BiologicalSex,
     ReportedEthnicity,
-    ExperimentId,
-    AlignedId,
 )
 
 
@@ -570,153 +568,94 @@ class Analyte(models.Model):
 
 
 class Biobank(models.Model):
+    """
+    Unified model for tracking a biosample from physical storage
+    through sequencing, alignment, and variant calling.
+
+    This table connects biobank logistics with downstream GREGoR pipeline stages
+    without modifying the GREGoR core models. Supports full reverse lookup.
+    """
+
     biobank_id = models.CharField(
         max_length=255,
         primary_key=True,
         help_text="Identifier for a biosample in repository",
     )
-    participant_id = models.ForeignKey(
-        Participant,
-        to_field="participant_id",
-        db_column="participant_id",
+    participant = models.ForeignKey(
+        "Participant",
         on_delete=models.CASCADE,
-        help_text="The participant from whom the biosample was taken",
+        related_name="biobank_samples",
+        help_text="Participant associated with the sample",
     )
-    collection_date = models.DateField(help_text="Date when the biosample was created")
+    collection_date = models.DateField(blank=True, null=True)
     specimen_type = models.CharField(
-        max_length=10,
-        choices=[
-            ("D", "EDTA in Cryovial"),
-            ("R", "PAX Tube"),
-            ("OG", "OGR-500 saliva collection kit"),
-            ("SC", "OCD-100 buccal collection kit"),
-            ("SG", "OGR-675 buccal collection kit"),
-            ("X", "Extracted DNA"),
-            ("XR", "Extracted RNA"),
-        ],
-        help_text="Analyte codes printed on biospecimen containers",
+        max_length=100, help_text="Type of specimen (e.g., blood, saliva)"
     )
-    current_location = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        help_text="Sample storage location, e.g. UCI, Ambry, CNH",
-    )
-    freezer_id = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Name of freezer or refrigerator the biospecimen is stored in",
-    )
-    shelf_id = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Name of freezer/refrigerator shelf the biospecimen is stored in",
-    )
-    rack_id = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Name of rack the biospecimen is stored in",
-    )
-    box_type = models.CharField(
-        max_length=50,
-        choices=[
-            ("5x5 cryobox", "5x5 cryobox"),
-            ("9x9 cryobox", "9x9 cryobox"),
-            ("10x10 cryobox", "10x10 cryobox"),
-            ("SBS plate", "SBS plate"),
-            ("Wire rack", "Wire rack"),
-            ("8x12 metal rack", "8x12 metal rack"),
-        ],
-        blank=True,
-        null=True,
-        help_text="Box type the biospecimen is stored in",
-    )
-    box_id = models.CharField(
-        max_length=100, blank=True, null=True, help_text="Box name as labelled"
-    )
-    box_position = models.CharField(
-        max_length=10,
-        blank=True,
-        null=True,
-        help_text="XY coordinates of biospecimens in box or plate, e.g. A01, H12",
-    )
-    tube_barcode = models.CharField(
-        max_length=50, blank=True, null=True, help_text="Barcode on tube if present"
-    )
-    plate_barcode = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Barcode on SBS plate if present or used",
-    )
+
+    current_location = models.CharField(max_length=100, blank=True, null=True)
+    freezer_id = models.CharField(max_length=100, blank=True, null=True)
+    shelf_id = models.CharField(max_length=100, blank=True, null=True)
+    rack_id = models.CharField(max_length=100, blank=True, null=True)
+    box_type = models.CharField(max_length=100, blank=True, null=True)
+    box_id = models.CharField(max_length=100, blank=True, null=True)
+    box_position = models.CharField(max_length=10, blank=True, null=True)
+
+    tube_barcode = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    plate_barcode = models.CharField(max_length=100, blank=True, null=True)
+
+    STATUS_CHOICES = [
+        ("Pending shipment", "Pending shipment"),
+        ("Shipped", "Shipped"),
+        ("Received", "Received"),
+        ("Stored", "Stored"),
+        ("QC issue", "QC issue, see comments"),
+        ("Data delivered", "Data delivered"),
+        ("Lost", "Lost, see comments"),
+        ("Replacement requested", "Replacement requested"),
+    ]
     status = models.CharField(
-        max_length=100,
-        choices=[
-            ("Pending shipment", "Pending shipment"),
-            ("Shipped", "Shipped"),
-            ("Received", "Received"),
-            ("Stored", "Stored"),
-            ("QC issue", "QC issue, see comments"),
-            ("Data delivered", "Data delivered"),
-            ("Lost", "Lost, see comments"),
-            ("Replacement requested", "Replacement requested"),
-        ],
-        help_text="Biospecimen status while ",
-    )
-    shipment_date = models.DateField(
+        max_length=25,
+        choices=STATUS_CHOICES,
         blank=True,
         null=True,
-        help_text="If the status is shipped, then include a date when it was mailed out.",
+        help_text="Current processing/storage status",
     )
-    tracking_number = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Fedex tracking number if available",
-    )
-    test_indication = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="Ambry shipping manifest requirement. Research or Clinical",
-    )
-    requested_test = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="Ambry test code. 10500 for LR-WGS. 10525 for WTS",
-    )
+
+    shipment_date = models.DateField(blank=True, null=True)
+    tracking_number = models.CharField(max_length=100, blank=True, null=True)
+    test_indication = models.TextField(blank=True, null=True)
+    requested_test = models.TextField(blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True)
+    internal_analysis = models.TextField(blank=True, null=True)
+    comments = models.TextField(blank=True, null=True)
+
+    # Downstream data links (optional)
     child_analytes = models.ManyToManyField(
-        Analyte,
-        related_name="analytes",
-        blank=True,
-        help_text="The analyte(s) derived from this biospecimen",
+        "Analyte", blank=True, help_text="Analyte extracted from this sample"
     )
     experiments = models.ManyToManyField(
-        ExperimentId,
-        related_name="experiment",
+        "experiments.Experiment",
         blank=True,
-        help_text="List of associated sr-gs, pacbio, nanopore, etc. experiment objects",
+        help_text="Sequencing experiment performed on the analyte",
     )
     alignments = models.ManyToManyField(
-        AlignedId,
-        related_name="aligned",
+        "experiments.Aligned",
         blank=True,
-        help_text="List of associated sr-gs, pacbio, nanopore, etc. alignment objects",
+        help_text="Alignment of reads from the experiment",
     )
-    external_id = models.CharField(
-        max_length=100, blank=True, null=True, help_text="Ambry identifier or similar"
+    # variant_calls = models.ManyToManyField(
+    #     "CalledVariantsDnaShortRead",
+    #     blank=True,
+    #     help_text="Final variant callset derived from the alignment"
+    # )
+
+    completed = models.BooleanField(
+        default=False, help_text="Whether the full pipeline is complete for this sample"
     )
-    internal_analysis = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Freetext to describe what analysis pipelines have been done on this case",
-    )
-    comments = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Free text description of any quality issues with biospecimens or adverse events.",
-    )
+
+    def __str__(self):
+        return f"{self.biobank_id} ({self.participant_id})"
+
+    class Meta:
+        verbose_name = "Biobank Sample (with traceability)"
+        ordering = ["participant", "collection_date"]

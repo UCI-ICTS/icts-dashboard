@@ -13,7 +13,7 @@ from config.selectors import (
     response_constructor,
     response_status,
     bulk_retrieve,
-    bulk_model_retrieve
+    bulk_model_retrieve,
 )
 
 from metadata.models import (
@@ -22,7 +22,7 @@ from metadata.models import (
     Family,
     GeneticFindings,
     Phenotype,
-    Biobank
+    Biobank,
 )
 
 from metadata.services import (
@@ -34,7 +34,7 @@ from metadata.services import (
     BiobankSerializer,
     create_metadata,
     update_metadata,
-    delete_metadata
+    delete_metadata,
 )
 
 
@@ -45,7 +45,7 @@ class ParticipantViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=ParticipantInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["Participant"]
+        tags=["Participant"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_participant(self, request):
@@ -55,12 +55,14 @@ class ParticipantViewSet(viewsets.ViewSet):
         for datum in request.data:
             participant_id = datum.get("participant_id")
             if participant_id and participant_id in participant:
-                response_data.append(response_constructor(
-                    identifier=participant_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Participant entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Participant entry already exists",
+                    )
+                )
                 rejected = True
             else:
                 data, result = create_metadata("participant", participant_id, datum)
@@ -73,12 +75,14 @@ class ParticipantViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Participant"]
+        tags=["Participant"],
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
@@ -87,20 +91,24 @@ class ParticipantViewSet(viewsets.ViewSet):
 
         for participant_id in ids:
             if participant_id in participant:
-                response_data.append(response_constructor(
-                    identifier=participant_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=participant[participant_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=participant[participant_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=participant_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -108,7 +116,7 @@ class ParticipantViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=ParticipantInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["Participant"]
+        tags=["Participant"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_participant(self, request):
@@ -118,12 +126,14 @@ class ParticipantViewSet(viewsets.ViewSet):
         for datum in request.data:
             participant_id = datum.get("participant_id")
             if participant_id not in participant:
-                response_data.append(response_constructor(
-                    identifier=participant_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
@@ -153,7 +163,7 @@ class ParticipantViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Participant"]
+        tags=["Participant"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -166,17 +176,21 @@ class ParticipantViewSet(viewsets.ViewSet):
 
         for participant_id in ids:
             if participant_id in participant:
-                data, result = delete_metadata("participant", participant_id, "participant_id")
+                data, result = delete_metadata(
+                    "participant", participant_id, "participant_id"
+                )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=participant_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -189,7 +203,7 @@ class FamilyViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=FamilySerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["Family"]
+        tags=["Family"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_family(self, request):
@@ -199,12 +213,14 @@ class FamilyViewSet(viewsets.ViewSet):
         for datum in request.data:
             family_id = datum.get("family_id")
             if family_id and family_id in family:
-                response_data.append(response_constructor(
-                    identifier=family_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Family entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Family entry already exists",
+                    )
+                )
                 rejected = True
             else:
                 data, result = create_metadata("family", family_id, datum)
@@ -217,12 +233,14 @@ class FamilyViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Family"]
+        tags=["Family"],
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
@@ -231,20 +249,24 @@ class FamilyViewSet(viewsets.ViewSet):
 
         for family_id in ids:
             if family_id in family:
-                response_data.append(response_constructor(
-                    identifier=family_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=family[family_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=family[family_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=family_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -252,7 +274,7 @@ class FamilyViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=FamilySerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["Family"]
+        tags=["Family"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_family(self, request):
@@ -262,12 +284,14 @@ class FamilyViewSet(viewsets.ViewSet):
         for datum in request.data:
             family_id = datum.get("family_id")
             if family_id not in family:
-                response_data.append(response_constructor(
-                    identifier=family_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
@@ -297,7 +321,7 @@ class FamilyViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Family"]
+        tags=["Family"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -315,12 +339,14 @@ class FamilyViewSet(viewsets.ViewSet):
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=family_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -333,7 +359,7 @@ class AnalyteViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=AnalyteSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["Analyte"]
+        tags=["Analyte"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_analyte(self, request):
@@ -343,12 +369,14 @@ class AnalyteViewSet(viewsets.ViewSet):
         for datum in request.data:
             analyte_id = datum.get("analyte_id")
             if analyte_id and analyte_id in analyte:
-                response_data.append(response_constructor(
-                    identifier=analyte_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Analyte entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Analyte entry already exists",
+                    )
+                )
                 rejected = True
             else:
                 data, result = create_metadata("analyte", analyte_id, datum)
@@ -361,12 +389,14 @@ class AnalyteViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Analyte"]
+        tags=["Analyte"],
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
@@ -375,20 +405,24 @@ class AnalyteViewSet(viewsets.ViewSet):
 
         for analyte_id in ids:
             if analyte_id in analyte:
-                response_data.append(response_constructor(
-                    identifier=analyte_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=analyte[analyte_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=analyte[analyte_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=analyte_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -396,7 +430,7 @@ class AnalyteViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=AnalyteSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["Analyte"]
+        tags=["Analyte"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_analyte(self, request):
@@ -406,12 +440,14 @@ class AnalyteViewSet(viewsets.ViewSet):
         for datum in request.data:
             analyte_id = datum.get("analyte_id")
             if analyte_id not in analyte:
-                response_data.append(response_constructor(
-                    identifier=analyte_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
@@ -441,7 +477,7 @@ class AnalyteViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Analyte"]
+        tags=["Analyte"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -459,12 +495,14 @@ class AnalyteViewSet(viewsets.ViewSet):
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=analyte_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -477,7 +515,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=PhenotypeSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["Phenotype"]
+        tags=["Phenotype"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_phenotype(self, request):
@@ -487,12 +525,14 @@ class PhenotypeViewSet(viewsets.ViewSet):
         for datum in request.data:
             phenotype_id = datum.get("phenotype_id")
             if phenotype_id and phenotype_id in phenotype:
-                response_data.append(response_constructor(
-                    identifier=phenotype_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Phenotype entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Phenotype entry already exists",
+                    )
+                )
                 rejected = True
             else:
                 data, result = create_metadata("phenotype", phenotype_id, datum)
@@ -505,12 +545,14 @@ class PhenotypeViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Phenotype"]
+        tags=["Phenotype"],
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
@@ -519,20 +561,24 @@ class PhenotypeViewSet(viewsets.ViewSet):
 
         for phenotype_id in ids:
             if phenotype_id in phenotype:
-                response_data.append(response_constructor(
-                    identifier=phenotype_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=phenotype[phenotype_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=phenotype[phenotype_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=phenotype_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -540,7 +586,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=PhenotypeSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["Phenotype"]
+        tags=["Phenotype"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_phenotype(self, request):
@@ -550,12 +596,14 @@ class PhenotypeViewSet(viewsets.ViewSet):
         for datum in request.data:
             phenotype_id = datum.get("phenotype_id")
             if phenotype_id not in phenotype:
-                response_data.append(response_constructor(
-                    identifier=phenotype_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
@@ -585,7 +633,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Phenotype"]
+        tags=["Phenotype"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -598,17 +646,21 @@ class PhenotypeViewSet(viewsets.ViewSet):
 
         for phenotype_id in ids:
             if phenotype_id in phenotype:
-                data, result = delete_metadata("phenotype", phenotype_id, "phenotype_id")
+                data, result = delete_metadata(
+                    "phenotype", phenotype_id, "phenotype_id"
+                )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=phenotype_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -621,25 +673,31 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=GeneticFindingsSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["GeneticFindings"]
+        tags=["GeneticFindings"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_genetic_findings(self, request):
-        genetic_findings = bulk_model_retrieve(request.data, GeneticFindings, "genetic_findings_id")
+        genetic_findings = bulk_model_retrieve(
+            request.data, GeneticFindings, "genetic_findings_id"
+        )
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
             genetic_findings_id = datum.get("genetic_findings_id")
             if genetic_findings_id and genetic_findings_id in genetic_findings:
-                response_data.append(response_constructor(
-                    identifier=genetic_findings_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="GeneticFindings entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="GeneticFindings entry already exists",
+                    )
+                )
                 rejected = True
             else:
-                data, result = create_metadata("genetic_findings", genetic_findings_id, datum)
+                data, result = create_metadata(
+                    "genetic_findings", genetic_findings_id, datum
+                )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -649,12 +707,14 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["GeneticFindings"]
+        tags=["GeneticFindings"],
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
@@ -663,20 +723,24 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
 
         for genetic_findings_id in ids:
             if genetic_findings_id in genetic_findings:
-                response_data.append(response_constructor(
-                    identifier=genetic_findings_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=genetic_findings[genetic_findings_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=genetic_findings[genetic_findings_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=genetic_findings_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -684,26 +748,33 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=GeneticFindingsSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["GeneticFindings"]
+        tags=["GeneticFindings"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_genetic_findings(self, request):
-        genetic_findings = bulk_model_retrieve(request.data, GeneticFindings, "genetic_findings_id")
+        genetic_findings = bulk_model_retrieve(
+            request.data, GeneticFindings, "genetic_findings_id"
+        )
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
             genetic_findings_id = datum.get("genetic_findings_id")
             if genetic_findings_id not in genetic_findings:
-                response_data.append(response_constructor(
-                    identifier=genetic_findings_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
-                    "genetic_findings", genetic_findings_id, genetic_findings[genetic_findings_id], datum
+                    "genetic_findings",
+                    genetic_findings_id,
+                    genetic_findings[genetic_findings_id],
+                    datum,
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -729,7 +800,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["GeneticFindings"]
+        tags=["GeneticFindings"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -742,17 +813,21 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
 
         for genetic_findings_id in ids:
             if genetic_findings_id in genetic_findings:
-                data, result = delete_metadata("genetic_findings", genetic_findings_id, "genetic_findings_id")
+                data, result = delete_metadata(
+                    "genetic_findings", genetic_findings_id, "genetic_findings_id"
+                )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=genetic_findings_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -763,24 +838,46 @@ class BiobankViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        responses={200: BiobankSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                "id", openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True
+            )
+        ],
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["get"], url_path="retrieve")
+    def retrieve_biobank(self, request):
+        biobank_id = request.GET.get("id")
+        if not biobank_id:
+            return Response({"detail": "Missing ID."}, status=400)
+
+        try:
+            obj = Biobank.objects.get(pk=biobank_id)
+            return Response(BiobankSerializer(obj).data)
+        except Biobank.DoesNotExist:
+            return Response({"detail": "Not found."}, status=404)
+
+    @swagger_auto_schema(
         request_body=BiobankSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
-        tags=["Biobank"]
+        tags=["Biobank"],
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_biobank(self, request):
         biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
         response_data, accepted, rejected = [], False, False
-
         for datum in request.data:
             biobank_id = datum.get("biobank_id")
             if biobank_id and biobank_id in biobank:
-                response_data.append(response_constructor(
-                    identifier=biobank_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Biobank entry already exists"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Biobank entry already exists",
+                    )
+                )
                 rejected = True
             else:
                 data, result = create_metadata("biobank", biobank_id, datum)
@@ -793,34 +890,47 @@ class BiobankViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "ids", openapi.IN_QUERY, description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
             )
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Biobank"]
+        tags=["Biobank"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
+        ids = request.GET.get("ids", "")
+        if not ids:
+            return Response(
+                {"detail": "Query parameter 'ids' is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        ids = ids.split(",")
+
         biobank = bulk_retrieve(Biobank, ids, "biobank_id")
         response_data, accepted, rejected = [], False, False
 
         for biobank_id in ids:
             if biobank_id in biobank:
-                response_data.append(response_constructor(
-                    identifier=biobank_id,
-                    request_status="SUCCESS",
-                    code=200,
-                    data=biobank[biobank_id]
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=biobank[biobank_id],
+                    )
+                )
                 accepted = True
             else:
-                response_data.append(response_constructor(
-                    identifier=biobank_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
@@ -828,7 +938,7 @@ class BiobankViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         request_body=BiobankSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
-        tags=["Biobank"]
+        tags=["Biobank"],
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_biobank(self, request):
@@ -838,12 +948,14 @@ class BiobankViewSet(viewsets.ViewSet):
         for datum in request.data:
             biobank_id = datum.get("biobank_id")
             if biobank_id not in biobank:
-                response_data.append(response_constructor(
-                    identifier=biobank_id,
-                    request_status="BAD REQUEST",
-                    code=400,
-                    data="Entry does not exist"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
                 rejected = True
             else:
                 data, result = update_metadata(
@@ -873,7 +985,7 @@ class BiobankViewSet(viewsets.ViewSet):
             207: "Some deletions failed",
             400: "Bad request",
         },
-        tags=["Biobank"]
+        tags=["Biobank"],
     )
     @action(detail=False, methods=["delete"], url_path="delete")
     def delete(self, request):
@@ -891,12 +1003,14 @@ class BiobankViewSet(viewsets.ViewSet):
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
             else:
-                response_data.append(response_constructor(
-                    identifier=biobank_id,
-                    request_status="NOT FOUND",
-                    code=404,
-                    data="Not found"
-                ))
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
