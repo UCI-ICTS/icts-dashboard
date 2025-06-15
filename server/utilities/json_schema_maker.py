@@ -39,7 +39,7 @@ def usr_args():
         '-v', '--version',
         action='version',
         version='%(prog)s ' + __version__)
-    
+
     parser.add_argument(
         '-i', '--input',
         help="input"
@@ -58,7 +58,7 @@ def usr_args():
 def convert_column(column: dict) -> dict:
     """
     Convert a single column definition from the schema-like object into a JSON Schema property.
-    
+
     - If the column has "multi_value_delimiter": "|", it is treated as an array of items.
     - If enumerations are provided, they are added.
     - Any 'notes' are appended to the description.
@@ -143,13 +143,13 @@ def list_2_schema(input_file: str, out_dir:str)-> dict:
             if req is True:
                 table_schema["required"].append(column["column"])
             table_schema["properties"][column["column"]] = convert_column(column)
-        
+
         write_schema(
             schema=table_schema,
             schema_name=f"{table_name}.json",
             out_dir=out_dir
         )
-        
+
 
 def write_schema(schema: dict, schema_name: str, out_dir: str):
     """Write JSON Schema to a file, ensuring that the output directory exists."""

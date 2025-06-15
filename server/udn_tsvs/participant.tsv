@@ -1,0 +1,10 @@
+participant_id	internal_project_id	gregor_center	consent_code	recontactable	prior_testing	pmid_id	family_id	paternal_id	maternal_id	twin_id	proband_relationship	proband_relationship_detail	sex	sex_detail	reported_race	reported_ethnicity	ancestry_detail	age_at_last_observation	affected_status	phenotype_description	age_at_enrollment	solve_status	missing_variant_case	missing_variant_details
+UDN246341		UCI	GRU	Yes	WES		30004734	0	0	0	Mother		Female					49	Unaffected		49	Unaffected	No	
+UDN443554		UCI	GRU	Yes	WES		30004771	0	0	0	Mother		Female					50	Unaffected		50	Unaffected	No	
+UDN831894		UCI	GRU	Yes	WES		30004771	0	0	0	Father		Male					52	Unaffected		52	Unaffected	No	
+UDN926567		UCI	GRU	Yes	WES		30004771	UDN831894	UDN443554	0	Self		Male					19	Affected	"Based on the submitted clinical information, the patient has global developmental delay, short stature, arthralgia, joint swelling,
+microcytic anemia, hypochromic anemia, inflammatory abnormality of the skin, attention deficit hyperactivity disorder, skin rash."	19	Probably solved	Unknown	
+UDN969754		UCI	GRU	Yes	WES		30004734	0	UDN246341	0	Self		Male					29	Affected	"Based on the submitted clinical information, the patient has abnormality of the vasculature, abnormal heart morphology, aborted
+sudden cardiac death, tachycardia, right bundle branch block, prolonged QRS complex, myoclonus, seizure, cerebral edema,
+dysphagia, urinary incontinence, bowel incontinence, dysarthria, gait disturbance, EEG abnormality, myopia, coma, abnormally slow
+thought process, protruding tongue, hypertonia, asthenia, and dysmetria."	29	Unsolved	Unknown	

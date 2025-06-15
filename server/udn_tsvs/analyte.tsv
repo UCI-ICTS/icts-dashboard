@@ -1,0 +1,6 @@
+analyte_id	internal_analyte_id	participant_id	analyte_type	analyte_processing_details	primary_biosample	primary_biosample_id	primary_biosample_details	tissue_affected_status	age_at_collection	participant_drugs_intake	participant_special_diet	hours_since_last_meal	passage_number	time_to_freeze	sample_transformation_detail	quality_issues
+10819		UDN246341	DNA	Qiagen QIAmp DNA Blood Kit	UBERON:0006956											
+10778		UDN443554	DNA	Qiagen QIAmp DNA Blood Kit	UBERON:0000178											
+10777		UDN831894	DNA	Qiagen QIAmp DNA Blood Kit	UBERON:0000178											
+10776		UDN926567	DNA	Qiagen QIAmp DNA Blood Kit	UBERON:0000178											
+10818		UDN969754	DNA	Qiagen QIAmp DNA Blood Kit	UBERON:0006956											

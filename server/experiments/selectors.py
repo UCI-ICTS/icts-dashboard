@@ -133,7 +133,7 @@ def parse_pac_bio(pac_bio_datum: dict) -> dict:
     """
 
     if "was_barcoded" in pac_bio_datum and pac_bio_datum["was_barcoded"] != "NA":
-        
+
         if pac_bio_datum["was_barcoded"] == "TRUE" \
             or pac_bio_datum["was_barcoded"] == 'true':
             try:
@@ -260,6 +260,29 @@ def parse_rna_aligned(rna_aligned: dict) -> dict:
         "aligned_index_file": rna_aligned["aligned_rna_short_read_index_file"],
     }
 
+    float_fields = [
+        "percent_rRNA",
+        "percent_mRNA",
+        "percent_mtRNA",
+        "percent_Globin",
+        "percent_UMI",
+        "5prime3prime_bias",
+        "percent_GC",
+        "percent_chrX_Y"
+    ]
+
+    for key, value in rna_aligned.items():
+        if value is None:
+            continue
+        if isinstance(value, str) and "|" in value:
+            rna_aligned[key] = value.split("|")
+        if key in float_fields:
+            try:
+                rna_aligned[key] = float(rna_aligned[key])
+            except ValueError:
+                print("oops!")
+                rna_aligned[key] = "NA"
+
     return rna_aligned
 
 
@@ -277,21 +300,20 @@ def parse_rna(rna_datum: dict) -> dict:
     - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
       fields are properly formatted.
     """
-    
+
     for key, value in rna_datum.items():
         if value is None:
             continue
         if isinstance(value, str) and "|" in value:
             rna_datum[key] = value.split("|")
-        if key == "5prime3prime_bias":
-            try:
-                rna_datum[key] = float(rna_datum[key])
-            except ValueError:
-                print("oops!")
-                rna_datum[key] = "NA"
-        if key in ["read_length", "RIN", "total_reads"]:
+        if key == "read_length":
             try:
                 rna_datum[key] = int(rna_datum[key])
+            except ValueError:
+                rna_datum[key] = "NA"
+        elif key in ["RIN", "total_reads"]:
+            try:
+                rna_datum[key] = float(rna_datum[key])
             except ValueError:
                 rna_datum[key] = "NA"
 

@@ -256,6 +256,14 @@ class LibraryPrepType(models.Model):
         return self.display_name
 
 
+class PrepTargetsDetail(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    display_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.display_name
+
+
 class ExperimentType(models.Model):
     name = models.CharField(max_length=255, unique=True)
     display_name = models.CharField(max_length=255)
@@ -288,6 +296,11 @@ class ExperimentRNAShortRead(models.Model):
         "LibraryPrepType",
         blank=True,
         help_text="Type of library prep used.",
+    )
+    prep_targets_detail = models.ManyToManyField(
+        "PrepTargetsDetail",
+        blank=True,
+        help_text="Depletion kit or list of depletion targets used.",
     )
     experiment_type = models.ManyToManyField(
         "ExperimentType",
@@ -325,33 +338,6 @@ class ExperimentRNAShortRead(models.Model):
         null=True,
         blank=True,
         help_text="Total number of reads; should be input as an integer despite the float type.",
-    )
-    percent_rRNA = models.FloatField(
-        null=True, blank=True, help_text="Percentage of rRNA."
-    )
-    percent_mRNA = models.FloatField(
-        null=True, blank=True, help_text="Percentage of mRNA."
-    )
-    percent_mtRNA = models.FloatField(
-        null=True, blank=True, help_text="Percentage of mtRNA."
-    )
-    percent_Globin = models.FloatField(
-        null=True, blank=True, help_text="Percentage of Globin."
-    )
-    percent_UMI = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Percentage of UMI (Unique Molecular Identifier).",
-    )
-    five_prime_three_prime_bias = models.FloatField(
-        db_column="5prime3prime_bias",
-        null=True, blank=True, help_text="5' to 3' bias of sequencing."
-    )
-    percent_GC = models.FloatField(
-        null=True, blank=True, help_text="GC content percentage."
-    )
-    percent_chrX_Y = models.FloatField(
-        null=True, blank=True, help_text="Percentage of reads from chromosome X and Y."
     )
 
     def __str__(self):
@@ -403,7 +389,22 @@ class AlignedRNAShortRead(models.Model):
     gene_annotation = models.CharField(
         max_length=255, help_text="Annotation file used for alignment."
     )
-    gene_annotation_details = models.TextField(
+    gene_annotation_details = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ("gencode_comprehensive_chr", "gencode_comprehensive_chr"),
+            ("gencode_comprehensive_all", "gencode_comprehensive_all"),
+            ("gencode_comprehensive_pri", "gencode_comprehensive_pri"),
+            ("gencode_basic_chr", "gencode_basic_chr"),
+            ("gencode_basic_all", "gencode_basic_all"),
+            ("gencode_basic_pri", "gencode_basic_pri"),
+            ("lncRNA_annotation", "lncRNA_annotation"),
+            ("polyA_feature_annotation", "polyA_feature_annotation"),
+            ("consensus_pseudogenes", "consensus_pseudogenes"),
+            ("predicted_tRNA_genes", "predicted_tRNA_genes"),
+        ],
         help_text="Detailed description of gene annotation used."
     )
     alignment_software = models.CharField(
@@ -436,6 +437,36 @@ class AlignedRNAShortRead(models.Model):
         blank=True,
         null=True,
         help_text="Any QC issues that would be important to note.",
+    )
+    alignment_QC_output_file = models.CharField(
+        null=True, blank=True, help_text="alignment QC output file."
+    )
+    percent_rRNA = models.FloatField(
+        null=True, blank=True, help_text="Percentage of rRNA."
+    )
+    percent_mRNA = models.FloatField(
+        null=True, blank=True, help_text="Percentage of mRNA."
+    )
+    percent_mtRNA = models.FloatField(
+        null=True, blank=True, help_text="Percentage of mtRNA."
+    )
+    percent_Globin = models.FloatField(
+        null=True, blank=True, help_text="Percentage of Globin."
+    )
+    percent_UMI = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Percentage of UMI (Unique Molecular Identifier).",
+    )
+    five_prime_three_prime_bias = models.FloatField(
+        db_column="5prime3prime_bias",
+        null=True, blank=True, help_text="5' to 3' bias of sequencing."
+    )
+    percent_GC = models.FloatField(
+        null=True, blank=True, help_text="GC content percentage."
+    )
+    percent_chrX_Y = models.FloatField(
+        null=True, blank=True, help_text="Percentage of reads from chromosome X and Y."
     )
 
     def __str__(self):
@@ -910,6 +941,11 @@ class AlignedPacBio(models.Model):
     )
     methylation_called = models.BooleanField(
         help_text="Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags"
+    )
+    quality_issues = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Describe if there are any QC issues that would be important to note.",
     )
 
 

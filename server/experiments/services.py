@@ -22,6 +22,7 @@ from experiments.models import (
     ExperimentPacBio,
     ExperimentRNAShortRead,
     LibraryPrepType,
+    PrepTargetsDetail,
     ExperimentType,
 )
 from experiments.selectors import (
@@ -58,46 +59,27 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
     )
-
+    prep_targets_detail = serializers.SlugRelatedField(
+        many=True, slug_field="name", queryset=PrepTargetsDetail.objects.all()
+    )
     experiment_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=ExperimentType.objects.all()
     )
 
-    # This renames the field in API input/output while keeping it correct in Django ORM
-    five_prime_three_prime_bias = serializers.FloatField(required=False, allow_null=True)
-
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-        extra_kwargs = {
-            "five_prime_three_prime_bias": {"read_only": True}  # Prevents duplication issues
-        }
-        rename_fields = {  # Custom rename logic
-            "five_prime_three_prime_bias": "5prime3prime_bias"
-        }
-
-
-    def to_representation(self, instance):
-        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
-        data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
-        return data
-
-    def to_internal_value(self, data):
-        """ Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias` """
-        if "5prime3prime_bias" in data:
-            data["five_prime_three_prime_bias"] = data.pop("5prime3prime_bias")
-        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """Create a new ExperimentRNAShortRead instance using the validated data and set the many-to-many relationships"""
 
         library_prep_types_data = validated_data.pop("library_prep_type", [])
+        prep_targets_detail_data = validated_data.pop("prep_targets_detail", [])
         experiment_types_data = validated_data.pop("experiment_type", [])
 
         experiment_rna_instance = ExperimentRNAShortRead.objects.create(**validated_data)
         experiment_rna_instance.library_prep_type.set(library_prep_types_data)
+        experiment_rna_instance.prep_targets_detail.set(prep_targets_detail_data)
         experiment_rna_instance.experiment_type.set(experiment_types_data)
 
         return experiment_rna_instance
@@ -106,6 +88,7 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
 
         library_prep_types_data = validated_data.pop("library_prep_type", None)
+        prep_targets_detail_data = validated_data.pop("prep_targets_detail", None)
         experiment_types_data = validated_data.pop("experiment_type", None)
 
         for attr, value in validated_data.items():
@@ -113,6 +96,8 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
 
         if library_prep_types_data is not None:
             instance.library_prep_type.set(library_prep_types_data)
+        if prep_targets_detail_data is not None:
+            instance.prep_targets_detail.set(prep_targets_detail_data)
         if experiment_types_data is not None:
             instance.experiment_type.set(experiment_types_data)
 
@@ -124,6 +109,9 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
+    prep_targets_detail = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
     experiment_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -131,13 +119,6 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-
-    def to_representation(self, instance):
-        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
-        data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
-        return data
 
 
 class ExperimentDNAInputSerializer(serializers.ModelSerializer):
@@ -327,10 +308,32 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
-class AlignedRNAShortReadSerializer(serializers.ModelSerializer):
+class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
+        extra_kwargs = {
+            "five_prime_three_prime_bias": {"read_only": True}  # Prevents duplication issues
+        }
+        rename_fields = {  # Custom rename logic
+            "five_prime_three_prime_bias": "5prime3prime_bias"
+        }
+        # This renames the field in API input/output while keeping it correct in Django ORM
+        five_prime_three_prime_bias = serializers.FloatField(required=False, allow_null=True)
+
+
+    def to_representation(self, instance):
+        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
+
+    def to_internal_value(self, data):
+        """ Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias` """
+        if "5prime3prime_bias" in data:
+            data["five_prime_three_prime_bias"] = data.pop("5prime3prime_bias")
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """Create a new AlignedRNAShortRead instance using the validated data and set the many-to-many relationships"""
@@ -346,6 +349,19 @@ class AlignedRNAShortReadSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedRNAShortRead
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
 
 
 class AlignedDNAShortReadSerializer(serializers.ModelSerializer):

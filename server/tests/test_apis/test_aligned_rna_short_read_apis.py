@@ -21,6 +21,7 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
 
         aligned1 = {   # Existing entry, should fail
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -37,11 +38,21 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
+
         }
 
         aligned2 = {   # New entry
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -58,11 +69,20 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
         }
 
         aligned3 =  {   # New entry
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -79,7 +99,15 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
         }
 
         #Checks for the Aligned table before creation
@@ -136,6 +164,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
 
         aligned1 = {
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -152,11 +181,20 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
         }
 
         aligned2 = {
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -173,11 +211,20 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
         }
 
         aligned3 =  {
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
@@ -194,7 +241,15 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_multimapped": None,
             "percent_unaligned": None,
             "quality_issues": None,
-            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            "alignment_QC_output_file": None,
+            "percent_rRNA": None,
+            "percent_mRNA": None,
+            "percent_mtRNA": None,
+            "percent_Globin": None,
+            "percent_UMI": None,
+            "five_prime_three_prime_bias": None,
+            "percent_GC": None,
+            "percent_chrX_Y": None
         }
 
 

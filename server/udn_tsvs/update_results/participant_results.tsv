@@ -1,0 +1,6 @@
+identifier	request_status	updates	validation errors
+UDN246341	BAD REQUEST		[{'participant_id': [ErrorDetail(string='participant with this participant id already exists.', code='unique')]}]
+UDN443554	BAD REQUEST		[{'participant_id': [ErrorDetail(string='participant with this participant id already exists.', code='unique')]}]
+UDN831894	BAD REQUEST		[{'participant_id': [ErrorDetail(string='participant with this participant id already exists.', code='unique')]}]
+UDN926567	BAD REQUEST		[{'participant_id': [ErrorDetail(string='participant with this participant id already exists.', code='unique')]}]
+UDN969754	BAD REQUEST		[{'participant_id': [ErrorDetail(string='participant with this participant id already exists.', code='unique')]}]

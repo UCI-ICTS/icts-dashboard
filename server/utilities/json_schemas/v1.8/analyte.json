@@ -1,0 +1,140 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/analyte.json",
+    "title": "analyte",
+    "version": "1.8",
+    "type": "object",
+    "required": [
+        "analyte_id",
+        "participant_id",
+        "analyte_type",
+        "primary_biosample"
+    ],
+    "definitions": {},
+    "properties": {
+        "analyte_id": {
+            "type": "string",
+            "description": "identifier for an analyte from a primary biosample source (primary key)\n\nNotes: ID is at level of analyte\nStanford example: SubjectID-TubetypeCode-TissueCode",
+            "examples": [
+                "Broad_COL_FAM1_1_D1",
+                "Broad_COL_FAM1_1_R1",
+                "GSS_201938-01-021"
+            ]
+        },
+        "participant_id": {
+            "type": "string"
+        },
+        "analyte_type": {
+            "type": "string",
+            "enum": [
+                "DNA",
+                "RNA",
+                "cDNA",
+                "blood plasma",
+                "frozen whole blood",
+                "high molecular weight DNA",
+                "urine",
+                "PBMC"
+            ],
+            "description": "analyte derived from the primary_biosample. The actual thing you're sticking into a machine to analyze/sequence",
+            "examples": [
+                "DNA"
+            ]
+        },
+        "analyte_processing_details": {
+            "type": "string",
+            "description": "details about how the analyte or original biosample was extracted or processed\n\nNotes: Regarding PMBC isolations from CPT tubes;  Isolations of PBMCs should be done on wet ice following the protocol.  Use only chilled cell freezing media.   Isolated PBMCs in freezing media",
+            "examples": [
+                "PAX extraction protocol,",
+                "CHX treatment,",
+                "globin depletion, etc."
+            ]
+        },
+        "primary_biosample": {
+            "type": "string",
+            "enum": [
+                "UBERON:0000479",
+                "UBERON:0003714",
+                "UBERON:0001836",
+                "UBERON:0001003",
+                "UBERON:0002385",
+                "UBERON:0000178",
+                "UBERON:0002371",
+                "UBERON:0006956",
+                "UBERON:0001359",
+                "UBERON:0001088",
+                "UBERON:0019306",
+                "CL: 0000034",
+                "CL: 0000576",
+                "CL: 0000542",
+                "CL: 0000057",
+                "UBERON:0005291",
+                "CL: 0011020",
+                "UBERON:0002037",
+                "UBERON:0001133"
+            ],
+            "description": "Tissue type of biosample taken from the participant that the analyte was extracted or processed from (for unknown can use tissue - UBERON:0000479), e.g. skin, liver, brain\n\nNotes: Contact the GREGoR Data Standards WG to expand the list of allowable UBERON codes. Currently allowed values are:\nUBERON:0000479 (tissue) \nUBERON:0003714 (neural tissue) \nUBERON:0001836 (saliva) \nUBERON:0001003 (skin epidermis) \nUBERON:0002385 (muscle tissue) \nUBERON:0000178 (whole blood) \nUBERON:0002371 (bone marrow) \nUBERON:0006956 (buccal mucosa)\nUBERON:0001359 (cerebrospinal fluid)\nUBERON:0001088 (urine)\nUBERON:0019306 (nose epithelium)\nCL: 0000034 (iPSC)\nCL: 0000576 (monocytes - PBMCs)\nCL: 0000542 (lymphocytes - LCLs)\nCL: 0000057 (fibroblasts)\nUBERON:0005291 (embryonic tissue)\nCL: 0011020 (iPSC NPC)\nUBERON:0002037 (cerebellum tissue)\nUBERON:0001133 (cardiac tissue)",
+            "examples": [
+                "UBERON:0000178"
+            ]
+        },
+        "primary_biosample_id": {
+            "type": "string",
+            "description": "Optional ID for the biosample; allows for linking of multiple analytes extracted or processed from the same biosample"
+        },
+        "primary_biosample_details": {
+            "type": "string",
+            "description": "Free text to capture information not in structured fields",
+            "examples": [
+                "\"Biopsy of birthmark\""
+            ]
+        },
+        "tissue_affected_status": {
+            "type": "string",
+            "enum": [
+                "Yes",
+                "No"
+            ],
+            "description": "If applicable to disease (suspected mosaic), is the tissue from an affected source or an unaffected source?"
+        },
+        "age_at_collection": {
+            "type": "number",
+            "description": "age or participant in years at biosample collection\n\nNotes: ages >89 are considered PHI."
+        },
+        "participant_drugs_intake": {
+            "type": "string",
+            "description": "The list of drugs patient is on, at the time of sample collection. This information is helpful during analysis of metabolomics and immune asssays. Free Text\n\nNotes: this is relevant when analyzing metabolomics data"
+        },
+        "participant_special_diet": {
+            "type": "string",
+            "description": "If the patient was fasting, when the sample was collected. this is relevant when analyzing metabolomics data. Free Text",
+            "examples": [
+                "ketogenic",
+                "gluten-free"
+            ]
+        },
+        "hours_since_last_meal": {
+            "type": "number",
+            "description": "his is relevant when analyzing metabolomics data\n\nNotes: this is relevant when analyzing metabolomics data"
+        },
+        "passage_number": {
+            "type": "integer",
+            "description": "passage_number is relevant for fibroblast cultures and possibly iPSC."
+        },
+        "time_to_freeze": {
+            "type": "number",
+            "description": "time (in hours) from collection to freezing the sample. delayed freeze turns out to be useful / important info for PaxGene blood (for RNA isolation).\n\nNotes: Regarding PaxGene blood processing for RNA:   Strict adherence following blood draw; ie minimum 2hrs at Room Temp, longer may be better including overnight incubations.   Post thaw samples to Room Temp and allow another 2 hrs incubate prior to processing.   All in accord with the PaxGene RNA blood isolation manual."
+        },
+        "sample_transformation_detail": {
+            "type": "string",
+            "description": "details regarding sample transformation\n\nNotes: If sample was transformed"
+        },
+        "quality_issues": {
+            "type": "string",
+            "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note",
+            "examples": [
+                "degraded sample; unable to obtain more DNA"
+            ]
+        }
+    }
+}
