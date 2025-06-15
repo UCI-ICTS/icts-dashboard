@@ -24,6 +24,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "analyte_id": "GREGoR_test-001-001-0-R-2",
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": ["rRNA depletion", "globin depletion"],
+            "prep_targets_detail": ["Watchmaker Polaris Depletion"],
+            "experiment_type": ["paired-end", "untargeted"],
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
             "date_data_generation": "2023-03-18",
@@ -31,23 +34,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "5prime3prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
-            "library_prep_type": [
-                "rRNA depletion",
-                "globin depletion"
-            ],
-            "experiment_type": [
-                "paired-end",
-                "untargeted"
-            ]
+            "total_reads": 240349679.0
         }
 
         experiment2 = {
@@ -55,6 +42,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "analyte_id": "GREGoR_test-001-001-0-R-2",
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": ["rRNA depletion", "globin depletion"],
+            "prep_targets_detail": ["Watchmaker Polaris Depletion"],
+            "experiment_type": ["paired-end", "untargeted"],
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
             "date_data_generation": "2023-03-18",
@@ -62,23 +52,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "5prime3prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
-            "library_prep_type": [
-                "rRNA depletion",
-                "globin depletion"
-            ],
-            "experiment_type": [
-                "paired-end",
-                "untargeted"
-            ]
+            "total_reads": 240349679.0
         }
 
         experiment3 = {
@@ -86,6 +60,9 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "analyte_id": "GREGoR_test-001-001-0-R-2",
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": ["rRNA depletion", "globin depletion"],
+            "prep_targets_detail": ["Watchmaker Polaris Depletion"],
+            "experiment_type": ["paired-end", "untargeted"],
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
             "date_data_generation": "2023-03-18",
@@ -93,23 +70,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "5prime3prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
-            "library_prep_type": [
-                "rRNA depletion",
-                "globin depletion"
-            ],
-            "experiment_type": [
-                "paired-end",
-                "untargeted"
-            ]
+            "total_reads": 240349679.0
         }
 
         response_200 = self.client.post(url, [experiment2], format='json')
@@ -157,16 +118,12 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_rna_short_read/update/"
         experiment1 =   {
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
-            "library_prep_type": [
-            "rRNA depletion",
-            "globin depletion"
-            ],
-            "experiment_type": [
-            "paired-end",
-            "untargeted"
-            ],
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": ["rRNA depletion", "globin depletion"],
+            "prep_targets_detail": ["Watchmaker Polaris Depletion"],
+            "experiment_type": ["paired-end", "untargeted"],
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
             "date_data_generation": "2023-03-18",
@@ -174,16 +131,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
-            "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "5prime3prime_bias": None
+            "total_reads": 240349679
         }
 
         experiment2 = {
@@ -191,6 +139,9 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "analyte_id": "GREGoR_test-001-001-0-R-2",
             "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": [3, 4],
+            "prep_targets_detail": [4],
+            "experiment_type": [2, 4],
             "read_length": 150,
             "single_or_paired_ends": "paired-end",
             "date_data_generation": "2023-03-18",
@@ -198,23 +149,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "5prime3prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
-            "library_prep_type": [
-                3,
-                4
-            ],
-            "experiment_type": [
-                2,
-                4
-            ]
+            "total_reads": 240349679.0
         }
 
         response_200 = self.client.post(url, [experiment1], format='json')

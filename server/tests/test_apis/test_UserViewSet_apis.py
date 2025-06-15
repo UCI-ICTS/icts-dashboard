@@ -35,20 +35,20 @@ class UserViewSetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
 
-    def test_authenticated_distroy_users(self):
+    def test_authenticated_destroy_users(self):
         url = "/api/auth/users/wheel/"
         self.client.force_authenticate(user=self.superuser)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_insufficeint_perms_distroy_users(self):
+    def test_insufficeint_perms_destroy_users(self):
         url = "/api/auth/users/testuser/"
         self.client.force_authenticate(user=self.user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("detail", response.data)
 
-    def test_unauthenticated_distroy_users(self):
+    def test_unauthenticated_destroy_users(self):
         url = "/api/auth/users/wheel/"
         self.client.force_authenticate(user=None)  # remove auth
         response = self.client.delete(url)
