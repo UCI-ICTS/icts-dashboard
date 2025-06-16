@@ -249,7 +249,17 @@ class CalledVariantsDNAShortRead(models.Model):
 
 
 class LibraryPrepType(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        choices=[
+            ("stranded poly-A pulldown", "stranded poly-A pulldown"),
+            ("stranded total RNA", "stranded total RNA"),
+            ("rRNA depletion", "rRNA depletion"),
+            ("globin depletion", "globin depletion"),
+            ("custom", "custom"),
+        ]
+    )
     display_name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -265,7 +275,16 @@ class PrepTargetsDetail(models.Model):
 
 
 class ExperimentType(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        choices=[
+            ("single-end", "single-end"),
+            ("paired-end", "paired-end"),
+            ("targeted", "targeted"),
+            ("untargeted", "untargeted"),
+        ]
+    )
     display_name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -439,7 +458,10 @@ class AlignedRNAShortRead(models.Model):
         help_text="Any QC issues that would be important to note.",
     )
     alignment_QC_output_file = models.CharField(
-        null=True, blank=True, help_text="alignment QC output file."
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="alignment QC output file."
     )
     percent_rRNA = models.FloatField(
         null=True, blank=True, help_text="Percentage of rRNA."

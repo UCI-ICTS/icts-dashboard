@@ -3004,7 +3004,7 @@
       "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
       "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
       "library_prep_type": [3, 4],
-      "prep_targets_detail": [4],
+      "prep_targets_detail": [],
       "experiment_type": [2, 4],
       "read_length": 150,
       "single_or_paired_ends": "paired-end",
