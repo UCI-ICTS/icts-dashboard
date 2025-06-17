@@ -751,15 +751,24 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
     }
     table_validator = TableValidator()
     experiment_name = swap_experiment_aligned(table_name)
-    try:
-        experiment_object = Experiment.objects.get(experiment_id=experiment_name+"."+datum[experiment_name + "_id"])
-        participant_id = experiment_object.participant_id.participant_id
-    except Experiment.DoesNotExist:
+    experiment_id = datum[experiment_name + "_id"]
+    if experiment_id != None and isinstance(experiment_id, str):
+        try:
+            experiment_object = Experiment.objects.get(experiment_id=experiment_name + "." + experiment_id)
+            participant_id = experiment_object.participant_id.participant_id
+        except Experiment.DoesNotExist:
+            return response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Experiment {experiment_name} for {identifier} does not exist.",
+            ), "rejected_request"
+    else:
         return response_constructor(
             identifier=identifier,
             request_status="BAD REQUEST",
             code=400,
-            data=f"Experiment {experiment_name} for {identifier} does not exist.",
+            data=f"Experiment ID {experiment_id} for {identifier} does not exist.",
         ), "rejected_request"
 
     aligned_data = {

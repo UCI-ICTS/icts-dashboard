@@ -56,7 +56,6 @@ class TableValidator:
         Returns:
             None
         """
-        #import pdb; pdb.set_trace()
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
             with open(schema_path, "r") as schema_file:
@@ -125,7 +124,7 @@ def remove_na(datum: dict) -> dict:
 
 
 def multi_value_split(datum: dict) -> dict:
-    """Multi valu split
+    """Multi value split
     """
     split_datum = {}
 

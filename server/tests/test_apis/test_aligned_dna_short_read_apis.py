@@ -74,12 +74,10 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
             pk="aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2"
         ).exists()
         assert not aligned2_exists
-
         response_200 = self.client.post(url, [aligned2], format='json')
         response_207 = self.client.post(url, [aligned1, aligned3], format='json')
         response_400 = self.client.post(url, [aligned3, aligned3], format='json')
 
-        #import pdb; pdb.set_trace()
         #Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
             pk="aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2"
