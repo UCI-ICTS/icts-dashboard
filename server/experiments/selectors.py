@@ -301,23 +301,27 @@ def parse_rna(rna_datum: dict) -> dict:
       fields are properly formatted.
     """
 
+    from config.selectors import multi_value_split
+
+    multi_value = ["library_prep_type", "prep_targets_detail", "experiment_type"]
+    split_rna_datum = multi_value_split(rna_datum)
     for key, value in rna_datum.items():
         if value is None:
             continue
-        if isinstance(value, str) and "|" in value:
-            rna_datum[key] = value.split("|")
+        if key in multi_value and not isinstance(split_rna_datum[key], list):
+            split_rna_datum[key] = [split_rna_datum[key]]
         if key == "read_length":
             try:
-                rna_datum[key] = int(rna_datum[key])
+                split_rna_datum[key] = int(split_rna_datum[key])
             except ValueError:
-                rna_datum[key] = "NA"
+                split_rna_datum[key] = "NA"
         elif key in ["RIN", "total_reads"]:
             try:
-                rna_datum[key] = float(rna_datum[key])
+                split_rna_datum[key] = float(split_rna_datum[key])
             except ValueError:
-                rna_datum[key] = "NA"
+                split_rna_datum[key] = "NA"
 
-    return rna_datum
+    return split_rna_datum
 
 
 def swap_experiment_aligned(text: str) -> str:

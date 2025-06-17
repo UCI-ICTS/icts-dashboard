@@ -267,7 +267,7 @@ class LibraryPrepType(models.Model):
 
 
 class PrepTargetsDetail(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True, blank=True, null=True)
     display_name = models.CharField(max_length=255)
 
     def __str__(self):

@@ -751,9 +751,8 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
     }
     table_validator = TableValidator()
     experiment_name = swap_experiment_aligned(table_name)
-
     try:
-        experiment_object = Experiment.objects.get(id_in_table=datum[experiment_name + "_id"])
+        experiment_object = Experiment.objects.get(experiment_id=experiment_name+"."+datum[experiment_name + "_id"])
         participant_id = experiment_object.participant_id.participant_id
     except Experiment.DoesNotExist:
         return response_constructor(
@@ -774,21 +773,33 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
 
     aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
 
-    if aligned_results['valid']:
-        alignment_serializer = AlignedService.create_or_update_aligned(aligned_data)
-        if alignment_serializer.is_valid():
-            alignment_instance = alignment_serializer.save()
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
+    else:
+        datum = remove_na(datum=datum)
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+
+    if results["valid"] and aligned_results['valid']:
+        serializer = table_serializers[table_name]["input_serializer"](data=datum)
+        aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
+        if serializer.is_valid() and aligned_serializer.is_valid():
+            new_instance = serializer.save()
             return response_constructor(
                 identifier=identifier,
                 request_status="CREATED",
                 code=201,
                 message=f"{table_name} {identifier} created.",
                 data={
-                    "instance": alignment_serializer.data
+                    "instance": table_serializers[table_name]["output_serializer"](new_instance).data
                 }
             ), "accepted_request"
         else:
-            error_data = [{item: alignment_serializer.errors[item]} for item in alignment_serializer.errors]
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            if aligned_serializer and hasattr(aligned_serializer, 'errors'):
+                error_data.extend(
+                    [{item: aligned_serializer.errors[item]} for item in aligned_serializer.errors]
+                )
             return response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
@@ -800,7 +811,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
             identifier=identifier,
             request_status="BAD REQUEST",
             code=400,
-            data=aligned_results["errors"],
+            data=results["errors"] + aligned_results["errors"],
         ), "rejected_request"
 
 
@@ -821,22 +832,26 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
         "aligned_dna_short_read": {
             "model": AlignedDNAShortRead,
             "input_serializer": AlignedDNAShortReadSerializer,
-            "output_serializer": AlignedDNAShortReadSerializer
+            "output_serializer": AlignedDNAShortReadSerializer,
+            "parsed_data": lambda datum: parse_short_read_aligned(short_read_aligned=datum)
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
-            "output_serializer": AlignedNanoporeSerializer
+            "output_serializer": AlignedNanoporeSerializer,
+            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum)
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
-            "output_serializer": AlignedPacBioSerializer
+            "output_serializer": AlignedPacBioSerializer,
+            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum)
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
             "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer
+            "output_serializer": AlignedRNASerializer,
+            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
         }
     }
     serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)

@@ -18,14 +18,6 @@
         }
     },
     {
-        "model": "authtoken.token",
-        "pk": "c779f2d087664915bb4e6b62ed4d0aba933be1e6",
-        "fields": {
-            "user": 2,
-            "created": "2024-08-13T19:22:25.584Z"
-        }
-    },
-    {
         "model": "submodels.reportedrace",
         "pk": "Asian",
         "fields": {
@@ -97,6 +89,14 @@
         "fields": {
             "name": "untargeted",
             "display_name": "untargeted"
+        }
+    },
+    {
+        "model": "experiments.preptargetsdetail",
+        "pk": 1,
+        "fields": {
+            "name": ".",
+            "display_name": "."
         }
     },
     {
