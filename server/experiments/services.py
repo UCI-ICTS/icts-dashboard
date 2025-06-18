@@ -57,7 +57,11 @@ class ExperimentTypeSerializer(serializers.ModelSerializer):
 
 class ExperimentRNAInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
-        many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
+        many=True,
+        slug_field="name",
+        queryset=LibraryPrepType.objects.all(),
+        required=False,
+        allow_null=True,
     )
     prep_targets_detail = serializers.SlugRelatedField(
         many=True,
