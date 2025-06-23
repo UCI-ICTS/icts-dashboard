@@ -46,14 +46,32 @@ export const dataSlice = createSlice({
     builder
       .addCase(getAllTables.pending, (state, action) => {
         state.status = "loading";
+        console.log("loading")
       })
       .addCase(getAllTables.rejected, (state, action) => {
+        message.error("Failed to load table data.");
         state.status = "rejected";
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
         const {
-          participants, families, genetic_findings, analytes, biobank_entries, phenotypes, experiments, experiment_stages, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore,  aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read
-        } = action.payload;
+          participants = [],
+          families = [],
+          genetic_findings = [],
+          analytes = [],
+          biobank_entries = [],
+          phenotypes = [],
+          experiments = [],
+          experiment_stages = [],
+          experiment_dna_short_read = [],
+          experiment_rna_short_read = [],
+          experiment_pac_bio = [],
+          experiment_nanopore = [],
+          aligned = [],
+          aligned_dna_short_read = [],
+          aligned_nanopore = [],
+          aligned_pac_bio = [],
+          aligned_rna_short_read = [],
+        } = action.payload || {};
 
         Object.assign(state, {
           participants, families, genetic_findings, analytes, biobank_entries, phenotypes, experiments, experiment_stages, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read, status: "fulfilled"
