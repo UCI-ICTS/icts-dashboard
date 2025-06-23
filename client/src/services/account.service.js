@@ -1,148 +1,83 @@
 // src/services/account.service.js
 
-import axios from "axios";
-import { store } from "../store";
+import api from "../api";
+import { message } from "antd";
 
-const APIDB = process.env.REACT_APP_APIDB;
-
-const getAuthHeaders = () => {
-  const state = store.getState();
-  const token = state.account.user.access_token;
-
-  if (!token) {
-    throw new Error("No authentication token found.");
-  }
-
-  return {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-};
-
-
+// Get CSRF token by pinging health check
 const getCSRFToken = async () => {
   try {
-    await axios.get("/api/health/"); // sets cookie
+    await api.get("health/");
   } catch (error) {
     console.warn("⚠️ Failed to get CSRF token:", error.message);
+    message.error(`⚠️ Failed to get CSRF token: ${error.message}`);
   }
 };
 
-function getCookie(name) {
+// Utility to fetch the CSRF cookie manually
+const getCookie = (name) => {
   const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  if (match) return match[2];
-  return null;
-}
+  return match ? match[2] : null;
+};
 
-// utility to fetch the cookie and inject it into headers
+// Wrapper for CSRF-secured POST requests
 const postWithCSRF = async (url, data) => {
   const csrftoken = getCookie("csrftoken");
-  return axios.post(url, data, {
+  return api.post(url, data, {
     headers: {
       "X-CSRFToken": csrftoken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    withCredentials: true, // ensures browser includes cookies
   });
 };
 
+// Auth services (return only res.data)
+const login = (username, password) =>
+  postWithCSRF("auth/token/login/", { username, password }).then(res => res.data);
 
-// ✅ user log in
-const login = async (username, password) => {
-  const response = await postWithCSRF(APIDB + "api/auth/token/login/", {
-    username,
-    password,
-  });
-  return response.data;
-};
+const logout = (refresh_token) =>
+  api.post("auth/token/logout/", { refresh: refresh_token }).then(res => res.data);
 
-// ✅ user log out (blacklist token)
-const logout = async (refresh_token) => {
-  const response = await axios.post(APIDB + "api/auth/token/logout/", {
-    refresh: refresh_token
-  });
-  return response.data;
-};
-  
-// ✅ user change password
-const changePassword = (values) => {
-  console.log("service values: ", values)
-  return axios.post(APIDB + "api/auth/password/change/", {
-    old_password: values.old_password,
-    new_password: values.new_password,
-    confirm_new_password: values.confirm_password
-  }, {
-    headers: getAuthHeaders(),
-  })
-};
-
-// ✅ password reset received via email
-const resetPassword = async (email) => {
-  console.log("Service password reset: ", email);
-  const response = await postWithCSRF(APIDB + "api/auth/password/reset/", {
-    email,
-  });
-  return response.data;
-};
-
-// ✅ confirm password reset received via email
-const confirmPasswordReset = async ({ uid, token, new_password }) => {
-  const response = await postWithCSRF(APIDB + "api/auth/password/confirm/", {
-    uid,
-    token,
+const changePassword = ({ old_password, new_password, confirm_password }) =>
+  api.post("auth/password/change/", {
+    old_password,
     new_password,
-  });
-  return response.data;
+    confirm_new_password: confirm_password,
+  }).then(res => res.data);
+
+const resetPassword = (email) =>
+  postWithCSRF("auth/password/reset/", { email }).then(res => res.data);
+
+const confirmPasswordReset = ({ uid, token, new_password }) =>
+  postWithCSRF("auth/password/confirm/", { uid, token, new_password }).then(res => res.data);
+
+const createPassword = ({ uid, token, new_password }) =>
+  api.post("auth/users/activate/", { uid, token, new_password }).then(res => res.data);
+
+// User management
+const getUsers = () =>
+  api.get("auth/users/").then(res => res.data);
+
+const createUser = (userData) =>
+  api.post("auth/users/", userData).then(res => res.data);
+
+const updateUser = (userData) =>
+  api.put(`auth/users/${encodeURIComponent(userData.username)}/`, userData).then(res => res.data);
+
+const deleteUser = (userId) =>
+  api.delete(`auth/users/${encodeURIComponent(userId)}/`).then(res => res.data);
+
+const accountService = {
+  getCSRFToken,
+  login,
+  logout,
+  changePassword,
+  resetPassword,
+  confirmPasswordReset,
+  getUsers,
+  createUser,
+  createPassword,
+  updateUser,
+  deleteUser,
 };
 
-// ✅ Fetch all users
-const getUsers = async () => {
-  const response = await axios.get(APIDB + "api/auth/users/", { headers: getAuthHeaders() });
-  return response.data;
-};
-
-// ✅ Create a new user
-const createUser = async (userData) => {
-  const response = await axios.post(APIDB + "api/auth/users/", userData, { headers: getAuthHeaders() });
-  return response.data;
-};
-
-// ✅ activate user/create password received via email
-const createPassword = async ({ uid, token, new_password }) => {
-  console.log("Service password create: ", uid, token, new_password);
-  const response = await axios.post(`${APIDB}api/auth/users/activate/`, {
-    uid,
-    token,
-    new_password,
-  })
-  return response.data;
-};
-
-// ✅ Update an existing user
-const updateUser = async (userData) => {
-  const response = await axios.put(APIDB + `api/auth/users/${userData.username}/`, userData, { headers: getAuthHeaders() });
-  return response.data;
-};
-
-// ✅ Delete a user
-const deleteUser = async (userId) => {
-  // handle special characters
-  const encodedUsername = encodeURIComponent(userId);
-  await axios.delete(APIDB + `api/auth/users/${encodedUsername}/`, { headers: getAuthHeaders() });
-};
-
-  const accountService = {
-    getCSRFToken,
-    login,
-    logout,
-    changePassword,
-    resetPassword,
-    confirmPasswordReset,
-    getUsers,
-    createUser,
-    createPassword,
-    updateUser,
-    deleteUser
-  };
-  
-  export default accountService;
+export default accountService;
