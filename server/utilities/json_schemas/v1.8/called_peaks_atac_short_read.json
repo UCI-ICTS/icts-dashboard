@@ -1,0 +1,70 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/called_peaks_atac_short_read.json",
+    "title": "called_peaks_atac_short_read",
+    "version": "1.8",
+    "type": "object",
+    "required": [
+        "aligned_atac_short_read_id",
+        "called_peaks_file",
+        "peaks_md5sum",
+        "peak_caller_software",
+        "peak_set_type"
+    ],
+    "definitions": {},
+    "properties": {
+        "called_peaks_atac_short_read_id": {
+            "type": "string",
+            "description": "unique key for table (anvil requirement)"
+        },
+        "aligned_atac_short_read_id": {
+            "type": "string",
+            "description": "identifier for aligned ATAC-seq data"
+        },
+        "called_peaks_file": {
+            "type": "string",
+            "description": "name and path of the bed file with open chromatin peaks after QC filtering",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.ATAC.IDR.bed"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "peaks_md5sum": {
+            "type": "string",
+            "description": "md5 checksum for called_peaks_file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
+            "examples": [
+                "129c28163df082"
+            ]
+        },
+        "peak_caller_software": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "peak calling software used including version number",
+                "examples": [
+                    "hotspot2",
+                    "overlap_peaks"
+                ]
+            }
+        },
+        "peak_set_type": {
+            "type": "string",
+            "enum": [
+                "narrowPeak",
+                "gappedPeak",
+                "IDR"
+            ],
+            "description": "peak set type, according to ENCODE descriptors",
+            "examples": [
+                "narrowPeak",
+                "gappedPeak",
+                "IDR"
+            ]
+        },
+        "analysis_details": {
+            "type": "string",
+            "description": "brief description of the analysis pipeline used for producing the called_peaks_file; perhaps a link to something like a WDL file or github repository"
+        }
+    }
+}

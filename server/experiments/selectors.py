@@ -17,6 +17,7 @@ from experiments.models import (
 )
 
 from metadata.models import Analyte, Participant
+from config.selectors import multi_value_split
 
 
 def parse_short_read_aligned(short_read_aligned: dict) -> dict:
@@ -37,11 +38,11 @@ def parse_short_read_aligned(short_read_aligned: dict) -> dict:
 
     if (
         "mean_coverage" in short_read_aligned
-        and short_read_aligned["mean_coverage"] != "NA"
+        and short_read_aligned["mean_coverage"] != None
     ):
         try:
             short_read_aligned["mean_coverage"] = int(
-                short_read_aligned["mean_coverage"]
+                    short_read_aligned["mean_coverage"]
             )
         except ValueError:
             short_read_aligned["mean_coverage"] = "NA"
@@ -133,7 +134,7 @@ def parse_pac_bio(pac_bio_datum: dict) -> dict:
     """
 
     if "was_barcoded" in pac_bio_datum and pac_bio_datum["was_barcoded"] != "NA":
-        
+
         if pac_bio_datum["was_barcoded"] == "TRUE" \
             or pac_bio_datum["was_barcoded"] == 'true':
             try:
@@ -219,6 +220,43 @@ def parse_nanopore(nanopore: dict) -> dict:
     return nanopore
 
 
+def parse_rna(rna_datum: dict) -> dict:
+    """
+    Parses and processes the rna record to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters or need conversion to different data types.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - rna_datum (dict): A dictionary containing rna data.
+
+    Returns:
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
+      fields are properly formatted.
+    """
+
+    multi_value = ["library_prep_type", "prep_targets_detail", "experiment_type"]
+    split_rna_datum = multi_value_split(rna_datum)
+
+    for key, value in split_rna_datum.items():
+        if key in multi_value and not isinstance(value, list):
+            split_rna_datum[key] = [value]
+        elif value is None:
+            continue
+        elif key == "read_length":
+            try:
+                split_rna_datum[key] = int(value)
+            except ValueError:
+                split_rna_datum[key] = "NA"
+        elif key in ["RIN", "total_reads"]:
+            try:
+                split_rna_datum[key] = float(value)
+            except ValueError:
+                split_rna_datum[key] = "NA"
+
+    return split_rna_datum
+
+
 def parse_rna_aligned(rna_aligned: dict) -> dict:
     """
     Parses and processes the rna_aligned dictionary to format and clean specific fields.
@@ -260,42 +298,28 @@ def parse_rna_aligned(rna_aligned: dict) -> dict:
         "aligned_index_file": rna_aligned["aligned_rna_short_read_index_file"],
     }
 
-    return rna_aligned
+    float_fields = [
+        "percent_rRNA",
+        "percent_mRNA",
+        "percent_mtRNA",
+        "percent_Globin",
+        "percent_UMI",
+        "5prime3prime_bias",
+        "percent_GC",
+        "percent_chrX_Y"
+    ]
 
-
-def parse_rna(rna_datum: dict) -> dict:
-    """
-    Parses and processes the rna record to format and clean specific fields.
-
-    The function handles specific fields that may contain delimiters or need conversion to different data types.
-    It removes or transforms values based on their content to ensure consistent data handling downstream.
-
-    Parameters:
-    - rna_datum (dict): A dictionary containing rna data.
-
-    Returns:
-    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and lists or numeric
-      fields are properly formatted.
-    """
-    
-    for key, value in rna_datum.items():
+    for key, value in rna_aligned.items():
         if value is None:
             continue
-        if isinstance(value, str) and "|" in value:
-            rna_datum[key] = value.split("|")
-        if key == "5prime3prime_bias":
+        if key in float_fields:
             try:
-                rna_datum[key] = float(rna_datum[key])
+                rna_aligned[key] = float(rna_aligned[key])
             except ValueError:
                 print("oops!")
-                rna_datum[key] = "NA"
-        if key in ["read_length", "RIN", "total_reads"]:
-            try:
-                rna_datum[key] = int(rna_datum[key])
-            except ValueError:
-                rna_datum[key] = "NA"
+                rna_aligned[key] = "NA"
 
-    return rna_datum
+    return rna_aligned
 
 
 def swap_experiment_aligned(text: str) -> str:
