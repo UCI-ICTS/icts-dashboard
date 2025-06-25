@@ -1,0 +1,217 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned_rna_short_read.json",
+    "title": "aligned_rna_short_read",
+    "version": "1.8",
+    "type": "object",
+    "required": [
+        "aligned_rna_short_read_id",
+        "experiment_rna_short_read_id",
+        "aligned_rna_short_read_file",
+        "aligned_rna_short_read_index_file",
+        "md5sum",
+        "reference_assembly",
+        "gene_annotation",
+        "alignment_software"
+    ],
+    "definitions": {},
+    "properties": {
+        "aligned_rna_short_read_id": {
+            "type": "string",
+            "description": "identifier for aligned_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ]
+        },
+        "experiment_rna_short_read_id": {
+            "type": "string",
+            "description": "identifier for experiment"
+        },
+        "aligned_rna_short_read_file": {
+            "type": "string",
+            "description": "name and path of file with aligned reads",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "aligned_rna_short_read_index_file": {
+            "type": "string",
+            "description": "name and path of index file corresponding to aligned reads file",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "md5sum": {
+            "type": "string",
+            "description": "md5 checksum for file",
+            "examples": [
+                "129c28163df082"
+            ]
+        },
+        "reference_assembly": {
+            "type": "string",
+            "enum": [
+                "GRCh38",
+                "GRCh37",
+                "NCBI36",
+                "NCBI35",
+                "NCBI34"
+            ],
+            "examples": [
+                "GRCh38"
+            ]
+        },
+        "reference_assembly_uri": {
+            "type": "string",
+            "examples": [
+                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
+            ]
+        },
+        "reference_assembly_details": {
+            "type": "string",
+            "examples": [
+                "primary, chrY-masked"
+            ]
+        },
+        "gene_annotation": {
+            "type": "string",
+            "description": "annotation file used for alignment",
+            "examples": [
+                "GENCODEv35"
+            ]
+        },
+        "gene_annotation_details": {
+            "type": "string",
+            "enum": [
+                "gencode_comprehensive_chr",
+                "gencode_comprehensive_all",
+                "gencode_comprehensive_pri",
+                "gencode_basic_chr",
+                "gencode_basic_all",
+                "gencode_basic_pri",
+                "lncRNA_annotation",
+                "polyA_feature_annotation",
+                "consensus_pseudogenes",
+                "predicted_tRNA_genes"
+            ],
+            "examples": [
+                "examples corresponding to GENCODE options",
+                "gencode_comprehensive_chr",
+                "gencode_comprehensive_all",
+                "gencode_comprehensive_pri"
+            ]
+        },
+        "alignment_software": {
+            "type": "string",
+            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "STARvXXX"
+            ]
+        },
+        "alignment_log_file": {
+            "type": "string",
+            "description": "path of (log) file with all parameters for alignment software",
+            "examples": [
+                "/path/to/STAR.log"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "alignment_postprocessing": {
+            "type": "string",
+            "description": "If any post processing was applied",
+            "examples": [
+                "multimapped reads removed, reads trimmed"
+            ]
+        },
+        "mean_coverage": {
+            "type": "number",
+            "description": "Mean coverage of either the genome or the targeted regions\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "100"
+            ]
+        },
+        "percent_uniquely_aligned": {
+            "type": "number",
+            "description": "how many reads aligned to just one place",
+            "examples": [
+                "81"
+            ]
+        },
+        "percent_multimapped": {
+            "type": "number",
+            "description": "how many reads aligned to multiple places",
+            "examples": [
+                "10"
+            ]
+        },
+        "percent_unaligned": {
+            "type": "number",
+            "description": "how many reads didn't align",
+            "examples": [
+                "9"
+            ]
+        },
+        "quality_issues": {
+            "type": "string",
+            "description": "describe if there are any QC issues that would be important to note"
+        },
+        "alignment_QC_output_file": {
+            "type": "string",
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "percent_rRNA": {
+            "type": "number",
+            "examples": [
+                "20"
+            ]
+        },
+        "percent_mRNA": {
+            "type": "number",
+            "examples": [
+                "75"
+            ]
+        },
+        "percent_mtRNA": {
+            "type": "number",
+            "examples": [
+                "4"
+            ]
+        },
+        "percent_Globin": {
+            "type": "number",
+            "examples": [
+                "1"
+            ]
+        },
+        "percent_UMI": {
+            "type": "number",
+            "examples": [
+                "0"
+            ]
+        },
+        "5prime3prime_bias": {
+            "type": "number",
+            "examples": [
+                "1.09"
+            ]
+        },
+        "percent_GC": {
+            "type": "number",
+            "examples": [
+                "66"
+            ]
+        },
+        "percent_chrX_Y": {
+            "type": "number",
+            "examples": [
+                "12"
+            ]
+        }
+    }
+}

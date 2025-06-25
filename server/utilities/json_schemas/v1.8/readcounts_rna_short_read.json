@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/readcounts_rna_short_read.json",
+    "title": "readcounts_rna_short_read",
+    "version": "1.8",
+    "type": "object",
+    "required": [
+        "aligned_rna_short_read_set_id",
+        "readcounts_rna_file",
+        "md5sum",
+        "quantification_software",
+        "quantification_types",
+        "quantification_unit"
+    ],
+    "definitions": {},
+    "properties": {
+        "readcounts_rna_short_read_id": {
+            "type": "string",
+            "description": "unique key for table (anvil requirement)"
+        },
+        "aligned_rna_short_read_set_id": {
+            "type": "string",
+            "description": "identifier for experiment set"
+        },
+        "readcounts_rna_file": {
+            "type": "string",
+            "description": "name and path of the file with readcounts/feature quantifications",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.vcf",
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SNV.gvcf",
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.EH.vcf"
+            ],
+            "x-is_bucket_path": true,
+            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+        },
+        "md5sum": {
+            "type": "string",
+            "description": "md5 checksum for file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
+            "examples": [
+                "129c28163df082"
+            ]
+        },
+        "quantification_software": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "description": "Quantification software used including version number",
+                "examples": [
+                    "gatk4.1.2",
+                    "expansionhunter-denovo-0.2b",
+                    "manta-3.1"
+                ]
+            }
+        },
+        "quantification_types": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "gene",
+                    "exon",
+                    "transcript"
+                ],
+                "description": "features used for quantification\n\nNotes: can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry"
+            }
+        },
+        "quantification_unit": {
+            "type": "string",
+            "enum": [
+                "TPM",
+                "raw"
+            ],
+            "description": "TPM or raw counts"
+        },
+        "analysis_details": {
+            "type": "string",
+            "description": "brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or github repository"
+        },
+        "annotation_file_for_quantification": {
+            "type": "string",
+            "description": "name and path of the file with quantification annotations"
+        },
+        "single_source": {
+            "type": "boolean",
+            "description": "indicate if counts are from a single RC (TRUE) or from a harmonized/merged dataset (FALSE)",
+            "examples": [
+                true
+            ]
+        }
+    }
+}

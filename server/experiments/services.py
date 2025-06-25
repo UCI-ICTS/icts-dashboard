@@ -7,7 +7,7 @@ from config.selectors import (
     remove_na,
     response_constructor,
     compare_data,
-    TableValidator
+    TableValidator,
 )
 
 from experiments.models import (
@@ -22,6 +22,7 @@ from experiments.models import (
     ExperimentPacBio,
     ExperimentRNAShortRead,
     LibraryPrepType,
+    PrepTargetsDetail,
     ExperimentType,
 )
 from experiments.selectors import (
@@ -33,7 +34,7 @@ from experiments.selectors import (
     parse_rna_aligned,
     parse_pac_bio,
     parse_pac_bio_aligned,
-    swap_experiment_aligned
+    swap_experiment_aligned,
 )
 
 from metadata.selectors import get_analyte
@@ -56,48 +57,39 @@ class ExperimentTypeSerializer(serializers.ModelSerializer):
 
 class ExperimentRNAInputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
-        many=True, slug_field="name", queryset=LibraryPrepType.objects.all()
+        many=True,
+        slug_field="name",
+        queryset=LibraryPrepType.objects.all(),
+        required=False,
+        allow_null=True,
     )
-
+    prep_targets_detail = serializers.SlugRelatedField(
+        many=True,
+        slug_field="name",
+        queryset=PrepTargetsDetail.objects.all(),
+        required=False,
+        allow_null=True,
+    )
     experiment_type = serializers.SlugRelatedField(
         many=True, slug_field="name", queryset=ExperimentType.objects.all()
     )
 
-    # This renames the field in API input/output while keeping it correct in Django ORM
-    five_prime_three_prime_bias = serializers.FloatField(required=False, allow_null=True)
-
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-        extra_kwargs = {
-            "five_prime_three_prime_bias": {"read_only": True}  # Prevents duplication issues
-        }
-        rename_fields = {  # Custom rename logic
-            "five_prime_three_prime_bias": "5prime3prime_bias"
-        }
-
-
-    def to_representation(self, instance):
-        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
-        data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
-        return data
-
-    def to_internal_value(self, data):
-        """ Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias` """
-        if "5prime3prime_bias" in data:
-            data["five_prime_three_prime_bias"] = data.pop("5prime3prime_bias")
-        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """Create a new ExperimentRNAShortRead instance using the validated data and set the many-to-many relationships"""
 
         library_prep_types_data = validated_data.pop("library_prep_type", [])
+        prep_targets_detail_data = validated_data.pop("prep_targets_detail", [])
         experiment_types_data = validated_data.pop("experiment_type", [])
 
-        experiment_rna_instance = ExperimentRNAShortRead.objects.create(**validated_data)
+        experiment_rna_instance = ExperimentRNAShortRead.objects.create(
+            **validated_data
+        )
         experiment_rna_instance.library_prep_type.set(library_prep_types_data)
+        experiment_rna_instance.prep_targets_detail.set(prep_targets_detail_data)
         experiment_rna_instance.experiment_type.set(experiment_types_data)
 
         return experiment_rna_instance
@@ -106,6 +98,7 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
 
         library_prep_types_data = validated_data.pop("library_prep_type", None)
+        prep_targets_detail_data = validated_data.pop("prep_targets_detail", None)
         experiment_types_data = validated_data.pop("experiment_type", None)
 
         for attr, value in validated_data.items():
@@ -113,6 +106,8 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
 
         if library_prep_types_data is not None:
             instance.library_prep_type.set(library_prep_types_data)
+        if prep_targets_detail_data is not None:
+            instance.prep_targets_detail.set(prep_targets_detail_data)
         if experiment_types_data is not None:
             instance.experiment_type.set(experiment_types_data)
 
@@ -124,6 +119,9 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
+    prep_targets_detail = serializers.SlugRelatedField(
+        many=True, slug_field="name", read_only=True
+    )
     experiment_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -131,13 +129,6 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperimentRNAShortRead
         fields = "__all__"
-
-    def to_representation(self, instance):
-        """ Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response """
-        data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
-        return data
 
 
 class ExperimentDNAInputSerializer(serializers.ModelSerializer):
@@ -159,7 +150,9 @@ class ExperimentDNAInputSerializer(serializers.ModelSerializer):
         library_prep_types_data = validated_data.pop("library_prep_type", [])
         experiment_types_data = validated_data.pop("experiment_type", [])
 
-        experiment_dna_instance = ExperimentDNAShortRead.objects.create(**validated_data)
+        experiment_dna_instance = ExperimentDNAShortRead.objects.create(
+            **validated_data
+        )
         experiment_dna_instance.library_prep_type.set(library_prep_types_data)
         experiment_dna_instance.experiment_type.set(experiment_types_data)
 
@@ -327,10 +320,35 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
-class AlignedRNAShortReadSerializer(serializers.ModelSerializer):
+class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
+        extra_kwargs = {
+            "five_prime_three_prime_bias": {
+                "read_only": True
+            }  # Prevents duplication issues
+        }
+        rename_fields = {  # Custom rename logic
+            "five_prime_three_prime_bias": "5prime3prime_bias"
+        }
+        # This renames the field in API input/output while keeping it correct in Django ORM
+        five_prime_three_prime_bias = serializers.FloatField(
+            required=False, allow_null=True
+        )
+
+    def to_representation(self, instance):
+        """Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response"""
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
+
+    def to_internal_value(self, data):
+        """Allow `5prime3prime_bias` as input while mapping it to `five_prime_three_prime_bias`"""
+        if "5prime3prime_bias" in data:
+            data["five_prime_three_prime_bias"] = data.pop("5prime3prime_bias")
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """Create a new AlignedRNAShortRead instance using the validated data and set the many-to-many relationships"""
@@ -346,6 +364,19 @@ class AlignedRNAShortReadSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlignedRNAShortRead
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        """Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response"""
+        data = super().to_representation(instance)
+        if "five_prime_three_prime_bias" in data:
+            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        return data
 
 
 class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
@@ -481,26 +512,26 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
             "model": ExperimentDNAShortRead,
             "input_serializer": ExperimentShortReadSerializer,
             "output_serializer": ExperimentShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read(short_read=datum)
+            "parsed_data": lambda datum: parse_short_read(short_read=datum),
         },
         "experiment_nanopore": {
             "model": ExperimentNanopore,
             "input_serializer": ExperimentNanoporeSerializer,
             "output_serializer": ExperimentNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore(nanopore=datum)
+            "parsed_data": lambda datum: parse_nanopore(nanopore=datum),
         },
         "experiment_pac_bio": {
             "model": ExperimentPacBio,
             "input_serializer": ExperimentPacBioSerializer,
             "output_serializer": ExperimentPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum)
+            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum),
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
             "input_serializer": ExperimentRNAInputSerializer,
             "output_serializer": ExperimentRNAOutputSerializer,
-            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
-        }
+            "parsed_data": lambda datum: parse_rna(rna_datum=datum),
+        },
     }
     table_validator = TableValidator()
 
@@ -508,12 +539,15 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         participant_id = get_analyte(datum["analyte_id"]).participant_id.participant_id
     else:
         analyte_id = datum["analyte_id"]
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Analyte {analyte_id} does not exist.",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Analyte {analyte_id} does not exist.",
+            ),
+            "rejected_request",
+        )
 
     experiment_data = {
         "experiment_id": f"{table_name}.{identifier}",
@@ -522,7 +556,9 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
         "participant_id": participant_id,
     }
 
-    experiment_results = ExperimentService.validate_experiment(experiment_data, table_validator)
+    experiment_results = ExperimentService.validate_experiment(
+        experiment_data, table_validator
+    )
 
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
@@ -531,39 +567,56 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
 
-    if results["valid"] and experiment_results['valid']:
+    if results["valid"] and experiment_results["valid"]:
         serializer = table_serializers[table_name]["input_serializer"](data=datum)
-        experiment_serializer = ExperimentService.create_or_update_experiment(experiment_data)
+        experiment_serializer = ExperimentService.create_or_update_experiment(
+            experiment_data
+        )
         if serializer.is_valid() and experiment_serializer.is_valid():
             new_instance = serializer.save()
-            return response_constructor(
-                identifier=identifier,
-                request_status="CREATED",
-                code=201,
-                message=f"{table_name} {identifier} created.",
-                data={
-                    "instance": table_serializers[table_name]["output_serializer"](new_instance).data
-                }
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="CREATED",
+                    code=201,
+                    message=f"{table_name} {identifier} created.",
+                    data={
+                        "instance": table_serializers[table_name]["output_serializer"](
+                            new_instance
+                        ).data
+                    },
+                ),
+                "accepted_request",
+            )
         else:
             error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-            if experiment_serializer and hasattr(experiment_serializer, 'errors'):
+            if experiment_serializer and hasattr(experiment_serializer, "errors"):
                 error_data.extend(
-                    [{item: experiment_serializer.errors[item]} for item in experiment_serializer.errors]
+                    [
+                        {item: experiment_serializer.errors[item]}
+                        for item in experiment_serializer.errors
+                    ]
                 )
-            return response_constructor(
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"] + experiment_results["errors"],
-        ), "rejected_request"
+                data=results["errors"] + experiment_results["errors"],
+            ),
+            "rejected_request",
+        )
+
 
 def update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
     """
@@ -583,53 +636,65 @@ def update_experiment(table_name: str, identifier: str, model_instance, datum: d
             "model": ExperimentDNAShortRead,
             "input_serializer": ExperimentShortReadSerializer,
             "output_serializer": ExperimentShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read(short_read=datum)
+            "parsed_data": lambda datum: parse_short_read(short_read=datum),
         },
         "experiment_nanopore": {
             "model": ExperimentNanopore,
             "input_serializer": ExperimentNanoporeSerializer,
             "output_serializer": ExperimentNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore(nanopore=datum)
+            "parsed_data": lambda datum: parse_nanopore(nanopore=datum),
         },
         "experiment_pac_bio": {
             "model": ExperimentPacBio,
             "input_serializer": ExperimentPacBioSerializer,
             "output_serializer": ExperimentPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum)
+            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum),
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
             "input_serializer": ExperimentRNAInputSerializer,
             "output_serializer": ExperimentRNAOutputSerializer,
-            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
-        }
+            "parsed_data": lambda datum: parse_rna(rna_datum=datum),
+        },
     }
 
-    serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
+    serializer = table_serializers[table_name]["input_serializer"](
+        model_instance, data=datum
+    )
     if serializer.is_valid():
         updated_instance = serializer.save()
         changes = compare_data(
-            old_data=table_serializers[table_name]["output_serializer"](model_instance).data,
-            new_data=datum
+            old_data=table_serializers[table_name]["output_serializer"](
+                model_instance
+            ).data,
+            new_data=datum,
         )
-        return response_constructor(
-            identifier=identifier,
-            request_status="UPDATED",
-            code=200,
-            message=f"{table_name} {identifier} updated.",
-            data={
-                "updates": changes,
-                "instance": table_serializers[table_name]["output_serializer"](updated_instance).data
-            }
-        ), "accepted_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="UPDATED",
+                code=200,
+                message=f"{table_name} {identifier} updated.",
+                data={
+                    "updates": changes,
+                    "instance": table_serializers[table_name]["output_serializer"](
+                        updated_instance
+                    ).data,
+                },
+            ),
+            "accepted_request",
+        )
     else:
         error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=error_data,
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=error_data,
+            ),
+            "rejected_request",
+        )
 
 
 def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
@@ -649,17 +714,20 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
         "experiment_dna_short_read": ExperimentDNAShortRead,
         "experiment_nanopore": ExperimentNanopore,
         "experiment_pac_bio": ExperimentPacBio,
-        "experiment_rna_short_read": ExperimentRNAShortRead
+        "experiment_rna_short_read": ExperimentRNAShortRead,
     }
 
     model_class = model_mapping.get(table_name)
     if not model_class:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Invalid table name: {table_name}",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Invalid table name: {table_name}",
+            ),
+            "rejected_request",
+        )
 
     try:
         instance = model_class.objects.filter(**{id_field: identifier}).first()
@@ -672,27 +740,36 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
             if experiment_instance:
                 experiment_instance.delete()
 
-            return response_constructor(
-                identifier=identifier,
-                request_status="DELETED",
-                code=200,
-                data=f"{table_name} {identifier} and associated experiment deleted successfully."
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="DELETED",
+                    code=200,
+                    data=f"{table_name} {identifier} and associated experiment deleted successfully.",
+                ),
+                "accepted_request",
+            )
         else:
-            return response_constructor(
-                identifier=identifier,
-                request_status="NOT FOUND",
-                code=404,
-                data=f"{table_name} {identifier} not found."
-            ), "rejected_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data=f"{table_name} {identifier} not found.",
+                ),
+                "rejected_request",
+            )
 
     except Exception as error:
-        return response_constructor(
-            identifier=identifier,
-            request_status="SERVER ERROR",
-            code=500,
-            data=str(error),
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ),
+            "rejected_request",
+        )
 
 
 def create_aligned(table_name: str, identifier: str, datum: dict):
@@ -712,40 +789,58 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
             "model": AlignedDNAShortRead,
             "input_serializer": AlignedDNAShortReadSerializer,
             "output_serializer": AlignedDNAShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read_aligned(short_read_aligned=datum)
+            "parsed_data": lambda datum: parse_short_read_aligned(
+                short_read_aligned=datum
+            ),
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum)
+            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum)
+            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
             "input_serializer": AlignedRNASerializer,
             "output_serializer": AlignedRNASerializer,
-            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
-        }
+            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
+        },
     }
     table_validator = TableValidator()
     experiment_name = swap_experiment_aligned(table_name)
-
-    try:
-        experiment_object = Experiment.objects.get(id_in_table=datum[experiment_name + "_id"])
-        participant_id = experiment_object.participant_id.participant_id
-    except Experiment.DoesNotExist:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Experiment {experiment_name} for {identifier} does not exist.",
-        ), "rejected_request"
+    experiment_id = datum[experiment_name + "_id"]
+    if experiment_id != None and isinstance(experiment_id, str):
+        try:
+            experiment_object = Experiment.objects.get(
+                experiment_id=experiment_name + "." + experiment_id
+            )
+            participant_id = experiment_object.participant_id.participant_id
+        except Experiment.DoesNotExist:
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=f"Experiment {experiment_name} for {identifier} does not exist.",
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Experiment ID {experiment_id} for {identifier} does not exist.",
+            ),
+            "rejected_request",
+        )
 
     aligned_data = {
         "aligned_id": f"{table_name}.{identifier}",
@@ -753,39 +848,65 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         "id_in_table": identifier,
         "participant_id": participant_id,
         "aligned_file": datum[f"{table_name}_file"],
-        "aligned_index_file": datum[f"{table_name}_index_file"]
+        "aligned_index_file": datum[f"{table_name}_index_file"],
     }
 
     aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
 
-    if aligned_results['valid']:
-        alignment_serializer = AlignedService.create_or_update_aligned(aligned_data)
-        if alignment_serializer.is_valid():
-            alignment_instance = alignment_serializer.save()
-            return response_constructor(
-                identifier=identifier,
-                request_status="CREATED",
-                code=201,
-                message=f"{table_name} {identifier} created.",
-                data={
-                    "instance": alignment_serializer.data
-                }
-            ), "accepted_request"
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
+    else:
+        datum = remove_na(datum=datum)
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+
+    if results["valid"] and aligned_results["valid"]:
+        serializer = table_serializers[table_name]["input_serializer"](data=datum)
+        aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
+        if serializer.is_valid() and aligned_serializer.is_valid():
+            new_instance = serializer.save()
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="CREATED",
+                    code=201,
+                    message=f"{table_name} {identifier} created.",
+                    data={
+                        "instance": table_serializers[table_name]["output_serializer"](
+                            new_instance
+                        ).data
+                    },
+                ),
+                "accepted_request",
+            )
         else:
-            error_data = [{item: alignment_serializer.errors[item]} for item in alignment_serializer.errors]
-            return response_constructor(
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            if aligned_serializer and hasattr(aligned_serializer, "errors"):
+                error_data.extend(
+                    [
+                        {item: aligned_serializer.errors[item]}
+                        for item in aligned_serializer.errors
+                    ]
+                )
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=aligned_results["errors"],
-        ), "rejected_request"
+                data=results["errors"] + aligned_results["errors"],
+            ),
+            "rejected_request",
+        )
 
 
 def update_aligned(table_name: str, identifier: str, model_instance, datum: dict):
@@ -805,49 +926,67 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
         "aligned_dna_short_read": {
             "model": AlignedDNAShortRead,
             "input_serializer": AlignedDNAShortReadSerializer,
-            "output_serializer": AlignedDNAShortReadSerializer
+            "output_serializer": AlignedDNAShortReadSerializer,
+            "parsed_data": lambda datum: parse_short_read_aligned(
+                short_read_aligned=datum
+            ),
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
-            "output_serializer": AlignedNanoporeSerializer
+            "output_serializer": AlignedNanoporeSerializer,
+            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
-            "output_serializer": AlignedPacBioSerializer
+            "output_serializer": AlignedPacBioSerializer,
+            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
             "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer
-        }
+            "output_serializer": AlignedRNASerializer,
+            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
+        },
     }
-    serializer = table_serializers[table_name]["input_serializer"](model_instance, data=datum)
+    serializer = table_serializers[table_name]["input_serializer"](
+        model_instance, data=datum
+    )
     if serializer.is_valid():
         updated_instance = serializer.save()
         changes = compare_data(
-            old_data=table_serializers[table_name]["output_serializer"](model_instance).data,
-            new_data=datum
+            old_data=table_serializers[table_name]["output_serializer"](
+                model_instance
+            ).data,
+            new_data=datum,
         )
-        return response_constructor(
-            identifier=identifier,
-            request_status="UPDATED",
-            code=200,
-            message=f"{table_name} {identifier} updated.",
-            data={
-                "updates": changes,
-                "instance": table_serializers[table_name]["output_serializer"](updated_instance).data
-            }
-        ), "accepted_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="UPDATED",
+                code=200,
+                message=f"{table_name} {identifier} updated.",
+                data={
+                    "updates": changes,
+                    "instance": table_serializers[table_name]["output_serializer"](
+                        updated_instance
+                    ).data,
+                },
+            ),
+            "accepted_request",
+        )
     else:
         error_data = [{item: serializer.errors[item]} for item in serializer.errors]
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=error_data,
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=error_data,
+            ),
+            "rejected_request",
+        )
 
 
 def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
@@ -867,17 +1006,20 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
         "aligned_dna_short_read": AlignedDNAShortRead,
         "aligned_nanopore": AlignedNanopore,
         "aligned_pac_bio": AlignedPacBio,
-        "aligned_rna_short_read": AlignedRNAShortRead
+        "aligned_rna_short_read": AlignedRNAShortRead,
     }
 
     model_class = model_mapping.get(table_name)
     if not model_class:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Invalid table name: {table_name}",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Invalid table name: {table_name}",
+            ),
+            "rejected_request",
+        )
 
     try:
         instance = model_class.objects.filter(**{id_field: identifier}).first()
@@ -890,30 +1032,41 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
             if aligned_instance:
                 aligned_instance.delete()
 
-            return response_constructor(
-                identifier=identifier,
-                request_status="DELETED",
-                code=200,
-                data=f"{table_name} {identifier} and associated alignment deleted successfully."
-            ), "accepted_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="DELETED",
+                    code=200,
+                    data=f"{table_name} {identifier} and associated alignment deleted successfully.",
+                ),
+                "accepted_request",
+            )
         else:
-            return response_constructor(
-                identifier=identifier,
-                request_status="NOT FOUND",
-                code=404,
-                data=f"{table_name} {identifier} not found."
-            ), "rejected_request"
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data=f"{table_name} {identifier} not found.",
+                ),
+                "rejected_request",
+            )
 
     except Exception as error:
-        return response_constructor(
-            identifier=identifier,
-            request_status="SERVER ERROR",
-            code=500,
-            data=str(error),
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ),
+            "rejected_request",
+        )
 
 
-def create_or_update_experiment(table_name: str, identifier: str, model_instance, datum: dict):
+def create_or_update_experiment(
+    table_name: str, identifier: str, model_instance, datum: dict
+):
     """
     Create or update a model instance based on the provided data.
 
@@ -928,32 +1081,31 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         dict: A response dictionary indicating the status of the operation.
     """
 
-
     table_serializers = {
         "experiment_dna_short_read": {
             "model": ExperimentDNAShortRead,
             "input_serializer": ExperimentShortReadSerializer,
             "output_serializer": ExperimentShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read(short_read=datum)
+            "parsed_data": lambda datum: parse_short_read(short_read=datum),
         },
         "experiment_nanopore": {
             "model": ExperimentNanopore,
             "input_serializer": ExperimentNanoporeSerializer,
             "output_serializer": ExperimentNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore(nanopore=datum)
+            "parsed_data": lambda datum: parse_nanopore(nanopore=datum),
         },
         "experiment_pac_bio": {
             "model": ExperimentPacBio,
             "input_serializer": ExperimentPacBioSerializer,
             "output_serializer": ExperimentPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum)
+            "parsed_data": lambda datum: parse_pac_bio(pac_bio_datum=datum),
         },
         "experiment_rna_short_read": {
             "model": ExperimentRNAShortRead,
             "input_serializer": ExperimentRNAInputSerializer,
             "output_serializer": ExperimentRNAOutputSerializer,
-            "parsed_data": lambda datum: parse_rna(rna_datum=datum)
-        }
+            "parsed_data": lambda datum: parse_rna(rna_datum=datum),
+        },
     }
     table_validator = TableValidator()
 
@@ -961,12 +1113,15 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         participant_id = get_analyte(datum["analyte_id"]).participant_id.participant_id
     else:
         analyte_id = datum["analyte_id"]
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Analyte {analyte_id} dose not exist.",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Analyte {analyte_id} dose not exist.",
+            ),
+            "rejected_request",
+        )
 
     experiment_data = {
         "experiment_id": f"{table_name}.{identifier}",
@@ -974,7 +1129,9 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
         "id_in_table": identifier,
         "participant_id": participant_id,
     }
-    experiment_results = ExperimentService.validate_experiment(experiment_data, table_validator)
+    experiment_results = ExperimentService.validate_experiment(
+        experiment_data, table_validator
+    )
 
     model_input_serializer = table_serializers[table_name]["input_serializer"]
     model_output_serializer = table_serializers[table_name]["output_serializer"]
@@ -986,68 +1143,88 @@ def create_or_update_experiment(table_name: str, identifier: str, model_instance
 
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
-    if results["valid"] and experiment_results['valid']:
-        changes = compare_data(
-            old_data=model_output_serializer(model_instance).data,
-            new_data=datum
-        ) if model_instance else {identifier:"CREATED"}
+    if results["valid"] and experiment_results["valid"]:
+        changes = (
+            compare_data(
+                old_data=model_output_serializer(model_instance).data, new_data=datum
+            )
+            if model_instance
+            else {identifier: "CREATED"}
+        )
 
         serializer = model_input_serializer(model_instance, data=datum)
-        experiment_serializer = ExperimentService.create_or_update_experiment(experiment_data)
+        experiment_serializer = ExperimentService.create_or_update_experiment(
+            experiment_data
+        )
         if serializer.is_valid() and experiment_serializer.is_valid():
             updated_instance = serializer.save()
             if not changes:
-                return response_constructor(
-                    identifier=identifier,
-                    request_status="SUCCESS",
-                    code=200,
-                    message=f"{table_name} {identifier} had no changes.",
-                    data={
-                        "updates": None,
-                        "instance": model_output_serializer(updated_instance).data
-                    }
-                ), "accepted_request"
+                return (
+                    response_constructor(
+                        identifier=identifier,
+                        request_status="SUCCESS",
+                        code=200,
+                        message=f"{table_name} {identifier} had no changes.",
+                        data={
+                            "updates": None,
+                            "instance": model_output_serializer(updated_instance).data,
+                        },
+                    ),
+                    "accepted_request",
+                )
 
-            return response_constructor(
-                identifier=identifier,
-                request_status="UPDATED" if model_instance else "CREATED",
-                code=200 if model_instance else 201,
-                message=(
-                    f"{table_name} {identifier} updated." if model_instance
-                    else f"{table_name} {identifier} created."
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="UPDATED" if model_instance else "CREATED",
+                    code=200 if model_instance else 201,
+                    message=(
+                        f"{table_name} {identifier} updated."
+                        if model_instance
+                        else f"{table_name} {identifier} created."
+                    ),
+                    data={
+                        "updates": changes,
+                        "instance": model_output_serializer(updated_instance).data,
+                    },
                 ),
-                data={
-                    "updates": changes,
-                    "instance": model_output_serializer(updated_instance).data
-                }
-            ), "accepted_request"
+                "accepted_request",
+            )
 
         else:
-            error_data = [
-                {item: serializer.errors[item]}
-                for item in serializer.errors
-            ]
-            if experiment_serializer and hasattr(experiment_serializer, 'errors'):
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            if experiment_serializer and hasattr(experiment_serializer, "errors"):
                 error_data.extend(
-                    [{item: experiment_serializer.errors[item]} for item in experiment_serializer.errors]
+                    [
+                        {item: experiment_serializer.errors[item]}
+                        for item in experiment_serializer.errors
+                    ]
                 )
-            return response_constructor(
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"] + experiment_results["errors"],
-        ), "rejected_request"
+                data=results["errors"] + experiment_results["errors"],
+            ),
+            "rejected_request",
+        )
 
 
-def create_or_update_alignment(table_name: str, identifier: str, model_instance, datum: dict):
+def create_or_update_alignment(
+    table_name: str, identifier: str, model_instance, datum: dict
+):
     """
     Create or update a model instance based on the provided data.
 
@@ -1062,46 +1239,52 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
         dict: A response dictionary indicating the status of the operation.
     """
 
-
     table_serializers = {
         "aligned_dna_short_read": {
             "model": AlignedDNAShortRead,
             "input_serializer": AlignedDNAShortReadSerializer,
             "output_serializer": AlignedDNAShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read_aligned(short_read_aligned=datum)
+            "parsed_data": lambda datum: parse_short_read_aligned(
+                short_read_aligned=datum
+            ),
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum)
+            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum)
+            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
             "input_serializer": AlignedRNASerializer,
             "output_serializer": AlignedRNASerializer,
-            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum)
-        }
+            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
+        },
     }
     table_validator = TableValidator()
     experiment_name = swap_experiment_aligned(table_name)
 
     try:
-        experiment_object = Experiment.objects.get(id_in_table=datum[experiment_name+"_id"])
+        experiment_object = Experiment.objects.get(
+            id_in_table=datum[experiment_name + "_id"]
+        )
         participant_id = experiment_object.participant_id.participant_id
     except Experiment.DoesNotExist:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=f"Experiment {experiment_name} for {identifier} dose not exist.",
-        ), "rejected_request"
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Experiment {experiment_name} for {identifier} dose not exist.",
+            ),
+            "rejected_request",
+        )
 
     aligned_data = {
         "aligned_id": f"{table_name}.{identifier}",
@@ -1109,7 +1292,7 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
         "id_in_table": identifier,
         "participant_id": participant_id,
         "aligned_file": datum[f"{table_name}_file"],
-        "aligned_index_file": datum[f"{table_name}_index_file"]
+        "aligned_index_file": datum[f"{table_name}_index_file"],
     }
 
     aligned_results = AlignedService.validate_aligned(aligned_data, table_validator)
@@ -1125,62 +1308,78 @@ def create_or_update_alignment(table_name: str, identifier: str, model_instance,
     table_validator.validate_json(json_object=datum, table_name=table_name)
     results = table_validator.get_validation_results()
 
-    if results["valid"] and aligned_results['valid']:
-        changes = compare_data(
-            old_data=model_output_serializer(model_instance).data,
-            new_data=datum
-        ) if model_instance else {identifier:"CREATED"}
+    if results["valid"] and aligned_results["valid"]:
+        changes = (
+            compare_data(
+                old_data=model_output_serializer(model_instance).data, new_data=datum
+            )
+            if model_instance
+            else {identifier: "CREATED"}
+        )
 
         serializer = model_input_serializer(model_instance, data=datum)
         alignment_serializer = AlignedService.create_or_update_aligned(aligned_data)
         if serializer.is_valid() and alignment_serializer.is_valid:
             updated_instance = serializer.save()
             if not changes:
-                return response_constructor(
-                    identifier=identifier,
-                    request_status="SUCCESS",
-                    code=200,
-                    message=f"{table_name} {identifier} had no changes.",
-                    data={
-                        "updates": None,
-                        "instance": model_output_serializer(updated_instance).data
-                    }
-                ), "accepted_request"
+                return (
+                    response_constructor(
+                        identifier=identifier,
+                        request_status="SUCCESS",
+                        code=200,
+                        message=f"{table_name} {identifier} had no changes.",
+                        data={
+                            "updates": None,
+                            "instance": model_output_serializer(updated_instance).data,
+                        },
+                    ),
+                    "accepted_request",
+                )
 
-            return response_constructor(
-                identifier=identifier,
-                request_status="UPDATED" if model_instance else "CREATED",
-                code=200 if model_instance else 201,
-                message=(
-                    f"{table_name} {identifier} updated." if model_instance
-                    else f"{table_name} {identifier} created."
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="UPDATED" if model_instance else "CREATED",
+                    code=200 if model_instance else 201,
+                    message=(
+                        f"{table_name} {identifier} updated."
+                        if model_instance
+                        else f"{table_name} {identifier} created."
+                    ),
+                    data={
+                        "updates": changes,
+                        "instance": model_output_serializer(updated_instance).data,
+                    },
                 ),
-                data={
-                    "updates": changes,
-                    "instance": model_output_serializer(updated_instance).data
-                }
-            ), "accepted_request"
+                "accepted_request",
+            )
 
         else:
-            error_data = [
-                {item: serializer.errors[item]}
-                for item in serializer.errors
-            ]
-            if alignment_serializer and hasattr(alignment_serializer, 'errors'):
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            if alignment_serializer and hasattr(alignment_serializer, "errors"):
                 error_data.extend(
-                    [{item: alignment_serializer.errors[item]} for item in alignment_serializer.errors]
+                    [
+                        {item: alignment_serializer.errors[item]}
+                        for item in alignment_serializer.errors
+                    ]
                 )
-            return response_constructor(
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+
+    else:
+        return (
+            response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
-            ), "rejected_request"
-
-    else:
-        return response_constructor(
-            identifier=identifier,
-            request_status="BAD REQUEST",
-            code=400,
-            data=results["errors"] + aligned_results["errors"],
-        ), "rejected_request"
+                data=results["errors"] + aligned_results["errors"],
+            ),
+            "rejected_request",
+        )
