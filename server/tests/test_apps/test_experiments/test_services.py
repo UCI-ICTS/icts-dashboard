@@ -43,6 +43,7 @@ class ExperimentServiceTest(TestCase):
             "read_length": 100,
             "sequencing_platform": "Illumina",
             "library_prep_type": ["rRNA depletion"],
+            "prep_targets_detail": ["Watchmaker Polaris Depletion"],
             "experiment_type": ["paired-end", "untargeted"],
             "single_or_paired_ends": "paired-end",
             "within_site_batch_name": "RNA 234A",

@@ -16,7 +16,6 @@ const initialState = {
   biobank_entries: [],
   phenotypes: [],
   experiments: [],
-  experiment_stages: [],
   experiment_dna_short_read: [],
   experiment_rna_short_read: [],
   experiment_pac_bio: [],
@@ -46,35 +45,47 @@ export const dataSlice = createSlice({
     builder
       .addCase(getAllTables.pending, (state, action) => {
         state.status = "loading";
-        console.log("loading")
       })
       .addCase(getAllTables.rejected, (state, action) => {
-        message.error("Failed to load table data.");
         state.status = "rejected";
       })
       .addCase(getAllTables.fulfilled, (state, action) => {
         const {
-          participants = [],
-          families = [],
-          genetic_findings = [],
-          analytes = [],
-          biobank_entries = [],
-          phenotypes = [],
-          experiments = [],
-          experiment_stages = [],
-          experiment_dna_short_read = [],
-          experiment_rna_short_read = [],
-          experiment_pac_bio = [],
-          experiment_nanopore = [],
-          aligned = [],
-          aligned_dna_short_read = [],
-          aligned_nanopore = [],
-          aligned_pac_bio = [],
-          aligned_rna_short_read = [],
-        } = action.payload || {};
+          participants,
+          families,
+          genetic_findings,
+          analytes,
+          biobank_entries,
+          phenotypes, experiments,
+          experiment_dna_short_read,
+          experiment_rna_short_read,
+          experiment_pac_bio,
+          experiment_nanopore,
+          aligned,
+          aligned_dna_short_read,
+          aligned_nanopore,
+          aligned_pac_bio,
+          aligned_rna_short_read
+        } = action.payload;
 
         Object.assign(state, {
-          participants, families, genetic_findings, analytes, biobank_entries, phenotypes, experiments, experiment_stages, experiment_dna_short_read, experiment_rna_short_read, experiment_pac_bio, experiment_nanopore, aligned, aligned_dna_short_read, aligned_nanopore, aligned_pac_bio, aligned_rna_short_read, status: "fulfilled"
+          participants,
+          families,
+          genetic_findings,
+          analytes,
+          biobank_entries,
+          phenotypes,
+          experiments,
+          experiment_dna_short_read,
+          experiment_rna_short_read,
+          experiment_pac_bio,
+          experiment_nanopore,
+          aligned,
+          aligned_dna_short_read,
+          aligned_nanopore,
+          aligned_pac_bio,
+          aligned_rna_short_read,
+          status: "fulfilled"
         });
       })
       .addCase(updateTable.fulfilled, (state, action) => {
@@ -98,7 +109,6 @@ export const dataSlice = createSlice({
                                  table === "biobank_entries" ? "biobank_entries" :
                                  table === "phenotypes" ? "phenotypes" :
                                  table === "experiments" ? "experiments" :
-                                 table === "experiment_stages" ? "experiment_stages" :
                                  table === "experiment_dna_short_read" ? "experiment_dna_short_read" :
                                  table === "experiment_rna_short_read" ? "experiment_rna_short_read" :
                                  table === "experiment_nanopore" ? "experiment_nanopore" :
@@ -146,7 +156,6 @@ export const dataSlice = createSlice({
                                  table === "biobank_entries" ? "biobank_entries" :
                                  table === "phenotypes" ? "phenotypes" :
                                  table === "experiments" ? "experiments" :
-                                 table === "experiment_stages" ? "experiment_stages" :
                                  table === "experiment_dna_short_read" ? "experiment_dna_short_read" :
                                  table === "experiment_rna_short_read" ? "experiment_rna_short_read" :
                                  table === "experiment_nanopore" ? "experiment_nanopore" :
@@ -211,9 +220,6 @@ export const addTable = createAsyncThunk(
       }
       if (table === "phenotypes") {
         return dataService.createPhenotype(data);
-      }
-      if (table === "experiment_stages") {
-        return dataService.createExperimentStage(data);
       }
       if (table === "experiment_dna_short_read_id") {
         console.log("stuff")
@@ -310,9 +316,6 @@ export const updateTable = createAsyncThunk(
       }
       if (table === "phenotypes") {
         return dataService.updatePhenotype(data);
-      }
-      if (table === "experiment_stages") {
-        return dataService.updateExperimentStage(data);
       }
       if (table === "experiment_dna_short_read_id") {
         console.log("stuff")

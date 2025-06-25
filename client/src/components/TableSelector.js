@@ -13,7 +13,6 @@ const tables = [
   { name: "Biobank Entries", schema: "biobank_entries", identifier: "biobank_id" },
   { name: "Phenotypes", schema: "phenotypes", identifier: "phenotype_id" },
   { name: "Experiments", schema: "experiments", identifier: "experiment_id" },
-  { name: "Experiment Stages", schema: "experiment_stages", identifier: "experiment_stage_id" },
   { name: "DNA Short Read", schema: "experiment_dna_short_read", identifier: "experiment_dna_short_read_id" },
   { name: "RNA Short Read", schema: "experiment_rna_short_read", identifier: "experiment_rna_short_read_id" },
   { name: "PacBio", schema: "experiment_pac_bio", identifier: "experiment_pac_bio_id" },
