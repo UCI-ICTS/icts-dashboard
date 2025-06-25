@@ -25,7 +25,8 @@ from experiments.models import (
 )
 from experiments.services import (
     AlignedDNAShortReadSerializer,
-    AlignedRNAShortReadSerializer,
+    AlignedRNAShortReadInputSerializer,
+    AlignedRNAShortReadOutputSerializer,
     AlignedNanoporeSerializer,
     AlignedPacBioSerializer,
     AlignedRNASerializer,
@@ -197,7 +198,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        request_body=AlignedRNAShortReadSerializer(many=True),
+        request_body=AlignedRNAShortReadInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedRNAShortRead"]
     )
@@ -260,7 +261,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        request_body=AlignedRNAShortReadSerializer(many=True),
+        request_body=AlignedRNAShortReadInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedRNAShortRead"]
     )
