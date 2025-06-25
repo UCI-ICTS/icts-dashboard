@@ -40,15 +40,16 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         aligned2 = {   # New entry
             "aligned_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_2",
             "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bai",
-            "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",
+            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1_2.bam",
+            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1_2.bai",
+            "md5sum": "309bdd2a8ec58ce165baf543f973d621",
             "reference_assembly": "GRCh38_noalt",
             "alignment_software": "pbmm2 v1.10.0",
             "analysis_details": None,
@@ -64,15 +65,16 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         aligned3 =  {   # New entry
             "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_2",
             "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bai",
-            "md5sum": "727f9869058ef757cc3ff66503f1e036",
+            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2_2.bam",
+            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2_2.bai",
+            "md5sum": "d5c724e5489ffc551d94572d90841875",
             "reference_assembly": "GRCh38_noalt",
             "alignment_software": "pbmm2 v1.10.0",
             "analysis_details": None,
@@ -88,7 +90,8 @@ class CreateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         #Checks for the Aligned table before creation
@@ -164,7 +167,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         aligned2 = {  # Valid
@@ -188,7 +192,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         aligned3 =  {  # Invalid, missing alignment_software
@@ -212,7 +217,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
         aligned4 =  {  # Invalid, swaps md5sum with a different sample
@@ -236,7 +242,8 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
             "aligned_read_length_mean": None,
             "read_error_rate": None,
             "mapped_reads_pct": None,
-            "methylation_called": True
+            "methylation_called": True,
+            "quality_issues": None
         }
 
 

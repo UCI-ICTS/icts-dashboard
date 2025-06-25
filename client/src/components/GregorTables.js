@@ -8,7 +8,7 @@ import { getAllTables, updateTable, addTable } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import TableSelector from "./TableSelector";
-import schemas from "../schemas/v1.7schemas.json";
+import schemas from "../schemas/v1.8schemas.json";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
 
