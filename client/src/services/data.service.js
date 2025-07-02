@@ -690,4 +690,4 @@ const dataService = {
   deleteAlnNanopore,
 }
 
-  export default dataService;
+export default dataService;

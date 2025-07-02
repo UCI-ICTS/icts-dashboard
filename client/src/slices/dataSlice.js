@@ -1,5 +1,6 @@
 // slices/dataSlice.js
 import dataService from "../services/data.service";
+import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
 //import { useSelector } from "react-redux";
@@ -241,58 +242,15 @@ export const addTable = createAsyncThunk(
       throw new Error("Invalid table type");
     }
     try {
-      console.log('here', table, data)
+      console.log('Create', table, data)
       const response = await apiCall(table, data);
       console.log('response', response)
       const payload = {response: response.data, table}
-      if (response.data[0].message.includes("had no changes.")) {
-        message.info(`${payload.table} ${response.data[0].identifier} had no changes`);
-        // Return a payload with a flag indicating no change
-        return { response: [], table, noChanges: true };
-      }
       message.success(`${payload.table} ${response.data[0].identifier} added successfuly`);
       return payload
 
     } catch (error) {
-      let errorMessage = "";
-
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
-      }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data) &&
-        error.response.data.length > 0
-      ) {
-        const firstError = error.response.data[0];
-        // If the first element has a 'data' key that is an array, use that:
-        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-          errorMessage = firstError.data
-            .map(err => `${err.field}: ${err.error}`)
-            .join(", ");
-        }
-        // Otherwise, if the first element itself has 'field' and 'error', use those.
-        else if (firstError.field && firstError.error) {
-          errorMessage = `${firstError.field}: ${firstError.error}`;
-        }
-        // Otherwise, fall back to stringifying the first element.
-        else {
-          errorMessage = JSON.stringify(firstError);
-        }
-        console.log("Constructed message from response data:", errorMessage);
-      }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
-      }
-
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+      message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue();
     }
   }
@@ -365,7 +323,7 @@ export const getTable = createAsyncThunk(
       throw new Error("Invalid table type");
     }
     try {
-      console.log('here', table, data)
+      console.log('Get', table, data)
       const response = await apiCall(table, data);
       console.log('response', response)
       const payload = {response: response.data, table}
@@ -373,21 +331,7 @@ export const getTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      let errorMessage = "";
-
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
-      }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
-      }
-
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+      message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue();
     }
   }
@@ -448,7 +392,7 @@ export const updateTable = createAsyncThunk(
       throw new Error("Invalid table type");
     }
     try {
-      console.log('here', table, data)
+      console.log('Update', table, data)
       const response = await apiCall(table, data);
       console.log('response', response)
       const payload = {response: response.data, table}
@@ -461,45 +405,7 @@ export const updateTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      let errorMessage = "";
-
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
-      }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data) &&
-        error.response.data.length > 0
-      ) {
-        const firstError = error.response.data[0];
-        // If the first element has a 'data' key that is an array, use that:
-        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-          errorMessage = firstError.data
-            .map(err => `${err.field}: ${err.error}`)
-            .join(", ");
-        }
-        // Otherwise, if the first element itself has 'field' and 'error', use those.
-        else if (firstError.field && firstError.error) {
-          errorMessage = `${firstError.field}: ${firstError.error}`;
-        }
-        // Otherwise, fall back to stringifying the first element.
-        else {
-          errorMessage = JSON.stringify(firstError);
-        }
-        console.log("Constructed message from response data:", errorMessage);
-      }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
-      }
-
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+      message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue();
     }
   }
@@ -560,7 +466,7 @@ export const deleteTable = createAsyncThunk(
       throw new Error("Invalid table type");
     }
     try {
-      console.log('here', table, data)
+      console.log('Delete', table, data)
       const response = await apiCall(table, data);
       console.log('response', response)
       const payload = {response: response.data, table}
@@ -568,45 +474,7 @@ export const deleteTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      let errorMessage = "";
-
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
-      }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data) &&
-        error.response.data.length > 0
-      ) {
-        const firstError = error.response.data[0];
-        // If the first element has a 'data' key that is an array, use that:
-        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-          errorMessage = firstError.data
-            .map(err => `${err.field}: ${err.error}`)
-            .join(", ");
-        }
-        // Otherwise, if the first element itself has 'field' and 'error', use those.
-        else if (firstError.field && firstError.error) {
-          errorMessage = `${firstError.field}: ${firstError.error}`;
-        }
-        // Otherwise, fall back to stringifying the first element.
-        else {
-          errorMessage = JSON.stringify(firstError);
-        }
-        console.log("Constructed message from response data:", errorMessage);
-      }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
-      }
-
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+      message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue();
     }
   }
