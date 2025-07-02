@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { message } from 'antd';
-import PrivateRout from "./components/PrivateRout";
+import PrivateRout from "./components/PrivateRoute";
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import AccountService from "./services/account.service";
 

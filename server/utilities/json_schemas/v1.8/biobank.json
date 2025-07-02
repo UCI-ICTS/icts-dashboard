@@ -88,8 +88,10 @@
                 "Shipped",
                 "Received",
                 "Stored",
+                "Extracted",
                 "QC issue",
                 "Data delivered",
+                "Ready for variant analysis",
                 "Lost",
                 "Replacement requested"
             ],

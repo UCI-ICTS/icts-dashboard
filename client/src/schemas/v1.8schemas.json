@@ -2691,6 +2691,7 @@
         "type": "object",
         "required": [
             "biobank_id",
+            "participant_id",
             "collection_date",
             "specimen_type",
             "status"
@@ -2773,15 +2774,30 @@
                     "Shipped",
                     "Received",
                     "Stored",
-                    "Replacement requested",
+                    "Extracted",
+                    "QC Issue-see comments",
+                    "Ready for variant analysis",
+                    "Data Delivered",
                     "Lost",
-                    "QC Issue-see comments"
+                    "Replacement requested"
                 ],
                 "description": "Notes: See participant_sample_status table in retool"
             },
             "shipment_date": {
                 "type": "string",
                 "description": "8-digit date MM/DD/YYYY"
+            },
+            "tracking_number": {
+                "type": "string",
+                "description": "Fedex tracking number if available"
+            },
+            "test_indication": {
+                "type": "string",
+                "description": "Ambry shipping manifest requirement. Research or Clinical"
+            },
+            "requested_test": {
+                "type": "string",
+                "description": "Ambry test code. 10500 for LR-WGS. 10525 for WTS"
             },
             "child_analytes": {
                 "type": "array",
@@ -2790,9 +2806,35 @@
                     "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
                 }
             },
+            "experiments": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. experiment objects"
+                }
+            },
+            "alignments": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. alignment objects"
+                }
+            },
+            "external_id": {
+                "type": "string",
+                "description": "Ambry identifier or similar"
+            },
+            "internal_analysis": {
+                "type": "string",
+                "description": "Freetext to describe what analysis pipelines have been done on this case"
+            },
             "comments": {
                 "type": "string",
                 "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+            },
+            "completed": {
+                "type": "boolean",
+                "description": "Whether the full pipeline is complete for this sample"
             }
         }
     }

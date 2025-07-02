@@ -674,6 +674,7 @@ class Biobank(models.Model):
             ("Extracted", "Extracted"),
             ("QC issue", "QC issue, see comments"),
             ("Data delivered", "Data delivered"),
+            ("Ready for variant analysis", "Ready for variant analysis"),
             ("Lost", "Lost, see comments"),
             ("Replacement requested", "Replacement requested"),
         ],
