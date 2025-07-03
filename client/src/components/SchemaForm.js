@@ -3,6 +3,7 @@
 import React, { useEffect, useState} from "react";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { getTable, getAllTables } from "../slices/dataSlice";
 
 const { Option } = Select;
 
@@ -74,6 +75,14 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
     );
   }
 
+  if (schema.type === "boolean") {
+    return (
+      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Switch checkedChildren="Yes" unCheckedChildren="No" disabled={readOnly} />
+      </Form.Item>
+    );
+  }
+
   if (schema.type === "array") {
     if (schema.items?.enum) {
       // Render enum-based array as multi-select
@@ -132,7 +141,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
 };
 
 //  initialValues + onCancel as props
-const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open }) => {
+const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open, keyName }) => {
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
 
@@ -150,6 +159,7 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open
 
   const handleFinish = (values) => {
     onSubmit(values);
+    getTable(keyName);
   };
 
   return (

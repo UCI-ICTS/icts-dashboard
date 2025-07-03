@@ -581,7 +581,7 @@ class Biobank(models.Model):
         primary_key=True,
         help_text="Identifier for a biosample in repository",
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         "Participant",
         on_delete=models.CASCADE,
         related_name="biobank_samples",
@@ -745,4 +745,4 @@ class Biobank(models.Model):
 
     class Meta:
         verbose_name = "Biobank Sample (with traceability)"
-        ordering = ["participant", "collection_date"]
+        ordering = ["participant_id", "collection_date"]

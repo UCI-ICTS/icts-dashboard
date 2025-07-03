@@ -2702,7 +2702,7 @@
                 "type": "string",
                 "description": "primary key, printed on tubes"
             },
-            "participant": {
+            "participant_id": {
                 "type": "string",
                 "description": "printed on tube, automatically reference with participant table"
             },
