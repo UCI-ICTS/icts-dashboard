@@ -32,7 +32,7 @@ const printErrorMessages = (error) => {
     // Otherwise, if the first element itself has 'field' and 'error', use those.
     else if (firstError.field && firstError.error) {
       console.log("error.response.data[0] has its own field and error attributes")
-      errorMessage = `Error. ${firstError.field}: ${firstError.error}`;
+      errorMessage = `Error: ${firstError.field}: ${firstError.error}`;
     }
     // Otherwise, fall back to stringifying the first element.
     else {
@@ -46,9 +46,7 @@ const printErrorMessages = (error) => {
     errorMessage = "An unknown error occurred.";
     console.log("Fallback message:", errorMessage);
   }
-
-  console.log("ERROR! ", error.response.data);
-  return JSON.stringify(errorMessage);
+  return errorMessage;
 }
 
 const errorService = {

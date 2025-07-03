@@ -3,7 +3,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/participant.json",
         "title": "participant",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "participant_id",
@@ -288,7 +288,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/family.json",
         "title": "family",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "family_id",
@@ -348,7 +348,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/genetic_findings.json",
         "title": "genetic_findings",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "genetic_findings_id",
@@ -818,7 +818,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/analyte.json",
         "title": "analyte",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "analyte_id",
@@ -958,7 +958,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/phenotype.json",
         "title": "phenotype",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "participant_id",
@@ -1294,7 +1294,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment.json",
         "title": "experiment",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_id",
@@ -1342,7 +1342,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_dna_short_read.json",
         "title": "experiment_dna_short_read",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_dna_short_read_id",
@@ -1448,7 +1448,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_nanopore.json",
         "title": "experiment_nanopore",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_nanopore_id",
@@ -1579,7 +1579,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_pac_bio.json",
         "title": "experiment_pac_bio",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_pac_bio_id",
@@ -1951,7 +1951,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned.json",
         "title": "aligned",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_id",
@@ -2009,7 +2009,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_dna_short_read.json",
         "title": "aligned_dna_short_read",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_dna_short_read_id",
@@ -2114,7 +2114,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_nanopore.json",
         "title": "aligned_nanopore",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_nanopore_id",
@@ -2294,7 +2294,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_pac_bio.json",
         "title": "aligned_pac_bio",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_pac_bio_id",
@@ -2687,7 +2687,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "biobank.json",
         "title": "PMGRC_data_model_with_extensions - biobank",
-        "version": "1.7.1",
+        "version": "1.8.1",
         "type": "object",
         "required": [
             "biobank_id",

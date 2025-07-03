@@ -174,8 +174,15 @@ const getAllTables = async () => {
 }
 
 
-const getFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/family/", [
+const getFamilyTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_family_table/", {
+    headers: getAuthHeaders()
+  });
+  return response;
+}
+
+const getParticipantTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_participant_table/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -183,8 +190,8 @@ const getFamily = async (data, token) => {
   return response;
 }
 
-const getParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/participant/", [
+const getPhenotypeTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_phenotype_table/", [
     data
   ], {
     headers: getAuthHeaders()
@@ -192,128 +199,93 @@ const getParticipant = async (data, token) => {
   return response;
 }
 
-const getPhenotype = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/phenotype/", [
-    data
-  ], {
+const getAnalyteTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_analyte_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/analyte/", [
-    data
-  ], {
+const getGeneticFindingsTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_genetic_findings_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getGeneticFindings = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/genetic_findings/", [
-    data
-  ], {
+const getBiobankEntriesTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_biobank_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getBiobankEntries = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/biobank/", [
-    data
-  ], {
+const getExperimentTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_experiment_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
-    data
-  ], {
+const getExpDnaShortReadTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_experiment_dna_short_read_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getExpDnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_dna_short_read/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const getExpRnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_rna_short_read/", [
-    data
-  ], {
+const getExpRnaShortReadTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_experiment_rna_short_read_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
 
-const getExpPacBio = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_pac_bio/", [
-    data
-  ], {
+const getExpPacBioTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_experiment_pac_bio_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getExpNanopore = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_nanopore/", [
-    data
-  ], {
+const getExpNanoporeTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_experiment_nanopore_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAligned = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
-    data
-  ], {
+const getAlignedTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_aligned_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAlnDnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/aligned_dna_short_read/", [
-    data
-  ], {
+const getAlnDnaShortReadTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_aligned_dna_short_read_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAlnRnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/aligned_rna_short_read/", [
-    data
-  ], {
+const getAlnRnaShortReadTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_aligned_rna_short_read_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAlnPacBio = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/aligned_pac_bio/", [
-    data
-  ], {
+const getAlnPacBioTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_aligned_pac_bio_table/", {
     headers: getAuthHeaders()
   });
   return response;
 }
 
-const getAlnNanopore = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/aligned_nanopore/", [
-    data
-  ], {
+const getAlnNanoporeTable = async (data, token) => {
+  const response = await axios.post(APIDB + "api/search/get_aligned_nanopore_table/", {
     headers: getAuthHeaders()
   });
   return response;
@@ -632,24 +604,24 @@ const dataService = {
 
   getAllTables,
 
-  getFamily,
-  getParticipant,
-  getPhenotype,
-  getAnalyte,
-  getGeneticFindings,
-  getBiobankEntries,
+  getFamilyTable,
+  getParticipantTable,
+  getPhenotypeTable,
+  getAnalyteTable,
+  getGeneticFindingsTable,
+  getBiobankEntriesTable,
 
-  getExperiment,
-  getExpDnaShortRead,
-  getExpRnaShortRead,
-  getExpPacBio,
-  getExpNanopore,
+  getExperimentTable,
+  getExpDnaShortReadTable,
+  getExpRnaShortReadTable,
+  getExpPacBioTable,
+  getExpNanoporeTable,
 
-  getAligned,
-  getAlnDnaShortRead,
-  getAlnRnaShortRead,
-  getAlnPacBio,
-  getAlnNanopore,
+  getAlignedTable,
+  getAlnDnaShortReadTable,
+  getAlnRnaShortReadTable,
+  getAlnPacBioTable,
+  getAlnNanoporeTable,
 
   updateFamily,
   updateParticipant,

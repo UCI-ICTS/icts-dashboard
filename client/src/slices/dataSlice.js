@@ -250,7 +250,7 @@ export const addTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      message.error(errorService.printErrorMessages(error));
+      message.error(`${errorService.printErrorMessages(error)}`);
       return thunkAPI.rejectWithValue();
     }
   }
@@ -270,61 +270,61 @@ export const getAllTables = createAsyncThunk(
 
 export const getTable = createAsyncThunk(
   "getTable",
-  async ({table, data}, thunkAPI) => {
-    const apiCall = (table, data) => {
-      if (table === "families") {
-        return dataService.getFamily(data);
+  async ({table}, thunkAPI) => {
+    const apiCall = (table) => {
+      if (table === "family_id") {
+        return dataService.getFamilyTable();
       }
-      if (table === "participants") {
-        return dataService.getParticipant(data);
+      if (table === "participant_id") {
+        return dataService.getParticipantTable();
       }
-      if (table === "phenotypes") {
-        return dataService.getPhenotype(data);
+      if (table === "phenotype_id") {
+        return dataService.getPhenotypeTable();
       }
-      if (table === "analytes") {
-        return dataService.getAnalyte(data);
+      if (table === "analyte_id") {
+        return dataService.getAnalyteTable();
       }
-      if (table === "genetic_findings") {
-        return dataService.getGeneticFindings(data);
+      if (table === "genetic_findings_id") {
+        return dataService.getGeneticFindingsTable();
       }
-      if (table === "biobank_entries") {
-        return dataService.getBiobankEntries(data);
+      if (table === "biobank_id") {
+        return dataService.getBiobankEntriesTable();
       }
       if (table === "experiment_id") {
-        return dataService.getExperiment(data);
+        return dataService.getExperimentTable();
       }
       if (table === "experiment_dna_short_read_id") {
-        return dataService.getExpDnaShortRead(data);
+        return dataService.getExpDnaShortReadTable();
       }
       if (table === "experiment_rna_short_read_id") {
-        return dataService.getExpRnaShortRead(data);
+        return dataService.getExpRnaShortReadTable();
       }
       if (table === "experiment_pac_bio_id") {
-        return dataService.getExpPacBio(data);
+        return dataService.getExpPacBioTable();
       }
       if (table === "experiment_nanopore_id") {
-        return dataService.getExpNanopore(data);
+        return dataService.getExpNanoporeTable();
       }
       if (table === "aligned_id") {
-        return dataService.getAligned(data);
+        return dataService.getAlignedTable();
       }
       if (table === "aligned_dna_short_read_id") {
-        return dataService.getAlnDnaShortRead(data);
+        return dataService.getAlnDnaShortReadTable();
       }
       if (table === "aligned_rna_short_read_id") {
-        return dataService.getAlnRnaShortRead(data);
+        return dataService.getAlnRnaShortReadTable();
       }
       if (table === "aligned_pac_bio_id") {
-        return dataService.getAlnPacBio(data);
+        return dataService.getAlnPacBioTable();
       }
       if (table === "aligned_nanopore_id") {
-        return dataService.getAlnNanopore(data);
+        return dataService.getAlnNanoporeTable();
       }
       throw new Error("Invalid table type");
     }
     try {
-      console.log('Get', table, data)
-      const response = await apiCall(table, data);
+      console.log('Get', table)
+      const response = await apiCall(table);
       console.log('response', response)
       const payload = {response: response.data, table}
       message.success(`${payload.table} ${response.data[0].identifier} retrieved successfuly`);

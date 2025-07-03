@@ -319,10 +319,22 @@ class GeneticFindings(models.Model):
     )
     pos = models.IntegerField(help_text="Start position of the variant")
     pos_end = models.IntegerField(blank=True, null=True, help_text="End position of SV")
-    ref = models.CharField(max_length=255, help_text="Reference allele of the variant")
-    alt = models.CharField(max_length=255, help_text="Alternate allele of the variant")
+    ref = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Reference allele of the variant"
+    )
+    alt = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Alternate allele of the variant"
+    )
     copy_number = models.IntegerField(
-        blank=True, null=True, help_text="CNV copy number"
+        blank=True,
+        null=True,
+        help_text="CNV copy number"
     )
     ClinGen_allele_ID = models.CharField(
         max_length=255,
@@ -359,6 +371,7 @@ class GeneticFindings(models.Model):
     )
     variant_inheritance = models.CharField(
         max_length=50,
+        blank=True,
         choices=VariantInheritance.choices,
         help_text="Detection of variant in parents",
     )
