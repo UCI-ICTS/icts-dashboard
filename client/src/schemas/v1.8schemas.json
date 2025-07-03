@@ -2463,6 +2463,10 @@
                 "examples": [
                     true
                 ]
+            },
+            "quality_issues": {
+                "type": "string",
+                "description": "describe if there are any QC issues that would be important to note"
             }
         }
     },
