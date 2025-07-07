@@ -2,7 +2,7 @@
 import dataService from "../services/data.service";
 import { combineSlices, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { message } from "antd";
-import { useSelector } from "react-redux";
+import { getCollectionName, getTableName } from "../utils/tableNameMap";
 
 const initialState = {
   tableView: "participants",
@@ -102,7 +102,7 @@ export const dataSlice = createSlice({
           // Extract the identifier value dynamically using the table name
           const identifier = updatedObject[table];
           // Dynamically determine the collection to update based on the table name
-          const collectionName = table === "participants" ? "participants" :
+          const collectionName = table === "participants" ? "participant" :
                                  table === "families" ? "families" :
                                  table === "genetic_findings" ? "genetic_findings" :
                                  table === "analyte" ? "analytes" :
@@ -181,10 +181,31 @@ export const dataSlice = createSlice({
       })
       .addCase(addTable.rejected, (state, action) => {
         state.status = "rejected";
-      });
+      })
+      .addCase(deleteEntry.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+
+        const { table, idList } = action.meta.arg;
+
+        // Normalize idList in case it's a single ID or an array of IDs
+        const idsToRemove = Array.isArray(idList) ? idList : [idList];
+        const stateTable = getTableName(table)
+        console.log("Before delete:", table, stateTable, idList, );
+        if (state[stateTable]) {
+          state[stateTable] = state[stateTable].filter(
+            (entry) => !idsToRemove.includes(entry[`${table}_id`])
+          );
+        }
+        console.log(action.meta.arg)
+      })
+      .addCase(deleteEntry.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(deleteEntry.rejected, (state, action) => {
+        state.status = "rejected";
+      })
   }
 });
-
 
 export const getAllTables = createAsyncThunk(
   "getAllTables",
@@ -237,12 +258,11 @@ export const addTable = createAsyncThunk(
       throw new Error("Invalid table type");
     }
     try {
-      console.log('herwe', table, data)
       const response = await apiCall(table, data);
-      console.log('repsonse', response)
       const payload = {response: response.data, table}
       if (response.data[0].message.includes("had no changes.")) {
         message.info(`${payload.table} ${response.data[0].identifier} had no changes`);
+
         // Return a payload with a flag indicating no change
         return { response: [], table, noChanges: true };
       }
@@ -298,43 +318,9 @@ export const addTable = createAsyncThunk(
 export const updateTable = createAsyncThunk(
   "updateTable",
   async ({table, data}, thunkAPI) => {
-    const apiCall = (table, data) => {
-      if (table === "participants") {
-        return dataService.updateParticipant(data);
-      }
-      if (table === "families") {
-        return dataService.updateFamily(data);
-      }
-      if (table === "genetic_findings") {
-        return dataService.updateGeneticFindings(data);
-      }
-      if (table === "analytes") {
-        return dataService.updateAnalyte(data);
-      }
-      if (table === "biobank_entries") {
-        return dataService.updateBiobankEntries(data);
-      }
-      if (table === "phenotypes") {
-        return dataService.updatePhenotype(data);
-      }
-      if (table === "experiment_dna_short_read_id") {
-        console.log("stuff")
-        return dataService.updateDnaShortRead(data);
-      }
-      if (table === "experiment_rna_short_read_id") {
-        return dataService.updateRnaShortRead(data);
-      }
-      if (table === "experiment_pac_bio_id") {
-        return dataService.updatePacBio(data);
-      }
-      if (table === "experiment_nanopore_id") {
-        return dataService.updateNanoPore(data);
-      }
-      throw new Error("Invalid table type");
-    }
     try {
       console.log('herwe', table, data)
-      const response = await apiCall(table, data);
+      const response = await dataService.updateEntry(table, data);
       console.log('repsonse', response)
       const payload = {response: response.data, table}
       if (response.data[0].message.includes("had no changes.")) {
@@ -387,9 +373,15 @@ export const updateTable = createAsyncThunk(
       message.error(errorMessage);
       return thunkAPI.rejectWithValue();
     }
-
   }
 )
+
+export const deleteEntry = createAsyncThunk(
+  "deleteEntry",
+  async ({table, idList}, thunkAPI) => {
+    const response = await dataService.deleteEntry(table, idList)
+    console.log("slice", response)
+  });
 
 export const {
   setJsonData,

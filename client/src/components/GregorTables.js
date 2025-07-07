@@ -14,6 +14,7 @@ import "../App.css";
 
 const GregorTables = () => {
   const dispatch = useDispatch();
+  const isAdmin = useSelector(state => state.account.user.is_superuser)
   const tableView = useSelector(state => state.data['tableView']);
   const tableData = useSelector(state => state.data[tableView]) || [];
   const dataStatus = useSelector(state => state.data.status);
@@ -25,7 +26,7 @@ const GregorTables = () => {
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [form] = Form.useForm();
-  const [editRecord, setEditRecord] = useState(null);
+  const [entry, setEntry] = useState(null);
   const [useRegex, setUseRegex] = useState(false);
   const [regexError, setRegexError] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -36,10 +37,29 @@ const GregorTables = () => {
     }, {});
   });
 
+  const defaultVisibleColumns = {
+    participants: ["participant_id", "proband_relationship", "family_id", "date_of_birth", "phenotype_description"],
+    genetic_findings: ["genetic_findings_id", "participant_id", "variant_type"],
+    analytes: ["analyte_id", "participant_id", "analyte_type"],
+    families: ["family_id", "consanguinity", "family_history_detail"],
+    biobank_entries: ["biobank_id", "participant", "current_location", "status"],
+    phenotypes: ["participant_id", "term_id", "ontology", "additional_details"],
+    experiment_dna_short_read: ["experiment_dna_short_read_id", "analyte_id", "experiment_sample_id"],
+    experiment_rna_short_read: ["experiment_rna_short_read_id","analyte_id", "experiment_sample_id"],
+    experiment_pac_bio: ["experiment_pac_bio_id", "analyte_id", "experiment_sample_id"],
+    experiment_nanopore: ["experiment_nanopore_id", "analyte_id", "experiment_sample_id"],
+    aligned_dna_short_read: ["aligned_dna_short_read_id"],
+    aligned_nanopore: ["aligned_nanopore_id"],
+    aligned_pac_bio: ["aligned_pac_bio_id"],
+    aligned_rna_short_read: ["aligned_rna_short_read_id"],
+    // Add more table types and their default columns as needed
+  };
+
   useEffect(() => {
+    const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {
-        acc[key] = true;
+        acc[key] = defaultColumns.length > 0 ? defaultColumns.includes(key) : true;
         return acc;
       }, {});
     });
@@ -56,80 +76,60 @@ const GregorTables = () => {
   };
 
   // Generate table columns dynamically
-    const baseColumns = useMemo(() => {
-      return Object.entries(schema.properties)
-        .filter(([key]) => visibleColumns[key])
-        .map(([key, value]) => ({
-          title: value.label || key,
-          dataIndex: key,
-          key,
-          width: (key.length * 10),
-          sorter: (a, b) => {
-            const valA = a[key] !== undefined && a[key] !== null ? String(a[key]) : "";
-            const valB = b[key] !== undefined && b[key] !== null ? String(b[key]) : "";
-            return valA.localeCompare(valB, undefined, { numeric: true });
-          },
-          render: (text) => text || "-",
-          onHeaderCell: () => ({}),
-        }));
-    }, [schema, visibleColumns]);
+  const baseColumns = useMemo(() => {
+    return Object.entries(schema.properties)
+      .filter(([key]) => visibleColumns[key])
+      .map(([key, value]) => ({
+        title: value.label || key,
+        dataIndex: key,
+        key,
+        width: (key.length * 10),
+        sorter: (a, b) => {
+          const valA = a[key] !== undefined && a[key] !== null ? String(a[key]) : "";
+          const valB = b[key] !== undefined && b[key] !== null ? String(b[key]) : "";
+          return valA.localeCompare(valB, undefined, { numeric: true });
+        },
+        render: (text) => text || "-",
+        onHeaderCell: () => ({}),
+      }));
+  }, [schema, visibleColumns]);
 
-    // add actions to rows
-    const columns = useMemo(() => [
-      {
-        title: "Actions",
-        key: "actions",
-        width: 100, // or 80, depending on your font size
-        fixed: "left", // optional: keeps it pinned on horizontal scroll
-        align: "center", // or "left" if you prefer
-        render: (text, record) => (
-          <Button
-            type="link"
-            onClick={() => {
-              setEditRecord(record);
-              setAddModalVisible(true);
-            }}
-            style={{ padding: 0 }} // optional: remove extra space
-          >
-            Edit
-          </Button>
-        ),
-      },
-      ...baseColumns,
-    ], [baseColumns]);
+  // add actions to rows
+  const columns = useMemo(() => [
+    ...baseColumns,
+  ], [baseColumns]);
 
-    // Data filtering for search, advanced search, regex search, and download.
-    const filteredData = useMemo(() => {
-      let data = [...tableData];
-
-      if (searchQuery.trim()) {
-        data = data.filter((row) => {
-          return Object.values(row).some((value) => {
-            const strVal = String(value || "");
-            if (useRegex) {
-              try {
-                const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
-                setRegexError(null); // Clear previous errors
-                return regex.test(strVal);
-              } catch (err) {
-                setRegexError("Invalid regular expression");
-                return false; // Invalid regex
-              }
+  // Data filtering for search, advanced search, regex search, and download.
+  const filteredData = useMemo(() => {
+    let data = [...tableData];
+    if (searchQuery.trim()) {
+      data = data.filter((row) => {
+        return Object.values(row).some((value) => {
+          const strVal = String(value || "");
+          if (useRegex) {
+            try {
+              const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
+              setRegexError(null); // Clear previous errors
+              return regex.test(strVal);
+            } catch (err) {
+              setRegexError("Invalid regular expression");
+              return false; // Invalid regex
             }
-            setRegexError(null);
-            return strVal.toLowerCase().includes(searchQuery.toLowerCase());
-          });
+          }
+          setRegexError(null);
+          return strVal.toLowerCase().includes(searchQuery.toLowerCase());
         });
-      }
-      if (advancedFilters && Object.keys(advancedFilters).length > 0) {
-        data = data.filter((row) =>
-          Object.entries(advancedFilters).every(([key, value]) =>
-            value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
-          )
-        );
-      }
-      return data;
-    }, [tableData, searchQuery, advancedFilters, useRegex]);
+      });
+    }
+    if (advancedFilters && Object.keys(advancedFilters).length > 0) {
+      data = data.filter((row) =>
+        Object.entries(advancedFilters).every(([key, value]) =>
+          value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
+        )
+      );
+    }
+    return data;
+  }, [tableData, searchQuery, advancedFilters, useRegex]);
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -144,95 +144,94 @@ const GregorTables = () => {
     ),
   }));
 
-
   return (
     <>
-    <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title="Fetch or refresh the table data">
-          <Button
-            onClick={() => dispatch(getAllTables())}
-            type="primary"
-          >
-            Fetch/Refresh data
-          </Button>
-        </Tooltip>
-      </Col>
-      <Col />
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title={`Add a new ${tableView} entry`}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setEditRecord(null);
-              form.resetFields();
-              setAddModalVisible(true);
-            }}
-          >
-            Add Row
-          </Button>
-        </Tooltip>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title="Download results in TSV or CSV">
-          <DownloadTSVButton
-            rows={filteredData}
-            rowID={rowID}
-            headCells={columns.map(col => ({
-              headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
-              field: col.dataIndex
-            }))}
-          />
-        </Tooltip>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Tooltip title="Select GREGoR table">
-          <Typography.Text strong>Select Table</Typography.Text>
-          <TableSelector />
-        </Tooltip>
-      </Col>
-    </Row>
-    <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="Search all fields"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: "100%",
-            maxWidth: 300,
-            borderColor: useRegex && regexError ? "red" : undefined,
-          }}
-          status={useRegex && regexError ? "error" : undefined}
-        />
-      </Col>
-      {useRegex && regexError && (
-        <Col xs={24}>
-          <Typography.Text type="danger">{regexError}</Typography.Text>
+      <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+          <Tooltip title="Fetch or refresh the table data">
+            <Button
+              onClick={() => dispatch(getAllTables())}
+              type="primary"
+            >
+              Fetch/Refresh data
+            </Button>
+          </Tooltip>
         </Col>
-      )}
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Typography.Text strong>{filteredData.length} Records</Typography.Text>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Tooltip title="Advanced Filters">
-          <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
-          Advanced Filters
-          </Button>
-        </Tooltip>
-      </Col>
+        <Col />
+        <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+          <Tooltip title={`Add a new ${tableView} entry`}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setEntry(null);
+                form.resetFields();
+                setAddModalVisible(true);
+              }}
+            >
+              Add Row
+            </Button>
+          </Tooltip>
+        </Col>
+        <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+          <Tooltip title="Download results in TSV or CSV">
+            <DownloadTSVButton
+              rows={filteredData}
+              rowID={rowID}
+              headCells={columns.map(col => ({
+                headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
+                field: col.dataIndex
+              }))}
+            />
+          </Tooltip>
+        </Col>
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Tooltip title="Select GREGoR table">
+            <Typography.Text strong>Select Table</Typography.Text>
+            <TableSelector />
+          </Tooltip>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
+        </Col>
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder="Search all fields"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              maxWidth: 300,
+              borderColor: useRegex && regexError ? "red" : undefined,
+            }}
+            status={useRegex && regexError ? "error" : undefined}
+          />
+        </Col>
+        {useRegex && regexError && (
+          <Col xs={24}>
+            <Typography.Text type="danger">{regexError}</Typography.Text>
+          </Col>
+        )}
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Typography.Text strong>{filteredData.length} Records</Typography.Text>
+        </Col>
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Tooltip title="Advanced Filters">
+            <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
+            Advanced Filters
+            </Button>
+          </Tooltip>
+        </Col>
 
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
-          <Button icon={<SettingOutlined />}>Columns</Button>
-        </Dropdown>
-      </Col>
-    </Row>
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
+            <Button icon={<SettingOutlined />}>Columns</Button>
+          </Dropdown>
+        </Col>
+      </Row>
 
       {dataStatus === "loading" ? (
         <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: "20px" }}>
@@ -243,6 +242,12 @@ const GregorTables = () => {
       ) : (
         <Table
           columns={columns}
+          onRow={(record) => ({
+            onClick: () => {
+              setEntry(record);
+              setAddModalVisible(true);
+            },
+          })}
           dataSource={filteredData}
           scroll={{ x: 1500, y: "calc(100vh - 250px)" }} // <-- Ensures layout even with no rows
           locale={{ emptyText: "No records match your filters or search." }}
@@ -260,7 +265,11 @@ const GregorTables = () => {
         />
       )}
       <Modal
-        title={editRecord ? `Edit ${tableView}` : `Add New ${tableView}`}
+        title={entry ? (
+          `Edit ${tableView}`
+        ) : (
+          `Add New ${tableView}`
+        )}
         open={addModalVisible}
         onCancel={() => {
           form.resetFields();
@@ -270,43 +279,16 @@ const GregorTables = () => {
         width={800}
       >
         <SchemaForm
+          isAdmin={isAdmin}
           form={form}
           schema={schemas[tableView]}
-          initialValues={editRecord || {}}
           open={addModalVisible}
-          onSubmit={async (values) => {
-            try {
-              let result;
-
-              if (editRecord) {
-                result = await dispatch(updateTable({ table: tableView, data: values }));
-                console.log("Editing row:", tableView, values);
-              } else {
-                result = await dispatch(addTable({ table: tableView, data: values }));
-                console.log("Creating new row:", tableView, values);
-              }
-
-              // Only close the form if the action was fulfilled
-              if (result.meta.requestStatus === "fulfilled") {
-                setAddModalVisible(false);
-                setEditRecord(null);
-                form.resetFields();
-              } else {
-                console.warn("Form submission failed", result);
-                // Optionally show an error message here
-              }
-            } catch (error) {
-              console.error("Error during form submission:", error);
-              // Optionally handle errors more gracefully
-            }
-          }}
-          onCancel={() => {
-            form.resetFields();
-            setAddModalVisible(false);
-            setEditRecord(null);
-          }}
+          initialValues={entry || {}}
+          setAddModalVisible={setAddModalVisible}
+          setEntry={setEntry}
         />
       </Modal>
+
       <Modal
         title="Advanced Filters"
         open={filterModalVisible}
