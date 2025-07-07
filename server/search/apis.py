@@ -21,7 +21,7 @@ from metadata.models import (
     GeneticFindings,
     Phenotype,
     Analyte,
-    Biobank
+    Biobank,
 )
 
 from metadata.services import (
@@ -31,7 +31,7 @@ from metadata.services import (
     GeneticFindingsSerializer,
     AnalyteSerializer,
     PhenotypeSerializer,
-    BiobankSerializer
+    BiobankSerializer,
 )
 
 from experiments.models import (
@@ -44,7 +44,7 @@ from experiments.models import (
     ExperimentDNAShortRead,
     ExperimentPacBio,
     ExperimentNanopore,
-    ExperimentRNAShortRead
+    ExperimentRNAShortRead,
 )
 
 from experiments.services import (
@@ -54,14 +54,16 @@ from experiments.services import (
     AlignedPacBioSerializer,
     AlignedRNASerializer,
     ExperimentSerializer,
-    ExperimentShortReadSerializer,
+    ExperimentDNAOutputSerializer,
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
-    ExperimentRNAOutputSerializer
+    ExperimentRNAOutputSerializer,
 )
+
 
 class GetAllTablesAPI(APIView):
     """"""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -73,17 +75,24 @@ class GetAllTablesAPI(APIView):
         },
         tags=["Search"],
     )
-
     def get(self, request):
         response_data = []
         try:
             # Metadata Models
-            serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
+            serialized_participants = ParticipantOutputSerializer(
+                Participant.objects.all(), many=True
+            )
             serialized_families = FamilySerializer(Family.objects.all(), many=True)
             serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
-            serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
-            serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
-            serialized_biobank_entries = BiobankSerializer(Biobank.objects.all(), many=True)
+            serialized_phenotypes = PhenotypeSerializer(
+                Phenotype.objects.all(), many=True
+            )
+            serialized_genetic_findings = GeneticFindingsSerializer(
+                GeneticFindings.objects.all(), many=True
+            )
+            serialized_biobank_entries = BiobankSerializer(
+                Biobank.objects.all(), many=True
+            )
 
             # Experiment Models
             serialized_aligned_experiments = AlignedSerializer(
@@ -101,198 +110,42 @@ class GetAllTablesAPI(APIView):
             serialized_aligned_rna = AlignedRNASerializer(
                 AlignedRNAShortRead.objects.all(), many=True
             )
-            serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
-            serialized_dna = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
-            serialized_rna = ExperimentRNAOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
-            serialized_pacbio = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
-            serialized_nanopore = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
-
+            serialized_experiments = ExperimentSerializer(
+                Experiment.objects.all(), many=True
+            )
+            serialized_dna = ExperimentDNAOutputSerializer(
+                ExperimentDNAShortRead.objects.all(), many=True
+            )
+            serialized_nanopore = ExperimentNanoporeSerializer(
+                ExperimentNanopore.objects.all(), many=True
+            )
+            serialized_pacbio = ExperimentPacBioSerializer(
+                ExperimentPacBio.objects.all(), many=True
+            )
+            serialized_rna = ExperimentRNAOutputSerializer(
+                ExperimentRNAShortRead.objects.all(), many=True
+            )
 
             serilized_return_data = {
                 # Metadata Tables
-                'families': serialized_families.data,
-                'participants': serialized_participants.data,
-                'phenotypes': serialized_phenotypes.data,
-                'analytes': serialized_analytes.data,
-                'genetic_findings': serialized_genetic_findings.data,
-                'biobank_entries': serialized_biobank_entries.data,
+                "participants": serialized_participants.data,
+                "families": serialized_families.data,
+                "genetic_findings": serialized_genetic_findings.data,
+                "analytes": serialized_analytes.data,
+                "phenotypes": serialized_phenotypes.data,
+                "biobank_entries": serialized_biobank_entries.data,
                 # Experiment Tables
-                'experiments': serialized_experiments.data,
-                'experiment_dna_short_read' : serialized_dna.data,
-                'experiment_rna_short_read': serialized_rna.data,
-                'experiment_pac_bio': serialized_pacbio.data,
-                'experiment_nanopore': serialized_nanopore.data,
+                "experiments": serialized_experiments.data,
+                "experiment_dna_short_read": serialized_dna.data,
+                "experiment_nanopore": serialized_nanopore.data,
+                "experiment_pac_bio": serialized_pacbio.data,
+                "experiment_rna_short_read": serialized_rna.data,
                 # Aligned tables
-                'aligned': serialized_aligned_experiments.data,
-                'aligned_dna_short_read': serialized_aligned_dna.data,
-                'aligned_rna_short_read': serialized_aligned_rna.data,
-                'aligned_pac_bio': serialized_aligned_pacbio.data,
-                'aligned_nanopore': serialized_aligned_nanopore.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-
-# Metadata Tables
-class GetFamilyTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_family_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_families = FamilySerializer(Family.objects.all(), many=True)
-
-            serilized_return_data = {
-                'families': serialized_families.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class GetParticipantTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_participant_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_participants = ParticipantOutputSerializer(Participant.objects.all(), many=True)
-
-            serilized_return_data = {
-                'participants': serialized_participants.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class GetPhenotypeTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_phenotype_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.all(), many=True)
-
-            serilized_return_data = {
-                'phenotypes': serialized_phenotypes.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class GetGeneticFindingsTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_genetic_findings_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.all(), many=True)
-
-            serilized_return_data = {
-                'genetic_findings': serialized_genetic_findings.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-class GetBiobankTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_biobank_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_biobank_entries = BiobankSerializer(Biobank.objects.all(), many=True)
-
-            serilized_return_data = {
-                'biobank_entries': serialized_biobank_entries.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
-        except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-# Experiments Tables
-class GetExperimentTableAPI(APIView):
-    """"""
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_id="get_experiment_table",
-        responses={
-            200: "Submission successfull",
-            400: "Bad request",
-        },
-        tags=["Search"],
-    )
-
-    def get(self, request):
-        response_data = []
-        try:
-            serialized_experiments = ExperimentSerializer(Experiment.objects.all(), many=True)
-
-            serilized_return_data = {
-                'experiments': serialized_experiments.data
+                "aligned": serialized_aligned_experiments.data,
+                "aligned_dna_short_read": serialized_aligned_dna.data,
+                "aligned_nanopore": serialized_aligned_nanopore.data,
+                "aligned_pac_bio": serialized_aligned_pacbio.data,
+                "aligned_rna_short_read": serialized_aligned_rna.data,
             }
             return Response(status=status.HTTP_200_OK, data=serilized_return_data)
         except Exception as error:
@@ -573,8 +426,10 @@ class GetAlignedNanoporeTableAPI(APIView):
 
 class DownloadTablesAPI(APIView):
     """AnVIL upload table generation."""
+
     authentication_classes = [TokenAuthentication]
     permission_classes = (IsAuthenticated,)
+
     @swagger_auto_schema(
         operation_id="get_anvil_tables",
         responses={
@@ -586,8 +441,8 @@ class DownloadTablesAPI(APIView):
     def get(self, request):
         zip_buffer = get_anvil_tables()
 
-        response = HttpResponse(zip_buffer, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="data.zip"'
+        response = HttpResponse(zip_buffer, content_type="application/zip")
+        response["Content-Disposition"] = 'attachment; filename="data.zip"'
 
         return response
 
@@ -612,7 +467,7 @@ class SearchTablesAPI(APIView):
     @swagger_auto_schema(
         manual_parameters=[model_name_param, slow_client_param],
         responses={200: "JSON response of model data"},
-        auto_schema=None
+        auto_schema=None,
     )
     def get(self, request, model_name):
         try:

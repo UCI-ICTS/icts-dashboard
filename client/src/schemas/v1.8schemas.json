@@ -2690,8 +2690,8 @@
     "biobank_entries": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "biobank.json",
-        "title": "PMGRC_data_model_with_extensions - biobank",
-        "version": "1.8.1",
+        "title": "biobank",
+        "version": "1.7.1",
         "type": "object",
         "required": [
             "biobank_id",
