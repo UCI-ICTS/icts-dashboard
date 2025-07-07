@@ -1535,7 +1535,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-1",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -1571,7 +1571,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-2",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
@@ -1607,7 +1607,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-3",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "UCSC",
@@ -1643,7 +1643,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-OG-1",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-09-18",
       "specimen_type": "OG",
       "current_location": "UCI",
@@ -1675,7 +1675,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-R-1",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -1711,7 +1711,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-X-1",
     "fields": {
-      "participant": "GREGoR_test-001-001-0",
+      "participant_id": "GREGoR_test-001-001-0",
       "collection_date": "2022-09-25",
       "specimen_type": "SC",
       "current_location": "UCI",
@@ -1744,7 +1744,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-D-1",
     "fields": {
-      "participant": "GREGoR_test-002-001-2",
+      "participant_id": "GREGoR_test-002-001-2",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -1780,7 +1780,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-D-2",
     "fields": {
-      "participant": "GREGoR_test-002-001-2",
+      "participant_id": "GREGoR_test-002-001-2",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
@@ -1816,7 +1816,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-R-1",
     "fields": {
-      "participant": "GREGoR_test-002-001-2",
+      "participant_id": "GREGoR_test-002-001-2",
       "collection_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -1848,7 +1848,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-D-1",
     "fields": {
-      "participant": "GREGoR_test-003-001-1",
+      "participant_id": "GREGoR_test-003-001-1",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -1884,7 +1884,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-D-2",
     "fields": {
-      "participant": "GREGoR_test-003-001-1",
+      "participant_id": "GREGoR_test-003-001-1",
       "collection_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
@@ -1920,7 +1920,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-R-1",
     "fields": {
-      "participant": "GREGoR_test-003-001-1",
+      "participant_id": "GREGoR_test-003-001-1",
       "collection_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -1952,7 +1952,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-D-1",
     "fields": {
-      "participant": "GREGoR_test-004-004-0",
+      "participant_id": "GREGoR_test-004-004-0",
       "collection_date": "2022-07-03",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -1988,7 +1988,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-D-3",
     "fields": {
-      "participant": "GREGoR_test-004-004-0",
+      "participant_id": "GREGoR_test-004-004-0",
       "collection_date": "2022-05-03",
       "specimen_type": "D",
       "current_location": "UCSC",
@@ -2024,7 +2024,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-R-1",
     "fields": {
-      "participant": "GREGoR_test-004-004-0",
+      "participant_id": "GREGoR_test-004-004-0",
       "collection_date": "2022-05-03",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -2056,7 +2056,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-005-004-2-D-1",
     "fields": {
-      "participant": "GREGoR_test-005-004-2",
+      "participant_id": "GREGoR_test-005-004-2",
       "collection_date": "2022-07-03",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -2092,7 +2092,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-005-004-2-R-1",
     "fields": {
-      "participant": "GREGoR_test-005-004-2",
+      "participant_id": "GREGoR_test-005-004-2",
       "collection_date": "2022-05-03",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -2124,7 +2124,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-D-1",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-11",
       "specimen_type": "D",
       "current_location": "Invitae",
@@ -2160,7 +2160,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-D-3",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-05-03",
       "specimen_type": "D",
       "current_location": "UCSC",
@@ -2196,7 +2196,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-R-1",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-11",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -2228,7 +2228,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-R-2",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-11",
       "specimen_type": "R",
       "current_location": "UCI",
@@ -2260,7 +2260,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-SC-1",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
@@ -2292,7 +2292,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-SC-2",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
@@ -2324,7 +2324,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-X-1",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
@@ -2358,7 +2358,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-XR-1",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-18",
       "specimen_type": "XR",
       "current_location": "UCI",
@@ -2391,7 +2391,7 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-XR-2",
     "fields": {
-      "participant": "GREGoR_test-006-006-0",
+      "participant_id": "GREGoR_test-006-006-0",
       "collection_date": "2022-09-18",
       "specimen_type": "XR",
       "current_location": "UCI",
