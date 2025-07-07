@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { store } from "../store";
+import api from "../api";
 
 
 const APIDB = process.env.REACT_APP_APIDB;
@@ -27,114 +28,6 @@ const getAllTables = async () => {
   return response;
 };
 
-const updateParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/participant/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const updateFamily = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/family/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateGeneticFindings = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/genetic_findings/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/analyte/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateBiobankEntries = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/biobank/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updatePhenotype = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/phenotype/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateDnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_dna_short_read/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateRnaShortRead = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment_rna_short_read/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updatePacBio = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/pac_bio/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-
-const updateNanoPore = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/nanopore/update/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
 const createParticipant = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/participant/create/", [
     data
@@ -153,7 +46,6 @@ const createFamily = async (data, token) => {
   return response;
 }
 
-
 const createGeneticFindings = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/genetic_findings/create/", [
     data
@@ -162,7 +54,6 @@ const createGeneticFindings = async (data, token) => {
   });
   return response;
 }
-
 
 const createAnalyte = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/analyte/create/", [
@@ -173,7 +64,6 @@ const createAnalyte = async (data, token) => {
   return response;
 }
 
-
 const createBiobankEntries = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/biobank/create/", [
     data
@@ -182,7 +72,6 @@ const createBiobankEntries = async (data, token) => {
   });
   return response;
 }
-
 
 const createPhenotype = async (data, token) => {
   const response = await axios.post(APIDB + "api/metadata/phenotype/create/", [
@@ -193,7 +82,6 @@ const createPhenotype = async (data, token) => {
   return response;
 }
 
-
 const createExperiment = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/submit_experiment/", [
     data
@@ -202,7 +90,6 @@ const createExperiment = async (data, token) => {
   });
   return response;
 }
-
 
 const createDnaShortRead = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/experiment_dna_short_read/create/", [
@@ -213,7 +100,6 @@ const createDnaShortRead = async (data, token) => {
   return response;
 }
 
-
 const createRnaShortRead = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/experiment_rna_short_read/create/", [
     data
@@ -222,7 +108,6 @@ const createRnaShortRead = async (data, token) => {
   });
   return response;
 }
-
 
 const createPacBio = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/pac_bio/create/", [
@@ -233,7 +118,6 @@ const createPacBio = async (data, token) => {
   return response;
 }
 
-
 const createNanoPore = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/nanopore/create/", [
     data
@@ -243,18 +127,40 @@ const createNanoPore = async (data, token) => {
   return response;
 }
 
+const updateEntry = async (table, data) => {
+  const metadata = ["participant", "family", "genetic_findings", "analyte", "biobank", "phenotype"]
+
+  if (metadata.includes(table)) {
+    const response = await axios.post(APIDB + `api/metadata/${table}/update/`, [data], {headers: getAuthHeaders()})
+    console.log("response: ", response)
+    return response
+  } else {
+    const response = await axios.post(APIDB + `api/experiments/${table}/update/`, [data], {headers: getAuthHeaders()})
+    console.log("response: ", response)
+    return response
+  }
+}
+
+
+const deleteEntry = async (table, idList) => {
+  const metadata = ["participant", "family", "genetic_findings", "analyte", "biobank", "phenotype"]
+
+  if (metadata.includes(table)) {
+    const response = await axios.delete(APIDB + `api/metadata/${table}/delete/?ids=${idList}`, {
+      headers: getAuthHeaders()
+    })
+    console.log("response: ", response)
+    return response
+  } else {
+    const response = await axios.delete(APIDB + `api/experiments/${table}/delete/?ids=${idList}`, {
+      headers: getAuthHeaders()
+    })
+    console.log("response: ", response)
+    return response
+  }
+}
+
 const dataService = {
-  updateNanoPore,
-  updatePacBio,
-  updateRnaShortRead,
-  updateDnaShortRead,
-  updateExperiment,
-  updatePhenotype,
-  updateBiobankEntries,
-  updateAnalyte,
-  updateGeneticFindings,
-  updateFamily,
-  updateParticipant,
   createAnalyte,
   createBiobankEntries,
   createDnaShortRead,
@@ -266,6 +172,8 @@ const dataService = {
   createParticipant,
   createPhenotype,
   createRnaShortRead,
+  updateEntry,
+  deleteEntry,
   getAllTables
 }
 
