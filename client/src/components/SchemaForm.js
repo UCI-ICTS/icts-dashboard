@@ -1,8 +1,10 @@
 // src/components/SchemaForm.js
 
-import React, { useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { addTable, updateTable, deleteEntry } from "../slices/dataSlice";
+import { useDispatch } from "react-redux";
 
 const { Option } = Select;
 
@@ -131,42 +133,86 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
   return null;
 };
 
-//  initialValues + onCancel as props
-const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open }) => {
+//  Pay attention to the props
+const SchemaForm = ({
+  schema,
+  form,
+  open,
+  isAdmin = false,
+  initialValues,
+  setAddModalVisible,
+  setEntry,
+}) => {
+  const dispatch = useDispatch();
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
+  const table = schema.title
 
-  // set form values every time they change
   useEffect(() => {
-    form.setFieldsValue(initialValues);
+    form.setFieldsValue(initialValues || {});
   }, [initialValues, form]);
 
-  // Reset editMode when modal closes
   useEffect(() => {
     if (!open) {
       setEditMode(false);
     }
   }, [open]);
 
-  const handleFinish = (values) => {
-    onSubmit(values);
+  const handleDelete = () => {
+    const idList = initialValues?.[`${table}_id`];
+    dispatch(deleteEntry({ table: table, idList }))
+      .unwrap()
+      .then(() => {
+        setAddModalVisible(false);
+        setEntry(null);
+        form.resetFields();
+      })
+      .catch((err) => console.error("Delete failed", err));
+  };
+
+  const handleSubmit = async (values) => {
+    try {
+      const action = initialValues
+        ? updateTable({ table: table, data: values })
+        : addTable({ table: table, data: values });
+
+      const result = await dispatch(action);
+      if (result.meta.requestStatus === "fulfilled") {
+        setAddModalVisible(false);
+        setEntry(null);
+        form.resetFields();
+      } else {
+        console.warn("Submission failed:", result);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setAddModalVisible(false);
+    setEntry(null);
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      style={{ maxWidth: 600 }}
-    >
+    <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
+      {/* Edit/Delete Controls */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16 }}>
         <span style={{ marginRight: 8 }}>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
+        {isAdmin && (
+          <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
+            <Button onClick={handleDelete} disabled={!editMode} danger>
+              DELETE
+            </Button>
+          </Tooltip>
+        )}
       </div>
-      </div>
+
+      {/* Dynamic Fields */}
       {Object.entries(schema.properties || {}).map(([key, value]) => (
         <SchemaField
           key={key}
@@ -177,18 +223,17 @@ const SchemaForm = ({ schema, initialValues = {}, onSubmit, onCancel, form, open
           readOnly={!editMode}
         />
       ))}
+
+      {/* Submit/Cancel Buttons */}
       {editMode && (
         <Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
-          {onCancel && (
-            <Button onClick={onCancel} style={{ marginLeft: 8 }}>
-              Cancel
-            </Button>
-          )}
+          <Button onClick={handleCancel} style={{ marginLeft: 8 }}>Cancel</Button>
         </Form.Item>
       )}
     </Form>
   );
 };
+
 
 export default SchemaForm;

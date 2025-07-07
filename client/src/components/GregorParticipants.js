@@ -49,10 +49,17 @@ const GregorParticipants = () => {
     }, {});
   });
 
+const defaultVisibleColumns = {
+    participants: ["participant_id", "proband_relationship", "family_id", "date_of_birth", "phenotype_description"],
+    genetic_findings: ["genetic_findings_id", "gene", "variant"],
+    // Add more table types and their default columns as needed
+  };
+
   useEffect(() => {
+    const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {
-        acc[key] = true;
+        acc[key] = defaultColumns.length > 0 ? defaultColumns.includes(key) : true;
         return acc;
       }, {});
     });
@@ -69,56 +76,56 @@ const GregorParticipants = () => {
   };
 
   // Generate table columns dynamically
-    const columns = useMemo(() => {
-      return Object.entries(schema.properties)
-        .filter(([key]) => visibleColumns[key])
-        .map(([key, value]) => ({
-          title: value.label || key,
-          dataIndex: key,
-          key,
-          width: (key.length * 10),
-          sorter: (a, b) => {
-            const valA = a[key] !== undefined && a[key] !== null ? String(a[key]) : "";
-            const valB = b[key] !== undefined && b[key] !== null ? String(b[key]) : "";
-            return valA.localeCompare(valB, undefined, { numeric: true });
-          },
-          render: (text) => text || "-",
-          onHeaderCell: () => ({}),
-        }));
-    }, [schema, visibleColumns]);
+  const columns = useMemo(() => {
+    return Object.entries(schema.properties)
+      .filter(([key]) => visibleColumns[key])
+      .map(([key, value]) => ({
+        title: value.label || key,
+        dataIndex: key,
+        key,
+        width: (key.length * 10),
+        sorter: (a, b) => {
+          const valA = a[key] !== undefined && a[key] !== null ? String(a[key]) : "";
+          const valB = b[key] !== undefined && b[key] !== null ? String(b[key]) : "";
+          return valA.localeCompare(valB, undefined, { numeric: true });
+        },
+        render: (text) => text || "-",
+        onHeaderCell: () => ({}),
+      }));
+  }, [schema, visibleColumns]);
 
     // Data filtering for search, advanced search, regex search, and download.
-    const filteredData = useMemo(() => {
-      let data = [...tableData];
+  const filteredData = useMemo(() => {
+    let data = [...tableData];
 
-      if (searchQuery.trim()) {
-        data = data.filter((row) => {
-          return Object.values(row).some((value) => {
-            const strVal = String(value || "");
-            if (useRegex) {
-              try {
-                const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
-                setRegexError(null); // Clear previous errors
-                return regex.test(strVal);
-              } catch (err) {
-                setRegexError("Invalid regular expression");
-                return false; // Invalid regex
-              }
+    if (searchQuery.trim()) {
+      data = data.filter((row) => {
+        return Object.values(row).some((value) => {
+          const strVal = String(value || "");
+          if (useRegex) {
+            try {
+              const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
+              setRegexError(null); // Clear previous errors
+              return regex.test(strVal);
+            } catch (err) {
+              setRegexError("Invalid regular expression");
+              return false; // Invalid regex
             }
-            setRegexError(null);
-            return strVal.toLowerCase().includes(searchQuery.toLowerCase());
-          });
+          }
+          setRegexError(null);
+          return strVal.toLowerCase().includes(searchQuery.toLowerCase());
         });
-      }
-      if (advancedFilters && Object.keys(advancedFilters).length > 0) {
-        data = data.filter((row) =>
-          Object.entries(advancedFilters).every(([key, value]) =>
-            value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
-          )
-        );
-      }
-      return data;
-    }, [tableData, searchQuery, advancedFilters, useRegex]);
+      });
+    }
+    if (advancedFilters && Object.keys(advancedFilters).length > 0) {
+      data = data.filter((row) =>
+        Object.entries(advancedFilters).every(([key, value]) =>
+          value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
+        )
+      );
+    }
+    return data;
+  }, [tableData, searchQuery, advancedFilters, useRegex]);
 
   // Dropdown menu for toggling column visibility
   const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
@@ -179,107 +186,6 @@ const GregorParticipants = () => {
 
   return (
     <>
-    <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title="Fetch or refresh the table data">
-          <Button
-            onClick={() => dispatch(getAllTables())}
-            type="primary"
-          >
-            Fetch/Refresh data
-          </Button>
-        </Tooltip>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
-        <Tooltip title="Download">
-          <DownloadTSVButton
-            rows={filteredData}
-            rowID={rowID}
-            headCells={columns.map(col => ({
-              headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
-              field: col.dataIndex
-            }))}
-          />
-        </Tooltip>
-      </Col>
-    </Row>
-
-    <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="Search all fields"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: "100%",
-            maxWidth: 300,
-            borderColor: useRegex && regexError ? "red" : undefined,
-          }}
-          status={useRegex && regexError ? "error" : undefined}
-        />
-      </Col>
-      {useRegex && regexError && (
-        <Col xs={24}>
-          <Typography.Text type="danger">{regexError}</Typography.Text>
-        </Col>
-      )}
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Typography.Text strong>{filteredData.length} Records</Typography.Text>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Tooltip title="Advanced Filters">
-          <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
-          Advanced Filters
-          </Button>
-        </Tooltip>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-      </Col>
-      <Col xs={24} sm={12} md={6} lg={4}>
-        <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
-          <Button icon={<SettingOutlined />}>Columns</Button>
-        </Dropdown>
-      </Col>
-
-    </Row>
-
-      {dataStatus === "loading" ? (
-        <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: "20px" }}>
-          <div style={{ minHeight: "100px" }} />
-        </Spin>
-      ) : dataStatus === "error" ? (
-        <Alert message="Error loading data" type="error" showIcon />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredData}
-          onRow={(record) => ({
-            onClick: () => setSelectedRow(record),
-          })}
-          // scroll={{ x: 1500, y: "calc(100vh - 250px)" }} // <-- Ensures layout even with no rows
-          scroll={{ x: "max-content", y: "50vh" }}
-          locale={{ emptyText: "No records match your filters or search." }}
-          rowKey={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
-          pagination={{
-            current: page,
-            pageSize,
-            onChange: (page, pageSize) => {
-              setPage(page);
-              setPageSize(pageSize === "All" ? tableData.length : pageSize); // Handle "All" option
-            },
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "25", "50", "100", "All"],
-          }}
-        />
-      )}
       {selectedRow && (
         <div style={{ marginTop: 24 }}>
           <Typography.Title level={4}>
@@ -300,25 +206,6 @@ const GregorParticipants = () => {
             rowKey="participant_id"
             size="small"
             columns={[
-              // {
-              //   title: "Actions",
-              //   key: "actions",
-              //   width: 100, // or 80, depending on your font size
-              //   fixed: "left", // optional: keeps it pinned on horizontal scroll
-              //   align: "center", // or "left" if you prefer
-              //   render: (text, record) => (
-              //     <Button
-              //       type="link"
-              //       onClick={() => {
-              //         setEditRecord(true);
-              //         setAddModalVisible(true);
-              //       }}
-              //       style={{ padding: 0 }} // optional: remove extra space
-              //     >
-              //       Edit
-              //     </Button>
-              //   ),
-              // },
               { title: "Participant ID", dataIndex: "participant_id", key: "participant_id" },
               { title: "Relation", dataIndex: "proband_relationship", key: "proband_relationship" },
               {
@@ -476,6 +363,107 @@ const GregorParticipants = () => {
           <br/>
         </div>
       )}
+    <Row gutter={[16, 16]} justify="start" style={{ marginBottom: 16 }}>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+        <Tooltip title="Fetch or refresh the table data">
+          <Button
+            onClick={() => dispatch(getAllTables())}
+            type="primary"
+          >
+            Fetch/Refresh data
+          </Button>
+        </Tooltip>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={6} xl={3}>
+        <Tooltip title="Download">
+          <DownloadTSVButton
+            rows={filteredData}
+            rowID={rowID}
+            headCells={columns.map(col => ({
+              headerName: typeof col.title === "string" ? col.title : col.title?.props?.children || col.dataIndex,
+              field: col.dataIndex
+            }))}
+          />
+        </Tooltip>
+      </Col>
+    </Row>
+
+    <Row gutter={[16, 16]} align="middle" style={{ flexWrap: "wrap" }}>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Switch checked={useRegex} onChange={setUseRegex} /> Enable Regex
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Input
+          prefix={<SearchOutlined />}
+          placeholder="Search all fields"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: "100%",
+            maxWidth: 300,
+            borderColor: useRegex && regexError ? "red" : undefined,
+          }}
+          status={useRegex && regexError ? "error" : undefined}
+        />
+      </Col>
+      {useRegex && regexError && (
+        <Col xs={24}>
+          <Typography.Text type="danger">{regexError}</Typography.Text>
+        </Col>
+      )}
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Typography.Text strong>{filteredData.length} Records</Typography.Text>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Tooltip title="Advanced Filters">
+          <Button icon={<FilterOutlined />} onClick={() => setFilterModalVisible(true)}>
+          Advanced Filters
+          </Button>
+        </Tooltip>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
+      </Col>
+      <Col xs={24} sm={12} md={6} lg={4}>
+        <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
+          <Button icon={<SettingOutlined />}>Columns</Button>
+        </Dropdown>
+      </Col>
+
+    </Row>
+
+      {dataStatus === "loading" ? (
+        <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: "20px" }}>
+          <div style={{ minHeight: "100px" }} />
+        </Spin>
+      ) : dataStatus === "error" ? (
+        <Alert message="Error loading data" type="error" showIcon />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          onRow={(record) => ({
+            onClick: () => setSelectedRow(record),
+          })}
+          scroll={{ x: "max-content", y: "50vh" }}
+          locale={{ emptyText: "No records match your filters or search." }}
+          rowKey={(row) => row[rowID] || row.participant_id || row.genetic_findings_id}
+          pagination={{
+            current: page,
+            pageSize,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize === "All" ? tableData.length : pageSize); // Handle "All" option
+            },
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "25", "50", "100", "All"],
+          }}
+        />
+      )}
+
       <Modal
         title="Advanced Filters"
         open={filterModalVisible}
