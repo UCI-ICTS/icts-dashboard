@@ -46,6 +46,51 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
 
   const rules = getValidationRules(keyName, schema, requiredFields);
 
+  // Handle foreign keys in tables
+  // if (schema.title == "participant") {
+  //   if (keyName == "internal_project_id") {
+  //     return (
+  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+  //         <Select>
+  //           {schema.enum.map((option) => (
+  //             <Option key={option} value={option} disabled={readOnly}>
+  //               {option}
+  //             </Option>
+  //           ))}
+  //         </Select>
+  //       </Form.Item>
+  //     );
+  //   }
+  //   if (keyName == "family_id") {
+  //     return (
+  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+  //         <Select>
+  //           {schema.enum.map((option) => (
+  //             <Option key={option} value={option} disabled={readOnly}>
+  //               {option}
+  //             </Option>
+  //           ))}
+  //         </Select>
+  //       </Form.Item>
+  //     );
+  //   }
+  // }
+  // if (schema.title == "phenotype") {
+  //   if (keyName == "participant_id") {
+  //     return (
+  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+  //         <Select>
+  //           {schema.enum.map((option) => (
+  //             <Option key={option} value={option} disabled={readOnly}>
+  //               {option}
+  //             </Option>
+  //           ))}
+  //         </Select>
+  //       </Form.Item>
+  //     );
+  //   }
+  // }
+
   if (schema.enum) {
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
@@ -72,6 +117,14 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <InputNumber style={{ width: "100%" }} disabled={readOnly} />
+      </Form.Item>
+    );
+  }
+
+  if (schema.type === "boolean") {
+    return (
+      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Switch checkedChildren="Yes" unCheckedChildren="No" disabled={readOnly} />
       </Form.Item>
     );
   }

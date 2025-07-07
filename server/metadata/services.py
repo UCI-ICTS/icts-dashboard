@@ -120,7 +120,6 @@ class BiobankSerializer(serializers.ModelSerializer):
     """
 
     participant_id = serializers.SlugRelatedField(
-        source="participant",
         slug_field="participant_id",
         queryset=Participant.objects.all(),
     )

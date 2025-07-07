@@ -19,7 +19,6 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState('patients');
-  const [selectedPatient, setSelectedPatient] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
@@ -35,7 +34,6 @@ const HomePage = () => {
 
   const handleMenuSelect = ({ key }) => {
     setSelectedMenuItem(key);
-    setSelectedPatient(null);
   };
 
   const renderContent = () => {

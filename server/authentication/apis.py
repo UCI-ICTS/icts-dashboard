@@ -32,6 +32,9 @@ from authentication.services import (
     IsSuperUser,
 )
 
+import string  # For replacing the deprecated Django method BaseUserManager.make_random_password()
+import secrets # 
+
 
 User = get_user_model()
 
@@ -42,10 +45,10 @@ class TokenViewSet(viewsets.ViewSet):
     """
 
     permission_classes_by_action = {
-        "logout": [permissions.IsAuthenticated],
-        "login": [permissions.AllowAny],
+        "logout":  [permissions.IsAuthenticated],
+        "login":   [permissions.AllowAny],
         "refresh": [permissions.AllowAny],
-        "verify": [permissions.AllowAny],
+        "verify":  [permissions.AllowAny],
     }
 
     def get_permissions(self):
@@ -158,7 +161,8 @@ class UserViewSet(viewsets.ViewSet):
         email = serializer.validated_data["email"]
 
         # Set temp password and mark user inactive
-        temp_password = User.objects.make_random_password()
+        alphabet = string.ascii_letters + string.digits + string.punctuation
+        temp_password = ''.join(secrets.choice(alphabet) for i in range(24))
         validated_data = {
             **serializer.validated_data,
             "password": temp_password,
