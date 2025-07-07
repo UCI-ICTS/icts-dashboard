@@ -319,10 +319,22 @@ class GeneticFindings(models.Model):
     )
     pos = models.IntegerField(help_text="Start position of the variant")
     pos_end = models.IntegerField(blank=True, null=True, help_text="End position of SV")
-    ref = models.CharField(max_length=255, help_text="Reference allele of the variant")
-    alt = models.CharField(max_length=255, help_text="Alternate allele of the variant")
+    ref = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Reference allele of the variant"
+    )
+    alt = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Alternate allele of the variant"
+    )
     copy_number = models.IntegerField(
-        blank=True, null=True, help_text="CNV copy number"
+        blank=True,
+        null=True,
+        help_text="CNV copy number"
     )
     ClinGen_allele_ID = models.CharField(
         max_length=255,
@@ -359,6 +371,7 @@ class GeneticFindings(models.Model):
     )
     variant_inheritance = models.CharField(
         max_length=50,
+        blank=True,
         choices=VariantInheritance.choices,
         help_text="Detection of variant in parents",
     )
@@ -581,7 +594,7 @@ class Biobank(models.Model):
         primary_key=True,
         help_text="Identifier for a biosample in repository",
     )
-    participant = models.ForeignKey(
+    participant_id = models.ForeignKey(
         "Participant",
         on_delete=models.CASCADE,
         related_name="biobank_samples",
@@ -674,6 +687,7 @@ class Biobank(models.Model):
             ("Extracted", "Extracted"),
             ("QC issue", "QC issue, see comments"),
             ("Data delivered", "Data delivered"),
+            ("Ready for variant analysis", "Ready for variant analysis"),
             ("Lost", "Lost, see comments"),
             ("Replacement requested", "Replacement requested"),
         ],
@@ -744,4 +758,4 @@ class Biobank(models.Model):
 
     class Meta:
         verbose_name = "Biobank Sample (with traceability)"
-        ordering = ["participant", "collection_date"]
+        ordering = ["participant_id", "collection_date"]

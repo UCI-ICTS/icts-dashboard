@@ -1,6 +1,7 @@
 // slices/dataSlice.js
 import dataService from "../services/data.service";
-import { combineSlices, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import errorService from "../services/error.service";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
 import { getCollectionName, getTableName } from "../utils/tableNameMap";
 
@@ -56,7 +57,8 @@ export const dataSlice = createSlice({
           genetic_findings,
           analytes,
           biobank_entries,
-          phenotypes, experiments,
+          phenotypes,
+          experiments,
           experiment_dna_short_read,
           experiment_rna_short_read,
           experiment_pac_bio,
@@ -224,36 +226,53 @@ export const addTable = createAsyncThunk(
   "addTable",
   async ({table, data}, thunkAPI) => {
     const apiCall = (table, data) => {
-      if (table === "participants") {
-        return dataService.createParticipant(data);
-      }
       if (table === "families") {
         return dataService.createFamily(data);
       }
-      if (table === "genetic_findings") {
-        return dataService.createGeneticFindings(data);
-      }
-      if (table === "analytes") {
-        return dataService.createAnalyte(data);
-      }
-      if (table === "biobank_entries") {
-        return dataService.createBiobankEntries(data);
+      if (table === "participants") {
+        return dataService.createParticipant(data);
       }
       if (table === "phenotypes") {
         return dataService.createPhenotype(data);
       }
+      if (table === "analytes") {
+        return dataService.createAnalyte(data);
+      }
+      if (table === "genetic_findings") {
+        return dataService.createGeneticFindings(data);
+      }
+      if (table === "biobank_entries") {
+        return dataService.createBiobankEntries(data);
+      }
+      if (table === "experiment_id") {
+        return dataService.createExperiment(data);
+      }
       if (table === "experiment_dna_short_read_id") {
-        console.log("stuff")
-        return dataService.createDnaShortRead(data);
+        return dataService.createExpDnaShortRead(data);
       }
       if (table === "experiment_rna_short_read_id") {
-        return dataService.createRnaShortRead(data);
+        return dataService.createExpRnaShortRead(data);
       }
       if (table === "experiment_pac_bio_id") {
-        return dataService.createPacBio(data);
+        return dataService.createExpPacBio(data);
       }
       if (table === "experiment_nanopore_id") {
-        return dataService.createNanoPore(data);
+        return dataService.createExpNanopore(data);
+      }
+      if (table === "aligned_id") {
+        return dataService.createAligned(data);
+      }
+      if (table === "aligned_dna_short_read_id") {
+        return dataService.createAlnDnaShortRead(data);
+      }
+      if (table === "aligned_rna_short_read_id") {
+        return dataService.createAlnRnaShortRead(data);
+      }
+      if (table === "aligned_pac_bio_id") {
+        return dataService.createAlnPacBio(data);
+      }
+      if (table === "aligned_nanopore_id") {
+        return dataService.createAlnNanopore(data);
       }
       throw new Error("Invalid table type");
     }
@@ -270,48 +289,90 @@ export const addTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      let errorMessage = "";
-
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
-      }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data) &&
-        error.response.data.length > 0
-      ) {
-        const firstError = error.response.data[0];
-        // If the first element has a 'data' key that is an array, use that:
-        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-          errorMessage = firstError.data
-            .map(err => `${err.field}: ${err.error}`)
-            .join(", ");
-        }
-        // Otherwise, if the first element itself has 'field' and 'error', use those.
-        else if (firstError.field && firstError.error) {
-          errorMessage = `${firstError.field}: ${firstError.error}`;
-        }
-        // Otherwise, fall back to stringifying the first element.
-        else {
-          errorMessage = JSON.stringify(firstError);
-        }
-        console.log("Constructed message from response data:", errorMessage);
-      }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
-      }
-
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+      message.error(`${errorService.printErrorMessages(error)}`);
       return thunkAPI.rejectWithValue();
     }
+  }
+)
 
+export const getAllTables = createAsyncThunk(
+  "getAllTables",
+  async (_, thunkAPI) => {
+    try {
+      const response = await dataService.getAllTables();
+      return response.data
+    } catch(error) {
+      console.log("ERROR! ",error)
+    }
+  }
+)
+
+export const getTable = createAsyncThunk(
+  "getTable",
+  async ({table}, thunkAPI) => {
+    const apiCall = (table) => {
+      if (table === "family_id") {
+        return dataService.getFamilyTable();
+      }
+      if (table === "participant_id") {
+        return dataService.getParticipantTable();
+      }
+      if (table === "phenotype_id") {
+        return dataService.getPhenotypeTable();
+      }
+      if (table === "analyte_id") {
+        return dataService.getAnalyteTable();
+      }
+      if (table === "genetic_findings_id") {
+        return dataService.getGeneticFindingsTable();
+      }
+      if (table === "biobank_id") {
+        return dataService.getBiobankEntriesTable();
+      }
+      if (table === "experiment_id") {
+        return dataService.getExperimentTable();
+      }
+      if (table === "experiment_dna_short_read_id") {
+        return dataService.getExpDnaShortReadTable();
+      }
+      if (table === "experiment_rna_short_read_id") {
+        return dataService.getExpRnaShortReadTable();
+      }
+      if (table === "experiment_pac_bio_id") {
+        return dataService.getExpPacBioTable();
+      }
+      if (table === "experiment_nanopore_id") {
+        return dataService.getExpNanoporeTable();
+      }
+      if (table === "aligned_id") {
+        return dataService.getAlignedTable();
+      }
+      if (table === "aligned_dna_short_read_id") {
+        return dataService.getAlnDnaShortReadTable();
+      }
+      if (table === "aligned_rna_short_read_id") {
+        return dataService.getAlnRnaShortReadTable();
+      }
+      if (table === "aligned_pac_bio_id") {
+        return dataService.getAlnPacBioTable();
+      }
+      if (table === "aligned_nanopore_id") {
+        return dataService.getAlnNanoporeTable();
+      }
+      throw new Error("Invalid table type");
+    }
+    try {
+      console.log('Get', table)
+      const response = await apiCall(table);
+      console.log('response', response)
+      const payload = {response: response.data, table}
+      message.success(`${payload.table} ${response.data[0].identifier} retrieved successfuly`);
+      return payload
+
+    } catch (error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue();
+    }
   }
 )
 
@@ -332,45 +393,76 @@ export const updateTable = createAsyncThunk(
       return payload
 
     } catch (error) {
-      let errorMessage = "";
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+)
 
-      // Check if there's a top-level errorMessage.
-      if (error.response && error.response.message) {
-        errorMessage = error.response.message;
-        console.log("Top-level message:", errorMessage);
+export const deleteTable = createAsyncThunk(
+  "deleteTable",
+  async ({table, data}, thunkAPI) => {
+    const apiCall = (table, data) => {
+      if (table === "families") {
+        return dataService.deleteFamily(data);
       }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
-        error.response &&
-        error.response.data &&
-        Array.isArray(error.response.data) &&
-        error.response.data.length > 0
-      ) {
-        const firstError = error.response.data[0];
-        // If the first element has a 'data' key that is an array, use that:
-        if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-          errorMessage = firstError.data
-            .map(err => `${err.field}: ${err.error}`)
-            .join(", ");
-        }
-        // Otherwise, if the first element itself has 'field' and 'error', use those.
-        else if (firstError.field && firstError.error) {
-          errorMessage = `${firstError.field}: ${firstError.error}`;
-        }
-        // Otherwise, fall back to stringifying the first element.
-        else {
-          errorMessage = JSON.stringify(firstError);
-        }
-        console.log("Constructed message from response data:", errorMessage);
+      if (table === "participants") {
+        return dataService.deleteParticipant(data);
       }
-      // Fallback generic message.
-      else {
-        errorMessage = "An unknown error occurred.";
-        console.log("Fallback message:", errorMessage);
+      if (table === "phenotypes") {
+        return dataService.deletePhenotype(data);
       }
+      if (table === "analytes") {
+        return dataService.deleteAnalyte(data);
+      }
+      if (table === "genetic_findings") {
+        return dataService.deleteGeneticFindings(data);
+      }
+      if (table === "biobank_entries") {
+        return dataService.deleteBiobankEntries(data);
+      }
+      if (table === "experiment_id") {
+        return dataService.deleteExperiment(data);
+      }
+      if (table === "experiment_dna_short_read_id") {
+        return dataService.deleteExpDnaShortRead(data);
+      }
+      if (table === "experiment_rna_short_read_id") {
+        return dataService.deleteExpRnaShortRead(data);
+      }
+      if (table === "experiment_pac_bio_id") {
+        return dataService.deleteExpPacBio(data);
+      }
+      if (table === "experiment_nanopore_id") {
+        return dataService.deleteExpNanopore(data);
+      }
+      if (table === "aligned_id") {
+        return dataService.deleteAligned(data);
+      }
+      if (table === "aligned_dna_short_read_id") {
+        return dataService.deleteAlnDnaShortRead(data);
+      }
+      if (table === "aligned_rna_short_read_id") {
+        return dataService.deleteAlnRnaShortRead(data);
+      }
+      if (table === "aligned_pac_bio_id") {
+        return dataService.deleteAlnPacBio(data);
+      }
+      if (table === "aligned_nanopore_id") {
+        return dataService.deleteAlnNanopore(data);
+      }
+      throw new Error("Invalid table type");
+    }
+    try {
+      console.log('Delete', table, data)
+      const response = await apiCall(table, data);
+      console.log('response', response)
+      const payload = {response: response.data, table}
+      message.success(`${payload.table} ${response.data[0].identifier} deleted successfuly`);
+      return payload
 
-      console.log("ERROR! ", error.response.data);
-      message.error(errorMessage);
+    } catch (error) {
+      message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue();
     }
   }

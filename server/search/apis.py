@@ -147,14 +147,284 @@ class GetAllTablesAPI(APIView):
                 "aligned_pac_bio": serialized_aligned_pacbio.data,
                 "aligned_rna_short_read": serialized_aligned_rna.data,
             }
-            # time.sleep(5)
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetExperimentDNAShortReadTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_experiment_dna_short_read_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_experiment_dna_short_reads = ExperimentShortReadSerializer(ExperimentDNAShortRead.objects.all(), many=True)
+
+            serilized_return_data = {
+                'experiment_dna_short_reads': serialized_experiment_dna_short_reads.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetExperimentRNAShortReadTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_experiment_rna_short_read_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_experiment_rna_short_reads = ExperimentRNAOutputSerializer(ExperimentRNAShortRead.objects.all(), many=True)
+
+            serilized_return_data = {
+                'experiment_rna_short_reads': serialized_experiment_rna_short_reads.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetExperimentPacBioTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_experiment_pac_bio_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_experiment_pac_bios = ExperimentPacBioSerializer(ExperimentPacBio.objects.all(), many=True)
+
+            serilized_return_data = {
+                'experiment_pac_bios': serialized_experiment_pac_bios.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetExperimentNanoporeTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_experiment_nanopore_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_experiment_nanopores = ExperimentNanoporeSerializer(ExperimentNanopore.objects.all(), many=True)
+
+            serilized_return_data = {
+                'experiment_nanopores': serialized_experiment_nanopores.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+# Aligned Tables
+class GetAlignedTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligneds = AlignedSerializer(Aligned.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligneds': serialized_aligneds.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetAlignedDNAShortReadTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_dna_short_read_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligned_dna_short_reads = AlignedDNAShortReadSerializer(AlignedDNAShortRead.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligned_dna_short_reads': serialized_aligned_dna_short_reads.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetAlignedRNAShortReadTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_rna_short_read_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligned_rna_short_reads = AlignedRNASerializer(AlignedRNAShortRead.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligned_rna_short_reads': serialized_aligned_rna_short_reads.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetAlignedRNAShortReadTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_rna_short_read_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligned_rna_short_reads = AlignedRNASerializer(AlignedRNAShortRead.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligned_rna_short_reads': serialized_aligned_rna_short_reads.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetAlignedPacBioTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_pac_bio_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligned_pac_bios = AlignedPacBioSerializer(AlignedPacBio.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligned_pac_bios': serialized_aligned_pac_bios.data
+            }
+            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+        except Exception as error:
+            response_data.insert(0, str(error))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+class GetAlignedNanoporeTableAPI(APIView):
+    """"""
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id="get_aligned_nanopore_table",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+    def get(self, request):
+        response_data = []
+        try:
+            serialized_aligned_nanopores = AlignedNanoporeSerializer(AlignedNanopore.objects.all(), many=True)
+
+            serilized_return_data = {
+                'aligned_nanopores': serialized_aligned_nanopores.data
+            }
             return Response(status=status.HTTP_200_OK, data=serilized_return_data)
         except Exception as error:
             response_data.insert(0, str(error))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
 
 
-class DounlaodTablesAPI(APIView):
+class DownloadTablesAPI(APIView):
     """AnVIL upload table generation."""
 
     authentication_classes = [TokenAuthentication]
@@ -178,8 +448,7 @@ class DounlaodTablesAPI(APIView):
 
 
 class SearchTablesAPI(APIView):
-    """ """
-
+    """"""
     permission_classes = [AllowAny]
     model_name_param = openapi.Parameter(
         "model_name",

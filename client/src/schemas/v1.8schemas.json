@@ -3,7 +3,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/participant.json",
         "title": "participant",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "participant_id",
@@ -288,7 +288,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/family.json",
         "title": "family",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "family_id",
@@ -348,7 +348,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/genetic_findings.json",
         "title": "genetic_findings",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "genetic_findings_id",
@@ -818,7 +818,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/analyte.json",
         "title": "analyte",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "analyte_id",
@@ -958,7 +958,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/phenotype.json",
         "title": "phenotype",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "participant_id",
@@ -1294,7 +1294,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment.json",
         "title": "experiment",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_id",
@@ -1342,7 +1342,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_dna_short_read.json",
         "title": "experiment_dna_short_read",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_dna_short_read_id",
@@ -1448,7 +1448,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_nanopore.json",
         "title": "experiment_nanopore",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_nanopore_id",
@@ -1579,7 +1579,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/experiment_pac_bio.json",
         "title": "experiment_pac_bio",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "experiment_pac_bio_id",
@@ -1951,7 +1951,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned.json",
         "title": "aligned",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_id",
@@ -2009,7 +2009,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_dna_short_read.json",
         "title": "aligned_dna_short_read",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_dna_short_read_id",
@@ -2114,7 +2114,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_nanopore.json",
         "title": "aligned_nanopore",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_nanopore_id",
@@ -2294,7 +2294,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.8/json_schemas/aligned_pac_bio.json",
         "title": "aligned_pac_bio",
-        "version": "1.7",
+        "version": "1.8",
         "type": "object",
         "required": [
             "aligned_pac_bio_id",
@@ -2463,6 +2463,10 @@
                 "examples": [
                     true
                 ]
+            },
+            "quality_issues": {
+                "type": "string",
+                "description": "describe if there are any QC issues that would be important to note"
             }
         }
     },
@@ -2691,6 +2695,7 @@
         "type": "object",
         "required": [
             "biobank_id",
+            "participant_id",
             "collection_date",
             "specimen_type",
             "status"
@@ -2701,7 +2706,7 @@
                 "type": "string",
                 "description": "primary key, printed on tubes"
             },
-            "participant": {
+            "participant_id": {
                 "type": "string",
                 "description": "printed on tube, automatically reference with participant table"
             },
@@ -2773,15 +2778,30 @@
                     "Shipped",
                     "Received",
                     "Stored",
-                    "Replacement requested",
+                    "Extracted",
+                    "QC Issue-see comments",
+                    "Ready for variant analysis",
+                    "Data Delivered",
                     "Lost",
-                    "QC Issue-see comments"
+                    "Replacement requested"
                 ],
                 "description": "Notes: See participant_sample_status table in retool"
             },
             "shipment_date": {
                 "type": "string",
                 "description": "8-digit date MM/DD/YYYY"
+            },
+            "tracking_number": {
+                "type": "string",
+                "description": "Fedex tracking number if available"
+            },
+            "test_indication": {
+                "type": "string",
+                "description": "Ambry shipping manifest requirement. Research or Clinical"
+            },
+            "requested_test": {
+                "type": "string",
+                "description": "Ambry test code. 10500 for LR-WGS. 10525 for WTS"
             },
             "child_analytes": {
                 "type": "array",
@@ -2790,9 +2810,35 @@
                     "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
                 }
             },
+            "experiments": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. experiment objects"
+                }
+            },
+            "alignments": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "description": "List of associated sr-gs, pacbio, nanopore, etc. alignment objects"
+                }
+            },
+            "external_id": {
+                "type": "string",
+                "description": "Ambry identifier or similar"
+            },
+            "internal_analysis": {
+                "type": "string",
+                "description": "Freetext to describe what analysis pipelines have been done on this case"
+            },
             "comments": {
                 "type": "string",
                 "description": "freetext (limited characters) to concisely describe if there are any QC issues that would be important to note"
+            },
+            "completed": {
+                "type": "boolean",
+                "description": "Whether the full pipeline is complete for this sample"
             }
         }
     }
