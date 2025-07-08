@@ -1,20 +1,25 @@
-// src/routes.js
+// src/routs.js
 
 import React, { useEffect } from 'react';
-import { useRoutes, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import { message } from 'antd';
+
+import AdminPage from './pages/AdminPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import { handleExpiredJWT } from './slices/accountSlice';
-import { message } from 'antd';
-import PrivateRout from "./components/PrivateRoute";
+import ProfilePage from './pages/ProfilePage';
+import SummaryPage from './pages/SummaryPage';
+import GregorParticipants from './components/GregorParticipants';
+import GregorTables from './components/GregorTables';
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
+import PrivateRout from "./components/PrivateRoute";
 import AccountService from "./services/account.service";
-
+import { handleExpiredJWT } from './slices/accountSlice';
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
-  const currentTime = Date.now() / 1000; // Convert to seconds
+  const currentTime = Date.now() / 1000;
   const timeUntilExpiration = expirationTime - currentTime;
 
   if (timeUntilExpiration > 0) {
@@ -29,28 +34,27 @@ const AppRoutes = () => {
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.account.isLoggedIn);
   const token = useSelector((state) => state.account.user?.access_token);
-  console.log("isLoggedIn", isLoggedIn)
 
   useEffect(() => {
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          setupTokenExpirationAlert(decoded.exp, () => {
-            navigate("/login");
-            dispatch(handleExpiredJWT())
-              .unwrap()
-              .then(() => {
-                message.error("JWT Expired. Please log in again.");
-              });
-          });
-        } catch (error) {
-          console.error("Invalid token:", error);
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setupTokenExpirationAlert(decoded.exp, () => {
           navigate("/login");
-          dispatch(handleExpiredJWT());
+          dispatch(handleExpiredJWT())
+            .unwrap()
+            .then(() => {
+              message.error("JWT Expired. Please log in again.");
+            });
+        });
+      } catch (error) {
+        console.error("Invalid token:", error);
+        navigate("/login");
+        dispatch(handleExpiredJWT());
       }
     }
     if (isLoggedIn && !token) {
-      console.log("Missing token",)
+      console.warn("Logged in but missing token");
     }
   }, [token, isLoggedIn, dispatch, navigate]);
 
@@ -58,30 +62,29 @@ const AppRoutes = () => {
     AccountService.getCSRFToken();
   }, []);
 
-  let element = useRoutes([
-    {
-      path: "/",
-      element: (
-        <PrivateRout>
-          <Dashboard />
-        </PrivateRout>
-      )
-    },
-    {
-      path: "/login",
-      element: <Login />
-    },
-    {
-      path: "/password-reset",
-      element: <PasswordResetConfirm />
-    },
-    {
-      path: "/password-create",
-      element: <PasswordResetConfirm />
-    }
-  ])
-  return element;
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/account/password-reset" element={<PasswordResetConfirm />} />
+      <Route path="/account/password-create" element={<PasswordResetConfirm />} />
+
+      <Route path="/dashboard" element={<PrivateRout><Dashboard /></PrivateRout>}>
+        <Route index element={<ProfilePage />} />
+        <Route path="table-data" element={<GregorTables />} />
+        <Route path="participant-detail" element={<GregorParticipants />} />
+        <Route path="admin" element={<AdminPage />} />
+        <Route path="summary" element={<SummaryPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
+
+      {/* Optional redirect from "/" to "/dashboard" */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+
 };
 
 export default AppRoutes;
-
