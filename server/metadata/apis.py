@@ -29,6 +29,7 @@ from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsSerializer,
     ParticipantInputSerializer,
+    ParticipantOutputSerializer,
     FamilySerializer,
     PhenotypeSerializer,
     BiobankSerializer,
@@ -41,6 +42,18 @@ from metadata.services import (
 class ParticipantViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Participant entries",
+        responses={200: ParticipantOutputSerializer(many=True), 400: "Bad request"},
+        tags=["Participant"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Participant.objects.all()
+        serializer = ParticipantOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=ParticipantInputSerializer(many=True),
@@ -201,6 +214,18 @@ class FamilyViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Family entries",
+        responses={200: FamilySerializer(many=True), 400: "Bad request"},
+        tags=["Family"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Family.objects.all()
+        serializer = FamilySerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=FamilySerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["Family"],
@@ -355,6 +380,18 @@ class FamilyViewSet(viewsets.ViewSet):
 class AnalyteViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Analyte entries",
+        responses={200: AnalyteSerializer(many=True), 400: "Bad request"},
+        tags=["Analyte"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Analyte.objects.all()
+        serializer = AnalyteSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=AnalyteSerializer(many=True),
@@ -513,6 +550,18 @@ class PhenotypeViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Phenotype entries",
+        responses={200: PhenotypeSerializer(many=True), 400: "Bad request"},
+        tags=["Phenotype"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Phenotype.objects.all()
+        serializer = PhenotypeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=PhenotypeSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["Phenotype"],
@@ -669,6 +718,18 @@ class PhenotypeViewSet(viewsets.ViewSet):
 class GeneticFindingsViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Genetic Findings entries",
+        responses={200: GeneticFindingsSerializer(many=True), 400: "Bad request"},
+        tags=["GeneticFindings"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = GeneticFindings.objects.all()
+        serializer = GeneticFindingsSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=GeneticFindingsSerializer(many=True),
@@ -836,6 +897,18 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
 class BiobankViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Biobank entries",
+        responses={200: BiobankSerializer(many=True)},
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Biobank.objects.all()
+        serializer = BiobankSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         responses={200: BiobankSerializer()},
