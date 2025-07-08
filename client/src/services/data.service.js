@@ -31,60 +31,6 @@ const createFamily = async (data, token) => {
   return response;
 }
 
-const createParticipant = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/participant/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const createPhenotype = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/phenotype/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const createAnalyte = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/analyte/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const createGeneticFindings = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/genetic_findings/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const createBiobankEntries = async (data, token) => {
-  const response = await axios.post(APIDB + "api/metadata/biobank/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
-const createExperiment = async (data, token) => {
-  const response = await axios.post(APIDB + "api/experiments/experiment/create/", [
-    data
-  ], {
-    headers: getAuthHeaders()
-  });
-  return response;
-}
-
 const createExpDnaShortRead = async (data, token) => {
   const response = await axios.post(APIDB + "api/experiments/experiment_dna_short_read/create/", [
     data
