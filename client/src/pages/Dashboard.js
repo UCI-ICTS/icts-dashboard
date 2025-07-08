@@ -1,6 +1,9 @@
 // src/pages/Dashboard.js
 
 import React, { useState } from 'react';
+
+import { Outlet, Link, useLocation } from "react-router-dom";
+
 import { Layout, Menu, Button, Spin, Alert, Tooltip, Space } from 'antd';
 import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined, ApiOutlined, GithubOutlined } from '@ant-design/icons';
 import AdminPage from './AdminPage';
@@ -16,10 +19,12 @@ const { Header, Content, Footer, Sider } = Layout;
 const APIDB = process.env.REACT_APP_APIDB;
 
 const HomePage = () => {
+  const location = useLocation();
+  const current = location.pathname.split("/").pop();
+
   const dispatch = useDispatch();
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('patients');
-  const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
   const isAdmin = auth?.user?.is_superuser
@@ -32,25 +37,6 @@ const HomePage = () => {
     navigate('/login');
   };
 
-  const handleMenuSelect = ({ key }) => {
-    setSelectedMenuItem(key);
-  };
-
-  const renderContent = () => {
-    if (error) return <Alert message={error} type="error" showIcon />;
-    switch (selectedMenuItem) {
-      case 'admin':
-        return <AdminPage />;
-      case 'gregor_data':
-        return <GregorTables />;
-      case 'gregor':
-        return <GregorParticipants />;
-      case 'profile':
-        return <ProfilePage/> ;
-      default:
-        return <ProfilePage/>;
-    }
-  };
 
   return (
     <Layout className="layout-container">
@@ -60,14 +46,14 @@ const HomePage = () => {
         <div className="sider-menu-wrapper">
           <Menu
             theme="dark"
-            selectedKeys={[selectedMenuItem]}
+            selectedKeys={[current]}
             mode="inline"
-            onClick={handleMenuSelect}
             items={[
-              { key: 'gregor_data', icon: <TeamOutlined />, label: 'GREGoR Tables' },
-              { key: 'gregor', icon: <TeamOutlined />, label: 'Participant Detail' },
-              { key: 'profile', icon: <ProfileOutlined />, label: 'Profile'},
-              ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: 'Admin' }] : []),
+              { key: 'summary', icon: <TeamOutlined />, label: <Link to="summary">Summary Page</Link> },
+              { key: 'table-data', icon: <TeamOutlined />, label: <Link to="table-data">GREGoR Tables</Link> },
+              { key: 'participant-detail', icon: <TeamOutlined />, label: <Link to="participant-detail">Participant Detail</Link> },
+              { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
+              ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
             ]}
           />
         </div>
@@ -85,7 +71,9 @@ const HomePage = () => {
       </Sider>
       <Layout className="site-layout">
         <Header className="site-header" />
-        <Content className="site-content">{renderContent()}</Content>
+        <Content className="site-content">
+          <Outlet />
+        </Content>
         <Footer className="site-footer">
           <Space >
             <Tooltip title="UCI ICTS Dashboard"> ©2024 UCI</Tooltip>
