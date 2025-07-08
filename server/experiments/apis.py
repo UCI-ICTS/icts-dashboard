@@ -35,7 +35,9 @@ from experiments.services import (
     ExperimentNanoporeSerializer,
     ExperimentPacBioSerializer,
     ExperimentRNAInputSerializer,
+    ExperimentRNAOutputSerializer,
     ExperimentDNAInputSerializer,
+    ExperimentDNAOutputSerializer,
     create_experiment,
     update_experiment,
     delete_experiment,
@@ -49,6 +51,18 @@ from experiments.selectors import get_experiment
 class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all ExperimentRNAShortRead entries",
+        responses={200: ExperimentRNAOutputSerializer(many=True), 400: "Bad request"},
+        tags=["ExperimentRNAShortRead"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = ExperimentRNAShortRead.objects.all()
+        serializer = ExperimentRNAOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=ExperimentRNAInputSerializer(many=True),
@@ -227,6 +241,21 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedRNAShortRead entries",
+        responses={
+            200: AlignedRNAShortReadOutputSerializer(many=True),
+            400: "Bad request",
+        },
+        tags=["AlignedRNAShortRead"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedRNAShortRead.objects.all()
+        serializer = AlignedRNAShortReadOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=AlignedRNAShortReadInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedRNAShortRead"],
@@ -401,6 +430,18 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
 class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all ExperimentDNAShortRead entries",
+        responses={200: ExperimentDNAOutputSerializer(many=True), 400: "Bad request"},
+        tags=["ExperimentDNAShortRead"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = ExperimentDNAShortRead.objects.all()
+        serializer = ExperimentDNAOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=ExperimentDNAInputSerializer(many=True),
@@ -579,6 +620,18 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedDNAShortRead entries",
+        responses={200: AlignedDNAShortReadSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedDNAShortRead"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedDNAShortRead.objects.all()
+        serializer = AlignedDNAShortReadSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=AlignedDNAShortReadSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedDNAShortRead"],
@@ -755,6 +808,18 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all ExperimentPacBio entries",
+        responses={200: ExperimentPacBioSerializer(many=True), 400: "Bad request"},
+        tags=["*"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = ExperimentPacBio.objects.all()
+        serializer = ExperimentPacBioSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=ExperimentPacBioSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["ExperimentPacBio"],
@@ -926,6 +991,18 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedPacBio entries",
+        responses={200: AlignedPacBioSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedPacBio"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedPacBio.objects.all()
+        serializer = AlignedPacBioSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=AlignedPacBioSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedPacBio"],
@@ -1091,6 +1168,18 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
 class ExperimentNanoporeViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all ExperimentNanopore entries",
+        responses={200: ExperimentNanoporeSerializer(many=True), 400: "Bad request"},
+        tags=["ExperimentNanopore"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = ExperimentNanopore.objects.all()
+        serializer = ExperimentNanoporeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
         request_body=ExperimentNanoporeSerializer(many=True),
@@ -1266,6 +1355,18 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedNanopore entries",
+        responses={200: AlignedNanoporeSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedNanopore"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedNanopore.objects.all()
+        serializer = AlignedNanoporeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
         request_body=AlignedNanoporeSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["AlignedNanopore"],
@@ -1426,95 +1527,3 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
-
-
-class CreateOrUpdateExperimentApi(APIView):
-    """"""
-
-    @swagger_auto_schema(
-        operation_id="create_phenotype",
-        request_body=ExperimentSerializer(many=True),
-        responses={
-            200: "All submissions of experiments were successfull",
-            207: "Some submissions of experiments were not successful.",
-            400: "Bad request",
-        },
-        tags=["Experiment"],
-    )
-    def post(self, request):
-        validator = TableValidator()
-        response_data = []
-        rejected_requests = False
-        accepted_requests = False
-        try:
-            for datum in request.data:
-                identifier = datum["experiment_id"]
-                # parsed_phenotype = parse_phenotype(phenotype=datum)
-                validator.validate_json(json_object=datum, table_name="experiment")
-                results = validator.get_validation_results()
-                if results["valid"] is True:
-                    existing_experiment = get_experiment(experiment_id=identifier)
-                    serializer = ExperimentSerializer(existing_experiment, data=datum)
-
-                    if serializer.is_valid():
-                        experiment_instance = serializer.save()
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                                request_status=(
-                                    "UPDATED" if existing_experiment else "CREATED"
-                                ),
-                                code=201 if existing_experiment else 200,
-                                message=(
-                                    f"Phenotype {identifier} updated."
-                                    if existing_experiment
-                                    else f"Phenotype {identifier} created."
-                                ),
-                                data=ExperimentSerializer(experiment_instance).data,
-                            )
-                        )
-                        accepted_requests = True
-
-                    else:
-                        error_data = [
-                            {item: serializer.errors[item]}
-                            for item in serializer.errors
-                        ]
-                        response_data.append(
-                            response_constructor(
-                                identifier=identifier,
-                                request_status="BAD REQUEST",
-                                code=400,
-                                data=error_data,
-                            )
-                        )
-                        rejected_requests = True
-                        continue
-
-                else:
-                    response_data.append(
-                        response_constructor(
-                            identifier=identifier,
-                            request_status="BAD REQUEST",
-                            code=400,
-                            data=results["errors"],
-                        )
-                    )
-                    rejected_requests = True
-                    continue
-
-            status_code = response_status(accepted_requests, rejected_requests)
-
-            return Response(status=status_code, data=response_data)
-
-        except Exception as error:
-            response_data.insert(
-                0,
-                response_constructor(
-                    identifier=id_list,
-                    request_status="SERVER ERROR",
-                    code=500,
-                    data=str(error),
-                ),
-            )
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)

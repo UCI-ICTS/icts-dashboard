@@ -295,18 +295,6 @@ export const addTable = createAsyncThunk(
   }
 )
 
-export const getAllTables = createAsyncThunk(
-  "getAllTables",
-  async (_, thunkAPI) => {
-    try {
-      const response = await dataService.getAllTables();
-      return response.data
-    } catch(error) {
-      console.log("ERROR! ",error)
-    }
-  }
-)
-
 export const getTable = createAsyncThunk(
   "getTable",
   async ({table}, thunkAPI) => {
