@@ -5,7 +5,7 @@ import { Descriptions, Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, 
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Resizable } from 'react-resizable';
-import { getAllTables, updateTable, addTable } from "../slices/dataSlice";
+import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import schemas from "../schemas/v1.8schemas.json";
@@ -178,7 +178,7 @@ const defaultVisibleColumns = {
       console.log("Editing row:", tableName, values);
     } else {
       // Add new record
-      dispatch(addTable({ table: tableName, data: values }));
+      dispatch(createEntry({ table: tableName, data: values }));
       console.log("Creating new row:", tableName, values);
     }
     setEditRecord(null);
