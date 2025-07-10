@@ -3,7 +3,7 @@
 import { useEffect, useState} from "react";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { addTable, updateTable, deleteEntry } from "../slices/dataSlice";
+import { createEntry, updateTable, deleteEntry } from "../slices/dataSlice";
 import { useDispatch } from "react-redux";
 
 const { Option } = Select;
@@ -225,10 +225,11 @@ const SchemaForm = ({
 
   const handleSubmit = async (values) => {
     try {
-      const action = initialValues
+      const updateForm = initialValues && Object.keys(initialValues).length > 0;
+      const action = updateForm
         ? updateTable({ table: table, data: values })
-        : addTable({ table: table, data: values });
-
+        : createEntry({ table: table, data: values });
+      console.log(action)
       const result = await dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {
         setAddModalVisible(false);
