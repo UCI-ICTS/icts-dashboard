@@ -323,18 +323,16 @@ class GeneticFindings(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        help_text="Reference allele of the variant"
+        help_text="Reference allele of the variant",
     )
     alt = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        help_text="Alternate allele of the variant"
+        help_text="Alternate allele of the variant",
     )
     copy_number = models.IntegerField(
-        blank=True,
-        null=True,
-        help_text="CNV copy number"
+        blank=True, null=True, help_text="CNV copy number"
     )
     ClinGen_allele_ID = models.CharField(
         max_length=255,
@@ -757,5 +755,5 @@ class Biobank(models.Model):
         return f"{self.biobank_id} ({self.participant_id})"
 
     class Meta:
-        verbose_name = "Biobank Sample (with traceability)"
+        verbose_name = "Biobank Sample"
         ordering = ["participant_id", "collection_date"]

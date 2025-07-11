@@ -457,7 +457,9 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
         )
 
 
-def update_metadata(table_name: str, identifier: str, model_instance, datum: dict):
+def update_metadata_entry(
+    table_name: str, identifier: str, model_instance, datum: dict
+):
     """
     Update an existing model instance based on the provided data.
 
@@ -503,82 +505,70 @@ def update_metadata(table_name: str, identifier: str, model_instance, datum: dic
         },
     }
 
-    model_input_serializer = table_serializers[table_name]["input_serializer"]
-    model_output_serializer = table_serializers[table_name]["output_serializer"]
+    serializers = table_serializers.get(table_name)
+    if not serializers:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Unsupported table: {table_name}",
+            ),
+            "rejected_request",
+        )
 
     if "parsed_data" in table_serializers[table_name]:
         datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
     else:
         datum = remove_na(datum=datum)
 
-    table_validator = TableValidator()
-    table_validator.validate_json(json_object=datum, table_name=table_name)
-    results = table_validator.get_validation_results()
-
-    if results["valid"]:
+    with transaction.atomic():
+        input_serializer = serializers["input_serializer"]
+        output_serializer = serializers["output_serializer"]
         changes = compare_data(
-            old_data=model_output_serializer(model_instance).data,
+            old_data=output_serializer(model_instance).data,
             new_data=datum,
         )
 
-        with transaction.atomic():
-            serializer = model_input_serializer(model_instance, data=datum)
-            if serializer.is_valid():
-                updated_instance = serializer.save()
+        serializer = input_serializer(model_instance, data=datum, partial=True)
 
-                if not changes:
-                    return (
-                        response_constructor(
-                            identifier=identifier,
-                            request_status="SUCCESS",
-                            code=200,
-                            message=f"{table_name} {identifier} had no changes.",
-                            data={
-                                "updates": None,
-                                "instance": model_output_serializer(
-                                    updated_instance
-                                ).data,
-                            },
-                        ),
-                        "accepted_request",
-                    )
+        if serializer.is_valid():
+            updated_instance = serializer.save()
 
-                return (
-                    response_constructor(
-                        identifier=identifier,
-                        request_status="UPDATED",
-                        code=200,
-                        message=(f"{table_name} {identifier} updated."),
-                        data={
-                            "updates": changes,
-                            "instance": model_output_serializer(updated_instance).data,
-                        },
-                    ),
-                    "accepted_request",
-                )
-            else:
-                error_data = [
-                    {item: serializer.errors[item]} for item in serializer.errors
-                ]
-                return (
-                    response_constructor(
-                        identifier=identifier,
-                        request_status="BAD REQUEST",
-                        code=400,
-                        data=error_data,
-                    ),
-                    "rejected_request",
-                )
-    else:
-        return (
-            response_constructor(
-                identifier=identifier,
-                request_status="BAD REQUEST",
-                code=400,
-                data=results["errors"],
-            ),
-            "rejected_request",
-        )
+            # import pdb; pdb.set_trace()
+
+            message = (
+                f"{table_name} {identifier} updated."
+                if changes
+                else f"{table_name} {identifier} had no changes."
+            )
+            status_label = "UPDATED" if changes else "NO CHANGE"
+            code = 200 if changes else 204
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status=status_label,
+                    code=code,
+                    message=message,
+                    data={
+                        "updates": changes or None,
+                        "instance": output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
 
 
 def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
@@ -648,3 +638,81 @@ def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
             ),
             "rejected_request",
         )
+
+
+# def validate_biobank_traceability(biobank):
+#     """
+#     Check that all experiments and alignments linked to a biobank sample
+#     are also traceable via analyte → experiment → aligned.
+
+#     Args:
+#         biobank (Biobank): The biobank sample to validate.
+
+#     Returns:
+#         dict: A status summary with errors, if any.
+#     """
+#     errors = []
+
+#     analyte_ids = {a.analyte_id for a in biobank.child_analytes.all()}
+#     experiment_ids = {e.experiment_id for e in biobank.experiments.all()}
+#     alignment_ids = {a.aligned_id for a in biobank.alignments.all()}
+
+#     for exp in biobank.experiments.all():
+#         analyte_match = getattr(exp, "analyte", None)
+#         if analyte_match and analyte_match.analyte_id not in analyte_ids:
+#             errors.append(f"Experiment {exp.experiment_id} links to unknown analyte {analyte_match.analyte_id}")
+
+#     for aln in biobank.alignments.all():
+#         experiment_match = getattr(aln, "experiment", None)
+#         if experiment_match and experiment_match.experiment_id not in experiment_ids:
+#             errors.append(f"Alignment {aln.aligned_id} links to unknown experiment {experiment_match.experiment_id}")
+
+#     return {
+#         "biobank_id": biobank.biobank_id,
+#         "status": "valid" if not errors else "invalid",
+#         "errors": errors
+#     }
+
+
+# def repair_biobank_links(biobank):
+#     """
+#     Attempt to reconstruct relationships for a Biobank sample:
+#     - link Analytes (by biobank or ID pattern)
+#     - link Experiments via Analyte
+#     - link Alignments via Experiment
+#     """
+#     result = {"biobank_id": biobank.biobank_id, "linked": {}, "errors": []}
+
+#     try:
+#         # 1. Link Analytes
+#         analytes = Analyte.objects.filter(analyte_id__icontains=biobank.participant_id_id)
+#         if analytes:
+#             biobank.child_analytes.set(analytes)
+#             import pdb; pdb.set_trace()
+#             result["linked"]["analytes"] = [a.analyte_id for a in analytes]
+#         else:
+#             result["errors"].append("No matching analytes")
+
+#         # 2. Link Experiments via Analyte
+#         experiments = Experiment.objects.filter(analyte__in=analytes)
+#         if experiments:
+#             biobank.experiments.set(experiments)
+#             result["linked"]["experiments"] = [e.experiment_id for e in experiments]
+#         else:
+#             result["errors"].append("No experiments found for analytes")
+
+#         # 3. Link Alignments via Experiment
+#         alignments = Aligned.objects.filter(experiment__in=experiments)
+#         if alignments:
+#             biobank.alignments.set(alignments)
+#             result["linked"]["alignments"] = [a.aligned_id for a in alignments]
+#         else:
+#             result["errors"].append("No alignments found for experiments")
+
+#         biobank.save()
+
+#     except Exception as e:
+#         result["errors"].append(str(e))
+
+#     result["status"] = "complete" if not result["errors"] else "partial"
+#     return result
