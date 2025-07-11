@@ -12,6 +12,7 @@ but in this version we assume that the create function handles validation.
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
 import django
 
 django.setup()
@@ -19,8 +20,9 @@ import sys
 import csv
 import argparse
 import json
+from collections import defaultdict
 from config.selectors import bulk_model_retrieve
-from metadata.services import create_metadata
+from metadata.services import create_metadata, update_metadata_entry
 from metadata.models import (
     Participant,
     Family,
@@ -30,7 +32,11 @@ from metadata.models import (
     Biobank,
 )
 
-from experiments.services import create_aligned, create_experiment
+from experiments.services import (
+    create_aligned,
+    create_experiment,
+    update_experiments_entry,
+)
 from experiments.models import (
     ExperimentDNAShortRead,
     ExperimentRNAShortRead,
@@ -162,10 +168,13 @@ class TableConverter:
 
         if table_name in metadata_models:
             create = create_metadata
+            update = update_metadata_entry
         if table_name in experiment_models:
             create = create_experiment
+            updata = update_experiments_entry
         if table_name in alignment_models:
             create = create_aligned
+            updata = update_experiments_entry
 
         results = []
 
@@ -174,33 +183,43 @@ class TableConverter:
             if not identifier:
                 print(f"No identifier ({identifier_field}) found in record: {record}")
                 continue
-
+            record["completed"] = bool(record["completed"])
+            # import pdb; pdb.set_trace()
             model_instance = model_instances.get(record[identifier_field])
-            # if model_instance:
-            #     result_entry = {
-            #         "identifier": identifier,
-            #         "request_status": "NO CHANGE",
-
-            #         "updates": "NA",
-            #         "validation_fails": "NA"
-            #     }
-            #     results.append(result_entry)
-            # else:
-            response, status = create(
-                table_name, identifier, record
-            )
-            result_entry = {
-                "identifier": identifier,
-                "request_status": (
-                    "NO CHANGE"
-                    if response["request_status"] == "CREATED"
-                    else response.get("request_status", "UNKNOWN")
-                ),
-                "validation_fails": response["data"],
-            }
+            if model_instance:
+                data, result = update(
+                    table_name,
+                    identifier,
+                    model_instance,
+                    record,
+                )
+                result_entry = {
+                    "identifier": identifier,
+                    "request_status": data["request_status"],
+                    "updates": data["updates"] if "updates" in data else "NA",
+                    "validation_fails": data if "updates" not in data else "NA",
+                }
+                results.append(result_entry)
+            else:
+                response, status = create(table_name, identifier, record)
+                result_entry = {
+                    "identifier": identifier,
+                    "request_status": (
+                        "NO CHANGE"
+                        if response["request_status"] == "CREATED"
+                        else response.get("request_status", "UNKNOWN")
+                    ),
+                    "validation_fails": response["data"],
+                }
             results.append(result_entry)
-            #if result_entry['request_status'] == "CREATED":
-            #import pdb; pdb.set_trace()
+
+        grouped = defaultdict(list)
+        for entry in results:
+            status = entry.get("request_status", "UNKNOWN")
+            grouped[status].append(entry)
+        summary = {status: len(entries) for status, entries in grouped.items()}
+        print(summary)
+
         self.write_results(table_file.split(".")[0], results)
 
     def write_results(self, table_file: str, results: list):

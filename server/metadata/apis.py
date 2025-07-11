@@ -34,7 +34,7 @@ from metadata.services import (
     PhenotypeSerializer,
     BiobankSerializer,
     create_metadata,
-    update_metadata,
+    update_metadata_entry,
     delete_metadata,
 )
 
@@ -149,7 +149,7 @@ class ParticipantViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "participant", participant_id, participant[participant_id], datum
                 )
                 response_data.append(data)
@@ -319,7 +319,7 @@ class FamilyViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "family", family_id, family[family_id], datum
                 )
                 response_data.append(data)
@@ -487,7 +487,7 @@ class AnalyteViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "analyte", analyte_id, analyte[analyte_id], datum
                 )
                 response_data.append(data)
@@ -655,7 +655,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "phenotype", phenotype_id, phenotype[phenotype_id], datum
                 )
                 response_data.append(data)
@@ -831,7 +831,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "genetic_findings",
                     genetic_findings_id,
                     genetic_findings[genetic_findings_id],
@@ -1031,7 +1031,7 @@ class BiobankViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata(
+                data, result = update_metadata_entry(
                     "biobank", biobank_id, biobank[biobank_id], datum
                 )
                 response_data.append(data)

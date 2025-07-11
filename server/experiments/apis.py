@@ -39,10 +39,9 @@ from experiments.services import (
     ExperimentDNAInputSerializer,
     ExperimentDNAOutputSerializer,
     create_experiment,
-    update_experiment,
+    update_experiments_entry,
     delete_experiment,
     create_aligned,
-    update_aligned,
     delete_aligned,
 )
 from experiments.selectors import get_experiment
@@ -169,7 +168,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiment(
+                data, result = update_experiments_entry(
                     "experiment_rna_short_read",
                     experiment_rna_short_read_id,
                     experiment_rna_short_read[experiment_rna_short_read_id],
@@ -360,7 +359,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_aligned(
+                data, result = update_experiments_entry(
                     "aligned_rna_short_read",
                     aligned_rna_short_read_id,
                     aligned_rna_short_read[aligned_rna_short_read_id],
@@ -548,7 +547,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiment(
+                data, result = update_experiments_entry(
                     "experiment_dna_short_read",
                     experiment_dna_short_read_id,
                     experiment_dna_short_read[experiment_dna_short_read_id],
@@ -736,7 +735,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_aligned(
+                data, result = update_experiments_entry(
                     "aligned_dna_short_read",
                     aligned_dna_short_read_id,
                     aligned_dna_short_read[aligned_dna_short_read_id],
@@ -811,7 +810,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
         method="get",
         operation_description="Retrieve all ExperimentPacBio entries",
         responses={200: ExperimentPacBioSerializer(many=True), 400: "Bad request"},
-        tags=["*"],
+        tags=["ExperimentPacBio"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
@@ -921,7 +920,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiment(
+                data, result = update_experiments_entry(
                     "experiment_pac_bio",
                     experiment_pac_bio_id,
                     experiment_pac_bio[experiment_pac_bio_id],
@@ -1102,7 +1101,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_aligned(
+                data, result = update_experiments_entry(
                     "aligned_pac_bio",
                     aligned_pac_bio_id,
                     aligned_pac_bio[aligned_pac_bio_id],
@@ -1283,7 +1282,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiment(
+                data, result = update_experiments_entry(
                     "experiment_nanopore",
                     experiment_nanopore_id,
                     experiment_nanopore[experiment_nanopore_id],
@@ -1466,7 +1465,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_aligned(
+                data, result = update_experiments_entry(
                     "aligned_nanopore",
                     aligned_nanopore_id,
                     aligned_nanopore[aligned_nanopore_id],
