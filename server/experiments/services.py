@@ -638,8 +638,6 @@ def update_experiments_entry(
             "rejected_request",
         )
 
-    datum = remove_na(datum=datum)
-
     with transaction.atomic():
         input_serializer = serializers["input_serializer"]
         output_serializer = serializers["output_serializer"]
@@ -652,8 +650,6 @@ def update_experiments_entry(
 
         if serializer.is_valid():
             updated_instance = serializer.save()
-
-            # import pdb; pdb.set_trace()
 
             message = (
                 f"{table_name} {identifier} updated."
