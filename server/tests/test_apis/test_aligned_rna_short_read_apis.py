@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Aligned
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -19,7 +22,7 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_rna_short_read_api(self):
         url = "/api/experiments/aligned_rna_short_read/create/"
 
-        aligned1 = {   # Existing entry, should fail
+        aligned1 = {  # Existing entry, should fail
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
@@ -46,11 +49,10 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
-
+            "percent_chrX_Y": None,
         }
 
-        aligned2 = {   # New entry
+        aligned2 = {  # New entry
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2",
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
@@ -77,10 +79,10 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
+            "percent_chrX_Y": None,
         }
 
-        aligned3 =  {   # New entry
+        aligned3 = {  # New entry
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3.cram",
@@ -107,10 +109,10 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
+            "percent_chrX_Y": None,
         }
 
-        #Checks for the Aligned table before creation
+        # Checks for the Aligned table before creation
         aligned1_exists = Aligned.objects.filter(
             pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         ).exists()
@@ -121,11 +123,11 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         ).exists()
         assert not aligned2_exists
 
-        response_200 = self.client.post(url, [aligned2], format='json')
-        response_207 = self.client.post(url, [aligned1, aligned3], format='json')
-        response_400 = self.client.post(url, [aligned1, aligned1], format='json')
+        response_200 = self.client.post(url, [aligned2], format="json")
+        response_207 = self.client.post(url, [aligned1, aligned3], format="json")
+        response_400 = self.client.post(url, [aligned1, aligned1], format="json")
 
-        #Checks for the Aligned table after creation
+        # Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
             pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2"
         ).exists()
@@ -150,9 +152,9 @@ class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_rna_short_read/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -189,7 +191,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
+            "percent_chrX_Y": None,
         }
 
         aligned2 = {
@@ -219,10 +221,10 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
+            "percent_chrX_Y": None,
         }
 
-        aligned3 =  {
+        aligned3 = {
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3",
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
@@ -249,16 +251,18 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "percent_UMI": None,
             "five_prime_three_prime_bias": None,
             "percent_GC": None,
-            "percent_chrX_Y": None
+            "percent_chrX_Y": None,
         }
+        aligned4 = aligned1
+        aligned4["gene_annotation"] = "hadley"
 
-
-        response_200 = self.client.post(url, [aligned1], format='json')
-        response_207 = self.client.post(url, [aligned1, aligned2], format='json')
-        response_400 = self.client.post(url, [aligned2, aligned3], format='json')
+        response_207 = self.client.post(url, [aligned4, aligned2], format="json")
+        response_200 = self.client.post(url, [aligned1], format="json")
+        response_400 = self.client.post(url, [aligned2, aligned3], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
+
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
@@ -267,7 +271,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
 class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
     def test_delete_rna_short_read_api(self):
 
-        #Checks for the Alignment table before deletion
+        # Checks for the Alignment table before deletion
 
         alignment1_exists = Aligned.objects.filter(
             pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
@@ -278,10 +282,10 @@ class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/aligned_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_rna_short_read/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
-        #Checks for the Alignment table after deletion
+        # Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
             pk="aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         ).exists()

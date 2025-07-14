@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Experiment
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -31,7 +34,7 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
             "date_data_generation": "2022-12-29",
             "target_insert_size": 150,
             "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": ""
+            "sequencing_event_details": "",
         }
 
         experiment2 = {  # Valid 2
@@ -46,7 +49,7 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
             "date_data_generation": "2022-07-06",
             "target_insert_size": 150,
             "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": ""
+            "sequencing_event_details": "",
         }
 
         experiment3 = {  # Valid 3
@@ -61,14 +64,14 @@ class CreateDNAShortReadAPITest(APITestCaseWithAuth):
             "date_data_generation": "2022-05-03",
             "target_insert_size": 150,
             "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": ""
+            "sequencing_event_details": "",
         }
 
-        response_200 = self.client.post(url, [experiment1, experiment2], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment3], format='json')
-        response_400 = self.client.post(url, [experiment2, experiment2], format='json')
+        response_200 = self.client.post(url, [experiment1, experiment2], format="json")
+        response_207 = self.client.post(url, [experiment1, experiment3], format="json")
+        response_400 = self.client.post(url, [experiment2, experiment2], format="json")
 
-        #Checks for the Experiment table
+        # Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_2"
         ).exists()
@@ -96,9 +99,9 @@ class ReadDNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_dna_short_read/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_dna_short_read/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -119,7 +122,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
             "date_data_generation": "2022-12-29",
             "target_insert_size": 500,  # changed from 150
             "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": ""
+            "sequencing_event_details": "",
         }
 
         experiment2 = {  # Invalid, missing target_insert_size
@@ -134,12 +137,12 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
             "date_data_generation": "2022-07-06",
             "target_insert_size": "",  # missing
             "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": ""
+            "sequencing_event_details": "",
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment2], format='json')
-        response_400 = self.client.post(url, [experiment2, experiment2], format='json')
+        response_207 = self.client.post(url, [experiment1, experiment2], format="json")
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_400 = self.client.post(url, [experiment2, experiment2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
@@ -152,7 +155,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
 class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_dna_short_read_api(self):
 
-        #Checks for the Experiment table before deletion
+        # Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
@@ -163,10 +166,10 @@ class DeleteDNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_dna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_dna_short_read/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
-        #Checks for the Experiment table after deletion
+        # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
             pk="experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
         ).exists()

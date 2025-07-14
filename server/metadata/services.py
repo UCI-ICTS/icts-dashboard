@@ -518,9 +518,7 @@ def update_metadata_entry(
         )
 
     if "parsed_data" in table_serializers[table_name]:
-        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
-    else:
-        datum = remove_na(datum=datum)
+        datum = table_serializers[table_name]["parsed_data"](datum)
 
     with transaction.atomic():
         input_serializer = serializers["input_serializer"]
@@ -529,7 +527,7 @@ def update_metadata_entry(
             old_data=output_serializer(model_instance).data,
             new_data=datum,
         )
-
+        # import pdb; pdb.set_trace()
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
