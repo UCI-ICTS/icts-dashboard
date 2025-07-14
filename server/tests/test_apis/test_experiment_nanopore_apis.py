@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Experiment
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -32,7 +35,7 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
             "sequencing_platform": "Oxford Nanopore PromethION 48",
             "chemistry_type": "R10.4.1",
             "was_barcoded": False,
-            "barcode_kit": None
+            "barcode_kit": None,
         }
 
         experiment2 = {  # Valid 2
@@ -48,7 +51,7 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
             "sequencing_platform": "Oxford Nanopore PromethION 48",
             "chemistry_type": "R10.4.1",
             "was_barcoded": False,
-            "barcode_kit": None
+            "barcode_kit": None,
         }
 
         experiment3 = {  # Invalid, missing experiment_type
@@ -64,14 +67,14 @@ class CreateNanoporeAPITest(APITestCaseWithAuth):
             "sequencing_platform": "Oxford Nanopore PromethION 48",
             "chemistry_type": "R10.4.1",
             "was_barcoded": False,
-            "barcode_kit": None
+            "barcode_kit": None,
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment2, experiment1], format='json')
-        response_400 = self.client.post(url, [experiment3, experiment3], format='json')
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_207 = self.client.post(url, [experiment2, experiment1], format="json")
+        response_400 = self.client.post(url, [experiment3, experiment3], format="json")
 
-        #Checks for the Experiment table
+        # Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_2"
         ).exists()
@@ -99,9 +102,9 @@ class ReadNanoporePITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_nanopore/?ids=UCI_GREGoR_test-004-004-0-D-3_NANO_1, DNE-01-1"
         url3 = "/api/experiments/experiment_nanopore/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -123,7 +126,7 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
             "sequencing_platform": "Oxford Nanopore PromethION 48",
             "chemistry_type": "R10.4.1",
             "was_barcoded": False,
-            "barcode_kit": None
+            "barcode_kit": None,
         }
 
         experiment2 = {  # Invalid, missing was_barcoded
@@ -139,12 +142,12 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
             "sequencing_platform": "Oxford Nanopore PromethION 48",
             "chemistry_type": "R10.4.1",
             "was_barcoded": None,  # changed
-            "barcode_kit": None
+            "barcode_kit": None,
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment2], format='json')
-        response_400 = self.client.post(url, [experiment2], format='json')
+        response_207 = self.client.post(url, [experiment1, experiment2], format="json")
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_400 = self.client.post(url, [experiment2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
@@ -168,8 +171,8 @@ class DeleteNanoporeAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-001-0-D-3_NANO_1, DNE-01-1"
         url3 = "/api/experiments/experiment_nanopore/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
         # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
