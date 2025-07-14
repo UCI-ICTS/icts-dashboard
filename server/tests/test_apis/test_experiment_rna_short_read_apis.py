@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Experiment
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -34,7 +37,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0
+            "total_reads": 240349679.0,
         }
 
         experiment2 = {
@@ -52,7 +55,7 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0
+            "total_reads": 240349679.0,
         }
 
         experiment3 = {
@@ -70,14 +73,14 @@ class CreateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0
+            "total_reads": 240349679.0,
         }
 
-        response_200 = self.client.post(url, [experiment2], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment3], format='json')
-        response_400 = self.client.post(url, [experiment1, experiment1], format='json')
+        response_200 = self.client.post(url, [experiment2], format="json")
+        response_207 = self.client.post(url, [experiment1, experiment3], format="json")
+        response_400 = self.client.post(url, [experiment1, experiment1], format="json")
 
-        #Checks for the Experiment table
+        # Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         ).exists()
@@ -105,9 +108,9 @@ class ReadRNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_rna_short_read/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -116,22 +119,9 @@ class ReadRNAShortReadAPITest(APITestCaseWithAuth):
 class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_rna_short_read_api(self):
         url = "/api/experiments/experiment_rna_short_read/update/"
-        experiment1 =   {
+        experiment1 = {
             "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
-            "analyte_id": "GREGoR_test-001-001-0-R-2",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
-            "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
-            "library_prep_type": ["rRNA depletion", "globin depletion"],
-            "prep_targets_detail": [],
-            "experiment_type": ["paired-end", "untargeted"],
-            "read_length": 150,
-            "single_or_paired_ends": "paired-end",
-            "date_data_generation": "2023-03-18",
-            "sequencing_platform": "NovaSeq",
-            "within_site_batch_name": "RNA 2A",
-            "RIN": None,
-            "estimated_library_size": None,
-            "total_reads": 240349679
+            "read_length": 300,
         }
 
         experiment2 = {
@@ -149,17 +139,23 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "within_site_batch_name": "RNA 2A",
             "RIN": None,
             "estimated_library_size": None,
-            "total_reads": 240349679.0
+            "total_reads": 240349679.0,
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment2], format='json')
-        response_400 = self.client.post(url, [experiment2, experiment2], format='json')
+        experiment3 = experiment1
+        experiment3["read_length"] = "150"
+
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_207 = self.client.post(url, [experiment3, experiment2], format="json")
+        response_400 = self.client.post(url, [experiment2, experiment2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_200.data[0]["request_status"], "UPDATED")
+
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
@@ -167,7 +163,7 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
 class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_rna_short_read_api(self):
 
-        #Checks for the Experiment table before deletion
+        # Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
@@ -178,10 +174,10 @@ class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_rna_short_read/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
-        #Checks for the Experiment table after deletion
+        # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
             pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
         ).exists()
