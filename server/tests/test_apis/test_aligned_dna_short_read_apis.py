@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Aligned
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -31,7 +34,7 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
             "alignment_software": "bwa 0.7.17",
             "mean_coverage": None,
             "analysis_details": "Raw reads were trimmed with fastp 0.23.2 and aligned to GRCh38 (no alts) with bwa 0.7.17. Duplicates were marked and removed with GATK 4.3.0 MarkDuplicates, and BQSR was applied. Mean depth was computed with somalier 0.2.16.",
-            "quality_issues": ""
+            "quality_issues": "",
         }
 
         aligned2 = {  # New entry
@@ -49,7 +52,7 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
             "quality_issues": None,
         }
 
-        aligned3 =  {  # New entry, invalid
+        aligned3 = {  # New entry, invalid
             "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1_DNA_1-Aligned_2",
             "experiment_dna_short_read_id": None,  # missing
             "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-001-002-0-R-1_DNA_1-Aligned_2.cram",
@@ -64,7 +67,7 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
             "quality_issues": None,
         }
 
-        #Checks for the Aligned table before creation
+        # Checks for the Aligned table before creation
         aligned1_exists = Aligned.objects.filter(
             pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
@@ -75,12 +78,12 @@ class CreateAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         ).exists()
         assert not aligned2_exists
 
-        response_200 = self.client.post(url, [aligned2], format='json')
-        response_207 = self.client.post(url, [aligned1, aligned3], format='json')
-        response_400 = self.client.post(url, [aligned3, aligned3], format='json')
+        response_200 = self.client.post(url, [aligned2], format="json")
+        response_207 = self.client.post(url, [aligned1, aligned3], format="json")
+        response_400 = self.client.post(url, [aligned3, aligned3], format="json")
 
-        #import pdb; pdb.set_trace()
-        #Checks for the Aligned table after creation
+        # import pdb; pdb.set_trace()
+        # Checks for the Aligned table after creation
         aligned2_exists = Aligned.objects.filter(
             pk="aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_2"
         ).exists()
@@ -105,9 +108,9 @@ class ReadAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/aligned_dna_short_read/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -147,10 +150,11 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
             "quality_issues": None,
         }
 
-        response_200 = self.client.post(url, [aligned1], format='json')
-        response_207 = self.client.post(url, [aligned1, aligned2], format='json')
-        response_400 = self.client.post(url, [aligned2], format='json')
+        response_200 = self.client.post(url, [aligned1], format="json")
+        response_207 = self.client.post(url, [aligned1, aligned2], format="json")
+        response_400 = self.client.post(url, [aligned2], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
@@ -161,7 +165,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
 class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_dna_short_read_api(self):
 
-        #Checks for the Alignment table before deletions
+        # Checks for the Alignment table before deletions
         alignment1_exists = Aligned.objects.filter(
             pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
@@ -171,10 +175,10 @@ class DeleteAlignedDNAShortReadAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/aligned_dna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1, DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
-        #Checks for the Alignment table after deletion
+        # Checks for the Alignment table after deletion
         alignment2_exists = Aligned.objects.filter(
             pk="aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
         ).exists()
