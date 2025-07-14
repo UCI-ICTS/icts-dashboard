@@ -2,10 +2,13 @@
 # tests/test_metadata/test_services.py
 
 import json
-from io import StringIO
-from django.test import TestCase
-from metadata.models import Participant, Biobank, Analyte
+from collections import defaultdict
 from django.core.management import call_command
+from django.test import TestCase
+from io import StringIO
+from typing import Dict, Any
+from metadata.models import Participant, Biobank, Analyte
+from experiments.models import Experiment, Aligned
 from metadata.services import (
     GeneticFindingsSerializer,
     AnalyteSerializer,
@@ -65,36 +68,3 @@ class ServicesTests(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
         self.assertEqual(instance.participant_id, "P001")
-
-
-# class BioBanklTests(TestCase):
-#     # fixtures = ['tests/fixtures/test_fixture.json']
-#     fixtures = ['dump.json']
-
-#     def dump_test_data(self, file_name:str="test_results.json")-> None:
-#         out = StringIO()
-#         call_command('dumpdata', '--exclude', 'contenttypes', '--indent', '2', stdout=out)
-#         with open(file_name, 'w') as f:
-#             f.write(out.getvalue())
-
-#     def test_validate_biobank_traceability(self):
-#         for sample in Biobank.objects.all():
-#             result = validate_biobank_traceability(sample)
-#             if result["status"] == "invalid":
-#                 print(result)
-
-#     def fix_all_biobank_entries(self):
-#         results = {}
-
-#         orphaned_analytes = Analyte.objects.filter(biobank__isnull=True)
-#         homed_analytes = Analyte.objects.filter(biobank__isnull=False)
-#         import pdb; pdb.set_trace()
-#         # for analyte in orphaned_analytes:
-
-
-#     def full_fix_all_biobank_entries(self):
-# results = []
-# for biobank in Biobank.objects.all():
-#     result = repair_biobank_links(biobank)
-#     results.append(result)
-# return results
