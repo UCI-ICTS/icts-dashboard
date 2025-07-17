@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTables, updateTable, addTable } from "../slices/dataSlice";
+import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import TableSelector from "./TableSelector";
@@ -42,7 +42,7 @@ const GregorTables = () => {
     genetic_findings: ["genetic_findings_id", "participant_id", "variant_type"],
     analytes: ["analyte_id", "participant_id", "analyte_type"],
     families: ["family_id", "consanguinity", "family_history_detail"],
-    biobank_entries: ["biobank_id", "participant", "current_location", "status"],
+    biobank_entries: ["biobank_id", "participant", "child_analytes", "alignments", "experiments", "current_location", "status"],
     phenotypes: ["participant_id", "term_id", "ontology", "additional_details"],
     experiment_dna_short_read: ["experiment_dna_short_read_id", "analyte_id", "experiment_sample_id"],
     experiment_rna_short_read: ["experiment_rna_short_read_id","analyte_id", "experiment_sample_id"],
@@ -56,6 +56,11 @@ const GregorTables = () => {
   };
 
   useEffect(() => {
+    console.log("tableview", tableData)
+    if (tableData.length < 1) {
+      // console.log("tableview", tableData.length)
+    }
+    console.log("tableview", tableData.length)
     const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {
