@@ -4,6 +4,7 @@ import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
 import { getCollectionName, getTableName } from "../utils/tableNameMap";
+import { tab } from "@testing-library/user-event/dist/tab";
 
 const initialState = {
   tableView: "participants",
@@ -89,6 +90,22 @@ export const dataSlice = createSlice({
           aligned_rna_short_read,
           status: "fulfilled"
         });
+      })
+      .addCase(fetchTable.pending, (state, action) => {
+        state.status = "loading"
+      })
+      .addCase(fetchTable.rejected, (state, action) => {
+        state.status = "rejected"
+      })
+      .addCase(fetchTable.fulfilled, (state, action) => {
+        state.status = "fulfilled"
+        const { table, response } = action.payload;
+        const stateTable = getTableName(table)
+
+        if (state[stateTable]) {
+          state[stateTable] = response
+        }
+
       })
       .addCase(updateTable.fulfilled, (state, action) => {
         state.status = "fulfilled";
@@ -215,6 +232,21 @@ export const getAllTables = createAsyncThunk(
       return response.data
     } catch(error) {
       console.log("ERROR! ",error)
+    }
+  }
+)
+
+export const fetchTable = createAsyncThunk(
+  "fetchTable",
+  async (table, thunkAPI) => {
+    try {
+      console.log("slice: ", table)
+      const response = await dataService.fetchTable(table);
+      const payload = {response: response.data, table}
+      return payload
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 )
