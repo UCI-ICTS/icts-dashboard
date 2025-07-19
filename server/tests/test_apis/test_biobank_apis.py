@@ -37,7 +37,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "status": "Stored",
             "shipment_date": None,
             "tracking_number": None,
-            "testing_indication": None,
+            "test_indication": None,
             "requested_test": None,
             "child_analytes": [],
             "experiments": [],
@@ -62,7 +62,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "status": "Stored",
             "shipment_date": None,
             "tracking_number": None,
-            "testing_indication": None,
+            "test_indication": None,
             "requested_test": None,
             "child_analytes": [],
             "experiments": [],
@@ -87,7 +87,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
             "status": "Stored",
             "shipment_date": None,
             "tracking_number": None,
-            "testing_indication": None,
+            "test_indication": None,
             "requested_test": None,
             "child_analytes": [],
             "experiments": [],
@@ -125,30 +125,9 @@ class ReadBiobankAPITest(APITestCaseWithAuth):
 class UpdateBiobankAPITest(APITestCaseWithAuth):
     def test_update_biobank_entry(self):
         url = "/api/metadata/biobank/update/"
-        part1 = {  # Valid submission, stored sample shipped out
+        part1 = {  # Valid submission, data-delivered sample ready for analysis
             "biobank_id": "GREGoR_test-001-001-0-R-1",
-            "participant_id": "GREGoR_test-001-001-0",
-            "collection_date": "2024-07-07",
-            "specimen_type": "R",
-            "current_location": "Ambry",
-            "freezer_id": "ULT #1",
-            "shelf_id": "ULT #1 Shelf 1",
-            "rack_id": "PAX RNA Rack 1",
-            "box_type": "9x9 cryobox",
-            "box_id": "12",
-            "box_position": "A1",
-            "tube_barcode": None,
-            "plate_barcode": None,
-            "status": "Shipped",
-            "shipment_date": "2025-03-14",
-            "tracking_number": None,
-            "testing_indication": None,
-            "requested_test": None,
-            "child_analytes": ["GREGoR_test-001-001-0-X-1"],
-            "experiments": [],
-            "alignments": [],
-            "internal_analysis": None,
-            "comments": None,
+            "status": "Ready for variant analysis",
         }
         part2 = {  # Invalid submission; non-existant biobank_id
             "biobank_id": "DNE-001-001-1",
@@ -175,8 +154,12 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
             "internal_analysis": None,
             "comments": None,
         }
+        part3 = {  # Analysis complete, closing case
+            "biobank_id": "GREGoR_test-001-001-0-R-1",
+            "completed": True,
+        }
         response_200 = self.client.post(url, [part1], format="json")
-        response_207 = self.client.post(url, [part1, part2], format="json")
+        response_207 = self.client.post(url, [part3, part2], format="json")
         response_400 = self.client.post(url, [part2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)

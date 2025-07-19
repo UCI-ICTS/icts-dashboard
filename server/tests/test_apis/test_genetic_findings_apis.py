@@ -172,28 +172,9 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
         url = "/api/metadata/genetic_findings/update/"
         part1 = {  # Valid submission
             "genetic_findings_id": "10_73792184_GREGoR_test-001-001-0",
-            "participant_id": "GREGoR_test-001-001-0",
-            "experiment_id": ["WGS"],
-            "variant_type": ["SNV/INDEL"],
-            "sv_type": "",
-            "variant_reference_assembly": "GRCh38",
-            "chrom": "10",
-            "pos": 73792184,
-            "ref": "C",
-            "alt": "T",
-            "gene_of_interest": [],  # changed
-            "transcript": "ENST00000604729.6",
-            "hgvsc": "c.1645C>T",
-            "zygosity": "Heterozygous",
-            "variant_inheritance": "maternal",
-            "gene_known_for_phenotype": "Candidate",
-            "condition_inheritance": ["Unknown"],
-            "GREGoR_variant_classification": "Curation in progress",
-            "gene_disease_validity": "Curation in progress",
-            "partial_contribution_explained": [],
-            "method_of_discovery": ["SR-GS"],
-            "additional_family_members_with_variant": [],
+            "gene_of_interest": [],
         }
+
         part2 = {  # Invalid submission; missing zygosity
             "genetic_findings_id": "11_64660831_GREGoR_test-004-004-0",
             "participant_id": "GREGoR_test-004-004-0",

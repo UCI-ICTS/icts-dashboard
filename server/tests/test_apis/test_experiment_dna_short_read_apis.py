@@ -112,17 +112,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_dna_short_read/update/"
         experiment1 = {  # Valid
             "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
-            "analyte_id": "GREGoR_test-001-001-0-D-1",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
-            "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
-            "read_length": 150,
-            "experiment_type": "genome",
-            "targeted_regions_method": "",
-            "targeted_region_bed_file": "",
-            "date_data_generation": "2022-12-29",
             "target_insert_size": 500,  # changed from 150
-            "sequencing_platform": "NovaSeq",
-            "sequencing_event_details": "",
         }
 
         experiment2 = {  # Invalid, missing target_insert_size
@@ -141,7 +131,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         }
 
         response_207 = self.client.post(url, [experiment1, experiment2], format="json")
-        response_200 = self.client.post(url, [experiment1], format="json")
+        response_200 = self.client.post(url, [experiment1], format="json")  # Returns SUCCESS instead of UPDATED
         response_400 = self.client.post(url, [experiment2, experiment2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)

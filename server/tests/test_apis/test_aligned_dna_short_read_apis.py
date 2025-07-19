@@ -130,24 +130,15 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
             "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
             "reference_assembly_details": "GRCh38, no alts",
             "alignment_software": "bwa 0.7.17",
-            "mean_coverage": "32.1",  # Added
+            "mean_coverage": 32.1,  # Added
             "analysis_details": "Raw reads were trimmed with fastp 0.23.2 and aligned to GRCh38 (no alts) with bwa 0.7.17. Duplicates were marked and removed with GATK 4.3.0 MarkDuplicates, and BQSR was applied. Mean depth was computed with somalier 0.2.16.",
             "quality_issues": None,
         }
 
         aligned2 = {  # Invalid, missing reference assembly, uri, and details
             "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
-            "experiment_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
-            "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.cram",
-            "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.crai",
-            "md5sum": "70754026de72938744accd00e32ea0dd",
             "reference_assembly": None,  # missing
-            "reference_assembly_uri": None,
-            "reference_assembly_details": None,
-            "alignment_software": "bwa 0.7.17",
-            "mean_coverage": "38.4",  # Added
-            "analysis_details": "Raw reads were trimmed with fastp 0.23.2 and aligned to GRCh38 (no alts) with bwa 0.7.17. Duplicates were marked and removed with GATK 4.3.0 MarkDuplicates, and BQSR was applied. Mean depth was computed with somalier 0.2.16.",
-            "quality_issues": None,
+            "mean_coverage": 38.4,
         }
 
         response_200 = self.client.post(url, [aligned1], format="json")
@@ -157,7 +148,7 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
 
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        self.assertEqual(response_207.data[0]["request_status"], "NO CHANGE")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 

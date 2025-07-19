@@ -173,77 +173,17 @@ class UpdateAlignedPacBioAPITest(APITestCaseWithAuth):
 
         aligned2 = {  # Valid
             "aligned_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1.bai",
-            "md5sum": "727f9869058ef757cc3ff66503f1e036",
-            "reference_assembly": "GRCh38_noalt",
-            "alignment_software": "pbmm2 v2.0",  # changed
-            "analysis_details": None,
-            "mean_coverage": None,
-            "genome_coverage": None,
-            "contamination": None,
-            "sex_concordance": None,
-            "num_reads": None,
-            "num_bases": None,
-            "read_length_mean": None,
-            "num_aligned_reads": None,
-            "num_aligned_bases": None,
-            "aligned_read_length_mean": None,
-            "read_error_rate": None,
-            "mapped_reads_pct": None,
-            "methylation_called": True,
-            "quality_issues": None
+            "alignment_software": "pbmm2 v2.0",
         }
 
         aligned3 =  {  # Invalid, missing alignment_software
             "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2.bai",
-            "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",
-            "reference_assembly": "GRCh38_noalt",
-            "alignment_software": None,  # changed
-            "analysis_details": None,
-            "mean_coverage": None,
-            "genome_coverage": None,
-            "contamination": None,
-            "sex_concordance": None,
-            "num_reads": None,
-            "num_bases": None,
-            "read_length_mean": None,
-            "num_aligned_reads": None,
-            "num_aligned_bases": None,
-            "aligned_read_length_mean": None,
-            "read_error_rate": None,
-            "mapped_reads_pct": None,
-            "methylation_called": True,
-            "quality_issues": None
+            "alignment_software": None,
         }
 
         aligned4 =  {  # Invalid, swaps md5sum with a different sample
             "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
-            "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
-            "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bam",
-            "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0.bai",
-            "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",  # changed but already exists in db.
-            "reference_assembly": "GRCh38_noalt",
-            "alignment_software": "pbmm2 v1.10.0",
-            "analysis_details": None,
-            "mean_coverage": 30.0,
-            "genome_coverage": None,
-            "contamination": None,
-            "sex_concordance": None,
-            "num_reads": None,
-            "num_bases": None,
-            "read_length_mean": None,
-            "num_aligned_reads": None,
-            "num_aligned_bases": None,
-            "aligned_read_length_mean": None,
-            "read_error_rate": None,
-            "mapped_reads_pct": None,
-            "methylation_called": True,
-            "quality_issues": None
+            "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",  # changed but already exists in the db from a different aligned_pac_bio_id
         }
 
 
