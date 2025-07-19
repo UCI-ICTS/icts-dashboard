@@ -115,18 +115,7 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_nanopore/update/"
         experiment1 = {  # Valid
             "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
-            "analyte_id": "GREGoR_test-001-001-0-D-3",
-            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
-            "seq_library_prep_kit_method": "Kit 14",
             "fragmentation_method": "Covaris g-TUBE",
-            "experiment_type": "genome",
-            "targeted_regions_method": None,
-            "targeted_region_bed_file": None,
-            "date_data_generation": "2023-10-10",
-            "sequencing_platform": "Oxford Nanopore PromethION 48",
-            "chemistry_type": "R10.4.1",
-            "was_barcoded": False,
-            "barcode_kit": None,
         }
 
         experiment2 = {  # Invalid, missing was_barcoded

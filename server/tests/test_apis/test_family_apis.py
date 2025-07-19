@@ -80,7 +80,6 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
             "consanguinity_detail": "New consanguinity detail found, UPDATE",
             "pedigree_file": "s3://gregor-data/P-101/P-101.ped",
             "pedigree_file_detail": "New pedigree found",
-            "family_history_detail": "",
         }
         part2 = {  # Invalid submission; missing consanguinity
             "family_id": "GREGoR_test-004",

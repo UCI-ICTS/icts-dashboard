@@ -154,31 +154,7 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_pac_bio/update/"
         experiment1 = {  # Valid
             "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
-            "analyte_id": "GREGoR_test-001-001-0-D-2",
-            "experiment_sample_id": "UCI-014",
-            "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
-            "fragmentation_method": "CHANGE",
-            "experiment_type": "genome",
-            "targeted_regions_method": "",
-            "targeted_region_bed_file": "",
-            "date_data_generation": "2023-09-29",
-            "sequencing_platform": "PacBio Revio",
-            "was_barcoded": True,
-            "barcode_kit": "",
-            "application_kit": "",
-            "smrtlink_server_version": "13.0.0.207600",
-            "instrument_ics_version": "13.0.1.212553",
-            "size_selection_method": "",
-            "library_size": "",
-            "smrt_cell_kit": "",
-            "smrt_cell_id": "",
-            "movie_name": "",
-            "polymerase_kit": "",
-            "sequencing_kit": "",
-            "movie_length_hours": None,
-            "includes_kinetics": False,
-            "includes_CpG_methylation": False,
-            "by_strand": False,
+            "fragmentation_method": "Hamilton Microlab Pipette Shearing",
         }
 
         experiment2 = {  # Invalid, missing experiment_type

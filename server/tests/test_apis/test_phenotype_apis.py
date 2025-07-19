@@ -85,15 +85,10 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
         url = "/api/metadata/phenotype/update/"
         part1 = {  # Valid submission
             "phenotype_id": "1.2",
-            "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002194",
-            "presence": "Present",
-            "ontology": "HPO",
-            "additional_details": "gross motor delay",
-            "onset_age_range": "HP:0011463",
             "additional_modifiers": ["HP:0025292"],
             "syndromic": "non-syndromic",
         }
+
         part2 = {  # Invalid submission; invalid syndromic
             "phenotype_id": "1.3",
             "participant_id": "GREGoR_test-002-001-2",
