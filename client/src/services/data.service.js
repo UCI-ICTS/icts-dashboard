@@ -41,20 +41,20 @@ const fetchTable = async (table) => {
 
 const createEntry = async (table, data) => {
   if (metadata.includes(table)) {
-    const response = await axios.post(APIDB + `api/metadata/${table}/create/`, [data], {headers: getAuthHeaders()})
+    const response = await axios.post(APIDB + `api/metadata/${table}/create/`, data, {headers: getAuthHeaders()})
     return response
   } else {
-    const response = await axios.post(APIDB + `api/experiments/${table}/create/`, [data], {headers: getAuthHeaders()})
+    const response = await axios.post(APIDB + `api/experiments/${table}/create/`, data, {headers: getAuthHeaders()})
     return response
   }
 }
 
 const updateEntry = async (table, data) => {
   if (metadata.includes(table)) {
-    const response = await axios.post(APIDB + `api/metadata/${table}/update/`, [data], {headers: getAuthHeaders()})
+    const response = await axios.post(APIDB + `api/metadata/${table}/update/`, data, {headers: getAuthHeaders()})
     return response
   } else {
-    const response = await axios.post(APIDB + `api/experiments/${table}/update/`, [data], {headers: getAuthHeaders()})
+    const response = await axios.post(APIDB + `api/experiments/${table}/update/`, data, {headers: getAuthHeaders()})
     return response
   }
 }

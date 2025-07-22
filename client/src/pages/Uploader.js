@@ -16,6 +16,7 @@ export const Uploader = () => {
   const dispatch = useDispatch();
   const jsonData = useSelector(state => state.data['jsonData']);
   const { tableView, tableID } = useSelector(state => state.data);
+  const tableName = getCollectionName(tableView)
   const tableData = useSelector(state => state.data[tableView])
   const initialRows = jsonData?.slice(1) || [];
   const schema = schemas[tableView] || { properties: {} };
@@ -23,7 +24,6 @@ export const Uploader = () => {
   const [form] = Form.useForm();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
 
   const handleCsvUpload = (sheet, fileInfo) => {
     const expectedHeaders = Object.keys(schema.properties || {});
@@ -48,7 +48,8 @@ export const Uploader = () => {
   }
 
   const handleSubmit = (values) => {
-    console.log("Form submitted", values);
+    const { rows } = values
+    dispatch(createEntry({ table: tableName, data: rows }));
   };
 
   // Precompute rules
@@ -64,7 +65,6 @@ export const Uploader = () => {
       if (key === tableID) {
         pkRules.push({
           validator: async (_, value) => {
-            console.log("Checking PK:", value, existingPKs);
             if (value && existingPKs.has(value)) {
               return Promise.reject(`${key} value "${value}" already exists`);
             }
@@ -75,47 +75,59 @@ export const Uploader = () => {
 
       rules[key] = [...baseRules, ...pkRules];
     }
-    console.log("tableData loaded:", tableData)
     return rules;
   }, [schema, tableData, tableID]);
 
 
   // Update validation count on change
-  const handleFieldsChange = (_, allFields) => {
-    const errors = allFields.filter(field => field.errors.length > 0);
-    if (errors === 0) {
-      setError(`Validation errors: ${errors.length}`);
+  const updateErrorState = () => {
+    const currentErrors = form.getFieldsError();
+    const hasErrors = currentErrors.some(f => f.errors.length > 0);
+
+    if (hasErrors) {
+      const errorCount = currentErrors.reduce(
+        (count, field) => count + field.errors.length,
+        0
+      );
+      setError(`Validation errors: ${errorCount}`);
     } else {
       setError(null);
     }
   };
 
   useEffect(() => {
-    const tableName = getCollectionName(tableView)
-    dispatch(fetchTable(tableName))
-    form.resetFields();
+    const tableName = getCollectionName(tableView);
+    dispatch(fetchTable(tableName));
+
     handleClear();
-  }, [tableView])
+
+    // Wait until after clear
+    setTimeout(() => {
+      if (form) {
+        form.resetFields();
+      }
+    }, 0);
+  }, [tableView]);
 
   useEffect(() => {
     if (jsonData) {
       form.setFieldsValue({ rows: jsonData.slice(1) });
 
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         form.validateFields()
           .then(() => {
             setError(null);
+            setIsLoading(false); // ✅ Already here
           })
           .catch((err) => {
             console.warn("Initial validation errors:", err);
             setError(`Initial validation errors: ${err.errorFields.length}`);
-          })
-          .finally(() => {
-            setIsLoading(false);
+            setIsLoading(false); // ✅ Add this line
           });
-      }, 100);
+      }, 0);
+
+      return () => clearTimeout(timeout);
     }
-    console.log("jsonData updated:", jsonData);
   }, [jsonData, form]);
 
   return (
@@ -159,8 +171,7 @@ export const Uploader = () => {
         <Row>
           {
             (jsonData !== null) ? (        
-              <Form form={form} onFinish={handleSubmit} onFieldsChange={handleFieldsChange} initialValues={{ rows: initialRows }} layout="vertical">
-                {error && <Alert type="error" message={error} />}
+              <Form form={form} onFinish={handleSubmit} onFieldsChange={updateErrorState} initialValues={{ rows: initialRows }} layout="vertical">
                 <Form.List name="rows">
                   {(fields, { add, remove }) => (
                     <>
@@ -180,6 +191,7 @@ export const Uploader = () => {
                                     remove(index);
                                     setTimeout(() => {
                                       form.validateFields();
+                                      updateErrorState();
                                     }, 0);
                                   }}
                                   icon={<MinusCircleOutlined />}
@@ -205,9 +217,13 @@ export const Uploader = () => {
                     </>
                   )}
                 </Form.List>
-                <Button type="primary" htmlType="submit" style={{ marginTop: 24 }}>
-                  Submit
-                </Button>
+                <Button
+                 type="primary"
+                 disabled={error}
+                 htmlType="submit"
+                 style={{ marginTop: 24 }}
+                >Submit</Button>
+                {error && <Alert type="error" message={error} />}
               </Form>
             ) : (
               <div>No data loaded</div>

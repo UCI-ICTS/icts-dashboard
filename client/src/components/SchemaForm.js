@@ -205,8 +205,8 @@ const SchemaForm = ({
     try {
       const updateForm = initialValues && Object.keys(initialValues).length > 0;
       const action = updateForm
-        ? updateTable({ table: table, data: values })
-        : createEntry({ table: table, data: values });
+        ? updateTable({ table: table, data: [values] })
+        : createEntry({ table: table, data: [values] });
       console.log(action)
       const result = await dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {
