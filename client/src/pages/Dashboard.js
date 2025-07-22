@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from "react-router-dom";
 
 import { Layout, Menu, Button, Spin, Alert, Tooltip, Space } from 'antd';
-import { ProfileOutlined, TeamOutlined, LogoutOutlined, SettingOutlined, ApiOutlined, GithubOutlined } from '@ant-design/icons';
+import { ProfileOutlined, TeamOutlined, HomeOutlined, LogoutOutlined, SettingOutlined, ApiOutlined, GithubOutlined, UploadOutlined } from '@ant-design/icons';
 import AdminPage from './AdminPage';
 import GregorParticipants from "../components/GregorParticipants";
 import '../App.css'; // ✅ Importing CSS
@@ -18,7 +18,7 @@ import ProfilePage from './ProfilePage';
 const { Header, Content, Footer, Sider } = Layout;
 const APIDB = process.env.REACT_APP_APIDB;
 
-const HomePage = () => {
+const Dashboard = () => {
   const location = useLocation();
   const current = location.pathname.split("/").pop();
 
@@ -28,13 +28,12 @@ const HomePage = () => {
   const navigate = useNavigate();
   const auth = useSelector((state) => state.account);
   const isAdmin = auth?.user?.is_superuser
-  console.log(isAdmin)
 
   const handleLogout = () => {
     const refresh_token = auth?.user?.refresh_token;
     localStorage.removeItem('authToken');
     dispatch(logout(refresh_token));
-    navigate('/login');
+    navigate('/');
   };
 
 
@@ -49,9 +48,11 @@ const HomePage = () => {
             selectedKeys={[current]}
             mode="inline"
             items={[
+              { key: 'home', icon: <HomeOutlined />, label: <Link to="/">ICTS Home</Link> },
               { key: 'summary', icon: <TeamOutlined />, label: <Link to="summary">Summary Page</Link> },
               { key: 'table-data', icon: <TeamOutlined />, label: <Link to="table-data">GREGoR Tables</Link> },
               { key: 'participant-detail', icon: <TeamOutlined />, label: <Link to="participant-detail">Participant Detail</Link> },
+              { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
               { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
               ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
             ]}
@@ -106,4 +107,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Dashboard;

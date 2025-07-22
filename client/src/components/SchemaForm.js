@@ -5,32 +5,10 @@ import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd"
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateTable, deleteEntry } from "../slices/dataSlice";
 import { useDispatch } from "react-redux";
+import { getValidationRules } from "../utils/schemaAndTables";
 
 const { Option } = Select;
 
-const getValidationRules = (key, schema, requiredFields = []) => {
-  const rules = [];
-
-  if (requiredFields.includes(key)) {
-    rules.push({ required: true, message: `${key} is required` });
-  }
-
-  if (schema.type === "string") {
-    if (schema.minLength)
-      rules.push({ min: schema.minLength, message: `${key} must be at least ${schema.minLength} characters` });
-    if (schema.maxLength)
-      rules.push({ max: schema.maxLength, message: `${key} must be at most ${schema.maxLength} characters` });
-  }
-
-  if (schema.type === "number" || schema.type === "integer") {
-    if (schema.minimum !== undefined)
-      rules.push({ type: "number", min: schema.minimum, message: `${key} must be at least ${schema.minimum}` });
-    if (schema.maximum !== undefined)
-      rules.push({ type: "number", max: schema.maximum, message: `${key} must be at most ${schema.maximum}` });
-  }
-
-  return rules;
-};
 
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
   const label = (
@@ -227,8 +205,8 @@ const SchemaForm = ({
     try {
       const updateForm = initialValues && Object.keys(initialValues).length > 0;
       const action = updateForm
-        ? updateTable({ table: table, data: values })
-        : createEntry({ table: table, data: values });
+        ? updateTable({ table: table, data: [values] })
+        : createEntry({ table: table, data: [values] });
       console.log(action)
       const result = await dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {

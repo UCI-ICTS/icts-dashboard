@@ -4,7 +4,8 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
+import { getAllTables, updateTable, createEntry, fetchTable } from "../slices/dataSlice";
+import { getCollectionName } from "../utils/tableNameMap";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import TableSelector from "./TableSelector";
@@ -56,11 +57,11 @@ const GregorTables = () => {
   };
 
   useEffect(() => {
-    console.log("tableview", tableData)
-    if (tableData.length < 1) {
-      // console.log("tableview", tableData.length)
+    const tableName = getCollectionName(tableView)
+  
+    if ((!tableData || tableData.length === 0)) {
+      dispatch(fetchTable(tableName))
     }
-    console.log("tableview", tableData.length)
     const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {
