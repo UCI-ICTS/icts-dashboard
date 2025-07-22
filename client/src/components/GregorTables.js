@@ -58,12 +58,12 @@ const GregorTables = () => {
 
   useEffect(() => {
     const tableName = getCollectionName(tableView)
-    console.log("tableview", tableData)
+  
     if ((!tableData || tableData.length === 0)) {
       console.log("tableview", tableView, tableName, tableData.length)
       dispatch(fetchTable(tableName))
     }
-    console.log("tableview", tableData.length)
+
     const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {

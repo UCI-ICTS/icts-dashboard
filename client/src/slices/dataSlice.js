@@ -4,13 +4,12 @@ import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
 import { getCollectionName, getTableName } from "../utils/tableNameMap";
-import { tab } from "@testing-library/user-event/dist/tab";
 
 const initialState = {
   tableView: "participants",
   tableID: "participant_id",
   tableName: "Participants",
-  jsonData: [],
+  jsonData: null,
   participants: [],
   families: [],
   genetic_findings: [],
@@ -36,6 +35,9 @@ export const dataSlice = createSlice({
   reducers: {
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
+    },
+    clearJsonData: (state, action) => {
+      state.jsonData = null;
     },
     setTableView: (state, action) => {
       state.tableView = action.payload.schema;
@@ -296,6 +298,7 @@ export const deleteEntry = createAsyncThunk(
 
 export const {
   setJsonData,
+  clearJsonData,
   setTableView
 } = dataSlice.actions;
 export const dataReducer = dataSlice.reducer;
