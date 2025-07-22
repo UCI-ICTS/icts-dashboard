@@ -16,7 +16,9 @@ import GregorTables from './components/GregorTables';
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import PrivateRout from "./components/PrivateRoute";
 import AccountService from "./services/account.service";
+import HomePage from './pages/Home';
 import { handleExpiredJWT } from './slices/accountSlice';
+import { Uploader } from "./pages/Uploader";
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000;
@@ -64,6 +66,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/account/password-reset" element={<PasswordResetConfirm />} />
       <Route path="/account/password-create" element={<PasswordResetConfirm />} />
@@ -73,6 +76,7 @@ const AppRoutes = () => {
         <Route path="table-data" element={<GregorTables />} />
         <Route path="participant-detail" element={<GregorParticipants />} />
         <Route path="admin" element={<AdminPage />} />
+        <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>

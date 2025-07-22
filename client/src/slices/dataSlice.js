@@ -9,7 +9,7 @@ const initialState = {
   tableView: "participants",
   tableID: "participant_id",
   tableName: "Participants",
-  jsonData: [],
+  jsonData: null,
   participants: [],
   families: [],
   genetic_findings: [],
@@ -35,6 +35,9 @@ export const dataSlice = createSlice({
   reducers: {
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
+    },
+    clearJsonData: (state, action) => {
+      state.jsonData = null;
     },
     setTableView: (state, action) => {
       state.tableView = action.payload.schema;
@@ -89,6 +92,22 @@ export const dataSlice = createSlice({
           aligned_rna_short_read,
           status: "fulfilled"
         });
+      })
+      .addCase(fetchTable.pending, (state, action) => {
+        state.status = "loading"
+      })
+      .addCase(fetchTable.rejected, (state, action) => {
+        state.status = "rejected"
+      })
+      .addCase(fetchTable.fulfilled, (state, action) => {
+        state.status = "fulfilled"
+        const { table, response } = action.payload;
+        const stateTable = getTableName(table)
+
+        if (state[stateTable]) {
+          state[stateTable] = response
+        }
+
       })
       .addCase(updateTable.fulfilled, (state, action) => {
         state.status = "fulfilled";
@@ -219,6 +238,20 @@ export const getAllTables = createAsyncThunk(
   }
 )
 
+export const fetchTable = createAsyncThunk(
+  "fetchTable",
+  async (table, thunkAPI) => {
+    try {
+      const response = await dataService.fetchTable(table);
+      const payload = {response: response.data, table}
+      return payload
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
+    }
+  }
+)
+
 export const createEntry = createAsyncThunk(
   "createEntry",
   async ({table, data}, thunkAPI) => {
@@ -264,6 +297,7 @@ export const deleteEntry = createAsyncThunk(
 
 export const {
   setJsonData,
+  clearJsonData,
   setTableView
 } = dataSlice.actions;
 export const dataReducer = dataSlice.reducer;
