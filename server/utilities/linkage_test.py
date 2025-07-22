@@ -384,6 +384,7 @@ class AlignmentTests(TestCase):
 
         for aln_type, conf in self.alignment_model_map.items():
             aln_model = conf["alignment_model"]
+            print(aln_type)
             exp_fk = conf["exp_fk"]
             aln_id_field = conf["aln_fk"]
 
@@ -392,6 +393,7 @@ class AlignmentTests(TestCase):
                 analyte = getattr(exp, "analyte_id", None)
 
                 result = {
+                    "model": aln_type,
                     "alignment_id": getattr(aln, aln_id_field, None),
                     "experiment_id": None,
                     "analyte": None,

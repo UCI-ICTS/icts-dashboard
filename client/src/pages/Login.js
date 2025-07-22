@@ -44,7 +44,7 @@ const Login = () => {
   // Redirect after login
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/'); // Redirect to Dashboard after login
+      navigate('/dashboard'); // Redirect to Dashboard after login
     }
   }, [isLoggedIn, navigate]);
 
