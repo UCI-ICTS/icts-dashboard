@@ -85,16 +85,11 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
         url = "/api/metadata/phenotype/update/"
         part1 = {  # Valid submission
             "phenotype_id": "1.2",
-            "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002194",
-            "presence": "Present",
-            "ontology": "HPO",
-            "additional_details": "gross motor delay",
-            "onset_age_range": "HP:0011463",
             "additional_modifiers": ["HP:0025292"],
             "syndromic": "non-syndromic",
         }
-        part2 = {  # Invalid submission; invalid additional_modifiers
+
+        part2 = {  # Invalid submission; invalid syndromic
             "phenotype_id": "1.3",
             "participant_id": "GREGoR_test-002-001-2",
             "term_id": "HP:0002076",
@@ -103,10 +98,10 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
             "additional_details": "migraines",
             "onset_age_range": "HP:0003621",
             "additional_modifiers": ["feeding difficulties"],
-            "syndromic": "non-syndromic",
+            "syndromic": "Invalid submission",
         }
-        response_200 = self.client.post(url, [part1], format="json")
         response_207 = self.client.post(url, [part1, part2], format="json")
+        response_200 = self.client.post(url, [part1], format="json")
         response_400 = self.client.post(url, [part2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
@@ -119,7 +114,7 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
 class DeletePhenotypeAPITest(APITestCaseWithAuth):
     def test_delete_phenotype(self):
         url = "/api/metadata/phenotype/delete/?ids=1.2"
-        response = self.client.delete(url, format='json')
-    
+        response = self.client.delete(url, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

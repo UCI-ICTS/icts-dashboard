@@ -9,9 +9,9 @@ import jsonref
 import jsonschema
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from rest_framework import status
 from requests.models import PreparedRequest
-from django.conf import settings
+from rest_framework import status
+from urllib.parse import urlparse
 
 """DB Level Services
 
@@ -21,6 +21,7 @@ from django.conf import settings
 """
 
 SCHEMA_VERSION = settings.SCHEMA_VERSION
+
 
 class TableValidator:
     """
@@ -37,7 +38,9 @@ class TableValidator:
 
     def __init__(self):
         """Initializes the TableValidator with the path to JSON schemas."""
-        self.base_path = os.path.join(settings.BASE_DIR, f"utilities/json_schemas/{SCHEMA_VERSION}")
+        self.base_path = os.path.join(
+            settings.BASE_DIR, f"utilities/json_schemas/{SCHEMA_VERSION}"
+        )
         self.valid = False
         self.errors = []
 
@@ -56,7 +59,7 @@ class TableValidator:
         Returns:
             None
         """
-        #import pdb; pdb.set_trace()
+
         schema_path = os.path.join(self.base_path, f"{table_name}.json")
         try:
             with open(schema_path, "r") as schema_file:
@@ -97,7 +100,9 @@ class TableValidator:
                 "field": error.split(":")[0]
                 .strip("[]' ")
                 .title(),  # Extract and clean up the field name, then capitalize
-                "error": error.split(":")[1].strip(),  # Extract and clean up the error message
+                "error": error.split(":")[
+                    1
+                ].strip(),  # Extract and clean up the error message
             }
             for error in self.errors
         ]
@@ -119,21 +124,24 @@ def remove_na(datum: dict) -> dict:
         list: The list of submissions with 'NA' values removed.
     """
 
-    parsed_datum = {k: v for k, v in datum.items() if v not in ("NA", "", ["NA"], [""], None, [None])}
+    parsed_datum = {
+        k: v
+        for k, v in datum.items()
+        if v not in ("NA", "", ["NA"], [""], None, [None])
+    }
 
     return parsed_datum
 
 
 def multi_value_split(datum: dict) -> dict:
-    """Multi valu split
-    """
+    """Multi valu split"""
     split_datum = {}
 
     for k, v in datum.items():
         if type(v) is str:
-            if '|' in v:
+            if "|" in v:
                 try:
-                    split_datum[k] = [item.strip() for item in v.split('|')]
+                    split_datum[k] = [item.strip() for item in v.split("|")]
                 except TypeError:
                     split_datum[k] = v
                 except AttributeError:
@@ -144,7 +152,7 @@ def multi_value_split(datum: dict) -> dict:
             else:
                 split_datum[k] = v.strip()
         else:
-                split_datum[k] = v
+            split_datum[k] = v
 
     return split_datum
 
@@ -184,7 +192,11 @@ def response_status(accepted_requests: bool, rejected_requests: bool) -> status:
 
 
 def response_constructor(
-    identifier: str, request_status: str, code: str, message: str = None, data: dict = None
+    identifier: str,
+    request_status: str,
+    code: str,
+    message: str = None,
+    data: dict = None,
 ) -> dict:
     """Constructs a structured response dictionary.
 
@@ -222,10 +234,6 @@ def response_constructor(
 
     return response_object
 
-
-from requests.models import PreparedRequest
-from django.core.exceptions import ValidationError
-from urllib.parse import urlparse
 
 def validate_url(url):
     """
@@ -273,7 +281,7 @@ def generate_tsv(data):
         str: A string containing the TSV formatted data.
     """
     output = StringIO(newline="")
-    writer = csv.writer(output, delimiter='\t', lineterminator='\n')
+    writer = csv.writer(output, delimiter="\t", lineterminator="\n")
     if data:
         writer.writerow(data[0].keys())
         for row in data:
@@ -297,14 +305,14 @@ def generate_zip(files):
         BytesIO: A BytesIO object containing the ZIP file data.
     """
     zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
         for file_name, content in files.items():
             zip_file.writestr(file_name, content)
     zip_buffer.seek(0)
     return zip_buffer
 
 
-def compare_data(old_data:dict, new_data:dict) -> dict:
+def compare_data(old_data: dict, new_data: dict) -> dict:
     """
     Compare two dictionaries and return a dictionary of changes.
 

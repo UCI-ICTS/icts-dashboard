@@ -43,7 +43,7 @@ const GregorTables = () => {
     genetic_findings: ["genetic_findings_id", "participant_id", "variant_type"],
     analytes: ["analyte_id", "participant_id", "analyte_type"],
     families: ["family_id", "consanguinity", "family_history_detail"],
-    biobank_entries: ["biobank_id", "participant", "current_location", "status"],
+    biobank_entries: ["biobank_id", "participant", "child_analytes", "alignments", "experiments", "current_location", "status"],
     phenotypes: ["participant_id", "term_id", "ontology", "additional_details"],
     experiment_dna_short_read: ["experiment_dna_short_read_id", "analyte_id", "experiment_sample_id"],
     experiment_rna_short_read: ["experiment_rna_short_read_id","analyte_id", "experiment_sample_id"],
@@ -60,10 +60,8 @@ const GregorTables = () => {
     const tableName = getCollectionName(tableView)
   
     if ((!tableData || tableData.length === 0)) {
-      console.log("tableview", tableView, tableName, tableData.length)
       dispatch(fetchTable(tableName))
     }
-
     const defaultColumns = defaultVisibleColumns[tableView] || [];
     setVisibleColumns(() => {
       return Object.keys(schema.properties).reduce((acc, key) => {

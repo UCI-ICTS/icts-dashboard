@@ -6,7 +6,7 @@ import {store} from "./store";
 import { logout } from "./slices/accountSlice";
 
 const api = axios.create({
-  baseURL: `${process.env.REACT_APP_APIDB || ""}/api/`,
+  baseURL: `${process.env.REACT_APP_APIDB || ""}api/`,
   withCredentials: true,
 });
 

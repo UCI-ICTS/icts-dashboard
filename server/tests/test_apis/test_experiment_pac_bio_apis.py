@@ -6,12 +6,15 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Experiment
 
+
 class APITestCaseWithAuth(APITestCase):
-    fixtures = ['tests/fixtures/test_fixture.json']
+    fixtures = ["tests/fixtures/test_fixture.json"]
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -45,7 +48,7 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
             "movie_length_hours": None,
             "includes_kinetics": False,
             "includes_CpG_methylation": False,
-            "by_strand": False
+            "by_strand": False,
         }
 
         experiment2 = {  # Valid 2
@@ -74,7 +77,7 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
             "movie_length_hours": None,
             "includes_kinetics": False,
             "includes_CpG_methylation": False,
-            "by_strand": False
+            "by_strand": False,
         }
 
         experiment3 = {  # Invalid, missing experiment_type
@@ -103,14 +106,14 @@ class CreatePacBioAPITest(APITestCaseWithAuth):
             "movie_length_hours": None,
             "includes_kinetics": False,
             "includes_CpG_methylation": False,
-            "by_strand": False
+            "by_strand": False,
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment2, experiment1], format='json')
-        response_400 = self.client.post(url, [experiment3, experiment3], format='json')
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_207 = self.client.post(url, [experiment2, experiment1], format="json")
+        response_400 = self.client.post(url, [experiment3, experiment3], format="json")
 
-        #Checks for the Experiment table
+        # Checks for the Experiment table
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-20_PB_1"
         ).exists()
@@ -138,9 +141,9 @@ class ReadPacBioPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_pac_bio/?ids=UCI_GREGoR_test-003-001-1-D-2_PB_1, DNE-01-1"
         url3 = "/api/experiments/experiment_pac_bio/?ids=DNE-1, DNE2"
 
-        response_200 = self.client.get(url1, format='json')
-        response_207 = self.client.get(url2, format='json')
-        response_400 = self.client.get(url3, format='json')
+        response_200 = self.client.get(url1, format="json")
+        response_207 = self.client.get(url2, format="json")
+        response_400 = self.client.get(url3, format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
@@ -151,31 +154,7 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
         url = "/api/experiments/experiment_pac_bio/update/"
         experiment1 = {  # Valid
             "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
-            "analyte_id": "GREGoR_test-001-001-0-D-2",
-            "experiment_sample_id": "UCI-014",
-            "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
-            "fragmentation_method": "",
-            "experiment_type": "genome",
-            "targeted_regions_method": "",
-            "targeted_region_bed_file": "",
-            "date_data_generation": "2023-09-29",
-            "sequencing_platform": "PacBio Revio",
-            "was_barcoded": True,
-            "barcode_kit": "",
-            "application_kit": "",
-            "smrtlink_server_version": "13.0.0.207600",
-            "instrument_ics_version": "13.0.1.212553",
-            "size_selection_method": "",
-            "library_size": "",
-            "smrt_cell_kit": "",
-            "smrt_cell_id": "",
-            "movie_name": "",
-            "polymerase_kit": "",
-            "sequencing_kit": "",
-            "movie_length_hours": None,
-            "includes_kinetics": False,
-            "includes_CpG_methylation": False,
-            "by_strand": False
+            "fragmentation_method": "Hamilton Microlab Pipette Shearing",
         }
 
         experiment2 = {  # Invalid, missing experiment_type
@@ -204,12 +183,12 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
             "movie_length_hours": None,
             "includes_kinetics": False,
             "includes_CpG_methylation": False,
-            "by_strand": False
+            "by_strand": False,
         }
 
-        response_200 = self.client.post(url, [experiment1], format='json')
-        response_207 = self.client.post(url, [experiment1, experiment2], format='json')
-        response_400 = self.client.post(url, [experiment2], format='json')
+        response_207 = self.client.post(url, [experiment1, experiment2], format="json")
+        response_200 = self.client.post(url, [experiment1], format="json")
+        response_400 = self.client.post(url, [experiment2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
@@ -222,7 +201,7 @@ class UpdatePacBioAPITest(APITestCaseWithAuth):
 class DeletePacBioAPITest(APITestCaseWithAuth):
     def test_delete_pac_bio_api(self):
 
-        #Checks for the Experiment table before deletion
+        # Checks for the Experiment table before deletion
 
         experiment1_exists = Experiment.objects.filter(
             pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1"
@@ -233,10 +212,10 @@ class DeletePacBioAPITest(APITestCaseWithAuth):
         url2 = "/api/experiments/experiment_pac_bio/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1, DNE-01-1"
         url3 = "/api/experiments/experiment_pac_bio/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format='json')
-        response_400 = self.client.delete(url3, format='json')
+        response_207 = self.client.delete(url2, format="json")
+        response_400 = self.client.delete(url3, format="json")
 
-        #Checks for the Experiment table after deletion
+        # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
             pk="experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1"
         ).exists()
