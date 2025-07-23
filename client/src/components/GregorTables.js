@@ -1,7 +1,7 @@
 // src/GregorTables.js
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Checkbox, Switch, Row, Col } from "antd";
+import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Select, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTables, updateTable, createEntry, fetchTable } from "../slices/dataSlice";
@@ -14,6 +14,7 @@ import SchemaForm from "./SchemaForm";
 import "../App.css";
 
 const GregorTables = () => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const isAdmin = useSelector(state => state.account.user.is_superuser)
   const tableView = useSelector(state => state.data['tableView']);
@@ -21,16 +22,19 @@ const GregorTables = () => {
   const dataStatus = useSelector(state => state.data.status);
   const rowID = useSelector(state => state.data['tableID']);
   const schema = schemas[tableView] || { properties: {} };
+  const [draftFilters, setDraftFilters] = useState({});
+
+  const [filterForm, setFilterForm] = useState({});
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [form] = Form.useForm();
   const [entry, setEntry] = useState(null);
   const [useRegex, setUseRegex] = useState(false);
   const [regexError, setRegexError] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  
   const [visibleColumns, setVisibleColumns] = useState(() => {
     return Object.keys(schema.properties).reduce((acc, key) => {
       acc[key] = true; // All columns are visible by default
@@ -39,7 +43,7 @@ const GregorTables = () => {
   });
 
   const defaultVisibleColumns = {
-    participants: ["participant_id", "proband_relationship", "family_id", "date_of_birth", "phenotype_description"],
+    participants: ["participant_id", "proband_relationship", "family_id", "solve_status"],
     genetic_findings: ["genetic_findings_id", "participant_id", "variant_type"],
     analytes: ["analyte_id", "participant_id", "analyte_type"],
     families: ["family_id", "consanguinity", "family_history_detail"],
@@ -71,6 +75,7 @@ const GregorTables = () => {
     });
     setFilterModalVisible(false);
     setAdvancedFilters({});
+    setFilterForm({});
   }, [tableView]);
 
   // Toggle column visibility
@@ -108,30 +113,49 @@ const GregorTables = () => {
   // Data filtering for search, advanced search, regex search, and download.
   const filteredData = useMemo(() => {
     let data = [...tableData];
-    if (searchQuery.trim()) {
-      data = data.filter((row) => {
-        return Object.values(row).some((value) => {
-          const strVal = String(value || "");
-          if (useRegex) {
-            try {
-              const regex = new RegExp(searchQuery.trim(), "i"); // ← safe and case-insensitive
-              setRegexError(null); // Clear previous errors
-              return regex.test(strVal);
-            } catch (err) {
-              setRegexError("Invalid regular expression");
-              return false; // Invalid regex
-            }
-          }
+if (searchQuery.trim()) {
+  const lowerQuery = searchQuery.trim().toLowerCase();
+  data = data.filter((row) =>
+    Object.entries(row).some(([key, value]) => {
+      const strVal = String(value || "");
+      const fieldSchema = schema.properties?.[key];
+
+      if (useRegex) {
+        try {
+          const regex = new RegExp(lowerQuery, "i");
           setRegexError(null);
-          return strVal.toLowerCase().includes(searchQuery.toLowerCase());
-        });
-      });
-    }
+          return regex.test(strVal);
+        } catch (err) {
+          setRegexError("Invalid regular expression");
+          return false;
+        }
+      }
+
+      // 💡 If field is enum, require exact match
+      if (fieldSchema?.enum) {
+        return strVal.toLowerCase() === lowerQuery;
+      }
+
+      // Default partial match
+      return strVal.toLowerCase().includes(lowerQuery);
+    })
+  );
+}
+
     if (advancedFilters && Object.keys(advancedFilters).length > 0) {
       data = data.filter((row) =>
-        Object.entries(advancedFilters).every(([key, value]) =>
-          value ? String(row[key] || "").toLowerCase().includes(value.toLowerCase()) : true
-        )
+        Object.entries(advancedFilters).every(([key, value]) => {
+          if (!value) return true;
+
+          const rowVal = String(row[key] || "");
+          const fieldSchema = schema.properties?.[key];
+
+          if (fieldSchema?.enum) {
+            return rowVal === value; // exact match for enum
+          }
+
+          return rowVal.toLowerCase().includes(value.toLowerCase()); // partial for free text
+        })
       );
     }
     return data;
@@ -233,7 +257,23 @@ const GregorTables = () => {
         </Col>
 
         <Col xs={24} sm={12} md={6} lg={4}>
-          <Dropdown menu={{ items: columnToggleMenuItems }} trigger={["click"]}>
+          <Dropdown
+            trigger={["click"]}
+            dropdownRender={() => (
+              <div style={{ padding: 12 }}>
+                {Object.keys(schema.properties).map((key) => (
+                  <div key={key}>
+                    <Checkbox
+                      checked={visibleColumns[key]}
+                      onChange={() => toggleColumnVisibility(key)}
+                    >
+                      {schema.properties[key]?.label || key}
+                    </Checkbox>
+                  </div>
+                ))}
+              </div>
+            )}
+          >
             <Button icon={<SettingOutlined />}>Columns</Button>
           </Dropdown>
         </Col>
@@ -300,6 +340,66 @@ const GregorTables = () => {
         open={filterModalVisible}
         onCancel={() => setFilterModalVisible(false)}
         footer={[
+          <Button key="clear" onClick={() => {
+            setDraftFilters({});
+            setAdvancedFilters({});
+          }}>
+            Clear
+          </Button>,
+          <Button key="apply" type="primary" onClick={() => {
+            setAdvancedFilters(draftFilters);
+            setFilterModalVisible(false);
+          }}>
+            Apply
+          </Button>
+        ]}
+      >        
+        <Form layout="vertical">
+          {columns.map((col) => {
+            const fieldSchema = schema.properties[col.dataIndex];
+            const fieldKey = col.dataIndex;
+
+            return (
+              <Form.Item label={`Filter by ${col.title}`} key={col.key}>
+                {fieldSchema?.enum ? (
+                  <Select
+                    allowClear
+                    value={draftFilters[fieldKey]}
+                    onChange={(value) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        [fieldKey]: value,
+                      }))
+                    }
+                  >
+                    {fieldSchema.enum.map((option) => (
+                      <Select.Option key={option} value={option}>
+                        {option}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                ) : (
+                  <Input
+                    value={draftFilters[fieldKey] || ""}
+                    onChange={(e) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        [fieldKey]: e.target.value,
+                      }))
+                    }
+                  />
+                )}
+              </Form.Item>
+            );
+          })}
+        </Form>
+      </Modal>
+
+      {/* <Modal
+        title="Advanced Filters"
+        open={filterModalVisible}
+        onCancel={() => setFilterModalVisible(false)}
+        footer={[
           <Button key="clear" onClick={() => setAdvancedFilters({})}>
             Clear
           </Button>,
@@ -323,7 +423,7 @@ const GregorTables = () => {
             </Form.Item>
           ))}
         </Form>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

@@ -1,80 +1,83 @@
 // src/pages/Home.js
 
-import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Card, Col, Row, Layout, Space, Tooltip, Typography } from 'antd';
-import { ApiOutlined, GithubOutlined} from '@ant-design/icons';
-
+import { Card, Col, Row, Layout, Space, Typography } from 'antd';
+import SiteFooter from "../components/SiteFooter";
 const { Header, Content, Footer, Sider } = Layout;
-const APIDB = process.env.REACT_APP_APIDB;
 const { Title } = Typography;
+
+const APIDB = process.env.REACT_APP_APIDB;
+const MIA = process.env.REACT_APP_MIA;
+const SNP = process.env.REACT_APP_SNP;
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   return (
-    <Layout>
+    <Layout className="fullscreen-bg">
         {/* <Header className="site-header" /> */}
-        <Title level={1}>ICTS </Title>
+        <Title level={1} className='site-title'>UCI Institute for Clinical & Translational Science (ICTS) </Title>
         <Content className="site-content">
-            <Row gutter={[16, 16]}>
-                <Col xs={24} md={8}>
-                  <Card 
-                    title="ICTS Dashboard"
-                    hoverable
-                    onClick={()=> navigate("/dashboard")}
-                  ></Card>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Card 
-                    hoverable
-                    onClick={()=> console.log("HI")}
-                    title="SNP"
-                  ></Card>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Card
-                    title="MIA"
-                    hoverable
-                    onClick={()=> console.log("HI")}
-                  ></Card>
-                </Col>
-                <Col xs={24} md={8}>
-                </Col>
-                <Col xs={24} md={8}>
-                </Col>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Card 
+                hoverable
+                onClick={()=> navigate("/dashboard")}
+                title={
+                  <Space>
+                    <span>ICTS Dashboard</span>
+                      <img
+                        src="/GREGoR_Final_Logo.png"
+                        alt="GREGoR"
+                        style={{
+                          width: 130,
+                          objectFit: "contain",
+                          display: "inline-block"
+                        }}
+                      />
+                  </Space>
+              }>
+              The GREGoR Consortium (Genomics Research to Elucidate the Genetics of Rare diseases) seeks to develop and apply approaches to discover the cause of currently unexplained rare genetic disorders.
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card 
+                hoverable
+                onClick={()=> {window.open(`${SNP}`, "_blank")}}
+                title="SNP Consortium Archive"
+              >Landing page and interface for the SNP Consortium archival material.</Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card
+                hoverable
+                onClick={()=> {window.open(`${MIA}`, "_blank")}}
+                title={
+                  <Space>
+                    <img
+                      src="/miaLogo192.png"
+                      alt="MIA logo"
+                      style={{
+                        width: 30,
+                        objectFit: "contain",
+                        display: "inline-block"
+                      }}
+                    />
+                    <span>Medical Information Assistant (MIA)</span>
+                  </Space>}
+              >Our virtual Medical Information Assistant (Mia)
+                A consentbot that facilitates virtual conversations with patients.
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+            </Col>
+            <Col xs={24} md={8}>
+            </Col>
             </Row>
             <Row gutter={[16, 16]}>
 
             </Row>
         </Content>
-        <Footer className="site-footer">
-          <Space >
-            <Tooltip title="UCI ICTS Dashboard"> ©2024 UCI</Tooltip>
-            <br/>
-            <Tooltip title="Swagger API site">
-              <ApiOutlined />
-              <a
-                href={`${APIDB}api/swagger/`} //"https://genomics.icts.uci.edu/"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()} // prevent triggering `onClick` from Menu
-                >
-                Swagger API
-              </a>
-            </Tooltip>
-            <br/>
-            <Tooltip title="UCI ICTS Dashboard GitHub">
-              <GithubOutlined />
-              <a
-                href="https://github.com/UCI-GREGoR/GREGor_dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()} // prevent triggering `onClick` from Menu
-              >GitHub</a>
-            </Tooltip>
-          </Space>
-        </Footer>
+        <SiteFooter showSwagger={false} showGitHub={false} />
     </Layout>
   )
 };
