@@ -158,7 +158,6 @@ if (searchQuery.trim()) {
         })
       );
     }
-
     return data;
   }, [tableData, searchQuery, advancedFilters, useRegex]);
 
@@ -277,7 +276,6 @@ if (searchQuery.trim()) {
           >
             <Button icon={<SettingOutlined />}>Columns</Button>
           </Dropdown>
-
         </Col>
       </Row>
 
