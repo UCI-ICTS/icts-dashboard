@@ -14,10 +14,12 @@ from rest_framework.views import APIView
 from config.selectors import bulk_model_retrieve, bulk_retrieve
 
 from experiments.models import (
+    Aligned,
     AlignedRNAShortRead,
     AlignedPacBio,
     AlignedDNAShortRead,
     AlignedNanopore,
+    Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
@@ -45,6 +47,118 @@ from experiments.services import (
     delete_aligned,
 )
 from experiments.selectors import get_experiment
+
+
+class ExperimentViewSet(viewsets.ViewSet):
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Experiment entries",
+        responses={200: ExperimentSerializer(many=True), 400: "Bad request"},
+        tags=["Experiment"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Experiment.objects.all()
+        serializer = ExperimentSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Experiment"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        experiments = bulk_retrieve(Experiment, ids, "experiment_id")
+        response_data, accepted, rejected = [], False, False
+
+        # import pdb; pdb.set_trace()
+        for experiment_id in ids:
+            if experiment_id in experiments:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=experiments[experiment_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=experiment_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class AlignedViewSet(viewsets.ViewSet):
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Aligned entries",
+        responses={200: AlignedSerializer(many=True), 400: "Bad request"},
+        tags=["Aligned"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = Aligned.objects.all()
+        serializer = AlignedSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Aligned"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+
+        aligned = bulk_retrieve(Aligned, ids, "aligned_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_id in ids:
+            if aligned_id in aligned:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=aligned[aligned_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
 
 
 class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
