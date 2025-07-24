@@ -54,6 +54,19 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
         model = GeneticFindings
         fields = "__all__"
 
+    def validate_experiment_id(self, exp_list):
+        if not isinstance(exp_list, list):
+            raise serializers.ValidationError("Must be a list")
+        for exp in exp_list:
+            try:
+                Experiment.objects.get(pk=exp)
+            except Experiment.DoesNotExist as err:
+                raise serializers.ValidationError(
+                    f"experiment_id {exp} does not exist."
+                )
+
+        return exp_list
+
     def create(self, validated_data):
         """
         Create a new GeneticFindings instance using the validated data

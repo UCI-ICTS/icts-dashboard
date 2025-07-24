@@ -170,54 +170,26 @@ class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
 class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
     def test_update_analyte_api(self):
         url = "/api/metadata/genetic_findings/update/"
-        part1 = {  # Valid submission
+        part1 = {  # Valid submission, changing experiment_id
             "genetic_findings_id": "10_73792184_GREGoR_test-001-001-0",
+            "experiment_id": [
+                "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+            ],
             "gene_of_interest": [],
         }
 
         part2 = {  # Invalid submission; missing zygosity
             "genetic_findings_id": "11_64660831_GREGoR_test-004-004-0",
-            "participant_id": "GREGoR_test-004-004-0",
-            "experiment_id": ["WGS"],
-            "variant_type": ["SNV/INDEL"],
-            "sv_type": "",
-            "variant_reference_assembly": "GRCh38",
-            "chrom": "11",
-            "chrom_end": "",
-            "pos": 64660831,
-            "pos_end": "",
-            "ref": "C",
-            "alt": "T",
-            "copy_number": "",
-            "ClinGen_allele_ID": "",
-            "gene_of_interest": [],
-            "transcript": "ENST00000265459.11",
-            "hgvsc": "c.2107G>A",
-            "hgvsp": "",
-            "hgvs": "",
             "zygosity": "",  # changed
-            "allele_balance_or_heteroplasmy_percentage": "",
-            "variant_inheritance": "paternal",
-            "linked_variant": "",
-            "linked_variant_phase": "",
-            "gene_known_for_phenotype": "Candidate",
-            "known_condition_name": "",
-            "condition_id": "",
-            "condition_inheritance": ["Unknown"],
-            "GREGoR_variant_classification": "Curation in progress",
-            "GREGoR_ClinVar_SCV": "",
-            "gene_disease_validity": "",
-            "public_database_other": "",
-            "public_database_ID_other": "",
-            "phenotype_contribution": "",
-            "partial_contribution_explained": [],
-            "method_of_discovery": ["SR-GS"],
-            "notes": "",
-            "additional_family_members_with_variant": [],
+        }
+
+        part3 = {  # Invalid submission; bad experiment id
+            "genetic_findings_id": "11_64660831_GREGoR_test-004-004-0",
+            "experiment_id": ["BAD ENTRY"],
         }
         response_207 = self.client.post(url, [part1, part2], format="json")
         response_200 = self.client.post(url, [part1], format="json")
-        response_400 = self.client.post(url, [part2], format="json")
+        response_400 = self.client.post(url, [part3], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
