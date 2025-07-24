@@ -1,13 +1,12 @@
 // src/GregorTables.js
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dropdown, Select, Checkbox, Switch, Row, Col } from "antd";
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTables, updateTable, createEntry, fetchTable } from "../slices/dataSlice";
+import { getAllTables, fetchTable } from "../slices/dataSlice";
 import { getCollectionName } from "../utils/tableNameMap";
 import DownloadTSVButton from "./TableDownload";
-import ErrorBoundary from "./ErrorBoundary";
 import TableSelector from "./TableSelector";
 import schemas from "../schemas/v1.8schemas.json";
 import SchemaForm from "./SchemaForm";
@@ -112,34 +111,34 @@ const GregorTables = () => {
   // Data filtering for search, advanced search, regex search, and download.
   const filteredData = useMemo(() => {
     let data = [...tableData];
-if (searchQuery.trim()) {
-  const lowerQuery = searchQuery.trim().toLowerCase();
-  data = data.filter((row) =>
-    Object.entries(row).some(([key, value]) => {
-      const strVal = String(value || "");
-      const fieldSchema = schema.properties?.[key];
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.trim().toLowerCase();
+      data = data.filter((row) =>
+        Object.entries(row).some(([key, value]) => {
+          const strVal = String(value || "");
+          const fieldSchema = schema.properties?.[key];
 
-      if (useRegex) {
-        try {
-          const regex = new RegExp(lowerQuery, "i");
-          setRegexError(null);
-          return regex.test(strVal);
-        } catch (err) {
-          setRegexError("Invalid regular expression");
-          return false;
-        }
-      }
+          if (useRegex) {
+            try {
+              const regex = new RegExp(lowerQuery, "i");
+              setRegexError(null);
+              return regex.test(strVal);
+            } catch (err) {
+              setRegexError("Invalid regular expression");
+              return false;
+            }
+          }
 
-      // 💡 If field is enum, require exact match
-      if (fieldSchema?.enum) {
-        return strVal.toLowerCase() === lowerQuery;
-      }
+          // 💡 If field is enum, require exact match
+          if (fieldSchema?.enum) {
+            return strVal.toLowerCase() === lowerQuery;
+          }
 
-      // Default partial match
-      return strVal.toLowerCase().includes(lowerQuery);
-    })
-  );
-}
+          // Default partial match
+          return strVal.toLowerCase().includes(lowerQuery);
+        })
+      );
+    }
 
     if (advancedFilters && Object.keys(advancedFilters).length > 0) {
       data = data.filter((row) =>
@@ -159,19 +158,6 @@ if (searchQuery.trim()) {
     }
     return data;
   }, [tableData, searchQuery, advancedFilters, useRegex]);
-
-  // Dropdown menu for toggling column visibility
-  const columnToggleMenuItems = Object.keys(schema.properties).map((key) => ({
-    key,
-    label: (
-      <Checkbox
-        checked={visibleColumns[key]}
-        onChange={() => toggleColumnVisibility(key)}
-      >
-        {schema.properties[key]?.label || key}
-      </Checkbox>
-    ),
-  }));
 
   return (
     <>
@@ -255,27 +241,52 @@ if (searchQuery.trim()) {
           </Tooltip>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
-          <Dropdown
-            trigger={["click"]}
-            dropdownRender={() => (
-              <div style={{ padding: 12 }}>
-                {Object.keys(schema.properties).map((key) => (
-                  <div key={key}>
-                    <Checkbox
-                      checked={visibleColumns[key]}
-                      onChange={() => toggleColumnVisibility(key)}
-                    >
-                      {schema.properties[key]?.label || key}
-                    </Checkbox>
-                  </div>
-                ))}
-              </div>
-            )}
-          >
-            <Button icon={<SettingOutlined />}>Columns</Button>
-          </Dropdown>
-        </Col>
+<Col xs={24} sm={12} md={6} lg={4}>
+  <Dropdown
+    trigger={["click"]}
+    dropdownRender={() => {
+      const allSelected = Object.values(visibleColumns).every(Boolean);
+      const someSelected = Object.values(visibleColumns).some(Boolean);
+
+      return (
+        <div className="column-toggle-menu">
+          <div className="column-toggle-item">
+            <Button
+              size="small"
+              onClick={() => {
+                const allSelected = Object.keys(schema.properties).every((key) => visibleColumns[key]);
+                const newState = !allSelected;
+                const updated = {};
+                Object.keys(schema.properties).forEach((key) => {
+                  updated[key] = newState;
+                });
+                setVisibleColumns(updated);
+              }}
+            >
+              {Object.keys(schema.properties).every((key) => visibleColumns[key])
+                ? "Deselect All"
+                : "Select All"}
+            </Button>
+          </div>
+          {Object.keys(schema.properties).map((key) => (
+            <div key={key}>
+              <Checkbox
+                checked={visibleColumns[key]}
+                onChange={() => toggleColumnVisibility(key)}
+                className="column-toggle-item"
+              >
+                {schema.properties[key]?.label || key}
+              </Checkbox>
+            </div>
+          ))}
+        </div>
+      );
+    }}
+  >
+    <Button icon={<SettingOutlined />}>Columns</Button>
+  </Dropdown>
+</Col>
+
       </Row>
 
       {dataStatus === "loading" ? (

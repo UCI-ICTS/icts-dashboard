@@ -50,5 +50,27 @@ export const foreignKeyFields = {
       valueKey: "participant_id",
       apiKey: "participant",
     }
+  },
+  biobank: {
+    participant_sid: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    },
+    child_analytes:{
+      sourceTable: "analytes",
+      valueKey: "analyte_id",
+      apiKey: "analyte",
+    },
+    experiments: {
+      sourceTable: "experiments",
+      valueKey: "experiment_id",
+      apiKey: "experiment",
+    },
+    alignments: {
+      sourceTable: "aligned",
+      valueKey: "aligned_id",
+      apiKey: "aligned",
+    }
   }
 };
