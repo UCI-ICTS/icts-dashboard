@@ -68,8 +68,8 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/account/password-reset" element={<PasswordResetConfirm />} />
-      <Route path="/account/password-create" element={<PasswordResetConfirm />} />
+      <Route path="/password-reset" element={<PasswordResetConfirm />} />
+      <Route path="/password-create" element={<PasswordResetConfirm />} />
 
       <Route path="/dashboard" element={<PrivateRout><Dashboard /></PrivateRout>}>
         <Route index element={<ProfilePage />} />
@@ -81,11 +81,8 @@ const AppRoutes = () => {
         <Route path="profile" element={<ProfilePage />} />
       </Route>
 
-      {/* Optional redirect from "/" to "/dashboard" */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
       {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 

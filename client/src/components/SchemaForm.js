@@ -1,16 +1,19 @@
 // src/components/SchemaForm.js
 
-import { useEffect, useState} from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { createEntry, updateTable, deleteEntry } from "../slices/dataSlice";
-import { useDispatch } from "react-redux";
-import { getValidationRules } from "../utils/schemaAndTables";
+import { createEntry, updateTable, deleteEntry, fetchTable } from "../slices/dataSlice";
+import { getValidationRules, foreignKeyFields } from "../utils/schemaAndTables";
 
 const { Option } = Select;
 
-
-const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
+const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName  }) => {
+  const dispatch = useDispatch();
+  const foreignMap = foreignKeyFields?.[tableName]?.[keyName]
+  const rules = getValidationRules(keyName, schema, requiredFields);
+ 
   const label = (
     <span>
       {schema.title || keyName}
@@ -21,53 +24,39 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly }) => {
       )}
     </span>
   );
+  
+ const sourceTable = foreignMap?.sourceTable;
 
-  const rules = getValidationRules(keyName, schema, requiredFields);
+  const rawData = useSelector(state =>
+    sourceTable ? state.data[sourceTable] : undefined
+  );
 
-  // Handle foreign keys in tables
-  // if (schema.title == "participant") {
-  //   if (keyName == "internal_project_id") {
-  //     return (
-  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-  //         <Select>
-  //           {schema.enum.map((option) => (
-  //             <Option key={option} value={option} disabled={readOnly}>
-  //               {option}
-  //             </Option>
-  //           ))}
-  //         </Select>
-  //       </Form.Item>
-  //     );
-  //   }
-  //   if (keyName == "family_id") {
-  //     return (
-  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-  //         <Select>
-  //           {schema.enum.map((option) => (
-  //             <Option key={option} value={option} disabled={readOnly}>
-  //               {option}
-  //             </Option>
-  //           ))}
-  //         </Select>
-  //       </Form.Item>
-  //     );
-  //   }
-  // }
-  // if (schema.title == "phenotype") {
-  //   if (keyName == "participant_id") {
-  //     return (
-  //       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-  //         <Select>
-  //           {schema.enum.map((option) => (
-  //             <Option key={option} value={option} disabled={readOnly}>
-  //               {option}
-  //             </Option>
-  //           ))}
-  //         </Select>
-  //       </Form.Item>
-  //     );
-  //   }
-  // }
+  const foreignData = useMemo(() => rawData || [], [rawData]);
+
+  
+  useEffect(() => {
+    if (foreignMap?.sourceTable && !foreignData.length) {
+      dispatch(fetchTable(foreignMap.apiKey));
+    }
+  }, [dispatch, foreignMap, foreignData]);
+
+  if (foreignMap) {
+    const { valueKey, apiKey } = foreignMap;
+
+    return (
+      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
+          {foreignData.map((item) => (
+            <Select.Option
+              key={item[valueKey]}
+              value={item[valueKey]}
+              label={item[valueKey]}
+            >{item[apiKey]}</Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+    )
+  }
 
   if (schema.enum) {
     return (
@@ -178,7 +167,7 @@ const SchemaForm = ({
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
   const table = schema.title
-
+  
   useEffect(() => {
     form.setFieldsValue(initialValues || {});
   }, [initialValues, form]);
@@ -226,7 +215,7 @@ const SchemaForm = ({
     setAddModalVisible(false);
     setEntry(null);
   };
-
+  
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
       {/* Edit/Delete Controls */}
@@ -253,6 +242,7 @@ const SchemaForm = ({
           requiredFields={requiredFields}
           form={form}
           readOnly={!editMode}
+          tableName={schema.title}
         />
       ))}
 

@@ -324,31 +324,31 @@ const defaultVisibleColumns = {
           >
             {selectedDetail && selectedAggregateRecord ? (
               <SchemaForm
-                form={form} // Or create a form instance above if needed
+                form={form}
                 schema={schemas[selectedDetail.table_name]}
                 initialValues={selectedAggregateRecord}
                 onSubmit={(values) => handleSubmit(values, selectedDetail.table_name)}
-                readOnly={true} // If your SchemaForm supports this
+                readOnly={true}
                 onCancel={() => setSelectedDetail(null)}
               />
             ) : (
               selectedDetail ? (
                 selectedDetail.phenotype_id ? (
                   <SchemaForm
-                    form={form} // Or create a form instance above if needed
+                    form={form}
                     schema={schemas["phenotypes"]}
                     initialValues={selectedDetail}
                     onSubmit={(values) => handleSubmit(values, "phenotypes")}
-                    readOnly={true} // If your SchemaForm supports this
+                    readOnly={true}
                     onCancel={() => setSelectedDetail(null)}
                   />
                 ) : (
                   <SchemaForm
-                    form={form} // Or create a form instance above if needed
+                    form={form} 
                     schema={schemas["genetic_findings"]}
                     initialValues={selectedDetail}
                     onSubmit={(values) => handleSubmit(values, "genetic_findings")}
-                    readOnly={true} // If your SchemaForm supports this
+                    readOnly={true}
                     onCancel={() => {
                       form.resetFields();
                       setEditRecord(false);
