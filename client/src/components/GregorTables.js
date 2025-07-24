@@ -44,7 +44,7 @@ const GregorTables = () => {
 
   const defaultVisibleColumns = {
     participants: ["participant_id", "proband_relationship", "family_id", "solve_status"],
-    genetic_findings: ["genetic_findings_id", "participant_id", "variant_type"],
+    genetic_findings: ["genetic_findings_id", "participant_id", "experiment_id"],
     analytes: ["analyte_id", "participant_id", "analyte_type"],
     families: ["family_id", "consanguinity", "family_history_detail"],
     biobank_entries: ["biobank_id", "participant", "child_analytes", "alignments", "experiments", "current_location", "status"],
@@ -57,7 +57,6 @@ const GregorTables = () => {
     aligned_nanopore: ["aligned_nanopore_id"],
     aligned_pac_bio: ["aligned_pac_bio_id"],
     aligned_rna_short_read: ["aligned_rna_short_read_id"],
-    // Add more table types and their default columns as needed
   };
 
   useEffect(() => {

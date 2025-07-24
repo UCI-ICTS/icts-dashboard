@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Checkbox, message, Modal } from 'antd';
+import { Form, Input, Button, Checkbox, message, Modal, Layout } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login, resetPassword } from '../slices/accountSlice';
+import SiteFooter from '../components/SiteFooter';
 
 
 const Login = () => {
@@ -49,76 +50,79 @@ const Login = () => {
   }, [isLoggedIn, navigate]);
 
   return (
-    <div className="login-container">
-      <div className="login-form-wrapper">
-        <h2>Welcome to the UCI ICTS Dashboard</h2>
-        <Form name="login_form" className="login-form" onFinish={onFinish}>
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="Username"
-              autoComplete="username"
-            />
-          </Form.Item>
+    <Layout className="fullscreen-bg">
+      <div className="login-container">
+        <div className="login-form-wrapper">
+          <h2>Welcome to the UCI ICTS Dashboard</h2>
+          <Form name="login_form" className="login-form" onFinish={onFinish}>
+            <Form.Item
+              name="username"
+              rules={[{ required: true, message: 'Please input your username!' }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Username"
+                autoComplete="username"
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please input your Password!' }]}
-          >
-            <Input
-              prefix={<LockOutlined />}
-              type="password"
-              placeholder="Password"
-              autoComplete="current-password"
-            />
-          </Form.Item>
-          <Form.Item>
-            <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
-              Remember Me
-            </Checkbox>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button" loading={loading}>
-              Log in
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              onClick={showModal}
-            >Forgot Password</Button>
-          </Form.Item>
-        </Form>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: 'Please input your Password!' }]}
+            >
+              <Input
+                prefix={<LockOutlined />}
+                type="password"
+                placeholder="Password"
+                autoComplete="current-password"
+              />
+            </Form.Item>
+            <Form.Item>
+              <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
+                Remember Me
+              </Checkbox>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="login-form-button" loading={loading}>
+                Log in
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Button
+                onClick={showModal}
+              >Forgot Password</Button>
+            </Form.Item>
+          </Form>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
+        <Modal
+          title="Password reset"
+          open={passwordResetModal}
+          onCancel={handleCancel}
+          footer={null}
+          width={500}
+        >
+          <Form layout="vertical" onFinish={submitReset}>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[{ required: true, message: "Please enter a valid email" }]}
+            >
+              <Input type="email" autoComplete="email" />
+            </Form.Item>
+            <Form.Item>
+              <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
-      <Modal
-        title="Password reset"
-        open={passwordResetModal}
-        onCancel={handleCancel}
-        footer={null}
-        width={500}
-      >
-        <Form layout="vertical" onFinish={submitReset}>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[{ required: true, message: "Please enter a valid email" }]}
-          >
-            <Input type="email" autoComplete="email" />
-          </Form.Item>
-          <Form.Item>
-            <Button onClick={handleCancel} style={{ marginRight: 8 }}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+      <SiteFooter showSwagger={false} showGitHub={false}/>
+    </Layout>
   );
 };
 

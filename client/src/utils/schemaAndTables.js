@@ -10,6 +10,10 @@ export const getValidationRules = (key, schema, requiredFields = []) => {
   if (schema.enum) {
     rules.push({
       validator: (_, value) => {
+        const isRequired = requiredFields.includes(key);
+        if (!isRequired && (value === undefined || value === null || value === "")) {
+          return Promise.resolve();
+        };
         return schema.enum.includes(value)
           ? Promise.resolve()
           : Promise.reject(new Error(`${key} must be one of: ${schema.enum.join(", ")}`));
@@ -34,3 +38,17 @@ export const getValidationRules = (key, schema, requiredFields = []) => {
   return rules;
 };
 
+export const foreignKeyFields = {
+  genetic_findings: {
+    experiment_id: {
+      sourceTable: "experiments",
+      valueKey: "experiment_id",
+      apiKey: "experiment",  // or whatever makes sense
+    },
+    participant_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    }
+  }
+};
