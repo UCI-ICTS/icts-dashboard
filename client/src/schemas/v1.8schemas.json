@@ -30,9 +30,9 @@
             },
             "internal_project_id": {
                 "type": "array",
+                "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
                 "items": {
                     "type": "string",
-                    "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
                     "examples": [
                         "UWCDR_uwcmg_distal_arthrogryposis_type 1_212",
                         "UWCDR_uwcmg_sponastrime_dysplasia_487"
@@ -73,9 +73,9 @@
             },
             "prior_testing": {
                 "type": "array",
+                "description": "Text description of any genetic testing for individual conducted prior to enrollment",
                 "items": {
                     "type": "string",
-                    "description": "Text description of any genetic testing for individual conducted prior to enrollment",
                     "examples": [
                         "Normal karyotype | FBN2 screened clinically"
                     ]
@@ -83,9 +83,9 @@
             },
             "pmid_id": {
                 "type": "array",
+                "description": "Case specific PubMed ID if applicable\n\nNotes: Publication which included participant;  Used for publications which include participant known prior to or after inclusion in GREGoR",
                 "items": {
                     "type": "string",
-                    "description": "Case specific PubMed ID if applicable\n\nNotes: Publication which included participant;  Used for publications which include participant known prior to or after inclusion in GREGoR",
                     "examples": [
                         "25683120"
                     ]
@@ -117,9 +117,9 @@
             },
             "twin_id": {
                 "type": "array",
+                "description": "participant_id for twins, triplets, etc; 0 if not available\n\nNotes: may be monozygotic, dizygotic, or polyzygotic",
                 "items": {
                     "type": "string",
-                    "description": "participant_id for twins, triplets, etc; 0 if not available\n\nNotes: may be monozygotic, dizygotic, or polyzygotic",
                     "examples": [
                         "BCM_Subject_1",
                         "BROAD_subj89054",
@@ -184,6 +184,7 @@
             },
             "reported_race": {
                 "type": "array",
+                "description": "Self/submitter-reported race (OMB categories)",
                 "items": {
                     "type": "string",
                     "enum": [
@@ -193,8 +194,7 @@
                         "Native Hawaiian or Other Pacific Islander",
                         "Middle Eastern or North African",
                         "White"
-                    ],
-                    "description": "Self/submitter-reported race (OMB categories)"
+                    ]
                 }
             },
             "reported_ethnicity": {
@@ -234,9 +234,9 @@
             },
             "phenotype_description": {
                 "type": "array",
+                "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband.\n\nNotes: For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
                 "items": {
                     "type": "string",
-                    "description": "human-readable 'Phenotypic one-line summary' for why this individual is of interest. Could be the same as the term_details value in the Phenotype table. Strongly encourage/required for proband.\n\nNotes: For unaffected/relatives, can note 'parent of ...' or 'relative of ...'",
                     "examples": [
                         "Missing one variant in gene XXX",
                         "Distal arthrogryposis with stellate teeth"
@@ -377,9 +377,9 @@
             },
             "experiment_id": {
                 "type": "array",
+                "description": "The experiment table and experiment ID(s) in which discovery was identified: experiment_table.id_in_table. Should correspond to an experiment_id in the DCC-generated experiment table.\n\nNotes: RC submitted. \n- If experiment identifier is not available due to current data model limitations, use the 'method_of_discovery' field\n- If variant is identified in multiple datasets, list the assigned primary experiment_id first and fill the following rows (e.g. allele balance) with data from this experiment\n- Additional information on orthogonal experiments can noted in the 'method_of_discovery' or 'notes' field",
                 "items": {
                     "type": "string",
-                    "description": "The experiment table and experiment ID(s) in which discovery was identified: experiment_table.id_in_table. Should correspond to an experiment_id in the DCC-generated experiment table.\n\nNotes: RC submitted. \n- If experiment identifier is not available due to current data model limitations, use the 'method_of_discovery' field\n- If variant is identified in multiple datasets, list the assigned primary experiment_id first and fill the following rows (e.g. allele balance) with data from this experiment\n- Additional information on orthogonal experiments can noted in the 'method_of_discovery' or 'notes' field",
                     "examples": [
                         "experiment_dna_short_read.GSS201938-01-021-SG-1",
                         "experiment_nanopore.BCM_00001",
@@ -390,6 +390,7 @@
             },
             "variant_type": {
                 "type": "array",
+                "description": "Notes: SNV/INDEL: single nucelotide variants or short insertion/deletions (<50bp)\nRE: repeat elements\nSV: structural variants, including copy number variants and mobile element insertions",
                 "items": {
                     "type": "string",
                     "enum": [
@@ -402,7 +403,6 @@
                         "MEI",
                         "STR"
                     ],
-                    "description": "Notes: SNV/INDEL: single nucelotide variants or short insertion/deletions (<50bp)\nRE: repeat elements\nSV: structural variants, including copy number variants and mobile element insertions",
                     "examples": [
                         "SNV|CNV"
                     ]
@@ -546,9 +546,9 @@
             },
             "gene_of_interest": {
                 "type": "array",
+                "description": "HGNC approved symbol of the known or candidate gene(s) that are relevant for the observed phenotype.\n\nNotes: - If the SNV/INDEL or RE is intergenic with no clear gene of interest, use 'intergenic'\n- If the SV has multiple genes of interest, use a multi-value delimiter\n- If the SV has no specific gene of interest, leave blank",
                 "items": {
                     "type": "string",
-                    "description": "HGNC approved symbol of the known or candidate gene(s) that are relevant for the observed phenotype.\n\nNotes: - If the SNV/INDEL or RE is intergenic with no clear gene of interest, use 'intergenic'\n- If the SV has multiple genes of interest, use a multi-value delimiter\n- If the SV has no specific gene of interest, leave blank",
                     "examples": [
                         "SEPSECS"
                     ],
@@ -665,6 +665,7 @@
             },
             "condition_inheritance": {
                 "type": "array",
+                "description": "Description of the expected inheritance of condition used for variant interpretation\n\nNotes: Inheritance description should match the OMIM or MONDO entry listed in line 26. \n- If multiple inheritance types listed in OMIM/MONDO, select that which is suspected for this proband\n- In cases where multiple inheritance patterns are being considered, it is possible to select multiple here",
                 "items": {
                     "type": "string",
                     "enum": [
@@ -679,7 +680,6 @@
                         "Other",
                         "Unknown"
                     ],
-                    "description": "Description of the expected inheritance of condition used for variant interpretation\n\nNotes: Inheritance description should match the OMIM or MONDO entry listed in line 26. \n- If multiple inheritance types listed in OMIM/MONDO, select that which is suspected for this proband\n- In cases where multiple inheritance patterns are being considered, it is possible to select multiple here",
                     "examples": [
                         "Autosomal recessive"
                     ],
@@ -731,16 +731,16 @@
             },
             "public_database_other": {
                 "type": "array",
+                "description": "Public databases that this variant in this participant has been submitted by the RC.",
                 "items": {
-                    "type": "string",
-                    "description": "Public databases that this variant in this participant has been submitted by the RC."
+                    "type": "string"
                 }
             },
             "public_database_ID_other": {
                 "type": "array",
+                "description": "Public database variant/case ID",
                 "items": {
-                    "type": "string",
-                    "description": "Public database variant/case ID"
+                    "type": "string"
                 }
             },
             "phenotype_contribution": {
@@ -757,9 +757,9 @@
             },
             "partial_contribution_explained": {
                 "type": "array",
+                "description": "List of specific phenotypes (HPO IDs) explained by the condition associated with this variant/gene in cases of partial contribution\n\nNotes: Field used when a genetic finding only partially explains participant phenotype and a second genetic finding is expected. For example, a syndromic case with a well-established pathogenic non-syndromic hearing loss variant. \n- For recesssive variants with partial contribution, only one of the linked variants needs to list HPO IDs explained by the linked candidate set.",
                 "items": {
                     "type": "string",
-                    "description": "List of specific phenotypes (HPO IDs) explained by the condition associated with this variant/gene in cases of partial contribution\n\nNotes: Field used when a genetic finding only partially explains participant phenotype and a second genetic finding is expected. For example, a syndromic case with a well-established pathogenic non-syndromic hearing loss variant. \n- For recesssive variants with partial contribution, only one of the linked variants needs to list HPO IDs explained by the linked candidate set.",
                     "examples": [
                         "HP:0000365"
                     ],
@@ -768,13 +768,17 @@
             },
             "additional_family_members_with_variant": {
                 "type": "array",
+                "description": "List of related participant IDs carrying the same variant",
                 "items": {
-                    "type": "string",
-                    "description": "List of related participant IDs carrying the same variant"
+                    "type": "string"
                 }
             },
             "method_of_discovery": {
                 "type": "array",
+                "description": "The method/assay(s) used to identify the candidate\n\nNotes: Field to be used to capture method of discovery if experiment not currently supported by data model. (eg. >experiment_table_name.id_in_table)",
+                "examples": [
+                    "SR-GS"
+                ],
                 "items": {
                     "type": "string",
                     "enum": [
@@ -794,10 +798,6 @@
                         "Karyotype-reanalysis",
                         "SR RNA-seq-reanalysis",
                         "LR RNA-seq-reanalysis"
-                    ],
-                    "description": "The method/assay(s) used to identify the candidate\n\nNotes: Field to be used to capture method of discovery if experiment not currently supported by data model. (eg. >experiment_table_name.id_in_table)",
-                    "examples": [
-                        "SR-GS"
                     ]
                 }
             },
@@ -1042,6 +1042,7 @@
             },
             "additional_modifiers": {
                 "type": "array",
+                "description": "Notes: this field should use the same ontology as above (e.g. Mondo disease characteristic if using mondo). \nIt should be a | delimited list of valid HPO IDs that are subordinate to HP:0012823 (clinical modifier) (For HPO terms) or a\n| delimited list of valid MONDO IDs that are subordinate to MONDO_0021125 (disease characteristic) (For MONDO terms)",
                 "items": {
                     "type": "string",
                     "enum": [
@@ -1273,8 +1274,7 @@
                         "MONDO:0024495",
                         "MONDO:0024490",
                         "MONDO:0024496"
-                    ],
-                    "description": "Notes: this field should use the same ontology as above (e.g. Mondo disease characteristic if using mondo). \nIt should be a | delimited list of valid HPO IDs that are subordinate to HP:0012823 (clinical modifier) (For HPO terms) or a\n| delimited list of valid MONDO IDs that are subordinate to MONDO_0021125 (disease characteristic) (For MONDO terms)"
+                    ]
                 }
             },
             "syndromic": {
@@ -1851,6 +1851,7 @@
                 "type": "array",
                 "items": {
                     "type": "string",
+                    "description": "type of library prep",
                     "enum": [
                         "stranded poly-A pulldown",
                         "stranded total RNA",
@@ -1858,7 +1859,6 @@
                         "globin depletion",
                         "custom"
                     ],
-                    "description": "type of library prep",
                     "examples": [
                         "stranded total RNA|globin depletion"
                     ]
@@ -1866,9 +1866,9 @@
             },
             "prep_targets_detail": {
                 "type": "array",
+                "description": "depletion kit or list of depletion targets used\n\nNotes: include this field if library_prep_type = 'custom'",
                 "items": {
-                    "type": "string",
-                    "description": "depletion kit or list of depletion targets used\n\nNotes: include this field if library_prep_type = 'custom'"
+                    "type": "string"
                 }
             },
             "experiment_type": {
@@ -2805,23 +2805,23 @@
             },
             "child_analytes": {
                 "type": "array",
+                "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs",
                 "items": {
-                    "type": "string",
-                    "description": "Zero or many derivative analytes and their analyte IDs\n\nNotes: Mainly for downstream gDNA extraction IDs"
+                    "type": "string"
                 }
             },
             "experiments": {
                 "type": "array",
+                "description": "List of associated sr-gs, pacbio, nanopore, etc. experiment objects",
                 "items": {
-                    "type": "string",
-                    "description": "List of associated sr-gs, pacbio, nanopore, etc. experiment objects"
+                    "type": "string"
                 }
             },
             "alignments": {
                 "type": "array",
+                "description": "List of associated sr-gs, pacbio, nanopore, etc. alignment objects",
                 "items": {
-                    "type": "string",
-                    "description": "List of associated sr-gs, pacbio, nanopore, etc. alignment objects"
+                    "type": "string"
                 }
             },
             "external_id": {

@@ -13,7 +13,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   const dispatch = useDispatch();
   const foreignMap = foreignKeyFields?.[tableName]?.[keyName]
   const rules = getValidationRules(keyName, schema, requiredFields);
- 
+  console.log(foreignMap)
   const label = (
     <span>
       {schema.title || keyName}
@@ -43,6 +43,30 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   if (foreignMap) {
     const { valueKey, apiKey } = foreignMap;
 
+    if (schema.type === "array") {
+      return (
+        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+          <Select
+            mode="multiple"
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            disabled={readOnly}
+          >
+            {foreignData.map((item) => (
+              <Select.Option
+                key={item[valueKey]}
+                value={item[valueKey]}
+                label={item[valueKey]}
+              >
+                {item[apiKey]}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      );
+    }
+
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
@@ -51,11 +75,13 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
               key={item[valueKey]}
               value={item[valueKey]}
               label={item[valueKey]}
-            >{item[apiKey]}</Select.Option>
+            >
+              {item[apiKey]}
+            </Select.Option>
           ))}
         </Select>
       </Form.Item>
-    )
+    );
   }
 
   if (schema.enum) {

@@ -258,16 +258,19 @@
 
 /* Column Toggle Menu - Ensure it appears horizontally & clearly */
 .column-toggle-menu {
-  background: white; /* ✅ Solid background */
+  background: white;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ✅ Gives a subtle shadow */
-  display: flex; /* ✅ Ensures horizontal layout */
-  flex-wrap: wrap; /* ✅ Prevents items from being cut off */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Gives a subtle shadow */
+  max-height: 300px; /* LIMIT dropdown height */
+  overflow-y: auto;  
+  /* display: flex;  horizontal layout */
+  flex-wrap: wrap; /* Prevents items from being cut off */
 }
 
 .column-toggle-item {
   margin-right: 12px; /* ✅ Adds spacing between items */
+  padding: 4px;
   white-space: nowrap; /* ✅ Prevents line wrapping */
 }
