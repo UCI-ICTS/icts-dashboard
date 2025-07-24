@@ -23,7 +23,9 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
         part1 = {  # Valid submission
             "genetic_findings_id": "10_73792185_GREGoR_test-001-001-0",
             "participant_id": "GREGoR_test-001-001-0",
-            "experiment_id": ["WGS"],
+            "experiment_id": [
+                "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            ],
             "variant_type": ["SNV/INDEL"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
@@ -63,7 +65,9 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
         part2 = {  # Valid submission 2
             "genetic_findings_id": "11_64660832_GREGoR_test-004-004-0",
             "participant_id": "GREGoR_test-004-004-0",
-            "experiment_id": ["WGS"],
+            "experiment_id": [
+                "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1"
+            ],
             "variant_type": ["SNV/INDEL"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
@@ -143,6 +147,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_207 = self.client.post(url, [part2, part3], format="json")
         response_400 = self.client.post(url, [part3], format="json")
+
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
