@@ -7,7 +7,7 @@ const map = {
   analytes: "analyte",
   biobank_entries: "biobank",
   phenotypes: "phenotype",
-  experiments: "experiments",
+  experiments: "experiment",
   experiment_dna_short_read: "experiment_dna_short_read",
   experiment_rna_short_read: "experiment_rna_short_read",
   experiment_pac_bio: "experiment_pac_bio",
