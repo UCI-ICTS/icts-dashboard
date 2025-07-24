@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # tests/test_db_integrity/test_linkage.py
 
-import json
+import json, csv
 from collections import defaultdict
 from django.core.management import call_command
 from django.test import TestCase
 from io import StringIO
 from typing import Dict, Any
-from metadata.models import Participant, Biobank, Analyte
+from metadata.models import Participant, Biobank, Analyte, GeneticFindings
 from experiments.models import (
     Experiment,
     Aligned,
@@ -361,9 +361,6 @@ class AlignmentTests(TestCase):
                     )
 
                 if result["errors"] or result["warnings"]:
-                    import pdb
-
-                    pdb.set_trace()
                     report[aln_id] = result
                     warning_count += len(result["warnings"])
                     error_count += len(result["errors"])
@@ -466,6 +463,111 @@ class AlignmentTests(TestCase):
         print(f"CROSS TRACEABILITY ERRORS: {errors}")
         print(f"Total flagged alignments: {len(report)}")
         print(f"Passed: {pass_checks}")
+        return dict(report)
+
+
+class GeneticFindingsTest(TestCase):
+    fixtures = ["dump.json"]
+    model_map = {
+        "dna_short_read": {
+            "experiment_model": ExperimentDNAShortRead,
+            "alignment_model": AlignedDNAShortRead,
+            "exp_fk": "experiment_dna_short_read_id",
+            "aln_fk": "aligned_dna_short_read_id",
+        },
+        "rna_short_read": {
+            "experiment_model": ExperimentRNAShortRead,
+            "alignment_model": AlignedRNAShortRead,
+            "exp_fk": "experiment_rna_short_read_id",
+            "aln_fk": "aligned_rna_short_read_id",
+        },
+        "nanopore": {
+            "experiment_model": ExperimentNanopore,
+            "alignment_model": AlignedNanopore,
+            "exp_fk": "experiment_nanopore_id",
+            "aln_fk": "aligned_nanopore_id",
+        },
+        "pac_bio": {
+            "experiment_model": ExperimentPacBio,
+            "alignment_model": AlignedPacBio,
+            "exp_fk": "experiment_pac_bio_id",
+            "aln_fk": "aligned_pac_bio_id",
+        },
+    }
+
+    def test_run_genetic_findings_qc_traceability(self) -> Dict[str, Any]:
+        report = defaultdict(dict)
+        warning_count = 0
+        error_count = 0
+        findings = GeneticFindings.objects.all()
+
+        for gene in findings:
+            genetic_findings_id = getattr(gene, "genetic_findings_id", None)
+            participant = getattr(gene, "participant_id", None)
+            experiments = getattr(gene, "experiment_id", None)
+            solve_status = getattr(participant, "solve_status", None)
+
+            result = {
+                "participant": participant.pk,
+                "experiments": experiments,
+                "solve_status": solve_status,
+                "candidate_experiments": [],
+                "warnings": [],
+                "errors": [],
+            }
+            for exp in experiments:
+                try:
+                    Experiment.objects.get(experiment_id=exp)
+                except Experiment.DoesNotExist as err:
+                    experiment_ids = list(
+                        Experiment.objects.filter(
+                            participant_id=participant.pk
+                        ).values_list("pk", flat=True)
+                    )
+                    result["errors"].append(f"Experiment {exp} does not exist.")
+                    if experiment_ids:
+                        result["candidate_experiments"].append(
+                            f"Candidate Experiments: {experiment_ids}"
+                        )
+
+            report[genetic_findings_id] = result
+            if result["errors"] or result["warnings"]:
+                warning_count += len(result["warnings"])
+                error_count += len(result["errors"])
+
+        with open("tests/results/findings_qc_output.json", "w") as json_file:
+            json.dump(report, json_file, indent=4)
+
+        with open("tests/results/findings_qc_output.tsv", "w") as tsv_file:
+            writer = csv.writer(tsv_file, delimiter="\t")
+            writer.writerow(
+                [
+                    "record_id",
+                    "participant",
+                    "experiments",
+                    "solve_status",
+                    "candidate_experiments",
+                    "warnings",
+                    "errors",
+                ]
+            )
+
+            for record_id, data in report.items():
+                writer.writerow(
+                    [
+                        record_id,
+                        data.get("participant", ""),
+                        ", ".join(data.get("experiments", [])),
+                        data.get("solve_status", ""),
+                        "; ".join(data.get("candidate_experiments", [])),
+                        "; ".join(data.get("warnings", [])),
+                        "; ".join(data.get("errors", [])),
+                    ]
+                )
+        print(f"\nWARNINGS: {warning_count}")
+        print(f"ERRORS: {error_count}")
+        print(f"Total inspected findings: {len(report)}")
+        # import pdb; pdb.set_trace()
         return dict(report)
 
 
