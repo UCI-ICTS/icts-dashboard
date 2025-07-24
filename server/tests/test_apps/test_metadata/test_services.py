@@ -24,7 +24,10 @@ class ServicesTests(TestCase):
         data = {
             "genetic_findings_id": "GF001",
             "participant_id": Participant.objects.first().participant_id,
-            "experiment_id": ["EXP1", "EXP2"],
+            "experiment_id": [
+                "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1",
+                "experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1",
+            ],
             "variant_reference_assembly": "GRCh38",
             "chrom": "1",
             "pos": 123456,
