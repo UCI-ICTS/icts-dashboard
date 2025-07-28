@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateTable, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange } from "../utils/schemaAndTables";
 
 const { Option } = Select;
 
@@ -13,7 +13,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   const dispatch = useDispatch();
   const foreignMap = foreignKeyFields?.[tableName]?.[keyName]
   const rules = getValidationRules(keyName, schema, requiredFields);
-  console.log(foreignMap)
+
   const label = (
     <span>
       {schema.title || keyName}
@@ -40,6 +40,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
   }, [dispatch, foreignMap, foreignData]);
 
+  
   if (foreignMap) {
     const { valueKey, apiKey } = foreignMap;
 
@@ -85,11 +86,24 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.enum) {
+    if (keyName == "onset_age_range") {
+      return (
+        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+          <Select disabled={readOnly}>
+            {schema.enum.map((option) => (
+              <Option key={option} value={option} disabled={readOnly}>
+                {option}; {onsetAgeRange[option]}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      );
+    }
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Select>
+        <Select disabled={readOnly}>
           {schema.enum.map((option) => (
-            <Option key={option} value={option} disabled={readOnly}>
+            <Option key={option} value={option} >
               {option}
             </Option>
           ))}
@@ -149,7 +163,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
                   key={key}
                   {...restField}
                   name={name}
-                  rules={[{ required: true, message: "Field cannot be empty" }]}
+                  rules={[{ required: true, message: "Field cannot be empty. Delete the entry or add a value." }]}
                 >
                   <Input
                     disabled={readOnly}

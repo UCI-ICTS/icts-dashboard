@@ -35,7 +35,6 @@ const GregorParticipants = () => {
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [form] = Form.useForm();
-
   const [editRecord, setEditRecord] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
   const [regexError, setRegexError] = useState(null);
@@ -326,10 +325,12 @@ const defaultVisibleColumns = {
               <SchemaForm
                 form={form}
                 schema={schemas[selectedDetail.table_name]}
-                initialValues={selectedAggregateRecord}
-                onSubmit={(values) => handleSubmit(values, selectedDetail.table_name)}
+                open={addModalVisible}
+                setAddModalVisible={setAddModalVisible}
+                initialValues={selectedAggregateRecord || {}}
+                setEntry={setSelectedDetail}
                 readOnly={true}
-                onCancel={() => setSelectedDetail(null)}
+
               />
             ) : (
               selectedDetail ? (
@@ -337,24 +338,23 @@ const defaultVisibleColumns = {
                   <SchemaForm
                     form={form}
                     schema={schemas["phenotypes"]}
-                    initialValues={selectedDetail}
-                    onSubmit={(values) => handleSubmit(values, "phenotypes")}
+                    open={addModalVisible}
+                    initialValues={selectedDetail || {}}
+                    setAddModalVisible={setAddModalVisible}
+                    setEntry={setSelectedDetail}
                     readOnly={true}
-                    onCancel={() => setSelectedDetail(null)}
+
                   />
                 ) : (
                   <SchemaForm
                     form={form} 
                     schema={schemas["genetic_findings"]}
-                    initialValues={selectedDetail}
-                    onSubmit={(values) => handleSubmit(values, "genetic_findings")}
+                    open={addModalVisible}
+                    setAddModalVisible={setAddModalVisible}
+                    initialValues={selectedDetail || {}}
+                    setEntry={setSelectedDetail}
                     readOnly={true}
-                    onCancel={() => {
-                      form.resetFields();
-                      setEditRecord(false);
-                      setSelectedDetail(null);
-                      console.log(form, editRecord, selectedDetail)
-                    }}
+
                   />
                 )
             ) : null
