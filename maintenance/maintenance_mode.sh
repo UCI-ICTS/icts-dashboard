@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FLAG_FILE="/Users/hadleyking/GitHub/UCI-ICTS/icts-dashboard/maintenance/maintenance.flag"
+FLAG_FILE="/var/www/github/GREGor_dashboard/maintenance/maintenance.flag"
 
 if [ -f "$FLAG_FILE" ]; then
     echo "🔓 Disabling maintenance mode..."
