@@ -43,7 +43,7 @@ export const foreignKeyFields = {
     experiment_id: {
       sourceTable: "experiments",
       valueKey: "experiment_id",
-      apiKey: "experiment",  // or whatever makes sense
+      apiKey: "experiment",  
     },
     participant_id: {
       sourceTable: "participants",
@@ -52,7 +52,7 @@ export const foreignKeyFields = {
     }
   },
   biobank: {
-    participant_sid: {
+    participant_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
@@ -74,3 +74,46 @@ export const foreignKeyFields = {
     }
   }
 };
+
+
+export const defaultVisibleColumns = {
+  participants: ["participant_id", "proband_relationship", "family_id", "solve_status"],
+  genetic_findings: ["genetic_findings_id", "participant_id", "experiment_id"],
+  analytes: ["analyte_id", "participant_id", "analyte_type"],
+  families: ["family_id", "consanguinity", "family_history_detail"],
+  biobank_entries: ["biobank_id", "participant", "child_analytes", "alignments", "experiments", "current_location", "status"],
+  phenotypes: ["participant_id", "term_id", "ontology", "additional_details"],
+  experiment_dna_short_read: ["experiment_dna_short_read_id", "analyte_id", "experiment_sample_id"],
+  experiment_rna_short_read: ["experiment_rna_short_read_id","analyte_id", "experiment_sample_id"],
+  experiment_pac_bio: ["experiment_pac_bio_id", "analyte_id", "experiment_sample_id"],
+  experiment_nanopore: ["experiment_nanopore_id", "analyte_id", "experiment_sample_id"],
+  aligned_dna_short_read: ["aligned_dna_short_read_id"],
+  aligned_nanopore: ["aligned_nanopore_id"],
+  aligned_pac_bio: ["aligned_pac_bio_id"],
+  aligned_rna_short_read: ["aligned_rna_short_read_id"],
+};
+
+export const onsetAgeRange = {
+  "unknown" : "Unknown",
+  "HP:0003581" : "Adult onset",
+  "HP:0030674" : "Antenatal onset",
+  "HP:0011463" : "Childhood onset",
+  "HP:0003577" : "Congenital onset",
+  "HP:0025708" : "Early young adult onset",
+  "HP:0011460" : "Embryonal onset",
+  "HP:0011461" : "Fetal onset",
+  "HP:0003593" : "Infantile onset",
+  "HP:0025709" : "Intermediate young adult onset",
+  "HP:0003621" : "Juvenile onset",
+  "HP:0034199" : "Late first trimester onset",
+  "HP:0003584" : "Late onset",
+  "HP:0025710" : "Late young adult onset",
+  "HP:0003596" : "Middle age onset",
+  "HP:0003623" : "Neonatal onset",
+  "HP:0410280" : "Pediatric onset",
+  "HP:4000040" : "Puerpural onset",
+  "HP:0034198" : "Second trimester onset",
+  "HP:0034197" : "Third trimester onset",
+  "HP:0011462" : "Young adult onset"
+}
+
