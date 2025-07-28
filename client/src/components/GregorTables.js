@@ -11,6 +11,7 @@ import TableSelector from "./TableSelector";
 import schemas from "../schemas/v1.8schemas.json";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
+import { defaultVisibleColumns } from "../utils/schemaAndTables";
 
 const GregorTables = () => {
   const [form] = Form.useForm();
@@ -40,23 +41,6 @@ const GregorTables = () => {
       return acc;
     }, {});
   });
-
-  const defaultVisibleColumns = {
-    participants: ["participant_id", "proband_relationship", "family_id", "solve_status"],
-    genetic_findings: ["genetic_findings_id", "participant_id", "experiment_id"],
-    analytes: ["analyte_id", "participant_id", "analyte_type"],
-    families: ["family_id", "consanguinity", "family_history_detail"],
-    biobank_entries: ["biobank_id", "participant", "child_analytes", "alignments", "experiments", "current_location", "status"],
-    phenotypes: ["participant_id", "term_id", "ontology", "additional_details"],
-    experiment_dna_short_read: ["experiment_dna_short_read_id", "analyte_id", "experiment_sample_id"],
-    experiment_rna_short_read: ["experiment_rna_short_read_id","analyte_id", "experiment_sample_id"],
-    experiment_pac_bio: ["experiment_pac_bio_id", "analyte_id", "experiment_sample_id"],
-    experiment_nanopore: ["experiment_nanopore_id", "analyte_id", "experiment_sample_id"],
-    aligned_dna_short_read: ["aligned_dna_short_read_id"],
-    aligned_nanopore: ["aligned_nanopore_id"],
-    aligned_pac_bio: ["aligned_pac_bio_id"],
-    aligned_rna_short_read: ["aligned_rna_short_read_id"],
-  };
 
   useEffect(() => {
     const tableName = getCollectionName(tableView)
@@ -404,36 +388,6 @@ const GregorTables = () => {
           })}
         </Form>
       </Modal>
-
-      {/* <Modal
-        title="Advanced Filters"
-        open={filterModalVisible}
-        onCancel={() => setFilterModalVisible(false)}
-        footer={[
-          <Button key="clear" onClick={() => setAdvancedFilters({})}>
-            Clear
-          </Button>,
-          <Button key="apply" type="primary" onClick={() => setFilterModalVisible(false)}>
-            Apply
-          </Button>,
-        ]}
-      >
-        <Form layout="vertical">
-          {columns.map((col) => (
-            <Form.Item label={`Filter by ${col.title}`} key={col.key}>
-              <Input
-                value={advancedFilters[col.dataIndex] || ""}
-                onChange={(e) =>
-                  setAdvancedFilters((prev) => ({
-                    ...prev,
-                    [col.dataIndex]: e.target.value,
-                  }))
-                }
-              />
-            </Form.Item>
-          ))}
-        </Form>
-      </Modal> */}
     </>
   );
 };

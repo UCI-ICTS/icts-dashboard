@@ -26,7 +26,8 @@ const printErrorMessages = (error) => {
       console.log("error.reponse.data[0].data has a value")
       let nestedResponse = firstError.data[0]
       for (const field in nestedResponse) {
-        errorMessage += console.log(`Error. ${field}: ${nestedResponse[field]}\n`)
+        errorMessage = `Error. ${field}: ${nestedResponse[field]}\n`
+        console.log(errorMessage)
       };
     }
     // Otherwise, if the first element itself has 'field' and 'error', use those.
