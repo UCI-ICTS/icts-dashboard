@@ -24,7 +24,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
       )}
     </span>
   );
-  
+
  const sourceTable = foreignMap?.sourceTable;
 
   const rawData = useSelector(state =>
@@ -33,14 +33,14 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   const foreignData = useMemo(() => rawData || [], [rawData]);
 
-  
+
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
       dispatch(fetchTable(foreignMap.apiKey));
     }
   }, [dispatch, foreignMap, foreignData]);
 
-  
+
   if (foreignMap) {
     const { valueKey, apiKey } = foreignMap;
 
@@ -207,7 +207,7 @@ const SchemaForm = ({
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
   const table = schema.title
-  
+
   useEffect(() => {
     form.setFieldsValue(initialValues || {});
   }, [initialValues, form]);
@@ -255,7 +255,7 @@ const SchemaForm = ({
     setAddModalVisible(false);
     setEntry(null);
   };
-  
+
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
       {/* Edit/Delete Controls */}
