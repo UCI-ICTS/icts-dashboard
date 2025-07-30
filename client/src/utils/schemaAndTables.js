@@ -42,36 +42,36 @@ export const foreignKeyFields = {
   participant: {
     family_id: {
       sourceTable: "families",
-      value_key: "family_id",
+      valueKey: "family_id",
       apiKey: "family",
     },
     maternal_id: {
       sourceTable: "participants",
-      value_key: "participant_id",
+      valueKey: "participant_id",
       apiKey: "participant",
     },
     paternal_id: {
       sourceTable: "participants",
-      value_key: "participant_id",
+      valueKey: "participant_id",
       apiKey: "participant",
     },
     twin_id: {
       sourceTable: "participants",
-      value_key: "participant_id",
+      valueKey: "participant_id",
       apiKey: "participant",
     }
   },
   phenotype: {
     participant_id: {
       sourceTable: "participants",
-      value_key: "participant_id",
+      valueKey: "participant_id",
       apiKey: "participant",
     }
   },
   analyte: {
     participant_id: {
       sourceTable: "participants",
-      value_key: "participant_id",
+      valueKey: "participant_id",
       apiKey: "participant",
     }
   },
