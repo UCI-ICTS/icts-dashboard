@@ -213,10 +213,11 @@ const SchemaForm = ({
   }, [initialValues, form]);
 
   useEffect(() => {
-    if (!open) {
-      setEditMode(false);
+    if (open) {
+      setEditMode(false);  // Always reset edit mode when modal opens
+      form.setFieldsValue(initialValues || {});  // Rehydrate form
     }
-  }, [open]);
+  }, [open, initialValues, form]);
 
   const handleDelete = () => {
     const idList = initialValues?.[`${table}_id`];
@@ -248,7 +249,7 @@ const SchemaForm = ({
         ? updateTable({ table: table, data: [normalized] })
         : createEntry({ table: table, data: [normalized] });
         
-      const result = await dispatch(action);
+      const result = dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {
         setAddModalVisible(false);
         setEntry(null);
@@ -263,6 +264,7 @@ const SchemaForm = ({
 
   const handleCancel = () => {
     form.resetFields();
+    setEditMode(false);
     setAddModalVisible(false);
     setEntry(null);
   };
