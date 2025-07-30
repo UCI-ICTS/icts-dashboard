@@ -145,7 +145,7 @@ export const foreignKeyFields = {
     }
   },
   aligned_rna_short_read: {
-    experiment_dna_short_read_id:{
+    experiment_rna_short_read_id:{
       sourceTable: "experiment_rna_short_read",
       valueKey: "experiment_rna_short_read_id",
       apiKey: "experiment_rna_short_read",

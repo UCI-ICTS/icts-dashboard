@@ -233,7 +233,6 @@ def post_requests(client, table_dict, table_name):
         update_responses = requests.post(url=f"{client['api_url']}/api/{table_name}/update/", json=update_list, headers=client['headers'])
         if update_responses.status_code == 400:
             print(f"All bad update requests")
-            sys.exit(1)
         elif update_responses.status_code == 207 or update_responses.status_code == 200:
             log = log + response_log(id_field, update_responses)
     # Creates
@@ -242,7 +241,6 @@ def post_requests(client, table_dict, table_name):
         if create_responses.status_code == 400:
             import pdb; pdb.set_trace()
             print(f"All bad create requests")
-            sys.exit(1)
         if create_responses.status_code == 207 or create_responses.status_code == 200:
             log = log + response_log(id_field, create_responses)
     return log
@@ -258,7 +256,13 @@ def post_log(log, log_file):
 
 if __name__ == '__main__':
     args = get_args()
-    config = parse_config(args.config)
+    if not args.config:
+        config = {
+            "host": args.host,
+            "api_token": args.token,
+        }
+    else:
+        config = parse_config(args.config)
     table_name = args.table_name
     if not table_name:
         table_name = os.path.basename(args.input).split('.')[0]
@@ -267,4 +271,4 @@ if __name__ == '__main__':
     table_name = coerce_table_name(table_name)
     client = get_tokens(config)
     log = post_requests(client, table_dict, table_name)
-    post_log(log, f"{os.path.dirname(args.input)}/{table_name}.log.csv")
+    post_log(log, f"{os.path.dirname(args.input)}/{table_name.split('/')[1]}.log.csv")
