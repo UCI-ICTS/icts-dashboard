@@ -71,8 +71,6 @@ const SummaryPage = () => {
 
           <div className="home-container" /> {/* Invisible placeholder for spacing */}
         </Header>
-
-
         <div style={{ marginBottom: "24px" }} /> 
 
         <Row gutter={[16, 16]}>

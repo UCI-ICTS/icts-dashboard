@@ -268,6 +268,7 @@
   white-space: nowrap; /* ✅ Prevents line wrapping */
 }
 
+
 .home-button {
   color: var(--uci-gold) !important;
   background: var(--uci-blue) !important;

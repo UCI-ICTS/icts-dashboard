@@ -61,6 +61,7 @@
         "onset_age_range": {
             "type": "string",
             "enum": [
+                "unknown",
                 "HP:0003581",
                 "HP:0030674",
                 "HP:0011463",

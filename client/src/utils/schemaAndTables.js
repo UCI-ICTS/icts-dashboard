@@ -6,7 +6,7 @@ export const getValidationRules = (key, schema, requiredFields = []) => {
   if (requiredFields.includes(key)) {
     rules.push({ required: true, message: `${key} is required` });
   }
-  
+
   if (schema.enum) {
     rules.push({
       validator: (_, value) => {
@@ -39,11 +39,47 @@ export const getValidationRules = (key, schema, requiredFields = []) => {
 };
 
 export const foreignKeyFields = {
+  participant: {
+    family_id: {
+      sourceTable: "families",
+      valueKey: "family_id",
+      apiKey: "family",
+    },
+    maternal_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    },
+    paternal_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    },
+    twin_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    }
+  },
+  phenotype: {
+    participant_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    }
+  },
+  analyte: {
+    participant_id: {
+      sourceTable: "participants",
+      valueKey: "participant_id",
+      apiKey: "participant",
+    }
+  },
   genetic_findings: {
     experiment_id: {
       sourceTable: "experiments",
       valueKey: "experiment_id",
-      apiKey: "experiment",  
+      apiKey: "experiment",
     },
     participant_id: {
       sourceTable: "participants",
@@ -72,7 +108,63 @@ export const foreignKeyFields = {
       valueKey: "aligned_id",
       apiKey: "aligned",
     }
-  }
+  },
+  experiment_dna_short_read: {
+    analyte_id:{
+      sourceTable: "analytes",
+      valueKey: "analyte_id",
+      apiKey: "analyte",
+    }
+  },
+  experiment_rna_short_read: {
+    analyte_id:{
+      sourceTable: "analytes",
+      valueKey: "analyte_id",
+      apiKey: "analyte",
+    }
+  },
+  experiment_pac_bio: {
+    analyte_id:{
+      sourceTable: "analytes",
+      valueKey: "analyte_id",
+      apiKey: "analyte",
+    }
+  },
+  experiment_nanopore: {
+    analyte_id:{
+      sourceTable: "analytes",
+      valueKey: "analyte_id",
+      apiKey: "analyte",
+    }
+  },
+  aligned_dna_short_read: {
+    experiment_dna_short_read_id:{
+      sourceTable: "experiment_dna_short_read",
+      valueKey: "experiment_dna_short_read_id",
+      apiKey: "experiment_dna_short_read",
+    }
+  },
+  aligned_rna_short_read: {
+    experiment_rna_short_read_id:{
+      sourceTable: "experiment_rna_short_read",
+      valueKey: "experiment_rna_short_read_id",
+      apiKey: "experiment_rna_short_read",
+    }
+  },
+  aligned_pac_bio: {
+    experiment_pac_bio_id:{
+      sourceTable: "experiment_pac_bio",
+      valueKey: "experiment_pac_bio_id",
+      apiKey: "experiment_pac_bio",
+    }
+  },
+  aligned_nanopore: {
+    experiment_nanopore_id:{
+      sourceTable: "experiment_nanopore",
+      valueKey: "experiment_nanopore_id",
+      apiKey: "experiment_nanopore",
+    }
+  },
 };
 
 
