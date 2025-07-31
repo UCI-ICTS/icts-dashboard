@@ -70,6 +70,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/password-reset" element={<PasswordResetConfirm />} />
       <Route path="/password-create" element={<PasswordResetConfirm />} />
+      <Route path="/gregor-summary" element={<SummaryPage />} />
 
       <Route path="/dashboard" element={<PrivateRout><Dashboard /></PrivateRout>}>
         <Route index element={<ProfilePage />} />

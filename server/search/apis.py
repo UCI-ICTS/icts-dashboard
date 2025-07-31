@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # search/apis.py
 
+from collections import Counter, defaultdict
 from django.apps import apps
-from django.db.models import Q
-from django.contrib.auth.models import User
+from django.db.models import Q, Count
 from django.http import HttpResponse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from itertools import chain
+from itertools import chain, groupby
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -15,23 +15,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from search.selectors import get_anvil_tables
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from metadata.models import (
-    Participant,
-    Family,
-    GeneticFindings,
-    Phenotype,
     Analyte,
     Biobank,
+    Family,
+    GeneticFindings,
+    Participant,
+    Phenotype,
 )
 
 from metadata.services import (
-    ParticipantInputSerializer,
-    ParticipantOutputSerializer,
+    AnalyteSerializer,
+    BiobankSerializer,
     FamilySerializer,
     GeneticFindingsSerializer,
-    AnalyteSerializer,
+    ParticipantOutputSerializer,
     PhenotypeSerializer,
-    BiobankSerializer,
 )
 
 from experiments.models import (
@@ -151,6 +151,109 @@ class GetAllTablesAPI(APIView):
         except Exception as error:
             response_data.insert(0, str(error))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+
+
+class SummaryAPI(APIView):
+    
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        operation_id="summary",
+        responses={
+            200: "Submission successfull",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+
+
+    def get(self, request):
+        try:
+            # Basic counts
+            participants = Participant.objects.all()
+            families = Family.objects.count()
+            analytes = Analyte.objects.all()
+            aligned = Aligned.objects.count()
+            biobank = Biobank.objects.all()
+            experiments = Experiment.objects.all()
+            findings = GeneticFindings.objects.all()
+
+            # --- Solve status for probands only ---
+            probands = participants.filter(proband_relationship="Self")
+            solve_status_counts = (
+                probands.values("solve_status")
+                .annotate(count=Count("solve_status"))
+                .order_by()
+            )
+            solve_status = {entry["solve_status"]: entry["count"] for entry in solve_status_counts}
+
+            # --- Biobank status ---
+            biobank_status = dict(Counter(biobank.values_list("status", flat=True)))
+
+            # --- Analyte counts ---
+            analyte_biosample = dict(Counter(analytes.values_list("primary_biosample", flat=True)))
+            analyte_type = dict(Counter(analytes.values_list("analyte_type", flat=True)))
+
+            # --- Genetic findings phenotype_contribution ---
+            findings_contribution = dict(Counter(findings.values_list("phenotype_contribution", flat=True)))
+
+            # --- Sequencing vs Aligned comparison ---
+            def group_by_table_name(qs):
+                values = qs.values_list("table_name", flat=True)
+                return dict(Counter(v.replace("experiment_", "").replace("aligned_", "").capitalize() for v in values))
+
+            experiment_counts = group_by_table_name(experiments)
+            aligned_counts = group_by_table_name(Aligned.objects.all())
+
+            # Delta comparison
+            labels = set(experiment_counts) | set(aligned_counts)
+            sequencing_vs_alignment = [
+                {
+                    "label": label,
+                    "experiments": experiment_counts.get(label, 0),
+                    "alignments": aligned_counts.get(label, 0),
+                    "delta": experiment_counts.get(label, 0) - aligned_counts.get(label, 0),
+                }
+                for label in sorted(labels)
+            ]
+
+            # --- Family relationship grouping ---
+            participants_sorted = sorted(participants, key=lambda x: x.family_id_id)
+
+            kindrid = {"Trios": 0, "Maternal Dyads": 0, "Paternal Dyads": 0, "Singletons": 0}
+            for family_id, members in groupby(participants_sorted, key=lambda x: x.family_id_id):
+                roles = [m.proband_relationship for m in members]
+                if "Self" in roles and "Mother" in roles and "Father" in roles:
+                    kindrid["Trios"] += 1
+                elif "Self" in roles and "Mother" in roles:
+                    kindrid["Maternal Dyads"] += 1
+                elif "Self" in roles and "Father" in roles:
+                    kindrid["Paternal Dyads"] += 1
+                elif "Self" in roles:
+                    kindrid["Singletons"] += 1
+
+            response = {
+                "participants": participants.count(),
+                "families": families,
+                "analytes": analytes.count(),
+                "aligned": aligned,
+                "biobank": biobank.count(),
+                "findings": findings.count(),
+                "solve_status_counts": solve_status,
+                "biobank_status_counts": biobank_status,
+                "analyte_biosample_counts": analyte_biosample,
+                "analyte_type_counts": analyte_type,
+                "findings_contribution": findings_contribution,
+                "sequencing_vs_alignment": sequencing_vs_alignment,
+                "kindrid": kindrid,
+            }
+
+            return Response(status=status.HTTP_200_OK, data=response)
+
+        except Exception as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class GetExperimentDNAShortReadTableAPI(APIView):

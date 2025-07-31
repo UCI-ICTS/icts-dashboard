@@ -1,149 +1,179 @@
-// src/pages/SummaryPage.js
+import { useEffect, useState } from "react";
+import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
+import { SolutionOutlined, CheckCircleTwoTone, WarningTwoTone } from "@ant-design/icons";
+import axios from "axios";
+import SiteFooter from "../components/SiteFooter";
+import { primaryBiosample } from "../utils/schemaAndTables";
+import "../App.css";
 
-import { Card, Row, Col, Typography, Tooltip, Button } from "antd";
-import { UserOutlined, MessageOutlined, SolutionOutlined, CheckCircleTwoTone, WarningTwoTone } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
-
+const { Header, Content } = Layout;
 const { Title } = Typography;
+
 const SummaryPage = () => {
-  const dispatch = useDispatch();
-  const data = useSelector(state => state.data)
-  const biobank = useSelector(state => state.data.biobank_entries)
-  
+  const [summary, setSummary] = useState();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Count and format occurrences of values in an array of objects by a specified key.
-  // Allows optional removal of specific words before formatting.
-  function countByKey(data, key, wordsToRemove = []) {
-    return data.reduce((acc, item) => {
-      const value = item[key] || 'Unknown';
-      const formatted = value
-        .split('_')
-        .filter(word => !wordsToRemove.includes(word.toLowerCase()))
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      acc[formatted] = (acc[formatted] || 0) + 1;
-      return acc;
-    }, {});
-  }
+  const fetchSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/search/summary/");
+      setSummary(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error loading summary:", err);
+      setError("Failed to load summary data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  //  Diff two count maps and return unified comparison with delta.
-  function diffCounts(experiments, alignments) {
-    const labels = new Set([...Object.keys(experiments), ...Object.keys(alignments)]);
-    return Array.from(labels).map(label => {
-      const exp = experiments[label] || 0;
-      const aln = alignments[label] || 0;
-      return {
-        label,
-        experiments: exp,
-        alignments: aln,
-        delta: exp - aln,
-      };
-    });
-  }
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
-  const biobankCounts = countByKey(biobank, 'status');
-  const solvedStatusCounts = countByKey(data.participants, 'solve_status');
-  const experimentCounts = countByKey(data.experiments, 'table_name', "experiment")
-  const alignedCounts = countByKey(data.aligned, 'table_name', "aligned")
-  const diff = diffCounts(experimentCounts, alignedCounts);
-  
-  return(
-    <div style={{ padding: 20 }}>
-      <Row gutter={[16, 16]}>
-        <Tooltip title="Fetch or refresh the table data">
-            <Button
-              onClick={() => dispatch(getAllTables())}
-              type="primary"
-            >
-              Fetch/Refresh data
-            </Button>
-          </Tooltip>
-      </Row>
-      <Title level={3}>Project Status Summary</Title>
-      <Row gutter={[16, 16]}>
-        {/* participants Card */}
-        <Col xs={24} md={8}>
-          <Card title="Participants" bordered>
-            <UserOutlined style={{ fontSize: "24px" }} />
-            <p>Total participants: {data.participants.length}</p>
-            <p>Families Enroled: {data.families.length}</p>
-            <p>Total Analytes: {data.analytes.length}</p>
-            <p>Samples Sequenced: {data.aligned.length}</p>
-          </Card>
-        </Col>
+  const get = (obj, key, fallback = "-") =>
+    loading ? "Loading..." : obj?.[key] ?? fallback;
 
-        {/* Biobank Entries Card */}
-        <Col xs={24} md={8}>
-          <Card title="Biobank Entries" bordered>
-            <MessageOutlined style={{ fontSize: "24px" }} />
-            <p>Total Biobank Entries: {biobank.length}</p>
+  return (
+    <Layout className="fullscreen-bg">
+      <Title level={1} className="site-title">
+        UCI Institute for Clinical & Translational Science (ICTS)
+      </Title>
 
-            {/* Render status counts */}
-            {Object.entries(biobankCounts).map(([status, count]) => (
-                <p key={status}>
-                <strong>{status}:</strong> {count}
+      {error && (
+        <Alert
+          message="Warning"
+          description="Some data failed to load. Displaying partial or placeholder results."
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      <Content className="site-content">
+        <Header className="summary-header">
+            <Title className="summary-title">Project Status Summary</Title>
+        </Header>
+
+        <div style={{ marginBottom: "24px" }} /> 
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={8}>
+            <Card title="Participant Snapshot">
+              <p>Total Participants: {get(summary, "participants")}</p>
+              <p>Families Enrolled: {get(summary, "families")}</p>
+              <p>Total Analytes: {get(summary, "analytes")}</p>
+              <p>Samples Sequenced: {get(summary, "aligned")}</p>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Proband Solve Status">
+              {Object.entries(summary?.solve_status_counts || {}).map(([status, count]) => (
+                <p key={status}>{status}: {count}</p>
+              ))}
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Kindrid">
+              {Object.entries(summary?.kindrid || {}).map(([label, count]) => (
+                <p key={label}>{label}: {count}</p>
+              ))}
+            </Card>
+          </Col>
+        </Row>
+
+        <Row><br /></Row>
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={8}>
+            <Card title="Biobank Snapshot">
+              <p>Total Biobank Entries: {
+                Object.values(summary?.biobank_status_counts || {}).reduce((a, b) => a + b, 0)
+              }</p>
+              <p>Biobank Status:</p>
+              <div style={{ paddingLeft: 16 }}>
+                {Object.entries(summary?.biobank_status_counts || {}).map(([status, count]) => (
+                  <p key={status}>{status}: {count}</p>
+                ))}
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Analyte Snapshot">
+              <p>Total Analyte Entries: {get(summary, "analytes")}</p>
+              <p>Primary Biosamples:</p>
+              <div style={{ paddingLeft: 16 }}>
+                {Object.entries(summary?.analyte_biosample_counts || {}).map(([status, count]) => (
+                  <p key={status}>{status} {primaryBiosample[status] || ""}: {count}</p>
+                ))}
+              </div>
+              <p>Analyte Types:</p>
+              <div style={{ paddingLeft: 16 }}>
+                {Object.entries(summary?.analyte_type_counts || {}).map(([status, count]) => (
+                  <p key={status}>{status}: {count}</p>
+                ))}
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Genetic Findings Snapshot">
+              <p>Total Genetic Findings: {get(summary, "findings")}</p>
+              <p>Phenotype Contribution:</p>
+              <div style={{ paddingLeft: 16 }}>
+                {Object.entries(summary?.findings_contribution || {}).map(([status, count]) => (
+                  status === "" 
+                  ? (<p key={status}>Na: {count}</p>)
+                  : (<p key={status}>{status}: {count}</p>)
+                ))}
+              </div>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row><br /></Row>
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={8}>
+            <Card title="Sequencing Experiments">
+              {summary?.sequencing_vs_alignment?.map(({ label, experiments }) => (
+                <p key={label}><strong>{label}:</strong> {experiments}</p>
+              )) || "Loading..."}
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Aligned Experiments">
+              {summary?.sequencing_vs_alignment?.map(({ label, alignments }) => (
+                <p key={label}><strong>{label}:</strong> {alignments}</p>
+              )) || "Loading..."}
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card title="Sequencing vs Alignment Counts">
+              {summary?.sequencing_vs_alignment?.map(({ label, experiments, alignments, delta }) => (
+                <p key={label}>
+                  <strong>{label}:</strong> {experiments} seq, {alignments} aln{" "}
+                  {delta === 0 ? (
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  ) : (
+                    <WarningTwoTone twoToneColor="#faad14" />
+                  )}
                 </p>
-            ))}
-          </Card>
-        </Col>
-        {/* Solve Status Card */}
-        <Col xs={24} md={8}>
-          <Card title="Solve Status" bordered>
-            <SolutionOutlined style={{ fontSize: "24px" }} />
-            {/* Render status counts */}
-            {Object.entries(solvedStatusCounts).map(([status, count]) => (
-                <p key={status}>
-                <strong>{status}:</strong> {count}
-                </p>
-            ))}
-          </Card>
-        </Col>
-      </Row>
-      <Row><br/></Row>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
-         {/* Sequencing Experiments Card */}
-          <Card title="Sequencing Experiments" bordered>
-            <SolutionOutlined style={{ fontSize: "24px" }} />
-            {/* Render status counts */}
-            {Object.entries(experimentCounts).map(([status, count]) => (
-                <p key={status}>
-                <strong>{status}:</strong> {count}
-                </p>
-            ))}
-          </Card>
-        </Col>
-        <Col xs={24} md={8}>
-        {/* Aligned Experiments Card */}
-          <Card title="Aligned Experiments" bordered>
-            <SolutionOutlined style={{ fontSize: "24px" }} />
-            {/* Render status counts */}
-            {Object.entries(alignedCounts).map(([status, count]) => (
-                <p key={status}>
-                <strong>{status}:</strong> {count}
-                </p>
-            ))}
-          </Card>
-        </Col>
-        <Col xs={24} md={8}>
-        {/* Comparison Card */}
-        <Card title="Sequencing vs Alignment Counts" bordered>
-            {diff.map(({ label, experiments, alignments, delta }) => (
-              <p key={label}>
-                <strong>{label}:</strong> {experiments} exp, {alignments} aln{' '}
-                {delta === 0 ? (
-                  <CheckCircleTwoTone twoToneColor="#52c41a" />
-                ) : (
-                  <WarningTwoTone twoToneColor="#faad14" />
-                )}
-              </p>
-            ))}
-          </Card>
-        </Col>
-      </Row>
-    </div>
-  )
-}
+              )) || "Loading..."}
+            </Card>
+          </Col>
+        </Row>
+      </Content>
+
+      <SiteFooter showSwagger={false} showGitHub={false} />
+    </Layout>
+  );
+};
 
 export default SummaryPage;
