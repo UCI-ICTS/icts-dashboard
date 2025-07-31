@@ -284,7 +284,7 @@ const GregorTables = () => {
           columns={columns}
           onRow={(record) => ({
             onClick: () => {
-              setEntry(record);
+              setEntry({...record});
               setAddModalVisible(true);
             },
           })}

@@ -213,10 +213,11 @@ const SchemaForm = ({
   }, [initialValues, form]);
 
   useEffect(() => {
-    if (!open) {
-      setEditMode(false);
+    if (open) {
+      setEditMode(false);  // Always reset edit mode when modal opens
+      form.setFieldsValue(initialValues || {});  // Rehydrate form
     }
-  }, [open]);
+  }, [open, initialValues, form]);
 
   const handleDelete = () => {
     const idList = initialValues?.[`${table}_id`];
@@ -230,14 +231,25 @@ const SchemaForm = ({
       .catch((err) => console.error("Delete failed", err));
   };
 
+  const normalizeArrays = (obj, schemaProps) => {
+    const result = { ...obj };
+    Object.entries(schemaProps).forEach(([key, def]) => {
+      if (def.type === "array" && result[key] === null) {
+        result[key] = [];
+      }
+    });
+    return result;
+  };
+
   const handleSubmit = async (values) => {
     try {
+      const normalized = normalizeArrays(values, schema.properties);  // 🔥 Fix here
       const updateForm = initialValues && Object.keys(initialValues).length > 0;
       const action = updateForm
-        ? updateTable({ table: table, data: [values] })
-        : createEntry({ table: table, data: [values] });
-      console.log(action)
-      const result = await dispatch(action);
+        ? updateTable({ table: table, data: [normalized] })
+        : createEntry({ table: table, data: [normalized] });
+        
+      const result = dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {
         setAddModalVisible(false);
         setEntry(null);
@@ -252,6 +264,7 @@ const SchemaForm = ({
 
   const handleCancel = () => {
     form.resetFields();
+    setEditMode(false);
     setAddModalVisible(false);
     setEntry(null);
   };
