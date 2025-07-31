@@ -7,10 +7,12 @@ from search.apis import (
     SearchTablesAPI,
     DownloadTablesAPI,
     GetAllTablesAPI,
+    SummaryAPI
 )
 
 urlpatterns = [
     path("get_all_tables/", GetAllTablesAPI.as_view(), name="get_all_tables"),
+    path("summary/", SummaryAPI.as_view(), name="get_all_tables"),
     # path("get_anvil_tables/", DownloadTablesAPI.as_view()),
     # path("<str:model_name>/", SearchTablesAPI.as_view(), name="general_search"),
 ]

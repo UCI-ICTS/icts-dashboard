@@ -209,3 +209,24 @@ export const onsetAgeRange = {
   "HP:0011462" : "Young adult onset"
 }
 
+export const primaryBiosample = {
+	"UBERON:0000479": "tissue", 
+	"UBERON:0003714": "neural tissue", 
+	"UBERON:0001836": "saliva", 
+	"UBERON:0001003": "skin epidermis", 
+	"UBERON:0002385": "muscle tissue", 
+	"UBERON:0000178": "whole blood",
+	"UBERON:0002371": "bone marrow",
+	"UBERON:0006956": "buccal mucosa", 
+	"UBERON:0001359": "cerebrospinal fluid", 
+	"UBERON:0001088": "urine", 
+	"UBERON:0019306": "nose epithelium", 
+	"CL: 0000034": "iPSC", 
+	"CL: 0000576": "monocytes - PBMCs", 
+	"CL: 0000542": "lymphocytes - LCLs", 
+	"CL: 0000057": "fibroblasts", 
+	"UBERON:0005291": "embryonic tissue", 
+	"CL: 0011020": "iPSC NPC", 
+	"UBERON:0002037": "cerebellum tissue", 
+	"UBERON:0001133": "cardiac tissue"
+}

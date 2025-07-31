@@ -83,13 +83,6 @@
   overflow-y: auto;
 }
 
-.sider-header {
-  color: white;
-  margin: 16px;
-  text-align: center;
-  font-weight: bold;
-}
-
 /* 🔳 Main Layout Content */
 .site-layout {
   display: flex;
@@ -273,4 +266,21 @@
   margin-right: 12px; /* ✅ Adds spacing between items */
   padding: 4px;
   white-space: nowrap; /* ✅ Prevents line wrapping */
+}
+
+.summary-header {
+  background: var(--uci-blue) !important;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+.summary-title {
+  color: var(--uci-gold) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 24px;
+  padding-left: 24px;
+  font-size: 24px !important;
 }
