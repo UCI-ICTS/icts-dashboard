@@ -1,6 +1,9 @@
+// src/pages/SummaryPage.js
+
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
-import { SolutionOutlined, CheckCircleTwoTone, WarningTwoTone } from "@ant-design/icons";
+import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone } from "@ant-design/icons";
 import axios from "axios";
 import SiteFooter from "../components/SiteFooter";
 import { primaryBiosample } from "../utils/schemaAndTables";
@@ -10,6 +13,7 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const SummaryPage = () => {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,8 +57,21 @@ const SummaryPage = () => {
 
       <Content className="site-content">
         <Header className="summary-header">
-            <Title className="summary-title">Project Status Summary</Title>
+          <div className="home-container">
+            <Tooltip title="Home page">
+              <Button
+                onClick={() => navigate("/")}
+                icon={<HomeOutlined />}
+                className="home-button"
+              />
+            </Tooltip>
+          </div>
+
+          <Title className="summary-title">GREGoR Project Status Summary</Title>
+
+          <div className="home-container" /> {/* Invisible placeholder for spacing */}
         </Header>
+
 
         <div style={{ marginBottom: "24px" }} /> 
 
