@@ -56,7 +56,7 @@ const Dashboard = () => {
             mode="inline"
             items={[
               { key: 'home', icon: <HomeOutlined />, label: <Link to="/">ICTS Home</Link> },
-              { key: 'summary', icon: <DotChartOutlined />, label: <Link to="summary">Summary Page</Link> },
+              { key: 'summary', icon: <DotChartOutlined />, label: <Link to="/gregor-summary">Summary Page</Link> },
               { key: 'table-data', icon: <DatabaseOutlined />, label: <Link to="table-data">GREGoR Tables</Link> },
               { key: 'participant-detail', icon: <UserOutlined />, label: <Link to="participant-detail">Participant Detail</Link> },
               { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
