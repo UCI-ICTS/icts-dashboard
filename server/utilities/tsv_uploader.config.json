@@ -1,0 +1,4 @@
+{
+    "host": "http://localhost:8000",
+    "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzMzAyNDc4LCJpYXQiOjE3NTMyMTYwNzgsImp0aSI6ImI5ZmRjZjdlMjMxMzQ4YmU5NTRhZDNlNDYwNzg5M2NjIiwidXNlcl9pZCI6MiwiZmlyc3RfbmFtZSI6IiIsImxhc3RfbmFtZSI6IiIsInVzZXJuYW1lIjoid2hlZWwiLCJlbWFpbCI6IndoZWVsQHdoZWVsLnRzdCIsImlzX3N0YWZmIjp0cnVlLCJpc19zdXBlcnVzZXIiOnRydWV9.hvA7fLXq1OZO6j1K_8ODgR21sX6IkQcPj6M4L-IV6U8"
+}
