@@ -113,11 +113,20 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.type === "string") {
-    return (
+    if (tableName == "phenotype" && keyName == "phenotype_id") {
+      return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Input disabled={readOnly}/>
+        <Input disabled={true}/>
       </Form.Item>
-    );
+      )
+    }
+    else {
+      return (
+        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+          <Input disabled={readOnly}/>
+        </Form.Item>
+      );
+    }
   }
 
   if (schema.type === "number" || schema.type === "integer") {
@@ -238,6 +247,9 @@ const SchemaForm = ({
         result[key] = [];
       }
     });
+    if (result["phenotype_id"] == undefined) {
+      result["phenotype_id"] = result["participant_id"] + "_" + result["term_id"]
+    }
     return result;
   };
 
@@ -248,7 +260,7 @@ const SchemaForm = ({
       const action = updateForm
         ? updateTable({ table: table, data: [normalized] })
         : createEntry({ table: table, data: [normalized] });
-        
+
       const result = dispatch(action);
       if (result.meta.requestStatus === "fulfilled") {
         setAddModalVisible(false);
