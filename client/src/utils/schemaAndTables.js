@@ -45,16 +45,6 @@ export const foreignKeyFields = {
       valueKey: "family_id",
       apiKey: "family",
     },
-    maternal_id: {
-      sourceTable: "participants",
-      valueKey: "participant_id",
-      apiKey: "participant",
-    },
-    paternal_id: {
-      sourceTable: "participants",
-      valueKey: "participant_id",
-      apiKey: "participant",
-    },
     twin_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
