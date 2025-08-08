@@ -219,17 +219,39 @@ class SummaryAPI(APIView):
             # --- Family relationship grouping ---
             participants_sorted = sorted(participants, key=lambda x: x.family_id_id)
 
-            kindrid = {"Trios": 0, "Maternal Dyads": 0, "Paternal Dyads": 0, "Singletons": 0}
-            for family_id, members in groupby(participants_sorted, key=lambda x: x.family_id_id):
-                roles = [m.proband_relationship for m in members]
-                if "Self" in roles and "Mother" in roles and "Father" in roles:
-                    kindrid["Trios"] += 1
-                elif "Self" in roles and "Mother" in roles:
+            # Keep track of which families appear in participants
+            family_ids_with_participants = set()
+
+            # Define mapping from role sets to category
+            FAMILY_CATEGORIES = ["Trio+", "Trio", "Maternal Dyads", "Paternal Dyads", "Singletons", "Other"]
+            # Initialize counts for all categories
+            kindrid = {category: 0 for category in FAMILY_CATEGORIES}
+            kindred_count = 0
+            for family_id, members_iter in groupby(participants_sorted, key=lambda x: x.family_id_id):
+                family_ids_with_participants.add(family_id)
+                roles = {m.proband_relationship for m in members_iter}  # set of roles in this family
+
+                # Determine category based on presence of proband (Self), Mother, and Father
+                if {"Self", "Mother", "Father"}.issubset(roles):
+                    # Family includes proband and both parents
+                    if len(roles) > 3:
+                        kindrid["Trio+"] += 1  # There are other roles in addition to the trio
+                    else:
+                        kindrid["Trio"] += 1   # Exactly Self, Mother, Father
+                elif roles == {"Self", "Mother"}:
                     kindrid["Maternal Dyads"] += 1
-                elif "Self" in roles and "Father" in roles:
+                elif roles == {"Self", "Father"}:
                     kindrid["Paternal Dyads"] += 1
-                elif "Self" in roles:
+                elif roles == {"Self"}:
                     kindrid["Singletons"] += 1
+                else:
+                    kindrid["Other"] += 1
+                    print(f'{family_id}: {roles}')
+                kindred_count += 1
+            print(kindred_count)
+            all_family_ids = set(Family.objects.values_list("family_id", flat=True))
+            family_ids_without_participants = all_family_ids - family_ids_with_participants
+            families = families - len(family_ids_without_participants)
 
             response = {
                 "participants": participants.count(),
@@ -237,6 +259,7 @@ class SummaryAPI(APIView):
                 "analytes": analytes.count(),
                 "aligned": aligned,
                 "biobank": biobank.count(),
+                "probands": probands.count(),
                 "findings": findings.count(),
                 "solve_status_counts": solve_status,
                 "biobank_status_counts": biobank_status,
