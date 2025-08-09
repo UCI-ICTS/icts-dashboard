@@ -2,9 +2,7 @@
 import { Footer } from "antd/es/layout/layout";
 import { Space, Tooltip } from "antd";
 import { ApiOutlined, GithubOutlined, CopyOutlined } from '@ant-design/icons';
-import { useLocation } from "react-router-dom";
 
-const APIDB = process.env.REACT_APP_APIDB;
 const GIT_VERSION = process.env.REACT_APP_VERSION
 
 const SiteFooter = ({ showSwagger = true, showGitHub = true }) => {
