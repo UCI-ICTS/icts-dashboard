@@ -160,7 +160,7 @@ class BiobankSerializer(serializers.ModelSerializer):
         fields = [
             "biobank_id",
             "participant_id",
-            "collection_date",
+            "received_date",
             "specimen_type",
             "current_location",
             "freezer_id",

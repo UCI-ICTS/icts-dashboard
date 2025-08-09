@@ -630,13 +630,18 @@
       "gene_disease_validity": "Curation in progress",
       "public_database_other": "",
       "public_database_ID_other": "",
-      "phenotype_contribution": "",
-      "partial_contribution_explained": [],
+      "phenotype_contribution": "Partial",
+      "partial_contribution_explained": [
+        "HP:0001260",
+        "HP:0001324"
+      ],
       "method_of_discovery": [
         "SR-GS"
       ],
       "notes": "",
-      "additional_family_members_with_variant": []
+      "additional_family_members_with_variant": [
+        "GREGoR_test-002-001-2"
+      ]
     }
   },
   {
@@ -1536,7 +1541,7 @@
     "pk": "GREGoR_test-001-001-0-D-1",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -1572,7 +1577,7 @@
     "pk": "GREGoR_test-001-001-0-D-2",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
       "freezer_id": null,
@@ -1608,7 +1613,7 @@
     "pk": "GREGoR_test-001-001-0-D-3",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "UCSC",
       "freezer_id": null,
@@ -1644,7 +1649,7 @@
     "pk": "GREGoR_test-001-001-0-OG-1",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "OG",
       "current_location": "UCI",
       "freezer_id": "Banana Fridge",
@@ -1676,7 +1681,7 @@
     "pk": "GREGoR_test-001-001-0-R-1",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -1712,7 +1717,7 @@
     "pk": "GREGoR_test-001-001-0-X-1",
     "fields": {
       "participant_id": "GREGoR_test-001-001-0",
-      "collection_date": "2022-09-25",
+      "received_date": "2022-09-25",
       "specimen_type": "SC",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -1745,7 +1750,7 @@
     "pk": "GREGoR_test-002-001-2-D-1",
     "fields": {
       "participant_id": "GREGoR_test-002-001-2",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -1781,7 +1786,7 @@
     "pk": "GREGoR_test-002-001-2-D-2",
     "fields": {
       "participant_id": "GREGoR_test-002-001-2",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
       "freezer_id": null,
@@ -1817,7 +1822,7 @@
     "pk": "GREGoR_test-002-001-2-R-1",
     "fields": {
       "participant_id": "GREGoR_test-002-001-2",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -1849,7 +1854,7 @@
     "pk": "GREGoR_test-003-001-1-D-1",
     "fields": {
       "participant_id": "GREGoR_test-003-001-1",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -1885,7 +1890,7 @@
     "pk": "GREGoR_test-003-001-1-D-2",
     "fields": {
       "participant_id": "GREGoR_test-003-001-1",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "D",
       "current_location": "Pacbio",
       "freezer_id": null,
@@ -1921,7 +1926,7 @@
     "pk": "GREGoR_test-003-001-1-R-1",
     "fields": {
       "participant_id": "GREGoR_test-003-001-1",
-      "collection_date": "2022-04-11",
+      "received_date": "2022-04-11",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -1953,7 +1958,7 @@
     "pk": "GREGoR_test-004-004-0-D-1",
     "fields": {
       "participant_id": "GREGoR_test-004-004-0",
-      "collection_date": "2022-07-03",
+      "received_date": "2022-07-03",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -1989,7 +1994,7 @@
     "pk": "GREGoR_test-004-004-0-D-3",
     "fields": {
       "participant_id": "GREGoR_test-004-004-0",
-      "collection_date": "2022-05-03",
+      "received_date": "2022-05-03",
       "specimen_type": "D",
       "current_location": "UCSC",
       "freezer_id": null,
@@ -2025,7 +2030,7 @@
     "pk": "GREGoR_test-004-004-0-R-1",
     "fields": {
       "participant_id": "GREGoR_test-004-004-0",
-      "collection_date": "2022-05-03",
+      "received_date": "2022-05-03",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2057,7 +2062,7 @@
     "pk": "GREGoR_test-005-004-2-D-1",
     "fields": {
       "participant_id": "GREGoR_test-005-004-2",
-      "collection_date": "2022-07-03",
+      "received_date": "2022-07-03",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -2093,7 +2098,7 @@
     "pk": "GREGoR_test-005-004-2-R-1",
     "fields": {
       "participant_id": "GREGoR_test-005-004-2",
-      "collection_date": "2022-05-03",
+      "received_date": "2022-05-03",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2125,7 +2130,7 @@
     "pk": "GREGoR_test-006-006-0-D-1",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-11",
+      "received_date": "2022-09-11",
       "specimen_type": "D",
       "current_location": "Invitae",
       "freezer_id": null,
@@ -2161,7 +2166,7 @@
     "pk": "GREGoR_test-006-006-0-D-3",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-05-03",
+      "received_date": "2022-05-03",
       "specimen_type": "D",
       "current_location": "UCSC",
       "freezer_id": null,
@@ -2197,7 +2202,7 @@
     "pk": "GREGoR_test-006-006-0-R-1",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-11",
+      "received_date": "2022-09-11",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2229,7 +2234,7 @@
     "pk": "GREGoR_test-006-006-0-R-2",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-11",
+      "received_date": "2022-09-11",
       "specimen_type": "R",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2261,7 +2266,7 @@
     "pk": "GREGoR_test-006-006-0-SC-1",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
       "freezer_id": "Banana Fridge",
@@ -2293,7 +2298,7 @@
     "pk": "GREGoR_test-006-006-0-SC-2",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
       "freezer_id": "Banana Fridge",
@@ -2325,7 +2330,7 @@
     "pk": "GREGoR_test-006-006-0-X-1",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "SC",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2359,7 +2364,7 @@
     "pk": "GREGoR_test-006-006-0-XR-1",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "XR",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",
@@ -2392,7 +2397,7 @@
     "pk": "GREGoR_test-006-006-0-XR-2",
     "fields": {
       "participant_id": "GREGoR_test-006-006-0",
-      "collection_date": "2022-09-18",
+      "received_date": "2022-09-18",
       "specimen_type": "XR",
       "current_location": "UCI",
       "freezer_id": "Boris Yeltsin",

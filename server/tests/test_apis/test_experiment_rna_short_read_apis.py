@@ -162,29 +162,54 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
 
 class DeleteRNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_rna_short_read_api(self):
-
-        # Checks for the Experiment table before deletion
-
-        experiment1_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
-        ).exists()
-
-        assert experiment1_exists
-
         url2 = "/api/experiments/experiment_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1, DNE-01-1"
         url3 = "/api/experiments/experiment_rna_short_read/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format="json")
-        response_400 = self.client.delete(url3, format="json")
+        response_400_1 = self.client.delete(url2, format="json")
+        response_400_2 = self.client.delete(url3, format="json")
+        self.assertEqual(response_400_1.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_400_2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_400_1.data[0]["data"][:124],
+                         '("Cannot delete some instances of model \'ExperimentRNAShortRead\' because they are referenced through protected foreign keys:')
+        self.assertEqual(response_400_1.data[1]["data"], "Not found")
+
+
+    def test_create_and_delete_rna_short_read_api(self):
+        create_url = "/api/experiments/experiment_rna_short_read/create/"
+        experiment2 = {
+            "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_2",
+            "analyte_id": "GREGoR_test-001-001-0-R-2",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
+            "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
+            "library_prep_type": ["rRNA depletion", "globin depletion"],
+            "prep_targets_detail": [],
+            "experiment_type": ["paired-end", "untargeted"],
+            "read_length": 150,
+            "single_or_paired_ends": "paired-end",
+            "date_data_generation": "2023-03-18",
+            "sequencing_platform": "NovaSeq",
+            "within_site_batch_name": "RNA 2A",
+            "RIN": None,
+            "estimated_library_size": None,
+            "total_reads": 240349679.0,
+        }
+        create_response = self.client.post(create_url, [experiment2], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        # Checks for the Experiment table before deletion
+        experiment1_exists = Experiment.objects.filter(
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_2"
+        ).exists()
+        assert experiment1_exists
+
+        delete_url = "/api/experiments/experiment_rna_short_read/delete/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_2"
+        delete_response = self.client.delete(delete_url, format="json")
 
         # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            pk="experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_2"
         ).exists()
         assert not experiment2_exists
 
-        self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-
-        self.assertEqual(response_207.data[0]["request_status"], "DELETED")
-        self.assertEqual(response_207.data[1]["request_status"], "NOT FOUND")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

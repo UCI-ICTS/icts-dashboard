@@ -95,5 +95,23 @@ class DeleteAnalyteAPITest(APITestCaseWithAuth):
     def test_delete_analyte(self):
         url = "/api/metadata/analyte/delete/?ids=GREGoR_test-001-001-0-R-1"
         response = self.client.delete(url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["request_status"], "DELETED")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data[0]["data"][:109],
+                         '("Cannot delete some instances of model \'Analyte\' because they are referenced through protected foreign keys:')
+
+
+    def test_create_and_delete_analyte_api(self):
+        create_url = "/api/metadata/analyte/create/"
+        analyte1 = {  # Valid submission
+            "analyte_id": "P-101-101-0-D-1",
+            "participant_id": "GREGoR_test-001-001-0",
+            "analyte_type": "frozen whole blood",
+            "primary_biosample": "UBERON:0000178",
+        }
+        create_response = self.client.post(create_url, [analyte1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        delete_url = "/api/metadata/analyte/delete/?ids=P-101-101-0-D-1"
+        delete_response = self.client.delete(delete_url, format="json")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

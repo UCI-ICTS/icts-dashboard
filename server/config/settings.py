@@ -60,7 +60,7 @@ backup = [
 ]
 
 # Required for frontend JS to read it
-CSRF_COOKIE_HTTPONLY = False  
+CSRF_COOKIE_HTTPONLY = False
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 
@@ -68,10 +68,22 @@ SHOW_ACTIVATION_LINKS = DEBUG
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# DATABASE settings
+ENGINE=secrets.get("DATABASE", "ENGINE", fallback="django.db.backends.postgresql")
+NAME=secrets.get("DATABASE", "NAME", fallback="ictsdashboard_app")
+USER=secrets.get("DATABASE", "USER", fallback="ictsdashboarduser")
+PASSWORD=secrets.get("DATABASE", "PASSWORD", fallback="ictsdashboarduser")
+HOST=secrets.get("DATABASE", "HOST", fallback="localhost") # Or your PostgreSQL server
+PORT=secrets.get("DATABASE", "PORT", fallback="5432") # Default PostgreSQL port
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": secrets.get("SERVER", "DATABASE", fallback=os.path.join(BASE_DIR, "db.sqlite3")),
+    'default': {
+        'ENGINE': ENGINE,
+        'NAME': NAME,
+        'USER': USER,
+        'PASSWORD': PASSWORD,
+        'HOST': HOST,
+        'PORT': PORT
     }
 }
 
