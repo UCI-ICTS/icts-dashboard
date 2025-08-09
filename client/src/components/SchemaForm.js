@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Input, InputNumber, Select, Button, Switch, Tooltip } from "antd";
+import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateTable, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange } from "../utils/schemaAndTables";
+import errorService from "../services/error.service";
 
 const { Option } = Select;
 
@@ -237,7 +238,7 @@ const SchemaForm = ({
         setEntry(null);
         form.resetFields();
       })
-      .catch((err) => console.error("Delete failed", err));
+      .catch((err) => message.error(errorService.printErrorMessages(err)));
   };
 
   const normalizeArrays = (obj, schemaProps) => {
