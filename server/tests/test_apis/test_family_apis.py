@@ -104,5 +104,25 @@ class DeleteFamilyAPITest(APITestCaseWithAuth):
     def test_delete_family_api(self):
         url = "/api/metadata/family/delete/?ids=GREGoR_test-001"
         response = self.client.delete(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data[0]["data"][:108],
+                         '("Cannot delete some instances of model \'Family\' because they are referenced through protected foreign keys:')
+
+
+    def test_create_and_delete_family_api(self):
+        create_url = "/api/metadata/family/create/"
+        fam1 = {  # Valid submission
+            "family_id": "P-101",
+            "consanguinity": "Unknown",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
+            "pedigree_file_detail": "",
+            "family_history_detail": "",
+        }
+        create_response = self.client.post(create_url, [fam1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        delete_url = "/api/metadata/family/delete/?ids=P-101"
+        response = self.client.delete(delete_url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")

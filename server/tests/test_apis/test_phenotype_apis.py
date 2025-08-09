@@ -115,6 +115,27 @@ class DeletePhenotypeAPITest(APITestCaseWithAuth):
     def test_delete_phenotype(self):
         url = "/api/metadata/phenotype/delete/?ids=1.2"
         response = self.client.delete(url, format="json")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["request_status"], "DELETED")
+        self.assertEqual(response.data[0]["data"], "phenotype 1.2 deleted successfully.")
+
+
+    def test_create_and_delete_analyte_api(self):
+        create_url = "/api/metadata/phenotype/create/"
+        pheno1 = {  # Valid submission
+            "phenotype_id": "1.10",
+            "participant_id": "GREGoR_test-001-001-0",
+            "term_id": "HP:0002194",
+            "presence": "Present",
+            "ontology": "HPO",
+            "additional_details": "gross motor delay",
+            "onset_age_range": "HP:0011463",
+            "additional_modifiers": [],
+            "syndromic": "non-syndromic",
+        }
+        create_response = self.client.post(create_url, [pheno1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        delete_url = "/api/metadata/phenotype/delete/?ids=1.10"
+        delete_response = self.client.delete(delete_url, format="json")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

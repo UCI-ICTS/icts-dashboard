@@ -208,5 +208,61 @@ class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
             "/api/metadata/genetic_findings/delete/?ids=2_6849938_GREGoR_test-001-001-0"
         )
         response = self.client.delete(url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["request_status"], "DELETED")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # Valid until a new table references this genetic_finding_id
+        self.assertEqual(response.data[0]["data"],
+                         "genetic_findings 2_6849938_GREGoR_test-001-001-0 deleted successfully.")
+
+
+    def test_create_and_delete_analyte_api(self):
+        create_url = "/api/metadata/genetic_findings/create/"
+        gf1 = {  # Valid submission
+            "genetic_findings_id": "10_73792185_GREGoR_test-001-001-0",
+            "participant_id": "GREGoR_test-001-001-0",
+            "experiment_id": [
+                "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            ],
+            "variant_type": ["SNV/INDEL"],
+            "sv_type": "",
+            "variant_reference_assembly": "GRCh38",
+            "chrom": "10",
+            "chrom_end": "",
+            "pos": 73792185,
+            "pos_end": "",
+            "ref": "G",
+            "alt": "A",
+            "copy_number": "",
+            "ClinGen_allele_ID": "",
+            "gene_of_interest": ["ZSWIM8"],
+            "transcript": "ENST00000604729.6",
+            "hgvsc": "c.1646G>A",
+            "hgvsp": "",
+            "hgvs": "",
+            "zygosity": "Heterozygous",
+            "allele_balance_or_heteroplasmy_percentage": "",
+            "variant_inheritance": "maternal",
+            "linked_variant": "",
+            "linked_variant_phase": "",
+            "gene_known_for_phenotype": "Candidate",
+            "known_condition_name": "",
+            "condition_id": "",
+            "condition_inheritance": ["Unknown"],
+            "GREGoR_variant_classification": "Curation in progress",
+            "GREGoR_ClinVar_SCV": "",
+            "gene_disease_validity": "Curation in progress",
+            "public_database_other": "",
+            "public_database_ID_other": "",
+            "phenotype_contribution": "",
+            "partial_contribution_explained": [],
+            "method_of_discovery": ["SR-GS"],
+            "notes": "",
+            "additional_family_members_with_variant": [],
+        }
+        create_response = self.client.post(create_url, [gf1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        delete_url = (
+            "/api/metadata/genetic_findings/delete/?ids=10_73792185_GREGoR_test-001-001-0"
+        )
+        delete_response = self.client.delete(delete_url, format="json")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

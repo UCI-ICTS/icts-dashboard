@@ -23,7 +23,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
         part1 = {  # Valid submission
             "biobank_id": "GREGoR_test-002-001-2-D-3",
             "participant_id": "GREGoR_test-002-001-2",
-            "collection_date": "2025-01-03",
+            "received_date": "2025-01-03",
             "specimen_type": "D",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
@@ -48,7 +48,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
         part2 = {  # Valid submission
             "biobank_id": "GREGoR_test-002-001-2-D-20",
             "participant_id": "GREGoR_test-002-001-2",
-            "collection_date": "2025-01-03",
+            "received_date": "2025-01-03",
             "specimen_type": "D",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
@@ -73,7 +73,7 @@ class CreateBiobankAPITest(APITestCaseWithAuth):
         part3 = {  # Invalid submission; non-existant participant
             "biobank_id": "DNE-002-002-2-X-1",
             "participant_id": "DNE-002-002-2",
-            "collection_date": "2025-01-03",
+            "received_date": "2025-01-03",
             "specimen_type": "X",
             "current_location": "UCI",
             "freezer_id": "ULT #1",
@@ -132,7 +132,7 @@ class UpdateBiobankAPITest(APITestCaseWithAuth):
         part2 = {  # Invalid submission; non-existant biobank_id
             "biobank_id": "DNE-001-001-1",
             "participant_id": "GREGoR_test-002-002-2",
-            "collection_date": "2024-07-07",
+            "received_date": "2024-07-07",
             "specimen_type": "D",
             "current_location": "UCI",
             "freezer_id": "ULT #1",

@@ -160,7 +160,7 @@ export const dataSlice = createSlice({
         state.status = "fulfilled";
         const { table, response, noChanges } = action.payload;
         console.log(table, response)
-        
+
         // Extract the added object from the response
         const addedObject = response[0]?.data?.instance;
         console.log(addedObject[table])
@@ -291,9 +291,17 @@ export const updateTable = createAsyncThunk(
 export const deleteEntry = createAsyncThunk(
   "deleteEntry",
   async ({table, idList}, thunkAPI) => {
-    const response = await dataService.deleteEntry(table, idList)
-    console.log("slice", response)
-  });
+    try {
+      const response = await dataService.deleteEntry(table, idList)
+      const payload = {response: response.data, table}
+      console.log("slice", response)
+      message.success(`${payload.table} ${response.data[0].identifier} deleted successfuly`);
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
+    }
+  }
+)
 
 export const {
   setJsonData,
