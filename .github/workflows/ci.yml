@@ -49,8 +49,9 @@ jobs:
           SECRET_KEY: "ci-temp-secret-key"
         run: |
           cd server
-          python manage.py migrate
-          python manage.py collectstatic --noinput
+          python -m manage makemigrations
+          python -m manage migrate
+          python -m manage collectstatic --noinput
 
       - name: Run Tests
         env:
@@ -58,7 +59,7 @@ jobs:
           SECRET_KEY: "ci-temp-secret-key"
         run: |
           cd server
-          python manage.py test
+          python -m manage test
 
   frontend-tests:
     name: React Tests
