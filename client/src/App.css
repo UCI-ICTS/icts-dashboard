@@ -1,10 +1,47 @@
 /* src/App.css */
 
-:root {
-  --uci-blue: #0064a4;
-  --uci-gold: #ffd200;
+/* import can also be done here if you prefer: */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  /* optionally set a fallback line-height or letter-spacing */
 }
 
+/* Override Ant Design’s default font if necessary */
+.ant-typography,
+.ant-card,
+.ant-menu,
+.ant-btn {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* 🎨 UCI Color Palette */
+:root {
+  /* Primary colours */
+  --uci-blue: #255799;         /* UCI Blue */
+  --uci-gold: #fecc07;         /* UCI Gold */
+  /* Secondary colours */
+  --uci-darkest-blue: #002244;
+  --uci-dark-blue:    #1b3d6d;
+  --uci-teal-blue:    #0083b3;
+  --uci-turquoise:    #00b0ca;
+  --uci-orange:       #f78d2d;
+  --uci-secondary-gold: #f0ab00;
+  --uci-dark-gray:    #555759;
+  --uci-light-gray:   #c6beb5;
+  /* Accent colours */
+  --uci-athletics-gold: #f8cf56;
+  --uci-light-yellow:    #f7eb5f;
+  --uci-green:           #3f9c35;
+  --uci-lime-green:      #7ab800;
+  --uci-royal-blue:      #00639e;
+  --uci-light-blue:      #6aa2b8;
+  --uci-bright-purple:   #7c109a;
+  --uci-magenta:         #d462ad;
+}
+
+/* Default App layout */
 .App {
   text-align: center;
 }
@@ -44,6 +81,7 @@
   }
 }
 
+/* Ant Design layout backgrounds */
 .site-layout .site-layout-background {
   background: #fff;
 }
@@ -59,6 +97,7 @@
 }
 
 .fullscreen-bg {
+  position: relative;
   background-image: url(../public/ICTS-background.jpeg);
   background-size: cover;
   background-position: center;
@@ -67,9 +106,26 @@
   width: 100%;
 }
 
+.fullscreen-bg::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--uci-teal-blue); /* or any variable from your palette */
+  opacity: 0.4;               /* adjust the transparency to taste */
+  filter: saturate(50%);
+  z-index: 0;          /* put the overlay behind the content */
+  pointer-events: none;
+}
+
+/* Ensure the actual page content appears above the overlay */
+.fullscreen-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* 🏠 Sidebar (Sider) */
 .sider-container {
-  background: #001529;
+  background: var(--uci-darkest-blue);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -92,7 +148,7 @@
 
 .site-header {
   padding: 0;
-  background: #fff; /* Matches AntD layout background */
+  background: #fff;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -118,7 +174,7 @@
 
 /* Wrapper for sidebar menu items */
 .sider-menu-wrapper {
-  flex-grow: 1; /* Fills available space */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -130,7 +186,6 @@
   display: flex;
   justify-content: center;
 }
-
 
 /* 📜 Footer */
 .site-footer {
@@ -148,7 +203,7 @@
 
 /* 🏠 AntD Menu Styling */
 .ant-menu-dark .ant-menu-item-selected {
-  background-color: #1890ff !important;
+  background-color: var(--uci-teal-blue) !important;
 }
 
 .login-container {
@@ -191,8 +246,8 @@
 
 .login-form .ant-input-affix-wrapper:hover,
 .login-form .ant-input-affix-wrapper:focus {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: var(--uci-teal-blue);
+  box-shadow: 0 0 0 2px rgba(0, 131, 179, 0.2);
 }
 
 .login-form .ant-input {
@@ -204,7 +259,7 @@
   height: 45px;
   font-size: 16px;
   border-radius: 6px;
-  background-color: #1e74f4;
+  background-color: var(--uci-blue);
   border: none;
   color: white;
   transition: 0.1s;
@@ -215,23 +270,21 @@
   opacity: 1;
 }
 
-/* Container to keep the table within the page */
+/* Table container, search and filter layout */
 .table-container {
   padding: 16px;
-  height: calc(100vh - 120px); /* Ensures it stays within the page */
-  overflow: hidden; /* Prevents the table from overflowing */
+  height: calc(100vh - 120px);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Ensures the search, filter, and add row button layout is clean */
 .table-header {
   margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
 }
 
-/* Scrollable Table Wrapper */
 .table-wrapper {
   flex: 1;
   overflow: auto;
@@ -240,35 +293,34 @@
   padding: 8px;
 }
 
-/* Table scroll settings */
+/* Ant Design table scroll settings */
 .ant-table-wrapper .ant-table {
   overflow: auto;
 }
 
 .ant-table-wrapper .ant-table-container {
-  max-height: calc(100vh - 250px); /* Adjust for dynamic heights */
+  max-height: calc(100vh - 250px);
 }
 
-/* Column Toggle Menu - Ensure it appears horizontally & clearly */
+/* Column toggle menu styling */
 .column-toggle-menu {
   background: white;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Gives a subtle shadow */
-  max-height: 300px; /* LIMIT dropdown height */
-  overflow-y: auto;  
-  /* display: flex;  horizontal layout */
-  flex-wrap: wrap; /* Prevents items from being cut off */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  flex-wrap: wrap;
 }
 
 .column-toggle-item {
-  margin-right: 12px; /* ✅ Adds spacing between items */
+  margin-right: 12px;
   padding: 4px;
-  white-space: nowrap; /* ✅ Prevents line wrapping */
+  white-space: nowrap;
 }
 
-
+/* Home and summary header styling with primary colours */
 .home-button {
   color: var(--uci-gold) !important;
   background: var(--uci-blue) !important;
@@ -289,4 +341,29 @@
   padding-right: 24px;
   padding-left: 24px;
   font-size: 24px !important;
+}
+
+.summary-card {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--uci-blue);
+  /* background-color: var(--uci-gold); */
+}
+
+/* Emphasised numbers and labels */
+.card-number {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--uci-blue);
+}
+
+.card-label {
+  font-size: 18px;
+  color: var(--uci-dark-blue);
 }

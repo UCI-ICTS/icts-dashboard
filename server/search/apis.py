@@ -225,7 +225,7 @@ class SummaryAPI(APIView):
             # Define mapping from role sets to category
             FAMILY_CATEGORIES = ["Trio+", "Trio", "Maternal Dyads", "Paternal Dyads", "Singletons", "Other"]
             # Initialize counts for all categories
-            kindrid = {category: 0 for category in FAMILY_CATEGORIES}
+            kindred = {category: 0 for category in FAMILY_CATEGORIES}
             kindred_count = 0
             for family_id, members_iter in groupby(participants_sorted, key=lambda x: x.family_id_id):
                 family_ids_with_participants.add(family_id)
@@ -235,20 +235,20 @@ class SummaryAPI(APIView):
                 if {"Self", "Mother", "Father"}.issubset(roles):
                     # Family includes proband and both parents
                     if len(roles) > 3:
-                        kindrid["Trio+"] += 1  # There are other roles in addition to the trio
+                        kindred["Trio+"] += 1  # There are other roles in addition to the trio
                     else:
-                        kindrid["Trio"] += 1   # Exactly Self, Mother, Father
+                        kindred["Trio"] += 1   # Exactly Self, Mother, Father
                 elif roles == {"Self", "Mother"}:
-                    kindrid["Maternal Dyads"] += 1
+                    kindred["Maternal Dyads"] += 1
                 elif roles == {"Self", "Father"}:
-                    kindrid["Paternal Dyads"] += 1
+                    kindred["Paternal Dyads"] += 1
                 elif roles == {"Self"}:
-                    kindrid["Singletons"] += 1
+                    kindred["Singletons"] += 1
                 else:
-                    kindrid["Other"] += 1
+                    kindred["Other"] += 1
                     print(f'{family_id}: {roles}')
                 kindred_count += 1
-            print(kindred_count)
+
             all_family_ids = set(Family.objects.values_list("family_id", flat=True))
             family_ids_without_participants = all_family_ids - family_ids_with_participants
             families = families - len(family_ids_without_participants)
@@ -267,7 +267,7 @@ class SummaryAPI(APIView):
                 "analyte_type_counts": analyte_type,
                 "findings_contribution": findings_contribution,
                 "sequencing_vs_alignment": sequencing_vs_alignment,
-                "kindrid": kindrid,
+                "kindred": kindred,
             }
 
             return Response(status=status.HTTP_200_OK, data=response)
