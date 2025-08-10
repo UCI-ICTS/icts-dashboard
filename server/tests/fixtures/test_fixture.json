@@ -19,6 +19,17 @@
   },
   {
     "model": "metadata.family",
+    "pk": "GREGoR_test_delete-001",
+    "fields": {
+      "consanguinity": "Suspected",
+      "consanguinity_detail": "",
+      "pedigree_file": "",
+      "pedigree_file_detail": "",
+      "family_history_detail": ""
+    }
+  },
+  {
+    "model": "metadata.family",
     "pk": "GREGoR_test-001",
     "fields": {
       "consanguinity": "Suspected",
