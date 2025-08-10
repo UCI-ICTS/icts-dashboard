@@ -283,7 +283,7 @@ const SchemaForm = ({
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
+    <Form form={form} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
       {/* Edit/Delete Controls */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
         <span style={{ marginRight: 8 }}>Edit Mode</span>

@@ -88,6 +88,7 @@ const DownloadExportButton = ({ rows, headCells, rowID, filename = "table_data",
 
       {/* Modal for Selecting Export Format */}
       <Modal
+        className="uci-modal"
         title="Select Export Format"
         open={openDialog}
         onCancel={() => setOpenDialog(false)}

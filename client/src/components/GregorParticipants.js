@@ -311,6 +311,7 @@ const defaultVisibleColumns = {
             }
           />
           <Modal
+            className="uci-modal"
             title={
               selectedDetail
                 ? `Details for ${selectedDetail.table_name}`
@@ -465,6 +466,7 @@ const defaultVisibleColumns = {
       )}
 
       <Modal
+        className="uci-modal"
         title="Advanced Filters"
         open={filterModalVisible}
         onCancel={() => setFilterModalVisible(false)}

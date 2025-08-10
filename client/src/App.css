@@ -494,7 +494,56 @@ body, html {
   background-color: var(--uci-light-yellow) !important;
 }
 
-.ant-modal-title {
-  color: var(--uci-blue) !important;
+/* Modal container */
+.uci-modal .ant-modal-content {
+  border-radius: 12px;
+  background-color: var(--uci-blue);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 0; /* Remove default padding, we’ll set custom below */
+}
+
+/* Modal header */
+.uci-modal .ant-modal-header {
+  background-color: var(--uci-blue);
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 16px 24px;
+}
+
+/* Modal title */
+.uci-modal .ant-modal-title {
+  font-size: 20px;
   font-weight: 700;
+  color: var(--uci-light-gray);
+}
+
+/* Modal body */
+.uci-modal .ant-modal-body {
+  padding: 24px;
+  background-color: #fafafa; /* Light background */
+  font-size: 16px;
+}
+
+/* Modal footer */
+.uci-modal .ant-modal-footer {
+  border-top: 1px solid #e8e8e8;
+  padding: 12px 24px;
+  background-color: #f5f5f5;
+}
+
+/* Modal buttons */
+.uci-modal .ant-btn-primary {
+  background-color: var(--uci-blue);
+  border-color: var(--uci-blue);
+}
+
+.uci-modal .ant-btn-primary:hover {
+  background-color: var(--uci-gold);
+  border-color: var(--uci-gold);
+}
+
+.uci-modal .ant-btn-default:hover {
+  border-color: var(--uci-blue);
+  color: var(--uci-blue);
 }

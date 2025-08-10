@@ -96,6 +96,7 @@ const Login = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
         <Modal
+          className="uci-modal"
           title="Password reset"
           open={passwordResetModal}
           onCancel={handleCancel}

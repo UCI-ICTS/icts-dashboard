@@ -306,6 +306,7 @@ const GregorTables = () => {
         />
       )}
       <Modal
+        className="uci-modal"
         title={entry ? (
           `Edit ${tableView}`
         ) : (
@@ -331,6 +332,7 @@ const GregorTables = () => {
       </Modal>
 
       <Modal
+        className="uci-modal"
         title="Advanced Filters"
         open={filterModalVisible}
         onCancel={() => setFilterModalVisible(false)}
@@ -349,7 +351,7 @@ const GregorTables = () => {
           </Button>
         ]}
       >        
-        <Form layout="vertical">
+        <Form layout="horizontal">
           {columns.map((col) => {
             const fieldSchema = schema.properties[col.dataIndex];
             const fieldKey = col.dataIndex;

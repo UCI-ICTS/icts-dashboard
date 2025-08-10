@@ -183,12 +183,13 @@ const ManageAdministrators = () => {
             bordered
           />
         <Modal
+          className="uci-modal"
           title={editingMember ? "Edit Member" : "Add New Member"}
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           onOk={handleSubmit}
         >
-          <Form form={form} layout="vertical">
+          <Form form={form} layout="horizontal">
             <Form.Item
               name="first_name"
               label="Given Name"
