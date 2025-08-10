@@ -152,7 +152,6 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
         response_400 = self.client.post(url, [part2, part2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
-        # self.assertEqual(response_200.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
@@ -161,11 +160,39 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
 
 class DeleteParticipantAPITest(APITestCaseWithAuth):
     def test_delete_participant(self):
-        url = "/api/metadata/participant/delete/?ids=GREGoR_test-001-001-0"
-        response = self.client.delete(url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # import pdb; pdb.set_trace()
-        self.assertEqual(response.data[0]["request_status"], "DELETED")
+        delete_url = "/api/metadata/participant/delete/?ids=GREGoR_test-001-001-0"
+        delete_response = self.client.delete(delete_url, format="json")
+        self.assertEqual(delete_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(delete_response.data[0]["data"][:113],
+                         '("Cannot delete some instances of model \'Participant\' because they are referenced through protected foreign keys:')
+
+
+    def test_create_and_delete_participant_api(self):
+        create_url = "/api/metadata/participant/create/"
+        part1 = {  # Valid submission
+            "participant_id": "P-002-101-0",
+            "gregor_center": "UCI",
+            "consent_code": "HMB",
+            "family_id": "GREGoR_test-001",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Self",
+            "sex": "Male",
+            # "reported_race": "More than one",
+            # "reported_ethnicity": "Unknown",
+            "age_at_last_observation": 20,
+            "affected_status": "Unaffected",
+            "age_at_enrollment": 20,
+            "solve_status": "Unsolved",
+            "missing_variant_case": "No",
+        }
+        create_response = self.client.post(create_url, [part1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        delete_url = "/api/metadata/participant/delete/?ids=P-002-101-0"
+        delete_response = self.client.delete(delete_url, format="json")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")
 
 
 class ListAllParticipants(APITestCaseWithAuth):

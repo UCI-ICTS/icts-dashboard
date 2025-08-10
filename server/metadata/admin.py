@@ -49,12 +49,12 @@ class BiobankAdmin(admin.ModelAdmin):
         "display_analytes",
         "display_experiments",
         "status",
-        "collection_date",
+        "received_date",
         "completed",
     ]
     search_fields = ["biobank_id", "participant__participant_id", "tube_barcode"]
-    list_filter = ["status", "completed", "collection_date"]
-    ordering = ["-collection_date"]
+    list_filter = ["status", "completed", "received_date"]
+    ordering = ["-received_date"]
 
     def display_analytes(self, obj):
         return ", ".join(a.analyte_id for a in obj.child_analytes.all())

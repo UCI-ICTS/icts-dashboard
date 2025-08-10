@@ -5,53 +5,56 @@ const APIDB = process.env.REACT_APP_APIDB;
 
 const printErrorMessages = (error) => {
   let errorMessage = "";
-  console.log("Starting error decision tree")
 
-  // Check if there's a top-level errorMessage.
-  if (error.response && error.response.message) {
-    errorMessage = error.response.message;
-    console.log("Top-level message:", errorMessage);
+  console.log(error)
+
+  if (error.name == "AxiosError"){
+    if (error.response) {
+      // Check if there's a top-level errorMessage.
+      if (error.response.message) { errorMessage = error.response.message; }
+      // Otherwise, if error.response.data is an array and has at least one element:
+      else if (
+        error.response.data &&
+        Array.isArray(error.response.data) &&
+        error.response.data.length > 0
+      ) {
+        // If the first element has a 'data' key that is an array, use that:
+        if (error.response.data[0].data &&
+          Array.isArray(error.response.data[0].data) &&
+          error.response.data[0].data.length > 0
+        ) {
+          for (const field in error.response.data[0].data[0]) {
+            errorMessage = `Error. ${field}: ${error.response.data[0].data[0][field]}\n`
+          };
+        }
+        // Otherwise, if the first element itself has 'field' and 'error', use those.
+        else if (
+          error.response.data[0].field &&
+          error.response.data[0].error
+        ) {
+          errorMessage = `Error: ${error.response.data[0].field}: ${error.response.data[0].error}`;
+        }
+        // Otherwise, fall back to stringifying the first element.
+        else {
+          console.log("error.response.data[0] is likely a string type")
+          if (error.response.data[0]["data"]) {
+            errorMessage = error.response.data[0]["data"]
+          }
+          else { errorMessage = JSON.stringify(error.response.data[0]) }
+        }
+      }
+    }
+    else if (error.message) { errorMessage = error.message }
+    else if (error.request) { errorMessage = error.request }
   }
-  // Otherwise, if error.response.data is an array and has at least one element:
-  else if (
-    error.response &&
-    error.response.data &&
-    Array.isArray(error.response.data) &&
-    error.response.data.length > 0
-  ) {
-    console.log("error.response.data is an array of len > 0")
-    const firstError = error.response.data[0];
-    // If the first element has a 'data' key that is an array, use that:
-    if (firstError.data && Array.isArray(firstError.data) && firstError.data.length > 0) {
-      console.log("error.reponse.data[0].data has a value")
-      let nestedResponse = firstError.data[0]
-      for (const field in nestedResponse) {
-        errorMessage = `Error. ${field}: ${nestedResponse[field]}\n`
-        console.log(errorMessage)
-      };
-    }
-    // Otherwise, if the first element itself has 'field' and 'error', use those.
-    else if (firstError.field && firstError.error) {
-      console.log("error.response.data[0] has its own field and error attributes")
-      errorMessage = `Error: ${firstError.field}: ${firstError.error}`;
-    }
-    // Otherwise, fall back to stringifying the first element.
-    else {
-      console.log("error.response.data[0] is likely a string type")
-      errorMessage = JSON.stringify(firstError);
-    }
-    console.log("Constructed message from response data:", errorMessage);
-  }
+
   // Fallback generic message.
-  else {
-    errorMessage = "An unknown error occurred.";
-    console.log("Fallback message:", errorMessage);
-  }
+  else if (error.message == "Rejected") { errorMessage = error.message }
+  else { errorMessage = "An unknown error occurred."; }
+  console.log(errorMessage)
   return errorMessage;
 }
 
-const errorService = {
-  printErrorMessages
-}
+const errorService = { printErrorMessages }
 
 export default errorService;

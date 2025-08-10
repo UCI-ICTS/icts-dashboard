@@ -34,7 +34,7 @@ DEBUG = secrets.getboolean("SERVER", "DEBUG", fallback=True)
 ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="localhost").split(",")
 VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
-SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.7")
+SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.8")
 
 EMAIL_BACKEND = secrets.get(
     "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
@@ -60,7 +60,7 @@ backup = [
 ]
 
 # Required for frontend JS to read it
-CSRF_COOKIE_HTTPONLY = False  
+CSRF_COOKIE_HTTPONLY = False
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 
@@ -68,10 +68,22 @@ SHOW_ACTIVATION_LINKS = DEBUG
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# DATABASE settings
+ENGINE=secrets.get("DATABASE", "ENGINE", fallback="django.db.backends.postgresql")
+NAME=secrets.get("DATABASE", "NAME", fallback="ictsdashboard_app")
+USER=secrets.get("DATABASE", "USER", fallback="postgres")
+PASSWORD=secrets.get("DATABASE", "PASSWORD", fallback="postgres")
+HOST=secrets.get("DATABASE", "HOST", fallback="localhost") # Or your PostgreSQL server
+PORT=secrets.get("DATABASE", "PORT", fallback="5432") # Default PostgreSQL port
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": secrets.get("SERVER", "DATABASE", fallback=os.path.join(BASE_DIR, "db.sqlite3")),
+    'default': {
+        'ENGINE': ENGINE,
+        'NAME': NAME,
+        'USER': USER,
+        'PASSWORD': PASSWORD,
+        'HOST': HOST,
+        'PORT': PORT
     }
 }
 

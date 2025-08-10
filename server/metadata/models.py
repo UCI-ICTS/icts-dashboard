@@ -106,7 +106,7 @@ class Participant(models.Model):
     family_id = models.ForeignKey(
         Family,
         to_field="family_id",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         help_text="Identifier for family",
@@ -215,7 +215,7 @@ class Phenotype(models.Model):
         Participant,
         to_field="participant_id",
         db_column="participant_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="phenotypes",
         help_text="Identifier for the participant associated with this phenotype.",
     )
@@ -297,7 +297,7 @@ class GeneticFindings(models.Model):
     )
     participant_id = models.ForeignKey(
         Participant,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Subject/Participant Identifier within project",
     )
     experiment_id = models.JSONField(
@@ -464,7 +464,7 @@ class Analyte(models.Model):
         Participant,
         to_field="participant_id",
         db_column="participant_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="analytes",
         help_text="The participant from whom the biosample was taken",
     )
@@ -594,11 +594,11 @@ class Biobank(models.Model):
     )
     participant_id = models.ForeignKey(
         "Participant",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="biobank_samples",
         help_text="Participant associated with the sample",
     )
-    collection_date = models.DateField(
+    received_date = models.DateField(
         blank=True, null=True, help_text="Date when the biosample was created"
     )
     specimen_type = models.CharField(
@@ -756,4 +756,4 @@ class Biobank(models.Model):
 
     class Meta:
         verbose_name = "Biobank Sample"
-        ordering = ["participant_id", "collection_date"]
+        ordering = ["participant_id", "received_date"]

@@ -148,29 +148,52 @@ class UpdateNanoporeAPITest(APITestCaseWithAuth):
 
 class DeleteNanoporeAPITest(APITestCaseWithAuth):
     def test_delete_nanopore_api(self):
-
-        # Checks for the Experiment table before deletion
-
-        experiment1_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1"
-        ).exists()
-
-        assert experiment1_exists
-
         url2 = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-001-0-D-3_NANO_1, DNE-01-1"
         url3 = "/api/experiments/experiment_nanopore/delete/?ids=DNE-1, DNE2"
 
-        response_207 = self.client.delete(url2, format="json")
-        response_400 = self.client.delete(url3, format="json")
+        response_400_1 = self.client.delete(url2, format="json")
+        response_400_2 = self.client.delete(url3, format="json")
+        self.assertEqual(response_400_1.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_400_2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_400_1.data[0]["data"][:120],
+                         '("Cannot delete some instances of model \'ExperimentNanopore\' because they are referenced through protected foreign keys:')
+        self.assertEqual(response_400_1.data[1]["data"], "Not found")
+
+
+    def test_create_and_delete_nanopore_api(self):
+        create_url = "/api/experiments/experiment_nanopore/create/"
+        experiment1 = {  # Valid
+            "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_2",
+            "analyte_id": "GREGoR_test-001-001-0-D-3",
+            "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_2",
+            "seq_library_prep_kit_method": "Kit 14",
+            "fragmentation_method": None,
+            "experiment_type": "genome",
+            "targeted_regions_method": None,
+            "targeted_region_bed_file": None,
+            "date_data_generation": "2023-10-10",
+            "sequencing_platform": "Oxford Nanopore PromethION 48",
+            "chemistry_type": "R10.4.1",
+            "was_barcoded": False,
+            "barcode_kit": None,
+        }
+        create_response = self.client.post(create_url, [experiment1], format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_200_OK)
+
+        # Checks for the Experiment table before deletion
+        experiment1_exists = Experiment.objects.filter(
+            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_2"
+        ).exists()
+        assert experiment1_exists
+
+        delete_url = "/api/experiments/experiment_nanopore/delete/?ids=UCI_GREGoR_test-001-001-0-D-3_NANO_2"
+        delete_response = self.client.delete(delete_url, format="json")
 
         # Checks for the Experiment table after deletion
         experiment2_exists = Experiment.objects.filter(
-            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1"
+            pk="experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_2"
         ).exists()
         assert not experiment2_exists
 
-        self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
-
-        self.assertEqual(response_207.data[0]["request_status"], "DELETED")
-        self.assertEqual(response_207.data[1]["request_status"], "NOT FOUND")
+        self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

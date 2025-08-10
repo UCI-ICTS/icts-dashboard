@@ -37,7 +37,7 @@ class Experiment(models.Model):
         Participant,
         to_field="participant_id",
         db_column="participant_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="experiments",
         help_text="References the participant associated with this experiment.",
     )
@@ -72,7 +72,7 @@ class Aligned(models.Model):
         Participant,
         to_field="participant_id",
         db_column="participant_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="The participant associated with this aligned data",
     )
     aligned_file = models.CharField(
@@ -106,7 +106,7 @@ class ExperimentDNAShortRead(models.Model):
     )
     analyte_id = models.ForeignKey(
         Analyte,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="reference to an analyte from which this experiment was derived",
     )
     experiment_sample_id = models.CharField(
@@ -156,7 +156,7 @@ class AlignedDNAShortRead(models.Model):
     aligned_dna_short_read_id = models.CharField(max_length=255, primary_key=True)
     experiment_dna_short_read_id = models.ForeignKey(
         "ExperimentDNAShortRead",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         to_field="experiment_dna_short_read_id",
         db_column="experiment_dna_short_read_id",
     )
@@ -230,7 +230,7 @@ class CalledVariantsDNAShortRead(models.Model):
         max_length=255, primary_key=True
     )
     aligned_dna_short_read_set_id = models.ForeignKey(
-        AlignedDNAShortReadSet, on_delete=models.CASCADE
+        AlignedDNAShortReadSet, on_delete=models.PROTECT
     )
     called_variants_dna_file = models.CharField(max_length=255, unique=True)
     md5sum = models.CharField(max_length=32, unique=True)
@@ -299,7 +299,7 @@ class ExperimentRNAShortRead(models.Model):
     )
     analyte_id = models.ForeignKey(
         Analyte,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Reference to the analyte ID from which this experiment derives.",
     )
     experiment_sample_id = models.CharField(
@@ -372,7 +372,7 @@ class AlignedRNAShortRead(models.Model):
     experiment_rna_short_read_id = models.ForeignKey(
         "ExperimentRNAShortRead",
         to_field="experiment_rna_short_read_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for experiment.",
     )
     aligned_rna_short_read_file = models.CharField(
@@ -504,7 +504,7 @@ class ExperimentNanopore(models.Model):
     analyte_id = models.ForeignKey(
         Analyte,
         to_field="analyte_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for the analyte used in the experiment.",
     )
     experiment_sample_id = models.CharField(
@@ -587,7 +587,7 @@ class AlignedNanopore(models.Model):
     experiment_nanopore_id = models.ForeignKey(
         "ExperimentNanopore",
         to_field="experiment_nanopore_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for experiment, referencing the experiment_nanopore_id from the experiment_nanopore table.",
     )
     aligned_nanopore_file = models.CharField(
@@ -700,7 +700,7 @@ class AlignedNanoporeSet(models.Model):
     )
     aligned_nanopore = models.ForeignKey(
         "AlignedNanopore",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="The identifier for a single-sample aligned_nanopore included in the read set (one per row). This refers to IDs from the aligned_nanopore table.",
     )
 
@@ -716,7 +716,7 @@ class CalledVariantsNanopore(models.Model):
     )
     aligned_nanopore_set = models.ForeignKey(
         "AlignedNanoporeSet",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for experiment set. This refers to IDs from the aligned_nanopore_set table.",
     )
     called_variants_dna_file = models.CharField(
@@ -756,7 +756,7 @@ class ExperimentPacBio(models.Model):
     analyte_id = models.ForeignKey(
         Analyte,
         to_field="analyte_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Analyte identifier linked to the ExperimentPacBio",
     )
     experiment_sample_id = models.CharField(
@@ -874,7 +874,7 @@ class AlignedPacBio(models.Model):
     experiment_pac_bio_id = models.ForeignKey(
         "ExperimentPacBio",
         to_field="experiment_pac_bio_id",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="identifier for experiment",
     )
     aligned_pac_bio_file = models.CharField(
@@ -980,7 +980,7 @@ class AlignedPacBioSet(models.Model):
     )
     aligned_pac_bio = models.ForeignKey(
         "AlignedPacBio",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="The identifier for a single-sample aligned_pac_bio included in the read set (one per row).",
     )
 
@@ -997,7 +997,7 @@ class CalledVariantsPacBio(models.Model):
     )
     aligned_pac_bio_set = models.ForeignKey(
         "AlignedPacBioSet",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for experiment set.",
     )
     called_variants_dna_file = models.CharField(
@@ -1034,7 +1034,7 @@ class ExperimentATACShortRead(models.Model):
         help_text="Identifier for experiment_atac_short_read (primary key). RCs make their own IDs, must begin with center abbreviation as defined in participant table; need to be globally unique in consortium; may be generated by prepending experiment_sample_id with center abbreviation.",
     )
     analyte_id = models.ForeignKey(
-        Analyte, on_delete=models.CASCADE, help_text="Reference to analyte ID."
+        Analyte, on_delete=models.PROTECT, help_text="Reference to analyte ID."
     )
     experiment_sample_id = models.CharField(
         max_length=255,
@@ -1089,7 +1089,7 @@ class AlignedATACShortRead(models.Model):
     )
     experiment_atac_short_read = models.ForeignKey(
         "ExperimentATACShortRead",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for experiment. Reference to experiment_atac_short_read.experiment_atac_short_read_id.",
     )
     aligned_atac_short_read_file = models.URLField(
@@ -1147,7 +1147,7 @@ class CalledPeaksATACShortRead(models.Model):
     )
     aligned_atac_short_read = models.OneToOneField(
         "AlignedATACShortRead",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for aligned ATAC-seq data.",
     )
     called_peaks_file = models.URLField(
@@ -1188,7 +1188,7 @@ class AlleleSpecificATACShortRead(models.Model):
     )
     called_peaks_atac_short_read = models.ForeignKey(
         "CalledPeaksATACShortRead",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text="Identifier for called peaks.",
     )
     asc_file = models.URLField(

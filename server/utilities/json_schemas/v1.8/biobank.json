@@ -7,7 +7,7 @@
     "required": [
         "biobank_id",
         "participant_id",
-        "collection_date",
+        "received_date",
         "specimen_type",
         "status"
     ],
@@ -21,7 +21,7 @@
             "type": "string",
             "description": "printed on tube, automatically reference with participant table"
         },
-        "collection_date": {
+        "received_date": {
             "type": "string",
             "description": "8-digit date as MM/DD/YYYY, printed on tube"
         },
