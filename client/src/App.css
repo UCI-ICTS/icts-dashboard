@@ -120,7 +120,7 @@ body, html {
 
 /* ==== Sidebar (Sider) ==== */
 .sider-container {
-  background-color: var(--uci-blue) !important;
+  background-color: var(--uci-dark-blue) !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -141,7 +141,7 @@ body, html {
 
 /* Sider menu background & text color */
 .ant-menu-dark {
-  background-color: var(--uci-blue) !important;
+  background-color: var(--uci-dark-blue) !important;
 }
 
 /* Default menu item text */
@@ -153,7 +153,7 @@ body, html {
 
 /* Hover effect for menu items */
 .ant-menu-dark .ant-menu-item:hover {
-  background-color: var(--uci-teal-blue) !important;
+  background-color: var(--uci-gold) !important;
   color: var(--uci-dark-blue) !important;
 }
 
@@ -204,7 +204,7 @@ body, html {
 
 /* Make the collapse button match your theme */
 .ant-layout-sider-trigger {
-  background-color: var(--uci-blue) !important;
+  background-color: var(--uci-dark-blue) !important;
   color: var(--uci-light-gray) !important;
   font-size: 16px;
   height: 48px;
@@ -214,7 +214,7 @@ body, html {
 
 /* Hover state */
 .ant-layout-sider-trigger:hover {
-  background-color: var(--uci-teal-blue) !important;
+  background-color: var(--uci-gold) !important;
   color: var(--uci-dark-blue) !important;
   opacity: 0.9;
 }
@@ -323,7 +323,7 @@ body, html {
   position: sticky;
   bottom: 0;
   width: 100%;
-  background: var(--uci-blue) !important;
+  background: var(--uci-dark-blue) !important;
   padding: 16px;
   text-align: center;
   z-index: 2;
@@ -346,7 +346,7 @@ body, html {
 
 /* AntD Menu Styling */
 .ant-menu-dark .ant-menu-item-selected {
-  background-color: var(--uci-teal-blue) !important;
+  background-color: var(--uci-gold) !important;
 }
 
 /* Table container, search and filter layout */
@@ -370,6 +370,19 @@ body, html {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 8px;
+}
+
+/* Column resizing */
+.react-resizable {
+  position: relative;
+}
+.react-resizable-handle {
+  position: absolute;
+  right: -4px;
+  bottom: 0;
+  top: 0;
+  width: 8px;
+  cursor: col-resize;
 }
 
 /* Ant Design table scroll settings */

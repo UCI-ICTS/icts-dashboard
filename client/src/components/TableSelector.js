@@ -34,6 +34,7 @@ const TableSelector = () => {
   };
 
   return (
+    <div>Select Table: 
     <Select
       value={selected}
       onChange={handleChange}
@@ -46,6 +47,7 @@ const TableSelector = () => {
         </Option>
       ))}
     </Select>
+    </div>
   );
 };
 

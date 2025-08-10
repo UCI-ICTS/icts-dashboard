@@ -173,11 +173,10 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Family Breakdown</span>} className="summary-card">
+            <Card title={<span className="card-title">Families by Type</span>} className="summary-card">
               <SummaryPieChart
                 data={kindredData}
                 label="Family Classification"
-                title="Families by Type"
               />
             </Card>
           </Col>

@@ -12,7 +12,7 @@ import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import SummaryPage from './pages/SummaryPage';
 import GregorParticipants from './components/GregorParticipants';
-import GregorTables from './components/GregorTables';
+import GregorDataSheets from './pages/GregorDataSheets';
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import PrivateRout from "./components/PrivateRoute";
 import AccountService from "./services/account.service";
@@ -74,7 +74,7 @@ const AppRoutes = () => {
 
       <Route path="/dashboard" element={<PrivateRout><Dashboard /></PrivateRout>}>
         <Route index element={<ProfilePage />} />
-        <Route path="table-data" element={<GregorTables />} />
+        <Route path="table-data" element={<GregorDataSheets />} />
         <Route path="participant-detail" element={<GregorParticipants />} />
         <Route path="admin" element={<AdminPage />} />
         <Route path="uploader" element={<Uploader />} />
