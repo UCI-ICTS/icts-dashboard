@@ -19,10 +19,14 @@ class APITestCaseWithAuth(APITestCase):
 
 class DeleteFamilyAPITest(APITestCaseWithAuth):
     def test_delete_family_api(self):
-        url = "/api/metadata/family/delete/?ids=GREGoR_test-001"
-        response = self.client.delete(url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["request_status"], "DELETED")
+        url1 = "/api/metadata/family/delete/?ids=GREGoR_test-001"
+        url2 = "/api/metadata/family/delete/?ids=GREGoR_test_delete-001"
+        bad_response = self.client.delete(url1, format="json")
+        good_response = self.client.delete(url2, format="json")
+        self.assertEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(bad_response.data[0]["request_status"], "SERVER ERROR")
+        self.assertEqual(good_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(good_response.data[0]["request_status"], "DELETED")
 
 
     def verify_delete_cascade(self):
