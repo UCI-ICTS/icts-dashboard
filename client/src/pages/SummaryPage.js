@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
-import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, CaretRightOutlined } from "@ant-design/icons";
+import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, DatabaseOutlined } from "@ant-design/icons";
 import SiteFooter from "../components/SiteFooter";
 import SummaryPieChart from "../components/SummaryPieChart";
 import SummaryCard from "../components/SummaryCard";
@@ -108,9 +108,29 @@ const SummaryPage = () => {
     console.log(comparisonItems)
   return (
     <Layout className="fullscreen-bg">
-      <Title level={1} className="site-title">
-        UCI Institute for Clinical & Translational Science (ICTS)
-      </Title>
+        <Header className="summary-header">
+          <div >
+            <Tooltip title="Home page">
+              <Button
+                onClick={() => navigate("/")}
+                icon={<HomeOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+            &nbsp;&nbsp;&nbsp;
+            <Tooltip title="Dashboard">
+              <Button
+                onClick={() => navigate("/dashboard/participant-detail")}
+                icon={<DatabaseOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+          </div>
+
+          <Title className="summary-title">GREGoR Project Status Summary</Title>
+
+          <div /> 
+        </Header>
 
       {error && (
         <Alert
@@ -123,21 +143,7 @@ const SummaryPage = () => {
       )}
 
       <Content className="site-content">
-        <Header className="summary-header">
-          <div className="home-container">
-            <Tooltip title="Home page">
-              <Button
-                onClick={() => navigate("/")}
-                icon={<HomeOutlined />}
-                className="home-button"
-              />
-            </Tooltip>
-          </div>
 
-          <Title className="summary-title">GREGoR Project Status Summary</Title>
-
-          <div className="home-container" /> {/* Invisible placeholder for spacing */}
-        </Header>
         <div style={{ marginBottom: "24px" }} /> 
 
         <Row gutter={[16, 16]}>

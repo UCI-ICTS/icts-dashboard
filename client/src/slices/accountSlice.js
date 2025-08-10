@@ -124,10 +124,14 @@ const initialState = user
           state.loading = false;
           state.error = action.payload;
         })
-
         .addCase(updateUser.fulfilled, (state, action) => {
           const updated = action.payload;
-          state.staff.push(updated);
+          const index = state.staff.findIndex(user => user.username === updated.username);
+          if (index !== -1) {
+            state.staff[index] = updated; // Replace existing
+          } else {
+            state.staff.push(updated); // Fallback: add if not found
+          }
         })
         .addCase(updateUser.pending, (state, action) => {
           const user = action.payload;
@@ -397,6 +401,7 @@ export const updateUser = createAsyncThunk(
   "data/updateUser",
   async (userData, thunkAPI) => {
   try {
+    console.log("SLICE: ", userData)
     const response = await AccountService.updateUser(userData);
     message.success("User updated successfully!");
     return response;

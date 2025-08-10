@@ -61,7 +61,7 @@ const createUser = (userData) =>
   api.post("auth/users/", userData).then(res => res.data);
 
 const updateUser = (userData) =>
-  api.put(`auth/users/${encodeURIComponent(userData.username)}/`, userData).then(res => res.data);
+  api.put(`auth/users/${encodeURIComponent(userData.id)}/`, userData).then(res => res.data);
 
 const deleteUser = (userId) =>
   api.delete(`auth/users/${encodeURIComponent(userId)}/`).then(res => res.data);

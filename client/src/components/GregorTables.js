@@ -281,6 +281,7 @@ const GregorTables = () => {
         <Alert message="Error loading data" type="error" showIcon />
       ) : (
         <Table
+          className="table"
           columns={columns}
           onRow={(record) => ({
             onClick: () => {

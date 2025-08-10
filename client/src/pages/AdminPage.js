@@ -14,12 +14,14 @@ import {
   Button,
   Form,
   Input,
+  Layout,
   Modal,
   Popconfirm,
   Select,
   Spin,
   Table,
   Tooltip,
+  Typography,
   message,
 } from "antd";
 import {
@@ -27,10 +29,10 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import ErrorBoundary from "../components/ErrorBoundary";
 
 const { Option } = Select;
-
+const { Header, Content } = Layout;
+const { Title } = Typography;
 const ManageAdministrators = () => {
   const dispatch = useDispatch();
   const currentUsername = useSelector((state) => state.account.user?.username);
@@ -54,31 +56,34 @@ const ManageAdministrators = () => {
       first_name: member?.first_name || "",
       last_name: member?.last_name || "",
       email: member?.email || "",
-      role: staff?.is_superuser ? "admin" : staff?.is_staff ? "staff" : "staff",
+      role: member?.is_superuser ? "admin" : staff?.is_staff ? "staff" : "staff",
     });
     setIsModalVisible(true);
   };
 
 
   const handleSubmit = async () => {
-    const values = await form.validateFields();
-    console.log(values)
-    const updatedValues = {
-      ...values,
-      is_superuser: values.role === "admin",
-      is_staff: values.role === "admin" || values.role === "staff",
-    };
+    try {
+      const values = await form.validateFields();
+      const updatedValues = {
+        ...values,
+        is_superuser: values.role === "admin",
+        is_staff: values.role === "admin" || values.role === "staff",
+      };
 
-    delete updatedValues.role;
+      delete updatedValues.role;
 
-    if (editingMember) {
-      dispatch(updateUser({ id: editingMember.username, ...updatedValues }));
-    } else {
-      dispatch(addUser(updatedValues));
+      if (editingMember) {
+        dispatch(updateUser({ id: editingMember.username, ...updatedValues }));
+      } else {
+        dispatch(addUser(updatedValues));
+      }
+
+      setIsModalVisible(false);
+      dispatch(fetchUsers());
+    } catch (errorInfo) {
+      console.log("Validation failed:", errorInfo);
     }
-
-    setIsModalVisible(false);
-    dispatch(fetchUsers());
   };
 
   const handleDelete = async (id) => {
@@ -117,7 +122,7 @@ const ManageAdministrators = () => {
           <>
             <Tooltip title="Edit administrator">
               <Button
-                icon={<EditOutlined />}
+                icon={<EditOutlined className="action-btn"/>}
                 onClick={() => handleOpenModal(record)}
                 style={{ marginRight: 8 }}
               />
@@ -144,16 +149,21 @@ const ManageAdministrators = () => {
   ];
 
   return (
-    <ErrorBoundary>
-      <div style={{ padding: 20 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => handleOpenModal()}
-          style={{ marginBottom: 20 }}
-        >
-          Add New Staff
-        </Button>
+    <Layout className="admin-layout">
+      <Header className="summary-header">
+        <div>
+          <Tooltip title="Add new staff or admin">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenModal()}
+              className="header-button"
+            >
+            </Button>
+          </Tooltip>
+        </div>
+        <Title className="summary-title">Manage Administrators</Title>
+      </Header>
 
         {loading ? (
           <Spin />
@@ -166,6 +176,7 @@ const ManageAdministrators = () => {
           />
         ) : ( null)}
           <Table
+            className="table"
             columns={columns}
             dataSource={staff.filter(Boolean)}
             rowKey="username"
@@ -211,8 +222,7 @@ const ManageAdministrators = () => {
             </Form.Item>
           </Form>
         </Modal>
-      </div>
-    </ErrorBoundary>
+      </Layout>
   );
 };
 
