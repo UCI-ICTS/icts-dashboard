@@ -606,7 +606,7 @@
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
-        "SNV/INDEL"
+        "SNV"
       ],
       "sv_type": "",
       "variant_reference_assembly": "GRCh38",
@@ -664,7 +664,7 @@
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1"
       ],
       "variant_type": [
-        "SNV/INDEL"
+        "SNV"
       ],
       "sv_type": "",
       "variant_reference_assembly": "GRCh38",
@@ -715,7 +715,7 @@
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
-        "SNV/INDEL"
+        "SNV"
       ],
       "sv_type": "",
       "variant_reference_assembly": "GRCh38",
@@ -768,7 +768,7 @@
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
-        "SNV/INDEL"
+        "SNV"
       ],
       "sv_type": "",
       "variant_reference_assembly": "GRCh38",
@@ -821,7 +821,7 @@
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
-        "SNV/INDEL"
+        "SNV"
       ],
       "sv_type": "",
       "variant_reference_assembly": "GRCh38",
