@@ -41,9 +41,13 @@ class PmidId(models.Model):
 
 
 class VariantType(models.TextChoices):
-    SNVINDEL = "SNV/INDEL", "Single Nucleotide Variant or Insertion/Deletion"
-    SV = "SV", "Structural Variant"
-    RE = "RE", "Repeat Expansion"
+    SNV = "SNV", "SNV: single nucelotide variants"
+    INDEL = "INDEL", "INDEL: short insertion/deletions (<50bp)"
+    SV = "SV", "SV: structural variants"
+    RE = "RE", "RE: repeat elements"
+    CNV = "CNV", "CNV: copy number variants"
+    MEI = "MEI", "MEI: mobile element insertions"
+    STR = "STR", "STR: short tandem repeats"
 
 
 class Zygosity(models.TextChoices):
@@ -112,6 +116,7 @@ class GregorCenter(models.TextChoices):
     UW_CRDR = "UW_CRDR", _("University of Washington Center for Rare Disease Research")
     GSS = "GSS", _("GREGoR Stanford Site")
     UW_DCC = "UW_DCC", _("University of Washington’s School of Public Health")
+    ILMN_IHOPE = "ILMN_IHOPE", _("Illumina iHope Genetic Health Program")
 
 
 class ConsentCode(models.TextChoices):
