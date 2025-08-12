@@ -528,7 +528,12 @@ class ExperimentNanopore(models.Model):
     )
     experiment_type = models.CharField(
         max_length=255,
-        choices=[("targeted", "targeted"), ("genome", "genome")],
+        choices=[
+            ("targeted", "targeted"),
+            ("genome", "genome"),
+            ("fiberseq-genome", "fiberseq-genome"),
+            ("fiberseq-targeted", "fiberseq-targeted"),
+        ],
         help_text="Type of experiment.",
     )
     targeted_regions_method = models.TextField(
@@ -687,6 +692,10 @@ class AlignedNanopore(models.Model):
         null=True,
         help_text="Describe if there are any QC issues that would be important to note.",
     )
+    fiberseq_format = models.BooleanField(
+        default=False,
+        help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
+    )
 
     def __str__(self):
         return self.aligned_nanopore_id
@@ -786,6 +795,8 @@ class ExperimentPacBio(models.Model):
             ("fiberseq", "fiberseq"),
             ("isoseq", "isoseq"),
             ("masseq", "masseq"),
+            ("fiberseq-genome", "fiberseq-genome"),
+            ("fiberseq-targeted", "fiberseq-targeted"),
         ],
         help_text="Type of experiment conducted",
     )
@@ -968,6 +979,10 @@ class AlignedPacBio(models.Model):
         blank=True,
         null=True,
         help_text="Describe if there are any QC issues that would be important to note.",
+    )
+    fiberseq_format = models.BooleanField(
+        default=False,
+        help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
     )
 
 
