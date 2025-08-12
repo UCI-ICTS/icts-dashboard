@@ -8,7 +8,7 @@ import { getAllTables, fetchTable } from "../slices/dataSlice";
 import { getCollectionName } from "../utils/tableNameMap";
 import DownloadTSVButton from "./TableDownload";
 import TableSelector from "./TableSelector";
-import schemas from "../schemas/v1.8schemas.json";
+import schemas from "../schemas/v1.9schemas.json";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
 import { defaultVisibleColumns } from "../utils/schemaAndTables";
@@ -34,7 +34,7 @@ const GregorTables = () => {
   const [useRegex, setUseRegex] = useState(false);
   const [regexError, setRegexError] = useState(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  
+
   const [visibleColumns, setVisibleColumns] = useState(() => {
     return Object.keys(schema.properties).reduce((acc, key) => {
       acc[key] = true; // All columns are visible by default
@@ -44,7 +44,7 @@ const GregorTables = () => {
 
   useEffect(() => {
     const tableName = getCollectionName(tableView)
-  
+
     if ((!tableData || tableData.length === 0)) {
       dispatch(fetchTable(tableName))
     }
@@ -347,7 +347,7 @@ const GregorTables = () => {
             Apply
           </Button>
         ]}
-      >        
+      >
         <Form layout="vertical">
           {columns.map((col) => {
             const fieldSchema = schema.properties[col.dataIndex];

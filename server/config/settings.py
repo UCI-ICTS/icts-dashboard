@@ -34,7 +34,7 @@ DEBUG = secrets.getboolean("SERVER", "DEBUG", fallback=True)
 ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="localhost").split(",")
 VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
-SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.8")
+SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.9")
 
 EMAIL_BACKEND = secrets.get(
     "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
