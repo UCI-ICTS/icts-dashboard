@@ -26,7 +26,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "experiment_id": [
                 "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
             ],
-            "variant_type": ["SNV/INDEL"],
+            "variant_type": ["SNV"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
             "chrom": "10",
@@ -68,7 +68,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "experiment_id": [
                 "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1"
             ],
-            "variant_type": ["SNV/INDEL"],
+            "variant_type": ["SNV"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
             "chrom": "11",
@@ -108,7 +108,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "genetic_findings_id": "2_6849938_GREGoR_test-001-001-0",
             "participant_id": "GREGoR_test-001-001-0",
             "experiment_id": ["WGS"],
-            "variant_type": ["SNV/INDEL"],
+            "variant_type": ["SNV"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
             "chrom": "2",
@@ -221,7 +221,7 @@ class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
             "experiment_id": [
                 "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
             ],
-            "variant_type": ["SNV/INDEL"],
+            "variant_type": ["SNV"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
             "chrom": "10",

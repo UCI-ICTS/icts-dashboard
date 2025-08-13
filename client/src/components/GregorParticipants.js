@@ -8,7 +8,7 @@ import { Resizable } from 'react-resizable';
 import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
-import schemas from "../schemas/v1.8schemas.json";
+import schemas from "../schemas/v1.9schemas.json";
 import SchemaForm from "./SchemaForm";
 import "../App.css";
 
@@ -348,7 +348,7 @@ const defaultVisibleColumns = {
                   />
                 ) : (
                   <SchemaForm
-                    form={form} 
+                    form={form}
                     schema={schemas["genetic_findings"]}
                     open={addModalVisible}
                     setAddModalVisible={setAddModalVisible}
