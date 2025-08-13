@@ -29,7 +29,7 @@ table_load_order = [
     'metadata/genetic_findings',
 ]
 branch="dev"
-schema_version = "v1.8"
+schema_version = "v1.9"
 schema_uri = f"https://raw.githubusercontent.com/UCI-ICTS/icts-dashboard/refs/heads/{branch}/server/utilities/json_schemas/{schema_version}"
 
 

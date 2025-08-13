@@ -7,7 +7,7 @@ import { Alert, Table, Input, Form, Spin, Layout, Row, Col, Button } from "antd"
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { setJsonData, clearJsonData, fetchTable, createEntry } from '../slices/dataSlice';
 import TableSelector from '../components/TableSelector';
-import schemas from '../schemas/v1.8schemas.json';
+import schemas from '../schemas/v1.9schemas.json';
 import { getValidationRules } from "../utils/schemaAndTables";
 import { getCollectionName } from "../utils/tableNameMap";
 
@@ -134,7 +134,7 @@ export const Uploader = () => {
     <Layout className="layout-container">
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}>
-          <TableSelector /> 
+          <TableSelector />
         </Col>
         <Col xs={24} md={8}>
           <input
@@ -170,7 +170,7 @@ export const Uploader = () => {
       <Spin spinning={isLoading}>
         <Row>
           {
-            (jsonData !== null) ? (        
+            (jsonData !== null) ? (
               <Form form={form} onFinish={handleSubmit} onFieldsChange={updateErrorState} initialValues={{ rows: initialRows }} layout="vertical">
                 <Form.List name="rows">
                   {(fields, { add, remove }) => (
