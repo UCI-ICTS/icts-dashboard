@@ -1,18 +1,34 @@
 // src/utils/useTableSettings.js
 import { useEffect, useMemo, useState, useCallback } from "react";
 
-export function useTableSettings({ schema, tableKey, defaults = [] }) {
+export function useTableSettings({
+  schema,
+  tableKey,
+  defaults = [],
+  persist = false,        // <-- NEW
+  storagePrefix = "columns" // optional namespace
+}) {
   const keys = useMemo(() => Object.keys(schema?.properties || {}), [schema]);
+  const storage = persist ? localStorage : { 
+    getItem: () => null, 
+    setItem: () => {}, 
+    removeItem: () => {} 
+  };
+
+  const storageKey = `${storagePrefix}:${tableKey}`;
 
   const [visible, setVisible] = useState({});
   const [widths, setWidths] = useState({});
-  const [sorter, setSorter] = useState(null);      // optional future
-  const [filters, setFilters] = useState({});      // optional future
+  const [sorter, setSorter] = useState(null);   // { key, order } | null
+  const [filters, setFilters] = useState({});   // { [key]: string }
 
   // init + hydrate
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem(`columns:${tableKey}`) || "{}");
-    // const saved = {};
+    let saved = {};
+    try {
+      saved = JSON.parse(storage.getItem(storageKey) || "{}");
+    } catch {}
+
     const nextVisible = keys.reduce((acc, k) => {
       const savedVis = saved.visible?.[k];
       acc[k] = savedVis != null ? savedVis : (defaults.length ? defaults.includes(k) : true);
@@ -22,14 +38,20 @@ export function useTableSettings({ schema, tableKey, defaults = [] }) {
       acc[k] = saved.widths?.[k] ?? 180;
       return acc;
     }, {});
+
     setVisible(nextVisible);
     setWidths(nextWidths);
-  }, [tableKey, keys, defaults]);
+    setSorter(saved.sorter ?? null);
+    setFilters(saved.filters ?? {});
+  }, [tableKey, keys, defaults, storageKey, storage]);
 
-  // persist
+  // persist (debounced-ish write)
   useEffect(() => {
-    localStorage.setItem(`columns:${tableKey}`, JSON.stringify({ visible, widths }));
-  }, [tableKey, visible, widths]);
+    const payload = JSON.stringify({ visible, widths, sorter, filters });
+    try {
+      storage.setItem(storageKey, payload);
+    } catch {}
+  }, [storage, storageKey, visible, widths, sorter, filters]);
 
   // actions
   const toggleColumn = useCallback((k, on) => {
@@ -54,25 +76,26 @@ export function useTableSettings({ schema, tableKey, defaults = [] }) {
     setWidths((prev) => ({ ...prev, [k]: Math.max(80, w) }));
   }, []);
 
+  const clearSaved = useCallback(() => {
+    try { storage.removeItem(storageKey); } catch {}
+  }, [storage, storageKey]);
+
   return {
     // state
     keys, visible, widths, sorter, filters,
     // actions
-    toggleColumn, toggleAll, reset, setWidth, setSorter, setFilters,
+    toggleColumn, toggleAll, reset, setWidth, setSorter, setFilters, clearSaved,
   };
 }
 
-export function buildColumns({ schema, visible, widths, onResize }) {
+export function buildColumns({ schema, visible, widths }) {
   const entries = Object.entries(schema?.properties || {});
-  const cols = entries
+  return entries
     .map(([key, prop]) => ({
       key,
       dataIndex: key,
       title: prop?.title || key,
       width: widths[key] ?? 180,
-      // AntD header resize hook is attached by the view, not here
     }))
     .filter((c) => visible[c.key]);
-
-  return cols;
 }

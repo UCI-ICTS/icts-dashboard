@@ -35,7 +35,9 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 const ManageAdministrators = () => {
   const dispatch = useDispatch();
-  const currentUsername = useSelector((state) => state.account.user?.username);
+  const user = useSelector((state) => state.account.user);
+  const currentUsername = user.username;
+  const isAdmin = user.is_superuser;
   const { staff = [], loading, error } = useSelector(
     (state) => state.account || {}
   );
@@ -125,6 +127,7 @@ const ManageAdministrators = () => {
                 icon={<EditOutlined className="action-btn"/>}
                 onClick={() => handleOpenModal(record)}
                 style={{ marginRight: 8 }}
+                disabled={!isAdmin}
               />
             </Tooltip>
             <Tooltip title={isSelf ? "You cannot delete yourself" : "Delete Administrator"}>
@@ -138,7 +141,7 @@ const ManageAdministrators = () => {
                 <Button
                   icon={<DeleteOutlined />}
                   danger
-                  disabled={isSelf}
+                  disabled={isSelf || !isAdmin}
                 />
               </Popconfirm>
             </Tooltip>
@@ -150,7 +153,7 @@ const ManageAdministrators = () => {
 
   return (
     <Layout className="admin-layout">
-      <Header className="summary-header">
+      <Header className="primary-header">
         <div>
           <Tooltip title="Add new staff or admin">
             <Button
@@ -158,11 +161,11 @@ const ManageAdministrators = () => {
               icon={<PlusOutlined />}
               onClick={() => handleOpenModal()}
               className="header-button"
-            >
-            </Button>
+              disabled={!isAdmin}
+            >Add new user</Button>
           </Tooltip>
         </div>
-        <Title className="summary-title">Manage Administrators</Title>
+        <Title className="primary-title">Manage Administrators</Title>
       </Header>
 
         {loading ? (

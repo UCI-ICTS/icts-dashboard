@@ -48,6 +48,7 @@ const Dashboard = () => {
   return (
     <Layout className="layout-container">
       <Sider
+        width={220}
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}

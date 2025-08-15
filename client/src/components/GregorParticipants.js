@@ -5,7 +5,7 @@ import { Descriptions, Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, 
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Resizable } from 'react-resizable';
-import { getAllTables, updateTable, createEntry } from "../slices/dataSlice";
+import { getAllTables, updateEntry, createEntry } from "../slices/dataSlice";
 import DownloadTSVButton from "./TableDownload";
 import ErrorBoundary from "./ErrorBoundary";
 import schemas from "../schemas/v1.9schemas.json";
@@ -41,6 +41,7 @@ const GregorParticipants = () => {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
+  
   const [visibleColumns, setVisibleColumns] = useState(() => {
     return Object.keys(schema.properties).reduce((acc, key) => {
       acc[key] = true; // All columns are visible by default
@@ -48,7 +49,7 @@ const GregorParticipants = () => {
     }, {});
   });
 
-const defaultVisibleColumns = {
+  const defaultVisibleColumns = {
     participants: ["participant_id", "proband_relationship", "family_id", "date_of_birth", "phenotype_description"],
     genetic_findings: ["genetic_findings_id", "gene", "variant"],
     // Add more table types and their default columns as needed
@@ -173,7 +174,7 @@ const defaultVisibleColumns = {
 
     if (editRecord) {
       // Update existing record
-      dispatch(updateTable({ table: tableName, data: values }));
+      dispatch(updateEntry({ table: tableName, data: values }));
       console.log("Editing row:", tableName, values);
     } else {
       // Add new record

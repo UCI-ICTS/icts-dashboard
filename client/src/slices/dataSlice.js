@@ -3,7 +3,7 @@ import dataService from "../services/data.service";
 import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
-import { getCollectionName, getTableName } from "../utils/tableNameMap";
+import { getCollectionName, getTableName } from "../utils/schemaAndTables";
 
 const initialState = {
   tableView: "participants",
@@ -103,13 +103,11 @@ export const dataSlice = createSlice({
         state.status = "fulfilled"
         const { table, response } = action.payload;
         const stateTable = getTableName(table)
-
         if (state[stateTable]) {
           state[stateTable] = response
         }
-
       })
-      .addCase(updateTable.fulfilled, (state, action) => {
+      .addCase(updateEntry.fulfilled, (state, action) => {
         state.status = "fulfilled";
         const { table, response, noChanges } = action.payload;
         // Return early if no changes
@@ -150,10 +148,10 @@ export const dataSlice = createSlice({
           }
         }
       })
-      .addCase(updateTable.pending, (state, action) => {
+      .addCase(updateEntry.pending, (state, action) => {
         state.status = "loading";
       })
-      .addCase(updateTable.rejected, (state, action) => {
+      .addCase(updateEntry.rejected, (state, action) => {
         state.status = "rejected";
       })
       .addCase(createEntry.fulfilled, (state, action) => {
@@ -267,8 +265,8 @@ export const createEntry = createAsyncThunk(
   }
 )
 
-export const updateTable = createAsyncThunk(
-  "updateTable",
+export const updateEntry = createAsyncThunk(
+  "updateEntry",
   async ({table, data}, thunkAPI) => {
     try {
       const response = await dataService.updateEntry(table, data);

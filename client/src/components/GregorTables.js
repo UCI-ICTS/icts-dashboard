@@ -5,7 +5,6 @@ import { Table, Form, Button, Input, Modal, Tooltip, Spin, Alert, Typography, Dr
 import { SearchOutlined, FilterOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTables, fetchTable } from "../slices/dataSlice";
-import { getCollectionName } from "../utils/tableNameMap";
 import DownloadTSVButton from "./TableDownload";
 import TableSelector from "./TableSelector";
 import schemas from "../schemas/v1.9schemas.json";

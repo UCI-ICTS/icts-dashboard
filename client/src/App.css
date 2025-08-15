@@ -124,6 +124,7 @@ body, html {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 220px; 
 }
 
 .sider-header {
@@ -418,7 +419,7 @@ body, html {
   background: var(--uci-blue) !important;
 }
 
-.summary-header {
+.primary-header {
   position: sticky;
   top: 0;
   z-index: 2;
@@ -428,7 +429,7 @@ body, html {
   padding: 0 24px;
 }
 
-.summary-title {
+.primary-title {
   color: var(--uci-gold) !important;
   display: flex;
   justify-content: space-between;
@@ -438,7 +439,33 @@ body, html {
   font-size: 24px !important;
 }
 
-.summary-card {
+.primary-card {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.secondary-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--uci-dark-blue) !important;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+.secondary-title {
+  color: var(--uci-light-gray) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 24px;
+  padding-left: 24px;
+  font-size: 24px !important;
+}
+
+.secondary-card {
   border-radius: 8px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background-color: rgba(255, 255, 255, 0.9);
@@ -559,4 +586,168 @@ body, html {
 .uci-modal .ant-btn-default:hover {
   border-color: var(--uci-blue);
   color: var(--uci-blue);
+}
+
+/* Base select style */
+.table-selector {
+  min-width: 200px;
+}
+
+.table-selector-container {
+  color: var(--uci-blue) !important;
+  font-size: 12pt;
+  font-weight: 600;
+  margin: 20px;
+}
+
+/* Dropdown menu */
+.table-selector-options {
+  /* background-color: var(--uci-dark-blue) !important; */
+  color: var(--uci-blue) !important;
+}
+
+/* Remove default AntD border & match button style */
+.table-selector .ant-select-selector {
+  /* background-color: var(--uci-dark-blue) !important; */
+  border-color: var(--uci-gold) !important;
+  color: var(--uci-dark-blue) !important;
+  font-size: 12pt;
+  height: 32px !important; 
+  display: flex;
+  align-items: center;
+}
+
+/* Column filter dropdown – themed to match site */
+.column-filter-menu {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  width: 260px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  padding: 10px;
+}
+
+/* Header: title + reset button */
+.column-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.column-filter-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--uci-blue);
+}
+
+.column-filter-reset {
+  border: none;
+  background: transparent;
+  color: var(--uci-blue);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.column-filter-reset:hover {
+  background: rgba(37, 87, 153, 0.08); /* uci-blue, light */
+}
+
+/* Sections & labels */
+.column-filter-section {
+  margin-bottom: 12px;
+}
+
+.column-filter-label {
+  font-size: 12px;
+  color: var(--uci-dark-blue);
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+/* Divider (thin & subtle) */
+.column-filter-divider {
+  height: 1px;
+  background: #eee;
+  margin: 8px 0 12px;
+}
+
+/* Input + Clear row */
+.column-filter-inputrow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+
+/* Clear button – match your accents */
+.column-filter-clear {
+  border-color: var(--uci-blue) !important;
+  color: var(--uci-blue) !important;
+}
+
+.column-filter-clear:hover {
+  background: var(--uci-light-yellow) !important;
+}
+
+/* Ant overrides inside the dropdown for theme cohesion */
+.column-filter-menu .ant-radio-group {
+  display: flex;
+  gap: 4px;
+}
+
+/* Selected radio button = UCI gold with dark text */
+.column-filter-menu .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: var(--uci-gold);
+  border-color: var(--uci-gold);
+  color: var(--uci-dark-blue);
+}
+
+/* Hover states for radios */
+.column-filter-menu .ant-radio-button-wrapper:hover {
+  color: var(--uci-blue);
+  border-color: var(--uci-blue);
+}
+
+/* Input focus tint */
+.column-filter-menu .ant-input:focus,
+.column-filter-menu .ant-input-focused {
+  border-color: var(--uci-teal-blue) !important;
+  box-shadow: 0 0 0 2px rgba(0, 131, 179, 0.15);
+}
+
+/* Optional: tighten default paddings to feel consistent */
+.column-filter-menu .ant-input,
+.column-filter-menu .ant-btn {
+  border-radius: 6px;
+}
+
+/* Container for search + regex switcher */
+.table-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+/* Search input */
+.table-search-input {
+  width: 280px;
+  max-width: 100%;
+  color: var(--uci-blue);
+}
+
+table-search-input .anticon {
+  color: var(--uci-blue); 
+}
+
+.toolbar-title {
+  color: var(--uci-blue);
+  font-size: 12pt;
+}
+
+.icon-blue {
+  color: var(--uci-blue) !important;
 }

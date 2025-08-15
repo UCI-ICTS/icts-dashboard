@@ -42,8 +42,8 @@ const SummaryPage = () => {
   const get = (obj, key, fallback = "-") =>
     loading ? "Loading..." : obj?.[key] ?? fallback;
   
-  const kindredData = summary?.kindred
-    ? Object.entries(summary.kindred).map(([label, value]) => ({ label, value }))
+  const kindredData = summary?.family_types
+    ? Object.entries(summary.family_types).map(([label, value]) => ({ label, value }))
     : [];
   
   const solveStatusData = summary?.solve_status_counts
@@ -108,7 +108,7 @@ const SummaryPage = () => {
     console.log(comparisonItems)
   return (
     <Layout className="fullscreen-bg">
-        <Header className="summary-header">
+        <Header className="primary-header">
           <div >
             <Tooltip title="Home page">
               <Button
@@ -127,7 +127,7 @@ const SummaryPage = () => {
             </Tooltip>
           </div>
 
-          <Title className="summary-title">GREGoR Project Status Summary</Title>
+          <Title className="primary-title">GREGoR Project Status Summary</Title>
 
           <div /> 
         </Header>
@@ -148,7 +148,7 @@ const SummaryPage = () => {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Proband Solve Status</span>} className="summary-card">
+            <Card title={<span className="card-title">Proband Solve Status</span>} className="primary-card">
               <SummaryPieChart 
                 data={solveStatusData}
                 chartType="doughnut"
@@ -157,7 +157,7 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Participant Snapshot</span>} className="summary-card">
+            <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
               <SummaryPieChart 
                 data={[
                   {label: "Total Participants", value:summary?.participants},
@@ -173,7 +173,7 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Families by Type</span>} className="summary-card">
+            <Card title={<span className="card-title">Families by Type</span>} className="primary-card">
               <SummaryPieChart
                 data={kindredData}
                 label="Family Classification"

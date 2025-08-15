@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { createEntry, updateTable, deleteEntry, fetchTable } from "../slices/dataSlice";
+import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 
@@ -210,40 +210,40 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   return null;
 };
 
-//  Pay attention to the props
 const SchemaForm = ({
   schema,
   form,
   open,
   isAdmin = false,
   initialValues,
-  setAddModalVisible,
-  setEntry,
+  onClose,
 }) => {
   const dispatch = useDispatch();
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
-  const table = schema.title
+  const table = schema.title;
+
+  const [internalForm] = Form.useForm();
+  const formInstance = form ?? internalForm;
 
   useEffect(() => {
-    form.setFieldsValue(initialValues || {});
-  }, [initialValues, form]);
+    formInstance.setFieldsValue(initialValues || {});
+  }, [initialValues, formInstance]);
 
   useEffect(() => {
     if (open) {
-      setEditMode(false);  // Always reset edit mode when modal opens
-      form.setFieldsValue(initialValues || {});  // Rehydrate form
+      setEditMode(false);
+      formInstance.setFieldsValue(initialValues || {});
     }
-  }, [open, initialValues, form]);
+  }, [open, initialValues, formInstance]);
 
   const handleDelete = () => {
     const idList = initialValues?.[`${table}_id`];
-    dispatch(deleteEntry({ table: table, idList }))
+    dispatch(deleteEntry({ table, idList }))
       .unwrap()
       .then(() => {
-        setAddModalVisible(false);
-        setEntry(null);
-        form.resetFields();
+        formInstance.resetFields();
+        onClose?.();
       })
       .catch((err) => message.error(errorService.printErrorMessages(err)));
   };
@@ -255,43 +255,37 @@ const SchemaForm = ({
         result[key] = [];
       }
     });
-    if (result["phenotype_id"] == undefined) {
-      result["phenotype_id"] = result["participant_id"] + "_" + result["term_id"]
+    if (result["phenotype_id"] == null && result["participant_id"] && result["term_id"]) {
+      result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
     }
     return result;
   };
 
   const handleSubmit = async (values) => {
     try {
-      const normalized = normalizeArrays(values, schema.properties);  // 🔥 Fix here
-      const updateForm = initialValues && Object.keys(initialValues).length > 0;
-      const action = updateForm
-        ? updateTable({ table: table, data: [normalized] })
-        : createEntry({ table: table, data: [normalized] });
+      const normalized = normalizeArrays(values, schema.properties);
+      const isUpdate = !!(initialValues && Object.keys(initialValues).length);
+      const action = isUpdate
+        ? updateEntry({ table, data: [normalized] })
+        : createEntry({ table, data: [normalized] });
 
-      const result = dispatch(action);
-      if (result.meta.requestStatus === "fulfilled") {
-        setAddModalVisible(false);
-        setEntry(null);
-        form.resetFields();
-      } else {
-        console.warn("Submission failed:", result);
-      }
+      await dispatch(action).unwrap();  // throws on error
+      formInstance.resetFields();
+      onClose?.();
     } catch (error) {
       console.error("Error submitting form:", error);
+      message.error("Save failed");
     }
   };
 
   const handleCancel = () => {
-    form.resetFields();
+    formInstance.resetFields();
     setEditMode(false);
-    setAddModalVisible(false);
-    setEntry(null);
+    onClose?.();
   };
 
   return (
-    <Form form={form} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
-      {/* Edit/Delete Controls */}
+    <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
         <span style={{ marginRight: 8 }}>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
@@ -306,20 +300,18 @@ const SchemaForm = ({
         )}
       </div>
 
-      {/* Dynamic Fields */}
       {Object.entries(schema.properties || {}).map(([key, value]) => (
         <SchemaField
           key={key}
           keyName={key}
           schema={value}
           requiredFields={requiredFields}
-          form={form}
+          form={formInstance}
           readOnly={!editMode}
           tableName={schema.title}
         />
       ))}
 
-      {/* Submit/Cancel Buttons */}
       {editMode && (
         <Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
@@ -329,6 +321,5 @@ const SchemaForm = ({
     </Form>
   );
 };
-
 
 export default SchemaForm;

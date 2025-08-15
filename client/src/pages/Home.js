@@ -21,7 +21,7 @@ const HomePage = () => {
             <Col xs={24} md={8}>
               <Card 
                 hoverable
-                className="summary-card"
+                className="primary-card"
                 onClick={()=> navigate("/dashboard")}
                 title={
                   <Space>
@@ -43,7 +43,7 @@ const HomePage = () => {
             <Col xs={24} md={8}>
               <Card 
                 hoverable
-                className="summary-card"
+                className="primary-card"
                 onClick={()=> {window.open(`${SNP}`, "_blank")}}
                 title={<span className="card-title">SNP Consortium Archive</span>}
               ><span className="card-label">Landing page and interface for the SNP Consortium archival material.</span></Card>
@@ -51,7 +51,7 @@ const HomePage = () => {
             <Col xs={24} md={8}>
               <Card
                 hoverable
-                className="summary-card"
+                className="primary-card"
                 onClick={()=> {window.open(`${MIA}`, "_blank")}}
                 title={
                   <Space>
