@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Typography, Spin, Modal, Form, Input, Select, Button, message } from "antd";
 import { useTableSettings, buildColumns } from "../utils/tableSettings";
-import { setTableView, fetchTable } from "../slices/dataSlice";
+import { setTableView, fetchTable, familyDetail } from "../slices/dataSlice";
 import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
@@ -41,7 +41,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
 
 // ----Participant Detail state ----
   const [selectedRow, setSelectedRow] = useState(null);
-  
+  const [detailLoading, setDetailLoding ] = useState(true)
 // ---- Table URL state ----
   
   const tableValid = useMemo(() => !!schemas[table], [table]);
@@ -252,6 +252,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
   const handleDetail = (record) => {
     console.log(record);
     setSelectedRow(record);
+    dispatch(familyDetail(record.participant_id))
   };
   
   return (
@@ -263,7 +264,14 @@ export default function GregorDataSheets({ renderDetail=false }) {
           </Header>
 
           {selectedRow ? (
-            <ParticipantDetail selectedRow={selectedRow} setSelectedRow={setSelectedRow} onRow={(record)=> {console.log(record)}}/>
+            <ParticipantDetail
+              selectedRow={selectedRow}
+              setSelectedRow={setSelectedRow}
+              onRow={(record)=> {console.log(record)}}
+              detailLoading={detailLoading}
+              setDetailLoding={setDetailLoding}
+              openModal={openModal}
+            />
           ) : null}
         </>
       ) : (
@@ -329,7 +337,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
           width={800}
         >
           <SchemaForm
-            schema={schema}
+            schema={schemas[modal.payload?.schemaKey || tableView] || schema}
             initialValues={modal.kind === "edit" ? modal.payload?.record : {}}
             open={modal.open}
             onClose={closeModal}

@@ -8,8 +8,7 @@ import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { setJsonData, clearJsonData, fetchTable, createEntry } from '../slices/dataSlice';
 import TableSelector from '../components/TableSelector';
 import schemas from '../schemas/v1.9schemas.json';
-import { getValidationRules } from "../utils/schemaAndTables";
-import { getCollectionName } from "../utils/tableNameMap";
+import { getValidationRules, getCollectionName } from "../utils/schemaAndTables";
 
 export const Uploader = () => {
   const fileInputRef = useRef(null);

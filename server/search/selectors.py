@@ -83,6 +83,46 @@ serializer_mapping ={
     'experimentstage': "ExperimentStageSerializer",
 }
 
+table_serializers = {
+        "experiment_dna_short_read": {
+            "model": ExperimentDNAShortRead,
+            "output_serializer": ExperimentDNAOutputSerializer,
+        },
+        "experiment_nanopore": {
+            "model": ExperimentNanopore,
+            "input_serializer": ExperimentNanoporeSerializer,
+            "output_serializer": ExperimentNanoporeSerializer,
+        },
+        "experiment_pac_bio": {
+            "model": ExperimentPacBio,
+            "input_serializer": ExperimentPacBioSerializer,
+            "output_serializer": ExperimentPacBioSerializer,
+        },
+        "experiment_rna_short_read": {
+            "model": ExperimentRNAShortRead,
+            "output_serializer": ExperimentRNAOutputSerializer,
+        },
+        "aligned_dna_short_read": {
+            "model": AlignedDNAShortRead,
+            "input_serializer": AlignedDNAShortReadSerializer,
+            "output_serializer": AlignedDNAShortReadSerializer,
+        },
+        "aligned_nanopore": {
+            "model": AlignedNanopore,
+            "input_serializer": AlignedNanoporeSerializer,
+            "output_serializer": AlignedNanoporeSerializer,
+        },
+        "aligned_pac_bio": {
+            "model": AlignedPacBio,
+            "input_serializer": AlignedPacBioSerializer,
+            "output_serializer": AlignedPacBioSerializer,
+        },
+        "aligned_rna_short_read": {
+            "model": AlignedRNAShortRead,
+            "input_serializer": AlignedRNASerializer,
+            "output_serializer": AlignedRNASerializer,
+        },
+    }
 
 def get_anvil_tables():
     files = {}
@@ -396,13 +436,39 @@ def get_family_detail(participant_id:str) -> dict:
     family_detail = []
     participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)
     for participant in participants:
+        serialized_participant = ParticipantOutputSerializer(participant)
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True) 
+        serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
+        serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
+        experiments = Experiment.objects.filter(participant_id=participant)
+        serialized_sequencing = []
+        for exp in experiments:
+            model = table_serializers[exp.table_name]["model"]
+            serializer = table_serializers[exp.table_name]["output_serializer"]
+            sequence = serializer(model.objects.get(pk=exp.id_in_table)).data
+            sequence["table_type"] = exp.table_name
+            serialized_sequencing.append(sequence)
+
+        aligned = Aligned.objects.filter(participant_id=participant)    
+        serialized_alignments = []
+        # import pdb;pdb.set_trace()
+        for aln in aligned:
+            print(aln.table_name)
+            model = table_serializers[aln.table_name]["model"]
+            serializer = table_serializers[aln.table_name]["output_serializer"]
+            alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
+            alignment["table_type"] = aln.table_name
+            serialized_alignments.append(alignment)
+        
         items = {
-            "participant_id": participant.pk,
+            "participant": serialized_participant.data,
+            "proband_relationship": participant.proband_relationship,
             "family_id": participant.family_id_id,
-            "phenotypes": Phenotype.objects.filter(participant_id=participant).values_list('pk', flat=True),
-            "genetic_findings": GeneticFindings.objects.filter(participant_id=participant).values_list('pk', flat=True),
-            "sequencing": Experiment.objects.filter(participant_id=participant).values_list('pk', flat=True),
-            "alignments": Aligned.objects.filter(participant_id=participant).values_list('pk', flat=True),
+            "biobank": serialized_biobanks.data,
+            "phenotypes": serialized_phenotypes.data,
+            "genetic_findings": serialized_genetic_findings.data,
+            "sequencing": serialized_sequencing,
+            "alignments": serialized_alignments,
             }
         family_detail.append(items)
     
