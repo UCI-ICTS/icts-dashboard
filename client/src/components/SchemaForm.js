@@ -114,7 +114,14 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.type === "string") {
-    if (tableName == "phenotype" && keyName == "phenotype_id") {
+    if (keyName == `${tableName}_id` && !readOnly) {
+      return (
+      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Input disabled={true}/>
+      </Form.Item>
+      )
+    }
+    else if (tableName == "phenotype" && keyName == "phenotype_id") {
       return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Input disabled={true}/>
