@@ -2707,8 +2707,8 @@
     },
     "biobank_entries": {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/PMGRC_data_model_with_extensions - biobank.json",
-        "title": "PMGRC_data_model_with_extensions - biobank",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/biobank.json",
+        "title": "biobank",
         "version": "1.9.1",
         "type": "object",
         "required": [
