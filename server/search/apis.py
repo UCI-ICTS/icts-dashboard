@@ -154,7 +154,6 @@ class GetAllTablesAPI(APIView):
 
 
 class SummaryAPI(APIView):
-    
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id="summary",
@@ -171,6 +170,7 @@ class SummaryAPI(APIView):
             # Basic counts
             participants = Participant.objects.all()
             families = Family.objects.count()
+            phenotypes = Phenotype.objects.all()
             analytes = Analyte.objects.all()
             aligned = Aligned.objects.count()
             biobank = Biobank.objects.all()
@@ -186,8 +186,21 @@ class SummaryAPI(APIView):
             )
             solve_status = {entry["solve_status"]: entry["count"] for entry in solve_status_counts}
 
+
             # --- Biobank status ---
             biobank_status = dict(Counter(biobank.values_list("status", flat=True)))
+
+            # --- Group phenotype descriptions by participant_id
+            participant_phenos = dict()
+            for pheno in phenotypes.values(
+                "phenotype_id",
+                "participant_id",
+                "term_id",
+                "additional_details",
+            )[::1]:
+                if pheno["participant_id"] not in participant_phenos:
+                    participant_phenos[pheno["participant_id"]] = list()
+                participant_phenos[pheno["participant_id"]].append(pheno["additional_details"])
 
             # --- Analyte counts ---
             analyte_biosample = dict(Counter(analytes.values_list("primary_biosample", flat=True)))
@@ -195,6 +208,23 @@ class SummaryAPI(APIView):
 
             # --- Genetic findings phenotype_contribution ---
             findings_contribution = dict(Counter(findings.values_list("phenotype_contribution", flat=True)))
+            if "" in findings_contribution:  # Replace empty key with 'unknown'
+                findings_contribution["Unknown"] = findings_contribution.pop("")
+
+            # --- Genetic findings candidate genes and phenotypes ---
+            gene_candidates = dict()
+            gene_known = dict()
+            for finding in findings.values(
+                "genetic_findings_id",
+                "participant_id",
+                "gene_known_for_phenotype",
+                "gene_of_interest",
+                "known_condition_name",
+            )[::1]:
+                if finding["gene_known_for_phenotype"] == "Candidate":
+                    gene_candidates[finding["gene_of_interest"][0]] = participant_phenos[finding["participant_id"]]
+                elif finding["gene_known_for_phenotype"] == "Known":
+                    gene_known[finding["gene_of_interest"][0]] = finding["known_condition_name"]
 
             # --- Sequencing vs Aligned comparison ---
             def group_by_table_name(qs):
@@ -266,6 +296,8 @@ class SummaryAPI(APIView):
                 "analyte_biosample_counts": analyte_biosample,
                 "analyte_type_counts": analyte_type,
                 "findings_contribution": findings_contribution,
+                "gene_candidates": gene_candidates,
+                "gene_known": gene_known,
                 "sequencing_vs_alignment": sequencing_vs_alignment,
                 "kindred": kindred,
             }
