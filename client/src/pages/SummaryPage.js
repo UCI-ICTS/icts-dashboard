@@ -41,22 +41,22 @@ const SummaryPage = () => {
 
   const get = (obj, key, fallback = "-") =>
     loading ? "Loading..." : obj?.[key] ?? fallback;
-  
+
   const kindredData = summary?.kindred
     ? Object.entries(summary.kindred).map(([label, value]) => ({ label, value }))
     : [];
-  
+
   const solveStatusData = summary?.solve_status_counts
     ? Object.entries(summary.solve_status_counts).map(([label, value]) => ({label,value,}))
     : [];
-  
+
   const biobankItems = [
     { label: "Total biobank entries", value: summary?.biobank },
     { label: "Biobank statuses", value: "" },
     ...Object.entries(summary?.biobank_status_counts || {}).map(([status, count]) => ({
       label: status,
       value: count,
-      indent: true,
+      indent: true
       // icon: <CaretRightOutlined />
     })),
   ];
@@ -67,7 +67,7 @@ const SummaryPage = () => {
     ...Object.entries(summary?.analyte_biosample_counts || {}).map(([status, count]) => ({
       label: `${status} ${primaryBiosample[status] || ""}`.trim(),
       value: count,
-      indent: true,
+      indent: true
       // icon: <CaretRightOutlined />
     })),
   ];
@@ -79,14 +79,14 @@ const SummaryPage = () => {
       label: (status === "") ? "None" : status,
       value: count,
       indent: true
-    })) 
+    }))
   ]
 
   const sequencingItems = summary?.sequencing_vs_alignment
     ? summary.sequencing_vs_alignment.map(({ label, experiments }) => ({
         label,
         value: experiments,
-        indent: true,
+        indent: true
       }))
     : [];
 
@@ -94,7 +94,7 @@ const SummaryPage = () => {
   ? summary.sequencing_vs_alignment.map(({ label, alignments }) => ({
       label,
       value: alignments,
-      indent: true,
+      indent: true
     }))
   : [];
 
@@ -102,7 +102,7 @@ const SummaryPage = () => {
     ? summary.sequencing_vs_alignment.map(({label, experiments, alignments, delta}) =>({
       label,
       value: `${experiments} seq, ${alignments} aln`,
-      icon: (delta === 0) ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <WarningTwoTone twoToneColor="#faad14" />
+      icon: (delta === 0) ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <WarningTwoTone twoToneColor="#faad14" />,
     }))
     : [];
     console.log(comparisonItems)
@@ -138,12 +138,12 @@ const SummaryPage = () => {
 
           <div className="home-container" /> {/* Invisible placeholder for spacing */}
         </Header>
-        <div style={{ marginBottom: "24px" }} /> 
+        <div style={{ marginBottom: "24px" }} />
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Proband Solve Status</span>} className="summary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={solveStatusData}
                 chartType="doughnut"
               />
@@ -152,7 +152,7 @@ const SummaryPage = () => {
 
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Participant Snapshot</span>} className="summary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={[
                   {label: "Total Participants", value:summary?.participants},
                   {label: "Total Probands", value:summary?.probands},
