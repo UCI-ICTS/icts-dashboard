@@ -47,3 +47,5 @@ server/tests/fixtures/U09_flattened_sampled_dump.json
 server/config/fixtures/dump.json
 server/config/fixtures/U09_dump.json
 server/dump.json
+server/*.json
+server/log*

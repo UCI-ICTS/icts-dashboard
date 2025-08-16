@@ -1,0 +1,19 @@
+[Unit]
+Description=ICTS Dashboard gunicorn daemon
+Requires=icts.socket
+After=network.target
+
+[Service]
+User=nginx
+Group=developer
+WorkingDirectory=/var/www/github/icts-dashboard/server
+ExecStart=/var/www/github/icts-dashboard/server/env/bin/gunicorn \
+        --access-logfile /var/log/gunicorn/api_stdout.log \
+        --log-level=debug \
+        --log-file /var/log/gunicorn/api_stderr.log \
+        --workers 3 \
+        --bind unix:/var/run/icts.sock \
+        config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

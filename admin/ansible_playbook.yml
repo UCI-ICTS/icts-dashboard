@@ -1,0 +1,217 @@
+# playbook.yml
+---
+- hosts: webservers
+  remote_user: root
+  vars:
+    git_projects: "/var/www/github"
+    dashboard_root: "{{ git_projects }}/icts-dashboard"
+    pyenv_root: "{{ git_projects }}/.pyenv"
+    python_version: "3.11"
+
+  tasks:
+  - name: Update all apt packages
+    ansible.builtin.apt:
+      name: "*"
+      state: latest
+    when: ansible_os_family == 'Debian'
+    become: true
+  - name: Install nginx
+    ansible.builtin.apt:
+      name: nginx
+      state: latest
+    when: ansible_os_family == 'Debian'
+    become: true
+  - name: Install pyenv deps
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - make
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - curl
+      - git
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - liblzma-dev
+    when: ansible_os_family == 'Debian'
+    become: true
+
+  - name: Update all dnf packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+    when: ansible_os_family == 'RedHat'
+    become: true
+  - name: Install ngnix
+    ansible.builtin.dnf:
+      name: nginx
+      state: latest
+    when: ansible_os_family == 'RedHat'
+    become: true
+
+  - name: Create developer group
+    ansible.builtin.group:
+      name: developer
+      state: present
+    become: true
+  - name: Add nginx to developer group
+    ansible.builtin.user:
+      name: nginx
+      groups: [developer]
+    become: true
+  - name: Install pyenv deps
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - make
+      - "@Development Tools"
+      - gcc
+      - patch
+      - zlib-devel
+      - bzip2
+      - bzip2-devel
+      - readline-devel
+      - sqlite
+      - sqlite-devel
+      - openssl-devel
+      - tk-devel
+      - libffi-devel
+      - xz-devel
+      - libuuid-devel
+      - gdbm-libs
+      - libnsl2
+    when: ansible_os_family == 'RedHat'
+    become: true
+
+  - name: Make dashboard workspace
+    ansible.builtin.file:
+      path: "{{ git_projects }}"
+      state: directory
+      mode: '0775'
+    become: true
+  - name: Clone dashboard from github
+    ansible.builtin.git:
+      repo: "https://github.com/UCI-ICTS/icts-dashboard.git"
+      dest: "{{ dashboard_root }}"
+      clone: yes
+      update: yes
+  - name: Clone pyenv from github
+    ansible.builtin.git:
+      repo: "https://github.com/pyenv/pyenv.git"
+      dest: "{{ pyenv_root }}"
+      clone: yes
+      update: yes
+  - name: Install pyenv python environment
+    ansible.builtin.shell:
+      cmd: '{{ pyenv_root }}/shims/pyenv install {{ python_version }}'
+  - name: Make pyenv bin accessible to developers group
+    ansible.builtin.file:
+      path: "{{ pyenv_root }}"
+      state: directory
+      group: 'developer'
+    become: true
+  - name: Install icts-dashboard python deps
+    ansible.builtin.pip:
+      requirements: "{{ git_projects }}/icts-dashboard/server/requirements.txt"
+      virtualenv: "{{ git_projects }}/icts-dashboard/server/env"
+      virtualenv_python: "{{ pyenv_root }}/versions/{{ python_version }}/bin/python"
+  - name: Make .secrets config
+    ansible.builtin.copy:
+      src: "{{ git_projects }}/icts-dashboard/server/.secrets.example"
+      dest: "{{ git_projects }}/icts-dashboard/server/.secrets"
+  - name: Make migrations, load demo fixtures, and build server-side static files
+    ansible.builtin.shell:
+      chdir: "{{ git_projects }}/icts-dashboard/server/"
+      cmd: >
+        'source env/bin/activate &&'
+        'python -m manage makemigrations &&'
+        'python -m manage migrate &&'
+        'python -m manage loaddata config/fixtures/initial.json &&'
+        'python -m manage collectstatic'
+      creates: "{{ git_projects }}/icts-dashboard/server/db.sqlite3"
+
+  - name: Make .env config
+    ansible.builtin.copy:
+      src: "{{ git_projects }}/icts-dashboard/client/.env.example"
+      dest: "{{ git_projects }}/icts-dashboard/client/.env"
+  - name: Install NPM deps, build static files
+    ansible.builtin.shell:
+      chdir: "{{ git_projects }}/icts-dashboard/client/"
+      cmd: >
+        'npm install &&'
+        'npm run build'
+  - name: Make dashboard accessible to developers group
+    ansible.builtin.file:
+      path: "{{ dashboard_root }}"
+      state: directory
+      group: 'developer'
+    become: true
+
+  - name: Copy over systemd socket
+    ansible.builtin.copy:
+      src: "{{ dashboard_root }}/admin/icts.socket"
+      dest: "/etc/systemd/system/icts.socket"
+    become: true
+  - name: Copy over systemd service
+    ansible.builtin.copy:
+      src: "{{ dashboard_root }}/admin/icts.service"
+      dest: "/etc/systemd/system/icts.service"
+    become: true
+  - name: Copy over nginx configuration
+    ansible.builtin.copy:
+      src: "{{ dashboard_root }}/admin/icts.conf"
+      dest: "/etc/nginx/conf.d/icts.conf"
+    become: true
+
+  - name: Set and apply SELinux policies for pyenv binaries
+    ansible.builtin.shell:
+      cmd: >
+        'selinux fcontext -a -t bin_t "{{ pyenv_root }}/versions/{{ python_version }}/bin(/.*)?" &&'
+        'restoreconf -vF {{ pyenv_root }}/versions/{{ python_version }}/bin/*"'
+    become: true
+  - name: Set SELinux policies for icts dashboard env binaries
+    ansible.builtin.shell:
+      cmd: >
+        'selinux fcontext -a -t bin_t "{{ dashboard_root }}/server/env/bin(/.*)?" &&'
+        'restoreconf -vF "{{ dashboard_root }}/server/env/bin/*"'
+    become: true
+  - name: Set SELinux policies for nginx
+    ansible.builtin.shell:
+      cmd: >
+        'selinux fcontext -a -t httpd_t nginx &&'
+        'restoreconf -vF nginx'
+    become: true
+
+  - name: Open firewall http port
+    ansible.builtin.shell:
+      cmd: >
+        'firewalld-cmd --permanent --zone=public --add-service=http &&'
+        'firewalld-cmd --permanent --zone=public --add-service=https &&'
+        'firewalld-cmd --reload'
+    become: true
+
+  - name: Start icts gunicorn socket to bind icts port and start icts gunicorn service
+    ansible.builtin.systemd_service:
+      daemon_reload: true
+      state: restarted
+      enabled: true
+      masked: no
+      name: icts.socket
+    become: true
+  - name: Start nginx
+    ansible.builtin.systemd_service:
+      state: restarted
+      enabled: true
+      masked: no
+      name: nginx
+    become: true
