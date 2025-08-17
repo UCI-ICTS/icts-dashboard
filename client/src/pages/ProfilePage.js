@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { Button, Card, Form, Input, Typography, message } from "antd";
+import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import PasswordReset from "../components/PasswordReset";
-import { updateUser } from "../slices/accountSlice";
+import { updateProfile } from "../slices/accountSlice";
 import "../App.css";
 
 const ProfilePage = () => {
@@ -21,23 +22,22 @@ const ProfilePage = () => {
       ...values,
       username: user?.username,
     };
-
-    console.log(values);
-    dispatch(updateUser(payload));
+    dispatch(updateProfile(payload));
     setLoading(false);
   };
 
   return (
-    <Card title="Profile Card" className="container-test">
+    <Card title={<span className="card-title">User Profile</span>} className="secondary-card">
       <PasswordReset open={open} setOpen={setOpen} />
 
-      <Button type="default" onClick={() => setOpen(true)} style={{ marginBottom: 16 }}>
+      <Button onClick={() => setOpen(true)} className="action-btn">
         Change Password
       </Button>
 
       <Form
+        className="profile-form"
         form={form}
-        layout="vertical"
+        layout="horizontal"
         initialValues={user}
         onFinish={handleSubmit}
       >
@@ -60,20 +60,27 @@ const ProfilePage = () => {
           <Input disabled />
         </Form.Item>
 
-        <Form.Item label="Access Token" name="access_token">
-          <Input.Password disabled />
-        </Form.Item>
-
-        <Button
-          type="link"
-          onClick={() => navigator.clipboard.writeText(user.access_token)}
-          style={{ marginBottom: 16 }}
+        <Form.Item label={
+          <Button
+          type="secondary"
+          size=""
+          onClick={() => {
+            navigator.clipboard.writeText(user.access_token)
+            message.success("Token copied to clipboard")
+          }}
+          className="action-btn"
         >
           Copy Access Token
         </Button>
+        } name="access_token">
+          <Input.Password 
+            disabled 
+            iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+          />
+        </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button className="logout-button" htmlType="submit" loading={loading}>
             Update Profile
           </Button>
         </Form.Item>
