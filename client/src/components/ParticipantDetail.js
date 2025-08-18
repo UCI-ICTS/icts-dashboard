@@ -15,8 +15,8 @@ export default function ParticipantDetail({
   openModal
 }) {
   const familyData =  useSelector((state) => state.data.familyDetail)
+  const rows = Array.isArray(familyData[0]) ? familyData[0] : []
   const familyName = selectedRow.participant_id
-  
   const handleOpen = (schemaKey, record) => {
     if (openModal && record) {
       openModal("edit", { schemaKey, record });
@@ -38,7 +38,7 @@ export default function ParticipantDetail({
     </span>
     <Table
       className="table"
-      dataSource={familyData || {}}
+      dataSource={rows}
       rowKey="participant_id"
       onRow={onRow}
       size="small"
@@ -52,7 +52,7 @@ export default function ParticipantDetail({
                     style={{ padding: 0 }}
                     onClick={() => handleOpen("participants", record.participant)}
                   >
-                    {record.participant.participant_id|| "✓"}
+                    { record.participant.participant_id || "✓"}
                   </Button>
               </div>
             )
@@ -61,7 +61,7 @@ export default function ParticipantDetail({
          { title: "Biobank",
           key: "biobank",
           render: (_, record) => {
-            const items = record.biobank || [];
+            const items = Array.isArray(record.biobank) ? record.biobank : [];
             if (!items.length) return "-";
             return (
               <div>
@@ -87,9 +87,10 @@ export default function ParticipantDetail({
         { title: "Phenotypes",
           key: "pheontypes",
           render: (_, record) => {
-            return record.phenotypes.length ? (
+            const items = Array.isArray(record.phenotypes) ? record.phenotypes : [];
+            return items.length ? (
               <div>
-                {record.phenotypes.map((entry, index) => (
+                {items.map((entry, index) => (
                   <div className="action-btn">
                     <Button
                       key={index}
@@ -105,9 +106,10 @@ export default function ParticipantDetail({
          },
         { title: "Genetic Findings", key: "genetic_findings",
           render: (_, record) => {
-            return record.phenotypes.length ? (
+            const items = Array.isArray(record.genetic_findings) ? record.genetic_findings : [];
+            return items.length ? (
               <div>
-                {record.genetic_findings.map((entry, index) => (
+                {items.map((entry, index) => (
                   <div className="action-btn">
                     <Button
                       key={index}
@@ -123,7 +125,7 @@ export default function ParticipantDetail({
         },
         { title: "Sequencing", key: "sequencing",
           render: (_, record) => {
-            const items = record.sequencing || [];
+            const items = Array.isArray(record.sequencing) ? record.sequencing : [];
             if (!items.length) return "-";
             return (
               <div>
@@ -147,7 +149,7 @@ export default function ParticipantDetail({
         },
         { title: "Alignments", key: "alignments",
           render: (_, record) => {
-            const items = record.alignments;
+            const items = Array.isArray(record.alignments) ? record.alignments : [];
             if (!items.length) return "-";
             return (
               <div>

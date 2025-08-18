@@ -218,8 +218,7 @@ export const dataSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(familyDetail.fulfilled, (state, action) => {
-        console.log(action.payload.data[0])
-        state.familyDetail = action.payload.data[0]
+        state.familyDetail = action.payload
         state.status = "fulfilled";
       })
   }
@@ -242,7 +241,7 @@ export const familyDetail = createAsyncThunk(
   async (participant_id, thunkAPI) => {
     try {
       const response = await dataService.familyDetail(participant_id);
-      return response
+      return response.data
     } catch(error) {
       message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue()

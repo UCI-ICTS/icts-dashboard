@@ -267,7 +267,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
             <ParticipantDetail
               selectedRow={selectedRow}
               setSelectedRow={setSelectedRow}
-              onRow={(record)=> {console.log(record)}}
+              onRow={(record)=> {}}
               detailLoading={detailLoading}
               setDetailLoding={setDetailLoding}
               openModal={openModal}

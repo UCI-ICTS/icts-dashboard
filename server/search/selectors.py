@@ -11,12 +11,9 @@ from config.selectors import (
     generate_zip,
 )
 
-from collections import Counter, defaultdict
+from collections import Counter
 from django.apps import apps
 from django.db.models import Q, Count
-from django.http import HttpResponse
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from itertools import chain, groupby
 
 from metadata.models import (
