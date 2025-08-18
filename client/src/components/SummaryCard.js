@@ -1,6 +1,6 @@
 // src/components/SummaryCard.js
 
-import { Button, Card } from "antd";
+import { Button, Card, Popover } from "antd";
 import PropTypes from "prop-types";
 import "../App.css";
 
@@ -21,16 +21,24 @@ const SummaryCard = ({ title, items = [], loading=false }) => {
 
   return (
     <Card
-      title={<span className="card-title">{title}</span>}
-      extra={
-        <Button
-          onClick={() => {
-            alert(info_map[title]);
-          }}
-          >
-            i
-          </Button>
+      title={
+        <Popover content={
+          <div>{info_map[title]}</div>
+          }
+          className="card-title"
+          placement="topLeft">
+          {title}
+        </Popover>
       }
+      //extra={
+      //  <Button
+      //    onClick={() => {
+      //      alert(info_map[title]);
+      //    }}
+      //    >
+      //     i
+      //    </Button>
+      //}
       className="summary-card">
       {loading ? (
         <p>Loading....</p>
