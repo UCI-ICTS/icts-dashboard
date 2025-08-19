@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 
 const { Option } = Select;
@@ -88,6 +88,22 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.enum) {
+    if (keyName === "specimen_type") {
+      return (
+        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+          <Select disabled={readOnly}>
+            {schema.enum.map((option) => (
+              <Option key={option} value={option} disabled={readOnly}>
+                {option}; {specimenType[option]}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      );
+    }
+  }
+
+  if (schema.enum) {
     if (keyName === "onset_age_range") {
       return (
         <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
@@ -101,6 +117,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
+
     return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Select disabled={readOnly}>
