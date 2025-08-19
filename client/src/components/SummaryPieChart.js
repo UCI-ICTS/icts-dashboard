@@ -65,13 +65,13 @@ function SummaryPieChart({ data, label, colors = [], title, chartType = "pie" })
     },
   };
 
-  if (chartType == "pie") {
+  if (chartType === "pie") {
     return <Pie data={chartData} options={options} />;
   }
-  if (chartType == "doughnut") {
+  if (chartType === "doughnut") {
     return <Doughnut data={chartData} options={options} />;
   }
-  if (chartType == "bar") {
+  if (chartType === "bar") {
     return <Bar data={chartData} options={options} />;
   }
 }
