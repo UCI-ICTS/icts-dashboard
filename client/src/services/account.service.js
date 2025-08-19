@@ -60,8 +60,10 @@ const getUsers = () =>
 const createUser = (userData) =>
   api.post("auth/users/", userData).then(res => res.data);
 
-const updateUser = (userData) =>
-  api.put(`auth/users/${encodeURIComponent(userData.username)}/`, userData).then(res => res.data);
+const updateUser = (userData) => {
+  const username = userData.username
+  api.put(`auth/users/${encodeURIComponent(username)}/`, userData).then(res => res.data)
+};
 
 const deleteUser = (userId) =>
   api.delete(`auth/users/${encodeURIComponent(userId)}/`).then(res => res.data);

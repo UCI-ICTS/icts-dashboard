@@ -11,8 +11,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import SummaryPage from './pages/SummaryPage';
-import GregorParticipants from './components/GregorParticipants';
-import GregorTables from './components/GregorTables';
+import GregorDataSheets from './pages/GregorDataSheets';
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import PrivateRout from "./components/PrivateRoute";
 import AccountService from "./services/account.service";
@@ -74,8 +73,10 @@ const AppRoutes = () => {
 
       <Route path="/dashboard" element={<PrivateRout><Dashboard /></PrivateRout>}>
         <Route index element={<ProfilePage />} />
-        <Route path="table-data" element={<GregorTables />} />
-        <Route path="participant-detail" element={<GregorParticipants />} />
+        <Route path="table-data" element={<GregorDataSheets />} />
+        <Route path="table-data/:table" element={<GregorDataSheets />} />
+        <Route path="participant-detail/" element={<GregorDataSheets renderDetail={true} />} />
+        <Route path="participant-detail/:pid" element={<GregorDataSheets renderDetail={true} />} />
         <Route path="admin" element={<AdminPage />} />
         <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />
@@ -83,7 +84,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
     </Routes>
   );
 
