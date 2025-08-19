@@ -30,7 +30,7 @@ const getAllTables = async () => {
 }
 
 const familyDetail = async (participant_id) => {
-    const response = api.get(APIDB + `api/search/family_detail/?ids=${participant_id}`, {headers: getAuthHeaders()})
+    const response = await axios.get(APIDB + `api/search/family_detail/?ids=${participant_id}`, {headers: getAuthHeaders()})
     return response
 }
 

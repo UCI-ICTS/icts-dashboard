@@ -331,16 +331,6 @@ export const primaryBiosample = {
 	"UBERON:0001133": "cardiac tissue"
 }
 
-export const specimenType = {
-  "D": "EDTA in Cryovial",
-  "R": "PAX Tube",
-  "OG": "OGR-500 saliva collection kit",
-  "SC": "OCD-100 buccal collection kit",
-  "SG": "OGR-675 buccal collection kit",
-  "X": "Extracted DNA",
-  "XR": "Extracted RNA"
-}
-
 export const TABLE_MAPPING = [
   { name: "Participants", schema: "participants", identifier: "participant_id" },
   { name: "Families", schema: "families", identifier: "family_id" },
@@ -374,7 +364,7 @@ export const getCollectionName = (schema) => {
  * @returns {string|null} Schema key
  */
 export const getTableName = (collectionName) => {
-  const entry = TABLE_MAPPING.find(item => 
+  const entry = TABLE_MAPPING.find(item =>
     item.identifier.replace(/_id$/, "") === collectionName
   );
   if (collectionName === "aligned") {

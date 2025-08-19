@@ -9,7 +9,7 @@ import { setTableView, fetchTable, familyDetail } from "../slices/dataSlice";
 import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
-import schemas from "../schemas/v1.9schemas.json";
+import schemas from "../schemas/v1.8schemas.json";
 import TableToolBar from "../components/TableToolBar";
 import ParticipantDetail from "../components/ParticipantDetail";
 
@@ -42,16 +42,16 @@ export default function GregorDataSheets({ renderDetail=false }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [detailLoading, setDetailLoding ] = useState(true)
 // ---- Table URL state ----
-  
+
   const tableValid = useMemo(() => !!schemas[table], [table]);
-  
+
   // create object for setTableView
   const meta = (schema) => ({
     schema,
     identifier: schemas[schema]?.identifier || `${schema}_id`,
     name: schemas[schema]?.title || schema,
   })
-  
+
   // Sync URL (only when NOT at ParticipantDetail)
   useEffect(() => {
     if (renderDetail) return;
@@ -61,7 +61,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     }
   }, [renderDetail, tableValid, table, tableView, dispatch]);
 
-  // Enforce “participants” in detail mode 
+  // Enforce “participants” in detail mode
   useEffect(() => {
     if (!renderDetail) return;
     if (tableView !== "participants") {
@@ -222,7 +222,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
 
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
-  
+
     } else if (exportFormat === "JSON") {
       fileExtension = "json";
       mimeType = "application/json;charset=utf-8";
@@ -243,7 +243,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     message.success(`Current data exported as ${exportFormat}`);
     setExportOpen(false); // Close modal after download
   };
-  
+
   const handleRefresh = () => {
     if (tableView) {
       dispatch(fetchTable(getCollectionName(tableView)));
@@ -255,7 +255,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     setSelectedRow(record);
     dispatch(familyDetail(record.participant_id))
   };
-  
+
   return (
     <Layout className="admin-layout">
       {renderDetail ? (
@@ -280,8 +280,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
           <Title className="primary-title">GREGoR Data Sheets</Title>
         </Header>
       )}
-      
-      
+
+
       <TableToolBar
         schema={schema}
         visibleColumns={dataTable.visible}
@@ -330,7 +330,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
       {(modal.kind === "add" || modal.kind === "edit") && (
         <Modal
           className="uci-modal"
-          title={modal.kind === "edit" ? `Edit Record:  ${tableView}` : `Add Record: ${tableView}`}
+          title={modal.kind === "edit" ? "Edit Record" : "Add Record"}
           open={modal.open}
           onCancel={closeModal}
           footer={null}
@@ -341,7 +341,6 @@ export default function GregorDataSheets({ renderDetail=false }) {
             schema={schemas[modal.payload?.schemaKey || tableView] || schema}
             initialValues={modal.kind === "edit" ? modal.payload?.record : {}}
             open={modal.open}
-            addEntry={(modal.kind === "add")}
             onClose={closeModal}
             isAdmin={isAdmin}
           />

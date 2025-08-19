@@ -129,7 +129,7 @@ const SummaryPage = () => {
 
           <Title className="primary-title">GREGoR Project Status Summary</Title>
 
-          <div /> 
+          <div />
         </Header>
 
       {error && (
@@ -143,12 +143,13 @@ const SummaryPage = () => {
       )}
 
       <Content className="site-content">
-        <div style={{ marginBottom: "24px" }} /> 
+
+        <div style={{ marginBottom: "24px" }} />
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Proband Solve Status</span>} className="primary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={solveStatusData}
                 chartType="doughnut"
               />
@@ -157,7 +158,7 @@ const SummaryPage = () => {
 
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={[
                   {label: "Total Participants", value:summary?.participants},
                   {label: "Total Probands", value:summary?.probands},

@@ -20,30 +20,7 @@ const SummaryCard = ({ title, items = [], loading=false }) => {
   console.log(title, info_map[title])
 
   return (
-    <Card
-      title={
-        <Popover 
-          overlayClassName="themed-popover"
-          content={
-          <div>{info_map[title]}</div>
-          }
-          className="card-title"
-          placement="topLeft"
-        >
-          {title}
-        </Popover>
-      }
-      //extra={
-      //  <Button
-      //    onClick={() => {
-      //      alert(info_map[title]);
-      //    }}
-      //    >
-      //     i
-      //    </Button>
-      //}
-      className="primary-card"
-    >
+    <Card title={<span className="card-title">{title}</span>} className="primary-card">
       {loading ? (
         <p>Loading....</p>
       ) : (

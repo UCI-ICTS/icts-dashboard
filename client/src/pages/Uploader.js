@@ -25,15 +25,16 @@ export const Uploader = () => {
   const defaultHeaders = Object.keys(schema.properties || {});
   const [form] = Form.useForm();
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (value) => {
     const selectedTable = TABLE_MAPPING.find((table) => table.schema === value);
     if (selectedTable) {
+        console.log(selectedTable)
       dispatch(setTableView(selectedTable));
     }
   };
-  
+
   const handleCsvUpload = (sheet, fileInfo) => {
     const expectedHeaders = Object.keys(schema.properties || {});
     const actualHeaders = Object.keys(sheet[0] || {});
@@ -171,7 +172,7 @@ export const Uploader = () => {
           </Tooltip>
         </Col>
         <Col xs={24} md={8}>
-          
+
           <input
             ref={fileInputRef}
             type="file"
@@ -200,7 +201,7 @@ export const Uploader = () => {
           />
         </Col>
         <Col xs={24} md={8}>
-          <Button 
+          <Button
             className="header-button"
             onClick={handleClear}
           >Clear Data</Button>

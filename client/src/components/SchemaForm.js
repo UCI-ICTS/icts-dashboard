@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 
 const { Option } = Select;
@@ -330,12 +330,12 @@ const SchemaForm = ({
   isAdmin = false,
   initialValues,
   onClose,
-  addEntry,
 }) => {
   const dispatch = useDispatch();
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
   const table = schema.title;
+
   const [internalForm] = Form.useForm();
   const formInstance = form ?? internalForm;
 
@@ -368,7 +368,7 @@ const SchemaForm = ({
         result[key] = [];
       }
     });
-    if (result["phenotype_id"] === null && result["participant_id"] && result["term_id"]) {
+    if (result["phenotype_id"] == null && result["participant_id"] && result["term_id"]) {
       result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
     }
     return result;
@@ -382,11 +382,12 @@ const SchemaForm = ({
         ? updateEntry({ table, data: [normalized] })
         : createEntry({ table, data: [normalized] });
 
-      await dispatch(action).unwrap();
+      await dispatch(action).unwrap();  // throws on error
       formInstance.resetFields();
       onClose?.();
     } catch (error) {
       console.error("Error submitting form:", error);
+      message.error("Save failed");
     }
   };
 
@@ -398,8 +399,8 @@ const SchemaForm = ({
 
   return (
     <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
-        <span>Edit Mode</span>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <span style={{ marginRight: 8 }}>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>

@@ -3,6 +3,8 @@
 
 import json
 import requests
+import json
+import requests
 import importlib
 from django.apps import apps
 
@@ -29,8 +31,7 @@ from metadata.services import (
     AnalyteSerializer,
     BiobankSerializer,
     FamilySerializer,
-    GeneticFindingsInputSerializer,
-    GeneticFindingsOutputSerializer,
+    GeneticFindingsSerializer,
     ParticipantOutputSerializer,
     PhenotypeSerializer,
 )
@@ -121,6 +122,48 @@ table_serializers = {
             "output_serializer": AlignedRNASerializer,
         },
     }
+}
+
+table_serializers = {
+        "experiment_dna_short_read": {
+            "model": ExperimentDNAShortRead,
+            "output_serializer": ExperimentDNAOutputSerializer,
+        },
+        "experiment_nanopore": {
+            "model": ExperimentNanopore,
+            "input_serializer": ExperimentNanoporeSerializer,
+            "output_serializer": ExperimentNanoporeSerializer,
+        },
+        "experiment_pac_bio": {
+            "model": ExperimentPacBio,
+            "input_serializer": ExperimentPacBioSerializer,
+            "output_serializer": ExperimentPacBioSerializer,
+        },
+        "experiment_rna_short_read": {
+            "model": ExperimentRNAShortRead,
+            "output_serializer": ExperimentRNAOutputSerializer,
+        },
+        "aligned_dna_short_read": {
+            "model": AlignedDNAShortRead,
+            "input_serializer": AlignedDNAShortReadSerializer,
+            "output_serializer": AlignedDNAShortReadSerializer,
+        },
+        "aligned_nanopore": {
+            "model": AlignedNanopore,
+            "input_serializer": AlignedNanoporeSerializer,
+            "output_serializer": AlignedNanoporeSerializer,
+        },
+        "aligned_pac_bio": {
+            "model": AlignedPacBio,
+            "input_serializer": AlignedPacBioSerializer,
+            "output_serializer": AlignedPacBioSerializer,
+        },
+        "aligned_rna_short_read": {
+            "model": AlignedRNAShortRead,
+            "input_serializer": AlignedRNASerializer,
+            "output_serializer": AlignedRNASerializer,
+        },
+    }
 
 def get_anvil_tables():
     files = {}
@@ -168,7 +211,7 @@ def get_all_tables():
     serialized_phenotypes = PhenotypeSerializer(
         Phenotype.objects.all(), many=True
     )
-    serialized_genetic_findings = GeneticFindingsOutputSerializer(
+    serialized_genetic_findings = GeneticFindingsSerializer(
         GeneticFindings.objects.all(), many=True
     )
     serialized_biobank_entries = BiobankSerializer(
@@ -291,12 +334,12 @@ def get_summary_stats():
 
     # --- Biobank status ---
     biobank_status = dict(Counter(biobank.values_list("status", flat=True)))
-    
+
     # --- Ontology Terms ---
     ontology_terms = dict()
     ontology_terms_sorted = dict(
         sorted(Counter(Phenotype.objects.all().
-                values_list("term_id", 
+                values_list("term_id",
                 flat=True)).items(),
                 key=lambda item: item[1],
                 reverse=True
@@ -310,10 +353,10 @@ def get_summary_stats():
             "count": count,
             "name": json.loads(term.text)['name']
         }
-        
+
     # --- Proband reported reace ---
     proband_reported_reace = dict(Counter(probands.values_list("reported_race", flat=True)))
-    
+
     # --- Analyte counts ---
     analyte_biosample = dict(Counter(analytes.values_list("primary_biosample", flat=True)))
     analyte_type = dict(Counter(analytes.values_list("analyte_type", flat=True)))
@@ -362,7 +405,7 @@ def get_summary_stats():
 
     # (Optional) keep a per-participant label if you want to display later
     participant_experiment_category = {}
-    
+
     for pid in all_exp_participants:
         has_sr = pid in sr_participants
         has_lr = pid in lr_participants
@@ -395,7 +438,7 @@ def get_summary_stats():
     }
     participants_sorted = sorted(participants, key=lambda x: x.family_id_id)
     family_types, families = families_by_type(participants_sorted)
-    
+
     lr_participants_sorted = sorted(
         Participant.objects.filter(
             pk__in=lr_participants),
@@ -435,9 +478,9 @@ def get_family_detail(participant_id:str) -> dict:
     participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
-        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True) 
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True)
         serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
-        serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
+        serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
         experiments = Experiment.objects.filter(participant_id=participant)
         serialized_sequencing = []
         for exp in experiments:
@@ -447,16 +490,17 @@ def get_family_detail(participant_id:str) -> dict:
             sequence["table_type"] = exp.table_name
             serialized_sequencing.append(sequence)
 
-        aligned = Aligned.objects.filter(participant_id=participant)    
+        aligned = Aligned.objects.filter(participant_id=participant)
         serialized_alignments = []
         # import pdb;pdb.set_trace()
         for aln in aligned:
+            print(aln.table_name)
             model = table_serializers[aln.table_name]["model"]
             serializer = table_serializers[aln.table_name]["output_serializer"]
             alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
             alignment["table_type"] = aln.table_name
             serialized_alignments.append(alignment)
-        
+
         items = {
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
@@ -468,5 +512,5 @@ def get_family_detail(participant_id:str) -> dict:
             "alignments": serialized_alignments,
             }
         family_detail.append(items)
-    
+
     return family_detail
