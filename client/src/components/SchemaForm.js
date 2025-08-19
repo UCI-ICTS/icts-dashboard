@@ -1,6 +1,6 @@
 // src/components/SchemaForm.js
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
@@ -12,6 +12,7 @@ const { Option } = Select;
 
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName  }) => {
   const dispatch = useDispatch();
+  const listContainerRef = useRef(null);
   const foreignMap = foreignKeyFields?.[tableName]?.[keyName]
   const rules = getValidationRules(keyName, schema, requiredFields);
 
@@ -87,7 +88,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.enum) {
-    if (keyName == "onset_age_range") {
+    if (keyName === "onset_age_range") {
       return (
         <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
           <Select disabled={readOnly}>
@@ -114,14 +115,14 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }
 
   if (schema.type === "string") {
-    if (keyName == `${tableName}_id` && !readOnly) {
+    if (keyName === `${tableName}_id` && !readOnly) {
       return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Input disabled={true}/>
       </Form.Item>
       )
     }
-    else if (tableName == "phenotype" && keyName == "phenotype_id") {
+    else if (tableName === "phenotype" && keyName === "phenotype_id") {
       return (
       <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
         <Input disabled={true}/>
@@ -171,40 +172,56 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
     // Render free-form text input array using Form.List
     return (
-      <Form.Item key={keyName} label={label}>
-        <Form.List name={keyName} rules={rules}>
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Form.Item
-                  key={key}
-                  {...restField}
-                  name={name}
-                  rules={[{ required: true, message: "Field cannot be empty. Delete the entry or add a value." }]}
+  <Form.Item key={keyName} label={label}>
+    <div ref={listContainerRef}>
+      <Form.List name={keyName} rules={rules}>
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map(({ key, name, ...restField }) => (
+              <Form.Item
+                key={key}
+                {...restField}
+                name={name}
+                rules={[{ required: true, message: "Field cannot be empty. Delete the entry or add a value." }]}
+              >
+                <Input
+                  disabled={readOnly}
+                  placeholder="Enter value"
+                  addonAfter={
+                    !readOnly && (
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    )
+                  }
+                />
+              </Form.Item>
+            ))}
+
+            {!readOnly && (
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => {
+                    add();
+                    // focus the newest input after it's rendered
+                    setTimeout(() => {
+                      const inputs = listContainerRef.current?.querySelectorAll('input');
+                      if (inputs?.length) inputs[inputs.length - 1].focus();
+                    }, 0);
+                  }}
+                  block
+                  icon={<PlusOutlined />}
                 >
-                  <Input
-                    disabled={readOnly}
-                    placeholder="Enter value"
-                    addonAfter={
-                      !readOnly && (
-                        <MinusCircleOutlined onClick={() => remove(name)} />
-                      )
-                    }
-                  />
-                </Form.Item>
-              ))}
-              {!readOnly && (
-                <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    Add item
-                  </Button>
-                </Form.Item>
-              )}
-            </>
-          )}
-        </Form.List>
-      </Form.Item>
-    );
+                  Add item
+                </Button>
+              </Form.Item>
+            )}
+          </>
+        )}
+      </Form.List>
+    </div>
+  </Form.Item>
+);
+
   }
 
   return null;
@@ -255,7 +272,7 @@ const SchemaForm = ({
         result[key] = [];
       }
     });
-    if (result["phenotype_id"] == null && result["participant_id"] && result["term_id"]) {
+    if (result["phenotype_id"] === null && result["participant_id"] && result["term_id"]) {
       result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
     }
     return result;
