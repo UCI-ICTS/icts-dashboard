@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
-import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, CaretRightOutlined } from "@ant-design/icons";
+import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, DatabaseOutlined } from "@ant-design/icons";
 import SiteFooter from "../components/SiteFooter";
 import SummaryPieChart from "../components/SummaryPieChart";
 import SummaryCard from "../components/SummaryCard";
@@ -41,22 +41,22 @@ const SummaryPage = () => {
 
   const get = (obj, key, fallback = "-") =>
     loading ? "Loading..." : obj?.[key] ?? fallback;
-  
-  const kindredData = summary?.kindred
-    ? Object.entries(summary.kindred).map(([label, value]) => ({ label, value }))
+
+  const kindredData = summary?.family_types
+    ? Object.entries(summary.family_types).map(([label, value]) => ({ label, value }))
     : [];
-  
+
   const solveStatusData = summary?.solve_status_counts
     ? Object.entries(summary.solve_status_counts).map(([label, value]) => ({label,value,}))
     : [];
-  
+
   const biobankItems = [
     { label: "Total biobank entries", value: summary?.biobank },
     { label: "Biobank statuses", value: "" },
     ...Object.entries(summary?.biobank_status_counts || {}).map(([status, count]) => ({
       label: status,
       value: count,
-      indent: true,
+      indent: true
       // icon: <CaretRightOutlined />
     })),
   ];
@@ -67,7 +67,7 @@ const SummaryPage = () => {
     ...Object.entries(summary?.analyte_biosample_counts || {}).map(([status, count]) => ({
       label: `${status} ${primaryBiosample[status] || ""}`.trim(),
       value: count,
-      indent: true,
+      indent: true
       // icon: <CaretRightOutlined />
     })),
   ];
@@ -79,14 +79,14 @@ const SummaryPage = () => {
       label: (status === "") ? "None" : status,
       value: count,
       indent: true
-    })) 
+    }))
   ]
 
   const sequencingItems = summary?.sequencing_vs_alignment
     ? summary.sequencing_vs_alignment.map(({ label, experiments }) => ({
         label,
         value: experiments,
-        indent: true,
+        indent: true
       }))
     : [];
 
@@ -94,7 +94,7 @@ const SummaryPage = () => {
   ? summary.sequencing_vs_alignment.map(({ label, alignments }) => ({
       label,
       value: alignments,
-      indent: true,
+      indent: true
     }))
   : [];
 
@@ -102,15 +102,35 @@ const SummaryPage = () => {
     ? summary.sequencing_vs_alignment.map(({label, experiments, alignments, delta}) =>({
       label,
       value: `${experiments} seq, ${alignments} aln`,
-      icon: (delta === 0) ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <WarningTwoTone twoToneColor="#faad14" />
+      icon: (delta === 0) ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <WarningTwoTone twoToneColor="#faad14" />,
     }))
     : [];
     console.log(comparisonItems)
   return (
     <Layout className="fullscreen-bg">
-      <Title level={1} className="site-title">
-        UCI Institute for Clinical & Translational Science (ICTS)
-      </Title>
+        <Header className="primary-header">
+          <div >
+            <Tooltip title="Home page">
+              <Button
+                onClick={() => navigate("/")}
+                icon={<HomeOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+            &nbsp;&nbsp;&nbsp;
+            <Tooltip title="Dashboard">
+              <Button
+                onClick={() => navigate("/dashboard/participant-detail")}
+                icon={<DatabaseOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+          </div>
+
+          <Title className="primary-title">GREGoR Project Status Summary</Title>
+
+          <div /> 
+        </Header>
 
       {error && (
         <Alert
@@ -123,26 +143,11 @@ const SummaryPage = () => {
       )}
 
       <Content className="site-content">
-        <Header className="summary-header">
-          <div className="home-container">
-            <Tooltip title="Home page">
-              <Button
-                onClick={() => navigate("/")}
-                icon={<HomeOutlined />}
-                className="home-button"
-              />
-            </Tooltip>
-          </div>
-
-          <Title className="summary-title">GREGoR Project Status Summary</Title>
-
-          <div className="home-container" /> {/* Invisible placeholder for spacing */}
-        </Header>
         <div style={{ marginBottom: "24px" }} /> 
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Proband Solve Status</span>} className="summary-card">
+            <Card title={<span className="card-title">Proband Solve Status</span>} className="primary-card">
               <SummaryPieChart 
                 data={solveStatusData}
                 chartType="doughnut"
@@ -151,7 +156,7 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Participant Snapshot</span>} className="summary-card">
+            <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
               <SummaryPieChart 
                 data={[
                   {label: "Total Participants", value:summary?.participants},
@@ -167,11 +172,10 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Family Breakdown</span>} className="summary-card">
+            <Card title={<span className="card-title">Families by Type</span>} className="primary-card">
               <SummaryPieChart
                 data={kindredData}
                 label="Family Classification"
-                title="Families by Type"
               />
             </Card>
           </Col>

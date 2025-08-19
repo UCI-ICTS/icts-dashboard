@@ -14,12 +14,14 @@ import {
   Button,
   Form,
   Input,
+  Layout,
   Modal,
   Popconfirm,
   Select,
   Spin,
   Table,
   Tooltip,
+  Typography,
   message,
 } from "antd";
 import {
@@ -27,13 +29,15 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import ErrorBoundary from "../components/ErrorBoundary";
 
 const { Option } = Select;
-
+const { Header, Content } = Layout;
+const { Title } = Typography;
 const ManageAdministrators = () => {
   const dispatch = useDispatch();
-  const currentUsername = useSelector((state) => state.account.user?.username);
+  const user = useSelector((state) => state.account.user);
+  const currentUsername = user.username;
+  const isAdmin = user.is_superuser;
   const { staff = [], loading, error } = useSelector(
     (state) => state.account || {}
   );
@@ -54,31 +58,34 @@ const ManageAdministrators = () => {
       first_name: member?.first_name || "",
       last_name: member?.last_name || "",
       email: member?.email || "",
-      role: staff?.is_superuser ? "admin" : staff?.is_staff ? "staff" : "staff",
+      role: member?.is_superuser ? "admin" : staff?.is_staff ? "staff" : "staff",
     });
     setIsModalVisible(true);
   };
 
 
   const handleSubmit = async () => {
-    const values = await form.validateFields();
-    console.log(values)
-    const updatedValues = {
-      ...values,
-      is_superuser: values.role === "admin",
-      is_staff: values.role === "admin" || values.role === "staff",
-    };
+    try {
+      const values = await form.validateFields();
+      const updatedValues = {
+        ...values,
+        is_superuser: values.role === "admin",
+        is_staff: values.role === "admin" || values.role === "staff",
+      };
 
-    delete updatedValues.role;
+      delete updatedValues.role;
 
-    if (editingMember) {
-      dispatch(updateUser({ id: editingMember.username, ...updatedValues }));
-    } else {
-      dispatch(addUser(updatedValues));
+      if (editingMember) {
+        dispatch(updateUser({ id: editingMember.username, ...updatedValues }));
+      } else {
+        dispatch(addUser(updatedValues));
+      }
+
+      setIsModalVisible(false);
+      dispatch(fetchUsers());
+    } catch (errorInfo) {
+      console.log("Validation failed:", errorInfo);
     }
-
-    setIsModalVisible(false);
-    dispatch(fetchUsers());
   };
 
   const handleDelete = async (id) => {
@@ -117,9 +124,10 @@ const ManageAdministrators = () => {
           <>
             <Tooltip title="Edit administrator">
               <Button
-                icon={<EditOutlined />}
+                icon={<EditOutlined className="action-btn"/>}
                 onClick={() => handleOpenModal(record)}
                 style={{ marginRight: 8 }}
+                disabled={!isAdmin}
               />
             </Tooltip>
             <Tooltip title={isSelf ? "You cannot delete yourself" : "Delete Administrator"}>
@@ -133,7 +141,7 @@ const ManageAdministrators = () => {
                 <Button
                   icon={<DeleteOutlined />}
                   danger
-                  disabled={isSelf}
+                  disabled={isSelf || !isAdmin}
                 />
               </Popconfirm>
             </Tooltip>
@@ -144,16 +152,21 @@ const ManageAdministrators = () => {
   ];
 
   return (
-    <ErrorBoundary>
-      <div style={{ padding: 20 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => handleOpenModal()}
-          style={{ marginBottom: 20 }}
-        >
-          Add New Staff
-        </Button>
+    <Layout className="admin-layout">
+      <Header className="primary-header">
+        <div>
+          <Tooltip title="Add new staff or admin">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenModal()}
+              className="header-button"
+              disabled={!isAdmin}
+            >Add new user</Button>
+          </Tooltip>
+        </div>
+        <Title className="primary-title">Manage Administrators</Title>
+      </Header>
 
         {loading ? (
           <Spin />
@@ -166,18 +179,20 @@ const ManageAdministrators = () => {
           />
         ) : ( null)}
           <Table
+            className="table"
             columns={columns}
             dataSource={staff.filter(Boolean)}
             rowKey="username"
             bordered
           />
         <Modal
+          className="uci-modal"
           title={editingMember ? "Edit Member" : "Add New Member"}
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           onOk={handleSubmit}
         >
-          <Form form={form} layout="vertical">
+          <Form form={form} layout="horizontal">
             <Form.Item
               name="first_name"
               label="Given Name"
@@ -211,8 +226,7 @@ const ManageAdministrators = () => {
             </Form.Item>
           </Form>
         </Modal>
-      </div>
-    </ErrorBoundary>
+      </Layout>
   );
 };
 
