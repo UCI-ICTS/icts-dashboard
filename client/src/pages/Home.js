@@ -1,9 +1,13 @@
 // src/pages/Home.js
 
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Col, Row, Layout, Space, Typography } from 'antd';
 import SiteFooter from "../components/SiteFooter";
-const { Header, Content, Footer, Sider } = Layout;
+import ReactMarkdown from 'react-markdown'
+
+const { Content } = Layout;
 const { Title } = Typography;
 
 const APIDB = process.env.REACT_APP_APIDB;
@@ -11,7 +15,29 @@ const MIA = process.env.REACT_APP_MIA;
 const SNP = process.env.REACT_APP_SNP;
 
 const HomePage = () => {
+  const README_URL = "https://raw.githubusercontent.com/UCI-ICTS/icts-dashboard/refs/heads/dev/docs/HomePage.MD"
   const navigate = useNavigate();
+  const [summary, setSummary] = useState();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(README_URL);
+      setSummary(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error loading summary:", err);
+      setError("Failed to load summary data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
   return (
     <Layout className="fullscreen-bg">
@@ -76,7 +102,9 @@ const HomePage = () => {
             </Col>
             </Row>
             <Row gutter={[16, 16]}>
-
+              <Card className="primary-card">
+                <ReactMarkdown>{summary}</ReactMarkdown>
+              </Card>
             </Row>
         </Content>
         <SiteFooter showSwagger={false} showGitHub={false} />
