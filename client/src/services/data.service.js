@@ -29,6 +29,11 @@ const getAllTables = async () => {
   return response;
 }
 
+const familyDetail = async (participant_id) => {
+    const response = await axios.get(APIDB + `api/search/family_detail/?ids=${participant_id}`, {headers: getAuthHeaders()})
+    return response
+}
+
 const fetchTable = async (table) => {
   if (metadata.includes(table)) {
     const response = await axios.get(APIDB + `api/metadata/${table}/all/`, {headers: getAuthHeaders()})
@@ -75,6 +80,7 @@ const deleteEntry = async (table, idList) => {
 
 const dataService = {
   createEntry,
+  familyDetail,
   fetchTable,
   updateEntry,
   deleteEntry,

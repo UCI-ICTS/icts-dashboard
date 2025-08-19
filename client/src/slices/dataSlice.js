@@ -3,13 +3,14 @@ import dataService from "../services/data.service";
 import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
-import { getCollectionName, getTableName } from "../utils/tableNameMap";
+import { getCollectionName, getTableName } from "../utils/schemaAndTables";
 
 const initialState = {
   tableView: "participants",
   tableID: "participant_id",
   tableName: "Participants",
   jsonData: null,
+  familyDetail: null,
   participants: [],
   families: [],
   genetic_findings: [],
@@ -38,6 +39,9 @@ export const dataSlice = createSlice({
     },
     clearJsonData: (state, action) => {
       state.jsonData = null;
+    },
+    clearFamilyDetail: (state, action) => {
+      state.familyDetail = null;
     },
     setTableView: (state, action) => {
       state.tableView = action.payload.schema;
@@ -103,13 +107,11 @@ export const dataSlice = createSlice({
         state.status = "fulfilled"
         const { table, response } = action.payload;
         const stateTable = getTableName(table)
-
         if (state[stateTable]) {
           state[stateTable] = response
         }
-
       })
-      .addCase(updateTable.fulfilled, (state, action) => {
+      .addCase(updateEntry.fulfilled, (state, action) => {
         state.status = "fulfilled";
         const { table, response, noChanges } = action.payload;
         // Return early if no changes
@@ -123,21 +125,7 @@ export const dataSlice = createSlice({
           // Extract the identifier value dynamically using the table name
           const identifier = updatedObject[table];
           // Dynamically determine the collection to update based on the table name
-          const collectionName = table === "participants" ? "participant" :
-                                 table === "families" ? "families" :
-                                 table === "genetic_findings" ? "genetic_findings" :
-                                 table === "analyte" ? "analytes" :
-                                 table === "biobank_entries" ? "biobank_entries" :
-                                 table === "phenotypes" ? "phenotypes" :
-                                 table === "experiments" ? "experiments" :
-                                 table === "experiment_dna_short_read" ? "experiment_dna_short_read" :
-                                 table === "experiment_rna_short_read" ? "experiment_rna_short_read" :
-                                 table === "experiment_nanopore" ? "experiment_nanopore" :
-                                 table === "aligned" ? "aligned" :
-                                 table === "aligned_dna_short_read" ? "aligned_dna_short_read" :
-                                 table === "aligned_nanopore" ? "aligned_nanopore" :
-                                 table === "aligned_pac_bio_id" ? "aligned_pac_bio" :
-                                 table === "aligned_rna_short_read" ? "aligned_rna_short_read" : null
+          const collectionName = table
 
           if (collectionName && state[collectionName]) {
             // Find the object to update in the relevant collection
@@ -150,10 +138,10 @@ export const dataSlice = createSlice({
           }
         }
       })
-      .addCase(updateTable.pending, (state, action) => {
+      .addCase(updateEntry.pending, (state, action) => {
         state.status = "loading";
       })
-      .addCase(updateTable.rejected, (state, action) => {
+      .addCase(updateEntry.rejected, (state, action) => {
         state.status = "rejected";
       })
       .addCase(createEntry.fulfilled, (state, action) => {
@@ -223,6 +211,16 @@ export const dataSlice = createSlice({
       .addCase(deleteEntry.rejected, (state, action) => {
         state.status = "rejected";
       })
+      .addCase(familyDetail.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(familyDetail.rejected, (state, action) => {
+        state.status = "rejected";
+      })
+      .addCase(familyDetail.fulfilled, (state, action) => {
+        state.familyDetail = action.payload
+        state.status = "fulfilled";
+      })
   }
 });
 
@@ -234,6 +232,19 @@ export const getAllTables = createAsyncThunk(
       return response.data
     } catch(error) {
       console.log("ERROR! ",error)
+    }
+  }
+)
+
+export const familyDetail = createAsyncThunk(
+  "familyDetail",
+  async (participant_id, thunkAPI) => {
+    try {
+      const response = await dataService.familyDetail(participant_id);
+      return response.data
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 )
@@ -267,8 +278,8 @@ export const createEntry = createAsyncThunk(
   }
 )
 
-export const updateTable = createAsyncThunk(
-  "updateTable",
+export const updateEntry = createAsyncThunk(
+  "updateEntry",
   async ({table, data}, thunkAPI) => {
     try {
       const response = await dataService.updateEntry(table, data);
