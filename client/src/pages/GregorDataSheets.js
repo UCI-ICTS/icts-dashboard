@@ -1,7 +1,7 @@
 // src/pages/GregorDataSheets.js
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Typography, Spin, Modal, Form, Input, Select, Button, message } from "antd";
 import { useTableSettings, buildColumns } from "../utils/tableSettings";
@@ -19,7 +19,6 @@ const { Option } = Select;
 
 export default function GregorDataSheets({ renderDetail=false }) {
   const { table } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAdmin  = useSelector((state) => state.account.user.is_superuser);
   const status   = useSelector((state) => state.data.status);
@@ -45,6 +44,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
 // ---- Table URL state ----
   
   const tableValid = useMemo(() => !!schemas[table], [table]);
+  
+  // create object for setTableView
   const meta = (schema) => ({
     schema,
     identifier: schemas[schema]?.identifier || `${schema}_id`,

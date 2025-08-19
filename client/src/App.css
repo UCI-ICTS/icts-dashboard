@@ -440,6 +440,7 @@ body, html {
   display: flex;
   justify-content: center;
   padding: 0 24px;
+  margin-bottom: 15px;
 }
 
 .primary-title {
