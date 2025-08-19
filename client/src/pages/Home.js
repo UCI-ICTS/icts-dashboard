@@ -15,17 +15,17 @@ const HomePage = () => {
 
   return (
     <Layout className="fullscreen-bg">
-        {/* <Header className="site-header" /> */}
         <Title level={1} className='site-title'>UCI Institute for Clinical & Translational Science (ICTS) </Title>
         <Content className="site-content">
           <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
               <Card 
                 hoverable
+                className="primary-card"
                 onClick={()=> navigate("/dashboard")}
                 title={
                   <Space>
-                    <span>ICTS Dashboard</span>
+                    <span className="card-title">ICTS Dashboard</span>
                       <img
                         src="/GREGoR_Final_Logo.png"
                         alt="GREGoR"
@@ -37,19 +37,21 @@ const HomePage = () => {
                       />
                   </Space>
               }>
-              The GREGoR Consortium (Genomics Research to Elucidate the Genetics of Rare diseases) seeks to develop and apply approaches to discover the cause of currently unexplained rare genetic disorders.
+              <span className="card-label">The GREGoR Consortium (Genomics Research to Elucidate the Genetics of Rare diseases) seeks to develop and apply approaches to discover the cause of currently unexplained rare genetic disorders.</span>
               </Card>
             </Col>
             <Col xs={24} md={8}>
               <Card 
                 hoverable
+                className="primary-card"
                 onClick={()=> {window.open(`${SNP}`, "_blank")}}
-                title="SNP Consortium Archive"
-              >Landing page and interface for the SNP Consortium archival material.</Card>
+                title={<span className="card-title">SNP Consortium Archive</span>}
+              ><span className="card-label">Landing page and interface for the SNP Consortium archival material.</span></Card>
             </Col>
             <Col xs={24} md={8}>
               <Card
                 hoverable
+                className="primary-card"
                 onClick={()=> {window.open(`${MIA}`, "_blank")}}
                 title={
                   <Space>
@@ -62,10 +64,10 @@ const HomePage = () => {
                         display: "inline-block"
                       }}
                     />
-                    <span>Medical Information Assistant (MIA)</span>
+                    <span className="card-title">Medical Information Assistant (MIA)</span>
                   </Space>}
-              >Our virtual Medical Information Assistant (Mia)
-                A consentbot that facilitates virtual conversations with patients.
+              ><span className="card-label">Our virtual Medical Information Assistant (Mia)
+                A consentbot that facilitates virtual conversations with patients.</span>
               </Card>
             </Col>
             <Col xs={24} md={8}>

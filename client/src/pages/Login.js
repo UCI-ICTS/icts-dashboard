@@ -11,7 +11,7 @@ const Login = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [passwordResetModal, setPasswordResetModal] = useState(false);
   const { isLoggedIn, loading, error } = useSelector((state) => state.account);
 
@@ -70,7 +70,7 @@ const Login = () => {
               name="password"
               rules={[{ required: true, message: 'Please input your Password!' }]}
             >
-              <Input
+              <Input.Password
                 prefix={<LockOutlined />}
                 type="password"
                 placeholder="Password"
@@ -96,6 +96,7 @@ const Login = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
         <Modal
+          className="uci-modal"
           title="Password reset"
           open={passwordResetModal}
           onCancel={handleCancel}

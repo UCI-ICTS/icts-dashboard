@@ -28,6 +28,7 @@ export default function PasswordReset({ open, setOpen }) {
 
   return (
     <Modal
+      className="uci-modal"
       title="Reset Password"
       open={open}
       onOk={handleOk}
