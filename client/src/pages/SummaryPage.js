@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
-import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, CaretRightOutlined } from "@ant-design/icons";
+import { HomeOutlined, CheckCircleTwoTone, WarningTwoTone, DatabaseOutlined } from "@ant-design/icons";
 import SiteFooter from "../components/SiteFooter";
 import SummaryPieChart from "../components/SummaryPieChart";
 import SummaryCard from "../components/SummaryCard";
@@ -42,8 +42,8 @@ const SummaryPage = () => {
   const get = (obj, key, fallback = "-") =>
     loading ? "Loading..." : obj?.[key] ?? fallback;
 
-  const kindredData = summary?.kindred
-    ? Object.entries(summary.kindred).map(([label, value]) => ({ label, value }))
+  const kindredData = summary?.family_types
+    ? Object.entries(summary.family_types).map(([label, value]) => ({ label, value }))
     : [];
 
   const solveStatusData = summary?.solve_status_counts
@@ -108,9 +108,29 @@ const SummaryPage = () => {
     console.log(comparisonItems)
   return (
     <Layout className="fullscreen-bg">
-      <Title level={1} className="site-title">
-        UCI Institute for Clinical & Translational Science (ICTS)
-      </Title>
+        <Header className="primary-header">
+          <div >
+            <Tooltip title="Home page">
+              <Button
+                onClick={() => navigate("/")}
+                icon={<HomeOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+            &nbsp;&nbsp;&nbsp;
+            <Tooltip title="Dashboard">
+              <Button
+                onClick={() => navigate("/dashboard/participant-detail")}
+                icon={<DatabaseOutlined />}
+                className="header-button"
+              />
+            </Tooltip>
+          </div>
+
+          <Title className="primary-title">GREGoR Project Status Summary</Title>
+
+          <div /> 
+        </Header>
 
       {error && (
         <Alert
@@ -123,27 +143,12 @@ const SummaryPage = () => {
       )}
 
       <Content className="site-content">
-        <Header className="summary-header">
-          <div className="home-container">
-            <Tooltip title="Home page">
-              <Button
-                onClick={() => navigate("/")}
-                icon={<HomeOutlined />}
-                className="home-button"
-              />
-            </Tooltip>
-          </div>
-
-          <Title className="summary-title">GREGoR Project Status Summary</Title>
-
-          <div className="home-container" /> {/* Invisible placeholder for spacing */}
-        </Header>
-        <div style={{ marginBottom: "24px" }} />
+        <div style={{ marginBottom: "24px" }} /> 
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Proband Solve Status</span>} className="summary-card">
-              <SummaryPieChart
+            <Card title={<span className="card-title">Proband Solve Status</span>} className="primary-card">
+              <SummaryPieChart 
                 data={solveStatusData}
                 chartType="doughnut"
               />
@@ -153,6 +158,8 @@ const SummaryPage = () => {
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Participant Snapshot</span>} className="summary-card">
               <SummaryPieChart
+            <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
+              <SummaryPieChart 
                 data={[
                   {label: "Total Participants", value:summary?.participants},
                   {label: "Total Probands", value:summary?.probands},
@@ -167,11 +174,10 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Family Breakdown</span>} className="summary-card">
+            <Card title={<span className="card-title">Families by Type</span>} className="primary-card">
               <SummaryPieChart
                 data={kindredData}
                 label="Family Classification"
-                title="Families by Type"
               />
             </Card>
           </Col>

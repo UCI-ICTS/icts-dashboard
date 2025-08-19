@@ -124,16 +124,34 @@ const initialState = user
           state.loading = false;
           state.error = action.payload;
         })
-
         .addCase(updateUser.fulfilled, (state, action) => {
           const updated = action.payload;
-          state.staff.push(updated);
+          const index = state.staff.findIndex(user => user.username === updated.username);
+          if (index !== -1) {
+            state.staff[index] = updated; // Replace existing
+          } else {
+            state.staff.push(updated); // Fallback: add if not found
+          }
         })
         .addCase(updateUser.pending, (state, action) => {
           const user = action.payload;
           state.staff.push(user);
+          state.user = user
         })
         .addCase(updateUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+        
+        .addCase(updateProfile.fulfilled, (state, action) => {
+          const updated = action
+          console.log(updated)
+        })
+        .addCase(updateProfile.pending, (state, action) => {
+          const user = action.payload;
+          state.staff.push(user);
+        })
+        .addCase(updateProfile.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload;
         })
@@ -397,6 +415,21 @@ export const updateUser = createAsyncThunk(
   "data/updateUser",
   async (userData, thunkAPI) => {
   try {
+    console.log("SLICE: ", userData)
+    const response = await AccountService.updateUser(userData);
+    message.success("User updated successfully!");
+    return response;
+  } catch (error) {
+    message.error("Failed to update user.");
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+export const updateProfile = createAsyncThunk(
+  "data/updateProfile",
+  async (userData, thunkAPI) => {
+  try {
+    console.log("SLICE: ", userData)
     const response = await AccountService.updateUser(userData);
     message.success("User updated successfully!");
     return response;

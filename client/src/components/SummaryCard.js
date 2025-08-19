@@ -39,7 +39,8 @@ const SummaryCard = ({ title, items = [], loading=false }) => {
       //     i
       //    </Button>
       //}
-      className="summary-card">
+      className="primary-card"
+    >
       {loading ? (
         <p>Loading....</p>
       ) : (

@@ -157,7 +157,6 @@ export const foreignKeyFields = {
   },
 };
 
-
 export const defaultVisibleColumns = {
   participants: ["participant_id", "proband_relationship", "family_id", "solve_status"],
   genetic_findings: ["genetic_findings_id", "participant_id", "experiment_id"],
@@ -220,3 +219,57 @@ export const primaryBiosample = {
 	"UBERON:0002037": "cerebellum tissue",
 	"UBERON:0001133": "cardiac tissue"
 }
+
+export const TABLE_MAPPING = [
+  { name: "Participants", schema: "participants", identifier: "participant_id" },
+  { name: "Families", schema: "families", identifier: "family_id" },
+  { name: "Genetic Findings", schema: "genetic_findings", identifier: "genetic_findings_id" },
+  { name: "Analytes", schema: "analytes", identifier: "analyte_id" },
+  { name: "Biobank Entries", schema: "biobank_entries", identifier: "biobank_id" },
+  { name: "Phenotypes", schema: "phenotypes", identifier: "phenotype_id" },
+  { name: "DNA Short Read", schema: "experiment_dna_short_read", identifier: "experiment_dna_short_read_id" },
+  { name: "RNA Short Read", schema: "experiment_rna_short_read", identifier: "experiment_rna_short_read_id" },
+  { name: "PacBio", schema: "experiment_pac_bio", identifier: "experiment_pac_bio_id" },
+  { name: "NanoPore", schema: "experiment_nanopore", identifier: "experiment_nanopore_id" },
+  { name: "Aligned DNA Short Read", schema: "aligned_dna_short_read", identifier: "aligned_dna_short_read_id" },
+  { name: "Aligned NanoPore", schema: "aligned_nanopore", identifier: "aligned_nanopore_id" },
+  { name: "Aligned Pac Bio", schema: "aligned_pac_bio", identifier: "aligned_pac_bio_id" },
+  { name: "Aligned RNA Short Read", schema: "aligned_rna_short_read", identifier: "aligned_rna_short_read_id" },
+];
+
+/**
+ * Get collection name from schema key
+ * @param {string} schema - Schema name from TABLE_MAPPING
+ * @returns {string|null} Identifier-friendly collection name
+ */
+export const getCollectionName = (schema) => {
+  const entry = TABLE_MAPPING.find(item => item.schema === schema);
+  return entry ? entry.identifier.replace(/_id$/, "") : null;
+};
+
+/**
+ * Get schema key from collection name
+ * @param {string} collectionName - Short collection name (no _id)
+ * @returns {string|null} Schema key
+ */
+export const getTableName = (collectionName) => {
+  const entry = TABLE_MAPPING.find(item => 
+    item.identifier.replace(/_id$/, "") === collectionName
+  );
+  if (collectionName === "aligned") {
+    return "aligned"
+  }
+  if (collectionName === "experiment") {
+    return "experiments"
+  }
+  return entry ? entry.schema : null;
+};
+
+/**
+ * Get primary key field for any schema
+ * @param {string} Schema key
+ * @returns {string|null} Primary key field
+ */
+export const getIdentifier = (schema) => {
+  return TABLE_MAPPING.find(item => item.schema === schema)?.identifier || null;
+};
