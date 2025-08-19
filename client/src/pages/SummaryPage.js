@@ -156,8 +156,6 @@ const SummaryPage = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card title={<span className="card-title">Participant Snapshot</span>} className="summary-card">
-              <SummaryPieChart
             <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
               <SummaryPieChart 
                 data={[
