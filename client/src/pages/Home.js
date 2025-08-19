@@ -19,7 +19,7 @@ const HomePage = () => {
         <Content className="site-content">
           <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
-              <Card 
+              <Card
                 hoverable
                 className="primary-card"
                 onClick={()=> navigate("/dashboard")}
@@ -41,7 +41,7 @@ const HomePage = () => {
               </Card>
             </Col>
             <Col xs={24} md={8}>
-              <Card 
+              <Card
                 hoverable
                 className="primary-card"
                 onClick={()=> {window.open(`${SNP}`, "_blank")}}
