@@ -6,7 +6,7 @@ import "../App.css";
 
 const SummaryCard = ({ title, items = [], loading=false }) => {
   return (
-    <Card title={<span className="card-title">{title}</span>} className="summary-card">
+    <Card title={<span className="card-title">{title}</span>} className="primary-card">
       {loading ? (
         <p>Loading....</p>
       ) : (

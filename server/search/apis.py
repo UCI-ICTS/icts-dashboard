@@ -13,55 +13,19 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from search.selectors import get_anvil_tables
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from metadata.models import (
-    Analyte,
-    Biobank,
-    Family,
-    GeneticFindings,
-    Participant,
-    Phenotype,
+from search.selectors import (
+    get_anvil_tables,
+    get_all_tables,
+    get_summary_stats,
+    get_family_detail
 )
 
-from metadata.services import (
-    AnalyteSerializer,
-    BiobankSerializer,
-    FamilySerializer,
-    GeneticFindingsSerializer,
-    ParticipantOutputSerializer,
-    PhenotypeSerializer,
-)
-
-from experiments.models import (
-    Aligned,
-    AlignedDNAShortRead,
-    AlignedNanopore,
-    AlignedPacBio,
-    AlignedRNAShortRead,
-    Experiment,
-    ExperimentDNAShortRead,
-    ExperimentPacBio,
-    ExperimentNanopore,
-    ExperimentRNAShortRead,
-)
-
-from experiments.services import (
-    AlignedSerializer,
-    AlignedDNAShortReadSerializer,
-    AlignedNanoporeSerializer,
-    AlignedPacBioSerializer,
-    AlignedRNASerializer,
-    ExperimentSerializer,
-    ExperimentDNAOutputSerializer,
-    ExperimentNanoporeSerializer,
-    ExperimentPacBioSerializer,
-    ExperimentRNAOutputSerializer,
-)
+from search.services import FamilyDetailInputSerializer
 
 
-class GetAllTablesAPI(APIView):
+class AllTablesAPI(APIView):
     """"""
 
     authentication_classes = [JWTAuthentication]
@@ -78,75 +42,7 @@ class GetAllTablesAPI(APIView):
     def get(self, request):
         response_data = []
         try:
-            # Metadata Models
-            serialized_participants = ParticipantOutputSerializer(
-                Participant.objects.all(), many=True
-            )
-            serialized_families = FamilySerializer(Family.objects.all(), many=True)
-            serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
-            serialized_phenotypes = PhenotypeSerializer(
-                Phenotype.objects.all(), many=True
-            )
-            serialized_genetic_findings = GeneticFindingsSerializer(
-                GeneticFindings.objects.all(), many=True
-            )
-            serialized_biobank_entries = BiobankSerializer(
-                Biobank.objects.all(), many=True
-            )
-
-            # Experiment Models
-            serialized_aligned_experiments = AlignedSerializer(
-                Aligned.objects.all(), many=True
-            )
-            serialized_aligned_dna = AlignedDNAShortReadSerializer(
-                AlignedDNAShortRead.objects.all(), many=True
-            )
-            serialized_aligned_nanopore = AlignedNanoporeSerializer(
-                AlignedNanopore.objects.all(), many=True
-            )
-            serialized_aligned_pacbio = AlignedPacBioSerializer(
-                AlignedPacBio.objects.all(), many=True
-            )
-            serialized_aligned_rna = AlignedRNASerializer(
-                AlignedRNAShortRead.objects.all(), many=True
-            )
-            serialized_experiments = ExperimentSerializer(
-                Experiment.objects.all(), many=True
-            )
-            serialized_dna = ExperimentDNAOutputSerializer(
-                ExperimentDNAShortRead.objects.all(), many=True
-            )
-            serialized_nanopore = ExperimentNanoporeSerializer(
-                ExperimentNanopore.objects.all(), many=True
-            )
-            serialized_pacbio = ExperimentPacBioSerializer(
-                ExperimentPacBio.objects.all(), many=True
-            )
-            serialized_rna = ExperimentRNAOutputSerializer(
-                ExperimentRNAShortRead.objects.all(), many=True
-            )
-
-            serilized_return_data = {
-                # Metadata Tables
-                "participants": serialized_participants.data,
-                "families": serialized_families.data,
-                "genetic_findings": serialized_genetic_findings.data,
-                "analytes": serialized_analytes.data,
-                "phenotypes": serialized_phenotypes.data,
-                "biobank_entries": serialized_biobank_entries.data,
-                # Experiment Tables
-                "experiments": serialized_experiments.data,
-                "experiment_dna_short_read": serialized_dna.data,
-                "experiment_nanopore": serialized_nanopore.data,
-                "experiment_pac_bio": serialized_pacbio.data,
-                "experiment_rna_short_read": serialized_rna.data,
-                # Aligned tables
-                "aligned": serialized_aligned_experiments.data,
-                "aligned_dna_short_read": serialized_aligned_dna.data,
-                "aligned_nanopore": serialized_aligned_nanopore.data,
-                "aligned_pac_bio": serialized_aligned_pacbio.data,
-                "aligned_rna_short_read": serialized_aligned_rna.data,
-            }
+            serilized_return_data = get_all_tables()
             return Response(status=status.HTTP_200_OK, data=serilized_return_data)
         except Exception as error:
             response_data.insert(0, str(error))
@@ -167,140 +63,7 @@ class SummaryAPI(APIView):
 
     def get(self, request):
         try:
-            # Basic counts
-            participants = Participant.objects.all()
-            families = Family.objects.count()
-            phenotypes = Phenotype.objects.all()
-            analytes = Analyte.objects.all()
-            aligned = Aligned.objects.count()
-            biobank = Biobank.objects.all()
-            experiments = Experiment.objects.all()
-            findings = GeneticFindings.objects.all()
-
-            # --- Solve status for probands only ---
-            probands = participants.filter(proband_relationship="Self")
-            solve_status_counts = (
-                probands.values("solve_status")
-                .annotate(count=Count("solve_status"))
-                .order_by()
-            )
-            solve_status = {entry["solve_status"]: entry["count"] for entry in solve_status_counts}
-
-
-            # --- Biobank status ---
-            biobank_status = dict(Counter(biobank.values_list("status", flat=True)))
-
-            # --- Group phenotype descriptions by participant_id
-            participant_phenos = dict()
-            for pheno in phenotypes.values(
-                "phenotype_id",
-                "participant_id",
-                "term_id",
-                "additional_details",
-            )[::1]:
-                if pheno["participant_id"] not in participant_phenos:
-                    participant_phenos[pheno["participant_id"]] = list()
-                participant_phenos[pheno["participant_id"]].append(pheno["additional_details"])
-
-            # --- Analyte counts ---
-            analyte_biosample = dict(Counter(analytes.values_list("primary_biosample", flat=True)))
-            analyte_type = dict(Counter(analytes.values_list("analyte_type", flat=True)))
-
-            # --- Genetic findings phenotype_contribution ---
-            findings_contribution = dict(Counter(findings.values_list("phenotype_contribution", flat=True)))
-            if "" in findings_contribution:  # Replace empty key with 'unknown'
-                findings_contribution["Unknown"] = findings_contribution.pop("")
-
-            # --- Genetic findings candidate genes and phenotypes ---
-            gene_candidates = dict()
-            gene_known = dict()
-            for finding in findings.values(
-                "genetic_findings_id",
-                "participant_id",
-                "gene_known_for_phenotype",
-                "gene_of_interest",
-                "known_condition_name",
-            )[::1]:
-                if finding["gene_known_for_phenotype"] == "Candidate":
-                    gene_candidates[finding["gene_of_interest"][0]] = participant_phenos[finding["participant_id"]]
-                elif finding["gene_known_for_phenotype"] == "Known":
-                    gene_known[finding["gene_of_interest"][0]] = finding["known_condition_name"]
-
-            # --- Sequencing vs Aligned comparison ---
-            def group_by_table_name(qs):
-                values = qs.values_list("table_name", flat=True)
-                return dict(Counter(v.replace("experiment_", "").replace("aligned_", "").capitalize() for v in values))
-
-            experiment_counts = group_by_table_name(experiments)
-            aligned_counts = group_by_table_name(Aligned.objects.all())
-
-            # Delta comparison
-            labels = set(experiment_counts) | set(aligned_counts)
-            sequencing_vs_alignment = [
-                {
-                    "label": label,
-                    "experiments": experiment_counts.get(label, 0),
-                    "alignments": aligned_counts.get(label, 0),
-                    "delta": experiment_counts.get(label, 0) - aligned_counts.get(label, 0),
-                }
-                for label in sorted(labels)
-            ]
-
-            # --- Family relationship grouping ---
-            participants_sorted = sorted(participants, key=lambda x: x.family_id_id)
-
-            # Keep track of which families appear in participants
-            family_ids_with_participants = set()
-
-            # Define mapping from role sets to category
-            FAMILY_CATEGORIES = ["Trio+", "Trio", "Maternal Dyads", "Paternal Dyads", "Singletons", "Other"]
-            # Initialize counts for all categories
-            kindred = {category: 0 for category in FAMILY_CATEGORIES}
-            kindred_count = 0
-            for family_id, members_iter in groupby(participants_sorted, key=lambda x: x.family_id_id):
-                family_ids_with_participants.add(family_id)
-                roles = {m.proband_relationship for m in members_iter}  # set of roles in this family
-
-                # Determine category based on presence of proband (Self), Mother, and Father
-                if {"Self", "Mother", "Father"}.issubset(roles):
-                    # Family includes proband and both parents
-                    if len(roles) > 3:
-                        kindred["Trio+"] += 1  # There are other roles in addition to the trio
-                    else:
-                        kindred["Trio"] += 1   # Exactly Self, Mother, Father
-                elif roles == {"Self", "Mother"}:
-                    kindred["Maternal Dyads"] += 1
-                elif roles == {"Self", "Father"}:
-                    kindred["Paternal Dyads"] += 1
-                elif roles == {"Self"}:
-                    kindred["Singletons"] += 1
-                else:
-                    kindred["Other"] += 1
-                    print(f'{family_id}: {roles}')
-                kindred_count += 1
-
-            all_family_ids = set(Family.objects.values_list("family_id", flat=True))
-            family_ids_without_participants = all_family_ids - family_ids_with_participants
-            families = families - len(family_ids_without_participants)
-
-            response = {
-                "participants": participants.count(),
-                "families": families,
-                "analytes": analytes.count(),
-                "aligned": aligned,
-                "biobank": biobank.count(),
-                "probands": probands.count(),
-                "findings": findings.count(),
-                "solve_status_counts": solve_status,
-                "biobank_status_counts": biobank_status,
-                "analyte_biosample_counts": analyte_biosample,
-                "analyte_type_counts": analyte_type,
-                "findings_contribution": findings_contribution,
-                "gene_candidates": gene_candidates,
-                "gene_known": gene_known,
-                "sequencing_vs_alignment": sequencing_vs_alignment,
-                "kindred": kindred,
-            }
+            response = get_summary_stats()
 
             return Response(status=status.HTTP_200_OK, data=response)
 
@@ -311,14 +74,21 @@ class SummaryAPI(APIView):
             )
 
 
-class GetExperimentDNAShortReadTableAPI(APIView):
-    """"""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+class FamilyDetail(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
-        operation_id="get_experiment_dna_short_read_table",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of `participant_id`s ",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        operation_id="family-detail",
         responses={
             200: "Submission successfull",
             400: "Bad request",
@@ -326,21 +96,21 @@ class GetExperimentDNAShortReadTableAPI(APIView):
         tags=["Search"],
     )
     def get(self, request):
-        response_data = []
+        response = []
         try:
-            serialized_experiment_dna_short_reads = ExperimentShortReadSerializer(
-                ExperimentDNAShortRead.objects.all(), many=True
-            )
+            participant_ids = request.GET.get("ids", "").split(",")
+            print(participant_ids)
+            for participant_id in participant_ids:
+                response.append(get_family_detail(participant_id)) 
 
-            serilized_return_data = {
-                "experiment_dna_short_reads": serialized_experiment_dna_short_reads.data
-            }
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+            return Response(status=status.HTTP_200_OK, data=response)
+
         except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-
-
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+## DEACTIVATED APIs
 class DownloadTablesAPI(APIView):
     """AnVIL upload table generation."""
 
