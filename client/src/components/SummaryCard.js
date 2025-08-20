@@ -22,11 +22,14 @@ const SummaryCard = ({ title, items = [], loading=false }) => {
   return (
     <Card
       title={
-        <Popover content={
+        <Popover 
+          overlayClassName="themed-popover"
+          content={
           <div>{info_map[title]}</div>
           }
           className="card-title"
-          placement="topLeft">
+          placement="topLeft"
+        >
           {title}
         </Popover>
       }
