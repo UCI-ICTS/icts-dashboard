@@ -9,7 +9,7 @@ import { setTableView, fetchTable, familyDetail } from "../slices/dataSlice";
 import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
-import schemas from "../schemas/v1.8schemas.json";
+import schemas from "../schemas/v1.9schemas.json";
 import TableToolBar from "../components/TableToolBar";
 import ParticipantDetail from "../components/ParticipantDetail";
 
@@ -341,6 +341,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
             schema={schemas[modal.payload?.schemaKey || tableView] || schema}
             initialValues={modal.kind === "edit" ? modal.payload?.record : {}}
             open={modal.open}
+            addEntry={(modal.kind === "add")}
             onClose={closeModal}
             isAdmin={isAdmin}
           />
