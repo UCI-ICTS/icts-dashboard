@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,7 +27,8 @@ from metadata.models import (
 
 from metadata.services import (
     AnalyteSerializer,
-    GeneticFindingsSerializer,
+    GeneticFindingsInputSerializer,
+    GeneticFindingsOutputSerializer,
     ParticipantInputSerializer,
     ParticipantOutputSerializer,
     FamilySerializer,
@@ -716,23 +717,24 @@ class PhenotypeViewSet(viewsets.ViewSet):
 
 
 class GeneticFindingsViewSet(viewsets.ViewSet):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Genetic Findings entries",
-        responses={200: GeneticFindingsSerializer(many=True), 400: "Bad request"},
+        responses={200: GeneticFindingsOutputSerializer(many=True), 400: "Bad request"},
         tags=["GeneticFindings"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
         queryset = GeneticFindings.objects.all()
-        serializer = GeneticFindingsSerializer(queryset, many=True)
+        serializer = GeneticFindingsInputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        request_body=GeneticFindingsSerializer(many=True),
+        request_body=GeneticFindingsOutputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["GeneticFindings"],
     )
@@ -807,7 +809,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        request_body=GeneticFindingsSerializer(many=True),
+        request_body=GeneticFindingsInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["GeneticFindings"],
     )
@@ -816,6 +818,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
         genetic_findings = bulk_model_retrieve(
             request.data, GeneticFindings, "genetic_findings_id"
         )
+
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
