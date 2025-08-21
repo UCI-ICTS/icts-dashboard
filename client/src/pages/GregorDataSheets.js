@@ -330,7 +330,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
       {(modal.kind === "add" || modal.kind === "edit") && (
         <Modal
           className="uci-modal"
-          title={modal.kind === "edit" ? "Edit Record" : "Add Record"}
+          title={modal.kind === "edit" ? `Edit Record:  ${tableView}` : `Add Record: ${tableView}`}
           open={modal.open}
           onCancel={closeModal}
           footer={null}

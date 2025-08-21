@@ -8,7 +8,7 @@ const printErrorMessages = (error) => {
 
   console.log(error)
 
-  if (error.name == "AxiosError"){
+  if (error.name === "AxiosError"){
     if (error.response) {
       // Check if there's a top-level errorMessage.
       if (error.response.message) { errorMessage = error.response.message; }
@@ -49,7 +49,7 @@ const printErrorMessages = (error) => {
   }
 
   // Fallback generic message.
-  else if (error.message == "Rejected") { errorMessage = error.message }
+  else if (error.message==="Rejected") { errorMessage = error.message }
   else { errorMessage = "An unknown error occurred."; }
   console.log(errorMessage)
   return errorMessage;

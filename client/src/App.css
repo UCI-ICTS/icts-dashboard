@@ -110,6 +110,17 @@ body, html {
   padding-left: 24px;
 }
 
+.site-subtitle {
+  color: var(--uci-light-gray) !important;
+  background: var(--uci-dark-blue);
+  font-size: 18pt !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
 .site-content {
   margin: 0 16px;
   padding: 24px;
@@ -496,6 +507,13 @@ body, html {
   gap: 8px; /* space between text and logo */
 }
 
+.home-card {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--uci-blue);
+  line-height: 1.2;
+}
+
 .card-title {
   font-size: 24px;
   font-weight: 800;
@@ -514,6 +532,74 @@ body, html {
   font-size: 18px;
   color: var(--uci-dark-blue);
 }
+
+.cards-equal-row {
+  justify-content: center !important;
+  margin-bottom: 20px;
+}
+/* Make each Col a flex container so the Card can stretch */
+.cards-equal-row .card-col {
+  display: flex;
+}
+
+/* Make the Card fill the Col’s height */
+.cards-equal-row .card-fill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Optional: ensure body stretches so footer can stick to bottom */
+.cards-equal-row .card-fill .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.flex-row {
+  display: flex;
+}
+
+.flex-row .flex-col {
+  flex: 1 1 0;   /* all take equal space */
+  min-width: 200px; /* optional min size for responsiveness */
+}
+
+.cards-equal-row .card-col {
+  display: flex;
+}
+
+.cards-equal-row .card-fill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Push footer to bottom if you have one */
+.cards-equal-row .card-footer {
+  margin-top: auto;
+}
+
+.themed-popover .ant-popover-inner {
+  max-width: 300px;
+  background: var(--uci-light-gray);
+  color: var(--uci-light-gray) !important;
+  border-radius: 12px;
+  padding: 12px;
+}
+.themed-popover .ant-popover-title {
+  background: transparent;
+  color: var(--uci-athletics-gold);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+}
+.themed-popover .ant-popover-arrow::before,
+.themed-popover .ant-popover-arrow::after {
+  background: #111827 !important; /* arrow color */
+  box-shadow: none !important;
+}
+
 
 .table {
   background-color: white;

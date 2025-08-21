@@ -22,10 +22,10 @@ ChartJS.register(
  */
 function SummaryPieChart({ data, label, colors = [], title, chartType = "pie" }) {
   // Helper to generate a default palette if no colors are provided
-  
+
   // const defaultPalette = [
-  //   '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', 
-  //   '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', 
+  //   '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+  //   '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
   // ];
 
   const defaultPalette = [
@@ -65,13 +65,13 @@ function SummaryPieChart({ data, label, colors = [], title, chartType = "pie" })
     },
   };
 
-  if (chartType == "pie") {
+  if (chartType === "pie") {
     return <Pie data={chartData} options={options} />;
   }
-  if (chartType == "doughnut") {
+  if (chartType === "doughnut") {
     return <Doughnut data={chartData} options={options} />;
   }
-  if (chartType == "bar") {
+  if (chartType === "bar") {
     return <Bar data={chartData} options={options} />;
   }
 }
