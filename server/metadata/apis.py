@@ -717,9 +717,8 @@ class PhenotypeViewSet(viewsets.ViewSet):
 
 
 class GeneticFindingsViewSet(viewsets.ViewSet):
-    # authentication_classes = [JWTAuthentication]
-    permission_classes = [AllowAny]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         method="get",

@@ -37,6 +37,7 @@ from submodels.models import (
     ReportedRace,
     VariantType,
     VariantInheritance,
+    ConditionInheritance,
     GREGoRVariantClassification,
     GeneDiseaseValidity,
     DiscoveryMethod
@@ -80,7 +81,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         errors = {}
 
         valid_variant_types = [choice[0] for choice in VariantType.choices]
-        valid_condition_inheritance = [choice[0] for choice in VariantInheritance.choices]
+        valid_condition_inheritance = [choice[0] for choice in ConditionInheritance.choices]
         valid_GREGoR_variant_classification = [choice[0] for choice in GREGoRVariantClassification.choices]
         valid_gene_disease_validity = [choice[0] for choice in  GeneDiseaseValidity.choices]
         valid_method_of_discovery = [choice[0] for choice in  DiscoveryMethod.choices]
@@ -138,39 +139,40 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             
             # condition_id must be `OMIM:` or `MONDO:`
             condition_id = (data.get("condition_id") or "").strip()
-            if condition_id and not re.match(r"^(OMOM|MONDO):\S+$", condition_id):
+
+            if condition_id and not re.match(r"^(OMIM|MONDO):\S+$", condition_id):
                 errors.setdefault("condition_id", []).append(f"{condition_id} must be OMIM:... or MONDO:...")
             
             # if known gene_known_for_phenotype then valid_condition_inheritance is required
-            condition_inheritance = attrs.get("condition_inheritance")
+            condition_inheritance = data.get("condition_inheritance")
             if not condition_inheritance:
                 errors.setdefault("condition_inheritance", []).append(
                     "If `gene_known_for_phenotype` is known then condition_inheritance is required and cannot be empty"
                 )
             else:
-                bad_condition_inheritance = [v for v in (attrs["condition_inheritance"] or []) if v not in valid_condition_inheritance]
+                bad_condition_inheritance = [v for v in (data["condition_inheritance"] or []) if v not in valid_condition_inheritance]
                 if bad_condition_inheritance:
                     errors.setdefault("condition_inheritance", []).append(
                         f"invalid: {bad_condition_inheritance} (valid: {', '.join(sorted(valid_condition_inheritance))})"
                     )
             # if known gene_known_for_phenotype then valid_GREGoR_variant_classification is required
-            GREGoR_variant_classification = attrs.get("GREGoR_variant_classification")
+            GREGoR_variant_classification = data.get("GREGoR_variant_classification")
             if not GREGoR_variant_classification:
                 errors.setdefault("GREGoR_variant_classification", []).append(
                     "If `gene_known_for_phenotype` is known then GREGoR_variant_classification is required and cannot be empty"
                 )
-            if attrs.get("GREGoR_variant_classification") and attrs["GREGoR_variant_classification"] not in valid_GREGoR_variant_classification:
+            if data.get("GREGoR_variant_classification") and data["GREGoR_variant_classification"] not in valid_GREGoR_variant_classification:
                 errors.setdefault("GREGoR_variant_classification", []).append(
                     f"invalid (valid: {', '.join(sorted(valid_GREGoR_variant_classification))})"
                 )
 
             # if known gene_known_for_phenotype then gene_disease_validity is required
-            gene_disease_validity = attrs.get("gene_disease_validity")
+            gene_disease_validity = data.get("gene_disease_validity")
             if not gene_disease_validity:
                 errors.setdefault("gene_disease_validity", []).append(
                     "If `gene_known_for_phenotype` is known then gene_disease_validity is required and cannot be empty"
                 )
-            if attrs.get("gene_disease_validity") and attrs["gene_disease_validity"] not in valid_gene_disease_validity:
+            if data.get("gene_disease_validity") and data["gene_disease_validity"] not in valid_gene_disease_validity:
                 errors.setdefault("gene_disease_validity", []).append(
                     f"invalid (valid: {', '.join(sorted(valid_gene_disease_validity))})"
                 )
@@ -191,7 +193,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
                     f"unknown HPO terms: {', '.join(missing)}"
                 )
         # method_of_discovery should be a list
-        method_of_discovery = attrs.get("method_of_discovery")
+        method_of_discovery = data.get("method_of_discovery")
         if method_of_discovery:
             if not isinstance(method_of_discovery, list):
                 errors.setdefault("method_of_discovery", []).append("method_of_discovery must be a list")

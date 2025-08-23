@@ -80,6 +80,18 @@ class VariantInheritance(models.TextChoices):
     NONPATERNAL = "nonpaternal", "Nonpaternal"
     UNKNOWN = "unknown", "Unknown"
 
+class ConditionInheritance(models.TextChoices):
+    AUTOSOMAL_RECESSIVE = "Autosomal recessive", "autosomal recessive", 
+    AUTOSOMAL_DOMINANT = "Autosomal dominant", "autosomal dominant", 
+    X_LINKED = "X-linked", "x-linked", 
+    MITOCHONDRIAL = "Mitochondrial", "mitochondrial", 
+    Y_LINKED = "Y-linked", "y-linked", 
+    CONTIGUOUS_GENE_SYNDROM = "Contiguous gene syndrome", "contiguous gene syndrom",
+    SOMATIC_MOSAICISM = "Somatic mosaicism", "somatic mosaicism",
+    DIGENIC = "Digenic", "digenic",
+    OTHER = "Other", "other",
+    UNKNOWN = "Unknown", "unkonwn", 
+
 class GeneDiseaseValidity(models.TextChoices):
     DEFINITIVE = "Definitive", "Definitive"
     STRONG = "Strong", "Strong"

@@ -14,7 +14,7 @@ export const parseRequiredCondition = (raw) => {
   const m = raw.match(/^CONDITIONAL\s*\((.*)\)\s*$/i);
   if (!m) return null;
 
-  // Split on commas not inside quotes (we have simple tokens so split on ',')
+  // Split on commas not inside quotes (simple tokens in our schemas)
   const parts = m[1].split(",").map(s => s.trim()).filter(Boolean);
 
   const tests = parts.map(p => {
@@ -22,7 +22,6 @@ export const parseRequiredCondition = (raw) => {
     if (eq === -1) return null;
     const field = p.slice(0, eq).trim();
     const value = p.slice(eq + 1).trim();
-    // normalize: allow "field" or "field_name", and strip quotes if any
     return {
       field,
       value: value.replace(/^['"]|['"]$/g, "")
@@ -53,7 +52,10 @@ export const conditionSatisfied = (cond, getValue) => {
 export const getConditionDependencies = (cond) =>
   cond?.tests?.map(t => t.field) ?? [];
 
-
+/**
+ * Build AntD rules for a field, including conditional required (x-required-condition),
+ * enum checks, string length, and numeric ranges.
+ */
 export const getValidationRules = (key, schema, requiredFields = [], getValue = () => undefined) => {
   const rules = [];
 
@@ -67,21 +69,23 @@ export const getValidationRules = (key, schema, requiredFields = [], getValue = 
     const cond = parseRequiredCondition(schema["x-required-condition"]);
     if (cond) {
       rules.push({
-        validator: (_, value) => {
+        validator: async (_, value) => {
           const mustHaveValue = conditionSatisfied(cond, (name) => getValue(name));
           if (!mustHaveValue) return Promise.resolve();
 
-          // Enforce non-empty value (handles string/number/array)
           const empty =
             value === undefined ||
             value === null ||
             (typeof value === "string" && value.trim() === "") ||
             (Array.isArray(value) && value.length === 0);
-          return empty
-            ? Promise.reject(new Error(`${key} is required when ${cond.tests.map(t => `${t.field} = ${t.value}`).join(" OR ")}`))
-            : Promise.resolve();
+          if (empty) {
+            throw new Error(
+              `${key} is required when ${cond.tests.map(t => `${t.field} = ${t.value}`).join(" OR ")}`
+            );
+          }
+          return Promise.resolve();
         },
-        // We'll wire dependencies in SchemaField so revalidation runs when drivers change
+        // INTERNAL marker for SchemaField to attach dependencies to Form.Item
         _conditionalDependencies: getConditionDependencies(cond),
       });
     }
@@ -92,7 +96,10 @@ export const getValidationRules = (key, schema, requiredFields = [], getValue = 
     rules.push({
       validator: (_, value) => {
         const isRequired = requiredFields.includes(key);
-        const isEmpty = value === undefined || value === null || value === "";
+        const isEmpty =
+          value === undefined ||
+          value === null ||
+          (typeof value === "string" && value === "");
         if (!isRequired && isEmpty) return Promise.resolve();
 
         return schema.enum.includes(value)
@@ -133,7 +140,6 @@ export const getValidationRules = (key, schema, requiredFields = [], getValue = 
 
   return rules;
 };
-
 
 export const foreignKeyFields = {
   participant: {
