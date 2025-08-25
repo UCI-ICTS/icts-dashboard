@@ -254,6 +254,7 @@ export const fetchTable = createAsyncThunk(
   async (table, thunkAPI) => {
     try {
       const response = await dataService.fetchTable(table);
+      console.log(response)
       const payload = {response: response.data, table}
       return payload
     } catch(error) {

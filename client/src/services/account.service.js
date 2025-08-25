@@ -1,6 +1,6 @@
 // src/services/account.service.js
 
-import api from "../api";
+import api from "../utils/axiosConfig";
 import { message } from "antd";
 
 // Get CSRF token by pinging health check
