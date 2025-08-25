@@ -18,49 +18,31 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const summary = home
-  const summary2 = home2
-  // const [summary, setSummary] = useState();
-  // const README_URL = "https://raw.githubusercontent.com/UCI-ICTS/icts-dashboard/refs/heads/dev/docs/HomePage.MD"
-  // const fetchSummary = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await axios.get(README_URL);
-  //     setSummary(response.data);
-  //     setError(null);
-  //   } catch (err) {
-  //     console.error("Error loading summary:", err);
-  //     setError("Failed to load summary data.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const [summary, setSummary] = useState();
+  const README_URL = "https://raw.githubusercontent.com/UCI-ICTS/icts-dashboard/refs/heads/dev/docs/HomePage.MD"
+  const fetchSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(README_URL);
+      setSummary(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error loading summary:", err);
+      setError("Failed to load summary data.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
-  // useEffect(() => {
-  //   fetchSummary();
-  // }, []);
-
+  useEffect(() => {
+    fetchSummary();
+  }, []);
+  console.log((typeof summary === "string"), (summary instanceof String))
   return (
     <Layout className="fullscreen-bg">
-        <Title level={1} className='site-title'>UCI Institute for Clinical & Translational Science (ICTS) </Title>
+        <Title level={1} className='site-title'>UCI Institute for Clinical & Translational Science </Title>
         <Content className="site-content">
-          <Row className="grid-row">
-            <Card className="primary-card">
-              <ReactMarkdown
-                // Make links open in new tab safely
-                components={{
-                  a: ({ node, ...props }) => (
-                    <a {...props} target="_blank" rel="noopener noreferrer" />
-                  ),
-                  img: ({ node, ...props }) => (
-                    <img {...props} style={{ maxWidth: "100%" }} alt={props.alt || ""} />
-                  ),
-                }}
-              >
-                {summary}
-              </ReactMarkdown>
-            </Card>
-          </Row>
+          
           {/* Resources */}
           <Title level={0} className='site-subtitle'>Resources </Title>
           <Row gutter={[16, 16]} className="cards-equal-row" >
@@ -77,15 +59,12 @@ const HomePage = () => {
                   onClick={()=> navigate("/dashboard")}
                 >
                   <span className="home-card">ICTS Dashboard</span> 
-                  <span className="card-label">by</span> 
+                  <span className="home-card">by</span> 
                   <img
                       src="/health-blue.png"
                       alt="UCI Health logo"
-                      style={{
-                        width: 130,
-                        objectFit: "contain",
-                        display: "inline-block"
-                      }}
+                      className="card-icon"
+                      style={{width: 130}}
                     />
                 </Card>
               </Popover>
@@ -111,11 +90,8 @@ const HomePage = () => {
                     <img
                       src="/GREGoR_Final_Logo.png"
                       alt="GREGoR logo"
-                      style={{
-                        width: 130,
-                        objectFit: "contain",
-                        display: "inline-block"
-                      }}
+                      className="card-icon"
+                      style={{width: 130}}
                     />
                   </Card>
               </Popover>
@@ -138,13 +114,10 @@ const HomePage = () => {
                   <img
                     src="/miaLogo192.png"
                     alt="MIA logo"
-                    style={{
-                      width: 60,
-                      objectFit: "contain",
-                      display: "inline-block"
-                    }}
+                    className="card-icon"
+                    style={{width: 60}}
                   />
-                  <span className="home-card">Medical Information Assistant (MIA)</span>
+                  <span className="home-card">Medical<br/>Information<br/>Assistant (MIA)</span>
                     
                 </Card>
               </Popover>
@@ -166,13 +139,8 @@ const HomePage = () => {
                     <img
                       src="/geneyx-clean.svg"
                       alt="geneyx"
-                      style={{
-                        // width: 130,
-                        height: 70,
-                        background: "black",
-                        objectFit: "contain",
-                        display: "inline-block"
-                      }}
+                      className="card-icon"
+                      style={{height: 70, background: "black"}}
                     />
                     <br/>
                     <span className="home-card">Geneyx</span>
@@ -181,7 +149,11 @@ const HomePage = () => {
             </Col>
           </Row>
         {/* Collabs */}
-          <Title level={0} className='site-subtitle'>Collaborations</Title>
+          <Row gutter={[16, 16]} className="cards-equal-row">
+            <Col span={24}>
+              <Title level={2} className="site-subtitle">Resources</Title>
+            </Col>
+          </Row>
             <Row gutter={[16, 16]} className="cards-equal-row" >
               <Col className="card-col flex-col">
                 <Popover
@@ -201,11 +173,8 @@ const HomePage = () => {
                       <img
                         src="/GREGoR_Final_Logo.png"
                         alt="GREGoR logo"
-                        style={{
-                          width: 130,
-                          objectFit: "contain",
-                          display: "inline-block"
-                        }}
+                        className="card-icon"
+                        style={{width: 130}}
                       />
                     
                   </Card>
@@ -245,39 +214,33 @@ const HomePage = () => {
                     className="primary-card card-fill"
                     onClick={()=> {window.open("https://undiagnosed.hms.harvard.edu/", "_blank")}}
                   >
-                    <span className="home-card">Undiagnosed Diseases Network (UDN)</span>
+                    <span className="home-card">Undiagnosed<br/>Diseases<br/>Network</span>
                     <img
                       src="/udn_logo.png"
                       alt="UDN logo"
-                      style={{
-                        width: 130,
-                        objectFit: "contain",
-                        display: "inline-block"
-                      }}
+                      className="card-icon"
+                      style={{width: 130}}
                     />
                   </Card>
                 </Popover>
               </Col>
             </Row>
             {/* Other Content */}
-            <Row className="grid-row">
+            {summary instanceof String ? (
               <Card className="primary-card">
                 <ReactMarkdown
                   // Make links open in new tab safely
                   components={{
-                    a: ({ node, ...props }) => (
-                      <a {...props} target="_blank" rel="noopener noreferrer" />
-                    ),
-                    img: ({ node, ...props }) => (
-                      <img {...props} style={{ maxWidth: "100%" }} alt={props.alt || ""} />
-                    ),
+                    a: ({ node, ...props }) => (<a {...props} target="_blank" rel="noopener noreferrer" />),
+                    img: ({ node, ...props }) => (<img {...props} style={{ maxWidth: "100%" }} alt={props.alt || ""} />),
                   }}
                 >
-                  {summary2}
+                  {summary}
                 </ReactMarkdown>
               </Card>
-          </Row>
-
+              ) : (
+                <div></div>
+            )}
         </Content>
         <SiteFooter showSwagger={false} showGitHub={false} />
     </Layout>

@@ -66,17 +66,18 @@ def genetic_findings_parser(genetic_findings: dict) -> dict:
         "additional_family_members_with_variant",
         "method_of_discovery",
     ]
-
+    coerce_to_int = ["pos", "pos_end"]
     for key, value in genetic_findings.items():
         if value is None:
             continue
         if isinstance(value, str) and "|" in value:
             genetic_findings[key] = value.split("|")
-        if key == "pos" and genetic_findings[key] != "NA":
+        # if key in int: import pdb; pdb.set_trace()
+        if key in coerce_to_int and genetic_findings[key] != "NA":
             try:
-                genetic_findings["pos"] = float(genetic_findings["pos"])
+                genetic_findings[key] = float(genetic_findings[key])
             except ValueError:
-                genetic_findings["pos"] = "NA"
+                genetic_findings[key] = "NA"
         if (
             key == "allele_balance_or_heteroplasmy_percentage"
             and genetic_findings[key] != "NA"

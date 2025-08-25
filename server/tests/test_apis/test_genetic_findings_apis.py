@@ -18,7 +18,7 @@ class APITestCaseWithAuth(APITestCase):
 
 
 class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
-    def test_create_analyte_api(self):
+    def test_create_genetic_findings_api(self):
         url = "/api/metadata/genetic_findings/create/"
         part1 = {  # Valid submission
             "genetic_findings_id": "10_73792185_GREGoR_test-001-001-0",
@@ -56,7 +56,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "gene_disease_validity": "Curation in progress",
             "public_database_other": "",
             "public_database_ID_other": "",
-            "phenotype_contribution": "",
+            "phenotype_contribution": "Uncertain",
             "partial_contribution_explained": [],
             "method_of_discovery": ["SR-GS"],
             "notes": "",
@@ -98,7 +98,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "gene_disease_validity": "",
             "public_database_other": "",
             "public_database_ID_other": "",
-            "phenotype_contribution": "",
+            "phenotype_contribution": "Uncertain",
             "partial_contribution_explained": [],
             "method_of_discovery": ["SR-GS"],
             "notes": "",
@@ -180,7 +180,10 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
             "experiment_id": [
                 "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
             ],
-            "gene_of_interest": [],
+            "gene_of_interest": ["ME"],
+            "phenotype_contribution": "Uncertain",
+            "linked_variant": "11_64660831_GREGoR_test-004-004-0"
+            
         }
 
         part2 = {  # Invalid submission; missing zygosity
@@ -251,7 +254,7 @@ class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
             "gene_disease_validity": "Curation in progress",
             "public_database_other": "",
             "public_database_ID_other": "",
-            "phenotype_contribution": "",
+            "phenotype_contribution": "Uncertain",
             "partial_contribution_explained": [],
             "method_of_discovery": ["SR-GS"],
             "notes": "",
