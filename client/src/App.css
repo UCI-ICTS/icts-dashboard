@@ -111,8 +111,9 @@ body, html {
 }
 
 .site-subtitle {
-  color: var(--uci-light-gray) !important;
+  color: var(--uci-athletics-gold) !important;
   background: var(--uci-dark-blue);
+  border-radius: 15px;
   font-size: 18pt !important;
   display: flex;
   justify-content: center;
@@ -521,7 +522,6 @@ body, html {
   line-height: 1.2;
 }
 
-/* Emphasised numbers and labels */
 .card-number {
   font-weight: 600;
   font-size: 18px;
@@ -545,6 +545,7 @@ body, html {
 /* Make the Card fill the Col’s height */
 .cards-equal-row .card-fill {
   display: flex;
+  text-align: center;
   flex-direction: column;
   height: 100%;
 }
@@ -552,8 +553,16 @@ body, html {
 /* Optional: ensure body stretches so footer can stick to bottom */
 .cards-equal-row .card-fill .ant-card-body {
   display: flex;
+  justify-content: center;
   flex-direction: column;
   flex: 1;
+}
+
+.card-icon {
+  justify-content: center;
+  object-fit: contain;
+  display: inline-block;
+  margin: 0 auto;
 }
 
 .flex-row {

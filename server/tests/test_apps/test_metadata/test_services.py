@@ -10,7 +10,7 @@ from typing import Dict, Any
 from metadata.models import Participant, Biobank, Analyte
 from experiments.models import Experiment, Aligned
 from metadata.services import (
-    GeneticFindingsSerializer,
+    GeneticFindingsInputSerializer,
     AnalyteSerializer,
     FamilySerializer,
     ParticipantInputSerializer,
@@ -28,6 +28,8 @@ class ServicesTests(TestCase):
                 "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1",
                 "experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1",
             ],
+            "variant_type": ["SNV"],
+            "gene_of_interest": ["PQBP1"],
             "variant_reference_assembly": "GRCh38",
             "chrom": "1",
             "pos": 123456,
@@ -36,7 +38,7 @@ class ServicesTests(TestCase):
             "zygosity": "Homozygous",
             "variant_inheritance": "biparental",
         }
-        serializer = GeneticFindingsSerializer(data=data)
+        serializer = GeneticFindingsInputSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
         self.assertEqual(instance.genetic_findings_id, "GF001")

@@ -22,6 +22,7 @@ from submodels.models import (
     ProbandRelationship,
     BiologicalSex,
     ReportedEthnicity,
+    GREGoRVariantClassification
 )
 
 
@@ -340,6 +341,7 @@ class GeneticFindings(models.Model):
         help_text="ClinGen Allele ID for cross table reference",
     )
     gene_of_interest = models.JSONField(
+        
         default=list,
         blank=True,
         null=True,
@@ -381,6 +383,10 @@ class GeneticFindings(models.Model):
     )
     gene_known_for_phenotype = models.CharField(
         max_length=50,
+        choices=[
+            ("Known","Known"),
+            ("Candidate", "Candidate")
+        ],
         blank=True,
         help_text="Indicate if the gene listed is a candidate or known disease gene",
     )
@@ -401,9 +407,15 @@ class GeneticFindings(models.Model):
     )
     GREGoR_variant_classification = models.CharField(
         max_length=50,
+        choices=GREGoRVariantClassification.choices,
         blank=True,
-        help_text="Clinical significance of variant described to condition listed as determined by the RC's variant curation",
+        help_text=(
+            "Clinical significance of variant described to condition listed as "
+            "determined by the RC's variant curation. "
+            "Currently optional; may be required if gene_known_for_phenotype = Known."
+        ),
     )
+
     GREGoR_ClinVar_SCV = models.CharField(
         max_length=255,
         blank=True,
@@ -425,6 +437,11 @@ class GeneticFindings(models.Model):
         default=list, blank=True, help_text="Public database variant/case ID"
     )
     phenotype_contribution = models.CharField(
+        choices=[
+            ("Partial", "Partial"),
+            ("Full", "Full"),
+            ("Uncertain", "Uncertain")
+        ],
         max_length=50,
         blank=True,
         help_text="Contribution of variant-linked condition to participant's phenotype",
@@ -441,6 +458,7 @@ class GeneticFindings(models.Model):
         help_text="List of related participant IDs carrying the same variant",
     )
     method_of_discovery = models.JSONField(
+        choices=DiscoveryMethod.choices,
         default=list,
         blank=True,
         help_text="The method/assay(s) used to identify the candidate",

@@ -59,6 +59,17 @@ class Zygosity(models.TextChoices):
     MOSAIC = "Mosaic", "Mosaic"
     UNKNOWN = "Unknown", "Unknown"
 
+class GREGoRVariantClassification(models.TextChoices):
+    BENIGN = "Benign", "Benign"
+    LIKELY_BENIGN = "Likely benign", "Likely benign"
+    UNCERTAIN_LOW = "Uncertain significance - low", "Uncertain significance - low"
+    UNCERTAIN_MODERATE = "Uncertain significance - moderate", "Uncertain significance - moderate"
+    UNCERTAIN_HIGH = "Uncertain significance - high", "Uncertain significance - high"
+    UNCERTAIN = "Uncertain significance", "Uncertain significance"
+    LIKELY_PATHOGENIC = "Likely pathogenic", "Likely pathogenic"
+    PATHOGENIC = "Pathogenic", "Pathogenic"
+    CURATION_IN_PROGRESS = "Curation in progress", "Curation in progress"
+    WELL_ESTABLISHED = "Well-established P/LP", "Well-established P/LP"
 
 class VariantInheritance(models.TextChoices):
     DE_NOVO = "de novo", "De Novo"
@@ -68,6 +79,18 @@ class VariantInheritance(models.TextChoices):
     NONMATERNAL = "nonmaternal", "Nonmaternal"
     NONPATERNAL = "nonpaternal", "Nonpaternal"
     UNKNOWN = "unknown", "Unknown"
+
+class ConditionInheritance(models.TextChoices):
+    AUTOSOMAL_RECESSIVE = "Autosomal recessive", "autosomal recessive", 
+    AUTOSOMAL_DOMINANT = "Autosomal dominant", "autosomal dominant", 
+    X_LINKED = "X-linked", "x-linked", 
+    MITOCHONDRIAL = "Mitochondrial", "mitochondrial", 
+    Y_LINKED = "Y-linked", "y-linked", 
+    CONTIGUOUS_GENE_SYNDROM = "Contiguous gene syndrome", "contiguous gene syndrom",
+    SOMATIC_MOSAICISM = "Somatic mosaicism", "somatic mosaicism",
+    DIGENIC = "Digenic", "digenic",
+    OTHER = "Other", "other",
+    UNKNOWN = "Unknown", "unkonwn", 
 
 class GeneDiseaseValidity(models.TextChoices):
     DEFINITIVE = "Definitive", "Definitive"
@@ -89,23 +112,15 @@ class DiscoveryMethod(models.TextChoices):
     KARYOTYPE = "Karyotype", "Karyotype"
     SR_RNA_SEQ = "SR RNA-seq", "Short Read RNA Sequencing"
     LR_RNA_SEQ = "LR RNA-seq", "Long Read RNA Sequencing"
-    SR_ES_REANALYSIS = "SR-ES-reanalysis", "Short Read Exome Sequencing Reanalysis"
-    SR_GS_REANALYSIS = "SR-GS-reanalysis", "Short Read Genome Sequencing Reanalysis"
-    LR_GS_REANALYSIS = "LR-GS-reanalysis", "Long Read Genome Sequencing Reanalysis"
+    SR_ES_REANALYSIS = "SR-ES-reanalysis", "Short Read ES Reanalysis"
+    SR_GS_REANALYSIS = "SR-GS-reanalysis", "Short Read GS Reanalysis"
+    LR_GS_REANALYSIS = "LR-GS-reanalysis", "Long Read GS Reanalysis"
     SNP_ARRAY_REANALYSIS = "SNP array-reanalysis", "SNP Array Reanalysis"
-    OPTICAL_MAPPING_REANALYSIS = (
-        "Optical mapping-reanalysis",
-        "Optical Mapping Reanalysis",
-    )
+    OPTICAL_MAPPING_REANALYSIS = "Optical mapping-reanalysis", "Optical Mapping Reanalysis"
     KARYOTYPE_REANALYSIS = "Karyotype-reanalysis", "Karyotype Reanalysis"
-    SR_RNA_SEQ_REANALYSIS = (
-        "SR RNA-seq-reanalysis",
-        "Short Read RNA Sequencing Reanalysis",
-    )
-    LR_RNA_SEQ_REANALYSIS = (
-        "LR RNA-seq-reanalysis",
-        "Long Read RNA Sequencing Reanalysis",
-    )
+    SR_RNA_SEQ_REANALYSIS = "SR RNA-seq-reanalysis", "Short Read RNA-seq Reanalysis"
+    LR_RNA_SEQ_REANALYSIS = "LR RNA-seq-reanalysis", "Long Read RNA-seq Reanalysis"
+
 
 
 class GregorCenter(models.TextChoices):

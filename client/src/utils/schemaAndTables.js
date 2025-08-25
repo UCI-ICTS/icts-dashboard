@@ -1,26 +1,128 @@
 // src/utils/schemaAndTables.js
 
-export const getValidationRules = (key, schema, requiredFields = []) => {
+/**
+ * Parse values like:
+ *  "CONDITIONAL (gene_known_for_phenotype = Known)"
+ *  "CONDITIONAL (variant_type = SNV, variant_type = INDEL, variant_type = RE)"
+ *  "CONDITIONAL (library_prep_type = custom)"
+ *
+ * Returns { op: 'ANY', tests: [{field, value}, ...] }
+ *   - 'ANY' means any one test may satisfy (OR across comma-separated items)
+ */
+export const parseRequiredCondition = (raw) => {
+  if (!raw || typeof raw !== "string") return null;
+  const m = raw.match(/^CONDITIONAL\s*\((.*)\)\s*$/i);
+  if (!m) return null;
+
+  // Split on commas not inside quotes (simple tokens in our schemas)
+  const parts = m[1].split(",").map(s => s.trim()).filter(Boolean);
+
+  const tests = parts.map(p => {
+    const eq = p.indexOf("=");
+    if (eq === -1) return null;
+    const field = p.slice(0, eq).trim();
+    const value = p.slice(eq + 1).trim();
+    return {
+      field,
+      value: value.replace(/^['"]|['"]$/g, "")
+    };
+  }).filter(Boolean);
+
+  return { op: "ANY", tests };
+};
+
+/**
+ * Determine if the condition is satisfied given current form values.
+ * Supports:
+ *  - string or number fields with equality
+ *  - array fields (condition satisfied if array includes the value)
+ */
+export const conditionSatisfied = (cond, getValue) => {
+  if (!cond || !cond.tests?.length) return false;
+  return cond.tests.some(({ field, value }) => {
+    const v = getValue(field);
+    if (Array.isArray(v)) return v.includes(value);
+    return v === value;
+  });
+};
+
+/**
+ * Which form fields should trigger revalidation for this conditional?
+ */
+export const getConditionDependencies = (cond) =>
+  cond?.tests?.map(t => t.field) ?? [];
+
+/**
+ * Build AntD rules for a field, including conditional required (x-required-condition),
+ * enum checks, string length, and numeric ranges.
+ */
+export const getValidationRules = (key, schema, requiredFields = [], getValue = () => undefined) => {
   const rules = [];
 
+  // Hard required from JSON Schema "required"
   if (requiredFields.includes(key)) {
     rules.push({ required: true, message: `${key} is required` });
   }
 
+  // Conditional required via x-required-condition
+  if (schema["x-required-condition"]) {
+    const cond = parseRequiredCondition(schema["x-required-condition"]);
+    if (cond) {
+      rules.push({
+        validator: async (_, value) => {
+          const mustHaveValue = conditionSatisfied(cond, (name) => getValue(name));
+          if (!mustHaveValue) return Promise.resolve();
+
+          const empty =
+            value === undefined ||
+            value === null ||
+            (typeof value === "string" && value.trim() === "") ||
+            (Array.isArray(value) && value.length === 0);
+          if (empty) {
+            throw new Error(
+              `${key} is required when ${cond.tests.map(t => `${t.field} = ${t.value}`).join(" OR ")}`
+            );
+          }
+          return Promise.resolve();
+        },
+        // INTERNAL marker for SchemaField to attach dependencies to Form.Item
+        _conditionalDependencies: getConditionDependencies(cond),
+      });
+    }
+  }
+
+  // Enum check (supports string or array of enums)
   if (schema.enum) {
     rules.push({
       validator: (_, value) => {
         const isRequired = requiredFields.includes(key);
-        if (!isRequired && (value === undefined || value === null || value === "")) {
-          return Promise.resolve();
-        };
+        const isEmpty =
+          value === undefined ||
+          value === null ||
+          (typeof value === "string" && value === "");
+        if (!isRequired && isEmpty) return Promise.resolve();
+
         return schema.enum.includes(value)
           ? Promise.resolve()
           : Promise.reject(new Error(`${key} must be one of: ${schema.enum.join(", ")}`));
       },
     });
+  } else if (schema.type === "array" && schema.items?.enum) {
+    rules.push({
+      validator: (_, value) => {
+        if (value == null) return Promise.resolve(); // handled by required rule if needed
+        if (!Array.isArray(value)) {
+          return Promise.reject(new Error(`${key} must be a list`));
+        }
+        const bad = value.filter(v => !schema.items.enum.includes(v));
+        return bad.length
+          ? Promise.reject(new Error(`${key} contains invalid value(s): ${bad.join(", ")}. Allowed: ${schema.items.enum.join(", ")}`))
+          : Promise.resolve();
+      },
+    });
   }
 
+  // String length
   if (schema.type === "string") {
     if (schema.minLength)
       rules.push({ min: schema.minLength, message: `${key} must be at least ${schema.minLength} characters` });
@@ -28,6 +130,7 @@ export const getValidationRules = (key, schema, requiredFields = []) => {
       rules.push({ max: schema.maxLength, message: `${key} must be at most ${schema.maxLength} characters` });
   }
 
+  // Numeric range
   if (schema.type === "number" || schema.type === "integer") {
     if (schema.minimum !== undefined)
       rules.push({ type: "number", min: schema.minimum, message: `${key} must be at least ${schema.minimum}` });
