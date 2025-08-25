@@ -10,11 +10,22 @@ import errorService from "../services/error.service";
 
 const { Option } = Select;
 
-const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName  }) => {
+const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
   const listContainerRef = useRef(null);
-  const foreignMap = foreignKeyFields?.[tableName]?.[keyName]
-  const rules = getValidationRules(keyName, schema, requiredFields);
+  // Foreign-key mapping (expect: { sourceTable, apiKey, valueKey, labelKey? })
+  const foreignMap = foreignKeyFields?.[tableName]?.[keyName];
+
+  const rules = useMemo(
+    () => getValidationRules(keyName, schema, requiredFields, form.getFieldValue),
+    [keyName, schema, requiredFields, form]
+  );
+
+  // Collect conditional dependencies from rules
+  const deps = useMemo(
+    () => rules.flatMap(r => r?._conditionalDependencies ?? []),
+    [rules]
+  );
 
   const label = (
     <span>
@@ -27,14 +38,12 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     </span>
   );
 
- const sourceTable = foreignMap?.sourceTable;
-
+  // ---------- Foreign Key handling ----------
+  const sourceTable = foreignMap?.sourceTable;
   const rawData = useSelector(state =>
     sourceTable ? state.data[sourceTable] : undefined
   );
-
   const foreignData = useMemo(() => rawData || [], [rawData]);
-
 
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
@@ -42,13 +51,19 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
   }, [dispatch, foreignMap, foreignData]);
 
-
   if (foreignMap) {
-    const { valueKey, apiKey } = foreignMap;
+    // support labelKey for display; fallback to apiKey for backward-compat
+    const { valueKey, apiKey, labelKey = apiKey } = foreignMap;
 
     if (schema.type === "array") {
       return (
-        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
           <Select
             mode="multiple"
             showSearch
@@ -60,9 +75,9 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
               <Select.Option
                 key={item[valueKey]}
                 value={item[valueKey]}
-                label={item[valueKey]}
+                label={item[labelKey]}
               >
-                {item[apiKey]}
+                {item[labelKey]}
               </Select.Option>
             ))}
           </Select>
@@ -71,15 +86,21 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
 
     return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
         <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
           {foreignData.map((item) => (
             <Select.Option
               key={item[valueKey]}
               value={item[valueKey]}
-              label={item[valueKey]}
+              label={item[labelKey]}
             >
-              {item[apiKey]}
+              {item[labelKey]}
             </Select.Option>
           ))}
         </Select>
@@ -87,13 +108,20 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     );
   }
 
+  // ---------- Enums with special mapping ----------
   if (schema.enum) {
     if (keyName === "specimen_type") {
       return (
-        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-          <Select disabled={readOnly}>
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
             {schema.enum.map((option) => (
-              <Option key={option} value={option} disabled={readOnly}>
+              <Option key={option} value={option} label={`${option}; ${specimenType[option]}`}>
                 {option}; {specimenType[option]}
               </Option>
             ))}
@@ -101,15 +129,19 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
-  }
 
-  if (schema.enum) {
     if (keyName === "onset_age_range") {
       return (
-        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-          <Select disabled={readOnly}>
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
             {schema.enum.map((option) => (
-              <Option key={option} value={option} disabled={readOnly}>
+              <Option key={option} value={option} label={`${option}; ${onsetAgeRange[option]}`}>
                 {option}; {onsetAgeRange[option]}
               </Option>
             ))}
@@ -119,10 +151,16 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
 
     return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Select disabled={readOnly}>
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
+        <Select disabled={readOnly} showSearch allowClear>
           {schema.enum.map((option) => (
-            <Option key={option} value={option} >
+            <Option key={option} value={option}>
               {option}
             </Option>
           ))}
@@ -131,24 +169,41 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     );
   }
 
+  // ---------- Primitives ----------
   if (schema.type === "string") {
     if (keyName === `${tableName}_id` && !readOnly) {
       return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Input disabled={true}/>
-      </Form.Item>
-      )
-    }
-    else if (tableName === "phenotype" && keyName === "phenotype_id") {
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Input disabled={!addEntry}/>
+        </Form.Item>
+      );
+    } else if (tableName === "phenotype" && keyName === "phenotype_id") {
       return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-        <Input disabled={true}/>
-      </Form.Item>
-      )
-    }
-    else {
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Input disabled={true}/>
+        </Form.Item>
+      );
+    } else {
       return (
-        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
           <Input disabled={readOnly}/>
         </Form.Item>
       );
@@ -157,7 +212,13 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   if (schema.type === "number" || schema.type === "integer") {
     return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
         <InputNumber style={{ width: "100%" }} disabled={readOnly} />
       </Form.Item>
     );
@@ -165,18 +226,33 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   if (schema.type === "boolean") {
     return (
-      <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        // Switch needs valuePropName="checked" to bind boolean
+        valuePropName="checked"
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
         <Switch checkedChildren="Yes" unCheckedChildren="No" disabled={readOnly} />
       </Form.Item>
     );
   }
 
+  // ---------- Arrays ----------
   if (schema.type === "array") {
     if (schema.items?.enum) {
-      // Render enum-based array as multi-select
+      // enum-based array as multi-select
       return (
-        <Form.Item key={keyName} name={keyName} label={label} rules={rules}>
-          <Select disabled={readOnly} mode="multiple">
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Select disabled={readOnly} mode="multiple" showSearch allowClear>
             {schema.items.enum.map((option) => (
               <Option key={option} value={option}>
                 {option}
@@ -187,58 +263,61 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
       );
     }
 
-    // Render free-form text input array using Form.List
+    // Free-form text array via Form.List
+    // wrap in a dependency-aware noStyle Item so conditional rules re-run when drivers change
     return (
-  <Form.Item key={keyName} label={label}>
-    <div ref={listContainerRef}>
-      <Form.List name={keyName} rules={rules}>
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, ...restField }) => (
-              <Form.Item
-                key={key}
-                {...restField}
-                name={name}
-                rules={[{ required: true, message: "Field cannot be empty. Delete the entry or add a value." }]}
-              >
-                <Input
-                  disabled={readOnly}
-                  placeholder="Enter value"
-                  addonAfter={
-                    !readOnly && (
-                      <MinusCircleOutlined onClick={() => remove(name)} />
-                    )
-                  }
-                />
-              </Form.Item>
-            ))}
+      <Form.Item key={keyName} label={label}>
+        <Form.Item noStyle dependencies={deps}>
+          {() => (
+            <div ref={listContainerRef}>
+              <Form.List name={keyName} rules={rules.map(({ _conditionalDependencies, ...r }) => r)}>
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Form.Item
+                        key={key}
+                        {...restField}
+                        name={name}
+                        rules={[{ required: true, message: "Field cannot be empty. Delete the entry or add a value." }]}
+                      >
+                        <Input
+                          disabled={readOnly}
+                          placeholder="Enter value"
+                          addonAfter={
+                            !readOnly && (
+                              <MinusCircleOutlined onClick={() => remove(name)} />
+                            )
+                          }
+                        />
+                      </Form.Item>
+                    ))}
 
-            {!readOnly && (
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    add();
-                    // focus the newest input after it's rendered
-                    setTimeout(() => {
-                      const inputs = listContainerRef.current?.querySelectorAll('input');
-                      if (inputs?.length) inputs[inputs.length - 1].focus();
-                    }, 0);
-                  }}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  Add item
-                </Button>
-              </Form.Item>
-            )}
-          </>
-        )}
-      </Form.List>
-    </div>
-  </Form.Item>
-);
-
+                    {!readOnly && (
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          onClick={() => {
+                            add();
+                            setTimeout(() => {
+                              const inputs = listContainerRef.current?.querySelectorAll('input');
+                              if (inputs?.length) inputs[inputs.length - 1].focus();
+                            }, 0);
+                          }}
+                          block
+                          icon={<PlusOutlined />}
+                        >
+                          Add item
+                        </Button>
+                      </Form.Item>
+                    )}
+                  </>
+                )}
+              </Form.List>
+            </div>
+          )}
+        </Form.Item>
+      </Form.Item>
+    );
   }
 
   return null;
@@ -251,12 +330,12 @@ const SchemaForm = ({
   isAdmin = false,
   initialValues,
   onClose,
+  addEntry,
 }) => {
   const dispatch = useDispatch();
   const [editMode, setEditMode] = useState(false);
   const requiredFields = schema.required || [];
   const table = schema.title;
-
   const [internalForm] = Form.useForm();
   const formInstance = form ?? internalForm;
 
@@ -303,12 +382,11 @@ const SchemaForm = ({
         ? updateEntry({ table, data: [normalized] })
         : createEntry({ table, data: [normalized] });
 
-      await dispatch(action).unwrap();  // throws on error
+      await dispatch(action).unwrap();
       formInstance.resetFields();
       onClose?.();
     } catch (error) {
       console.error("Error submitting form:", error);
-      message.error("Save failed");
     }
   };
 
@@ -320,8 +398,8 @@ const SchemaForm = ({
 
   return (
     <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-        <span style={{ marginRight: 8 }}>Edit Mode</span>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
+        <span>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
@@ -343,6 +421,7 @@ const SchemaForm = ({
           form={formInstance}
           readOnly={!editMode}
           tableName={schema.title}
+          addEntry={addEntry}
         />
       ))}
 

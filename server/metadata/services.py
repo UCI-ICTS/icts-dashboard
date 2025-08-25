@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # metadata/servces.py
 
+import re
 from django.db import transaction, IntegrityError
+from django.db.models import Q
+from django.forms.models import model_to_dict
 from rest_framework import serializers
 from config.selectors import (
     remove_na,
@@ -30,14 +33,18 @@ from metadata.selectors import (
     biobank_parser,
 )
 
-from submodels.models import ReportedRace
+from submodels.models import (
+    ReportedRace,
+    VariantType,
+    VariantInheritance,
+    ConditionInheritance,
+    GREGoRVariantClassification,
+    GeneDiseaseValidity,
+    DiscoveryMethod
+)
 
-
-class GeneticFindingsSerializer(serializers.ModelSerializer):
+class GeneticFindingsInputSerializer(serializers.ModelSerializer):
     """
-    1. Pop the ManyToMany field from validated_data
-    2. Create/update the main instance with the remaining fields
-    3. Use .set() to assign the ManyToMany relation
     """
 
     additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(
@@ -53,19 +60,151 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneticFindings
         fields = "__all__"
+    
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+        
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+    
 
-    def validate_experiment_id(self, exp_list):
-        if not isinstance(exp_list, list):
-            raise serializers.ValidationError("Must be a list")
-        for exp in exp_list:
-            try:
-                Experiment.objects.get(pk=exp)
-            except Experiment.DoesNotExist as err:
-                raise serializers.ValidationError(
-                    f"experiment_id {exp} does not exist."
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+        valid_condition_inheritance = [choice[0] for choice in ConditionInheritance.choices]
+        valid_GREGoR_variant_classification = [choice[0] for choice in GREGoRVariantClassification.choices]
+        valid_gene_disease_validity = [choice[0] for choice in  GeneDiseaseValidity.choices]
+        valid_method_of_discovery = [choice[0] for choice in  DiscoveryMethod.choices]
+
+        variant_types = set(data.get("variant_type") or [])
+        experiment_ids = set(data.get("experiment_id" or []))
+        
+        if not isinstance(data.get("variant_type"), list):
+            errors.setdefault("variant_type", []).append("variant_types must be a list")
+        if not isinstance(data.get("experiment_id"), list):
+            errors.setdefault("experiment_id", []).append("experiment_id must be a list")
+        
+        missing_experiment_ids = [e for e in experiment_ids if not Experiment.objects.filter(pk=e).exists()]
+        if missing_experiment_ids:
+            errors.setdefault("experiment_id", []).append(
+                f"experiment_id not found: {', '.join(map(str, missing_experiment_ids))}"
+            )
+
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+    
+        # Required ref/alt for SNV/INDEL/RE
+        if variant_types & {"SNV", "INDEL", "RE"}:
+            if not data.get("ref"):
+                errors.setdefault("ref", []).append(
+                    "ref is required for SNV/INDEL/RE"
+                )
+            if not data.get("alt"):
+                errors.setdefault("alt", []).append(
+                    "alt is required for SNV/INDEL/RE"
+                )
+        # Require gene_of_interest for small variants
+        if variant_types & {"SNV", "INDEL", "RE"} and not (data.get("gene_of_interest")):
+            errors.setdefault("gene_of_interest", []).append(
+                "gene_of_interest is required for SNV/INDEL/RE"
+            )
+
+        # candidate/known phenotype logic
+        gene_known_for_phenotype = (data.get("gene_known_for_phenotype") or "").strip().lower()
+        phenotype_contribution = data.get("phenotype_contribution") or ""
+        if gene_known_for_phenotype == "candidate" and phenotype_contribution != "Uncertain":
+            errors.setdefault("phenotype_contribution", []).append(
+                "If 'gene_known_for_phenotype' is 'Candidate, 'phenotype_contribution' must be 'Uncertain'"
+            )
+        
+        if gene_known_for_phenotype == "known":
+            # require known_condition_name
+            if not (data.get("known_condition_name") or "").strip():
+                errors.setdefault("known_condition_name", []).append(
+                    "known_condition_name is required for a known gene/phenotype."
+                )
+            
+            # condition_id must be `OMIM:` or `MONDO:`
+            condition_id = (data.get("condition_id") or "").strip()
+
+            if condition_id and not re.match(r"^(OMIM|MONDO):\S+$", condition_id):
+                errors.setdefault("condition_id", []).append(f"{condition_id} must be OMIM:... or MONDO:...")
+            
+            # if known gene_known_for_phenotype then valid_condition_inheritance is required
+            condition_inheritance = data.get("condition_inheritance")
+            if not condition_inheritance:
+                errors.setdefault("condition_inheritance", []).append(
+                    "If `gene_known_for_phenotype` is known then condition_inheritance is required and cannot be empty"
+                )
+            else:
+                bad_condition_inheritance = [v for v in (data["condition_inheritance"] or []) if v not in valid_condition_inheritance]
+                if bad_condition_inheritance:
+                    errors.setdefault("condition_inheritance", []).append(
+                        f"invalid: {bad_condition_inheritance} (valid: {', '.join(sorted(valid_condition_inheritance))})"
+                    )
+            # if known gene_known_for_phenotype then valid_GREGoR_variant_classification is required
+            GREGoR_variant_classification = data.get("GREGoR_variant_classification")
+            if not GREGoR_variant_classification:
+                errors.setdefault("GREGoR_variant_classification", []).append(
+                    "If `gene_known_for_phenotype` is known then GREGoR_variant_classification is required and cannot be empty"
+                )
+            if data.get("GREGoR_variant_classification") and data["GREGoR_variant_classification"] not in valid_GREGoR_variant_classification:
+                errors.setdefault("GREGoR_variant_classification", []).append(
+                    f"invalid (valid: {', '.join(sorted(valid_GREGoR_variant_classification))})"
                 )
 
-        return exp_list
+            # if known gene_known_for_phenotype then gene_disease_validity is required
+            gene_disease_validity = data.get("gene_disease_validity")
+            if not gene_disease_validity:
+                errors.setdefault("gene_disease_validity", []).append(
+                    "If `gene_known_for_phenotype` is known then gene_disease_validity is required and cannot be empty"
+                )
+            if data.get("gene_disease_validity") and data["gene_disease_validity"] not in valid_gene_disease_validity:
+                errors.setdefault("gene_disease_validity", []).append(
+                    f"invalid (valid: {', '.join(sorted(valid_gene_disease_validity))})"
+                )
+
+        # check for linked_variant existance
+        linked_variant = data.get("linked_variant")
+        if linked_variant and not GeneticFindings.objects.filter(pk=linked_variant).exists():
+            errors.setdefault("linked_variant", []).append(
+                f"'linked_variant' {linked_variant} does not match any 'genetic_findings_id'"
+            )
+        
+        # partial_contribution_explained terms must be valid HPO in phenotype table
+        partial_contribution_explained = data.get("partial_contribution_explained") or []
+        if partial_contribution_explained and isinstance(partial_contribution_explained, list):
+            missing = [p for p in partial_contribution_explained if not Phenotype.objects.filter(term_id=p).exists()]
+            if missing:
+                errors.setdefault("partial_contribution_explained", []).append(
+                    f"unknown HPO terms: {', '.join(missing)}"
+                )
+        # method_of_discovery should be a list
+        method_of_discovery = data.get("method_of_discovery")
+        if method_of_discovery:
+            if not isinstance(method_of_discovery, list):
+                errors.setdefault("method_of_discovery", []).append("method_of_discovery must be a list")
+            bad_method_of_discovery = [x for x in method_of_discovery if x not in valid_method_of_discovery]
+            if bad_method_of_discovery:
+                f"invalid: {bad_method_of_discovery} (valid: {', '.join(sorted(valid_method_of_discovery))})"
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+    
 
     def create(self, validated_data):
         """
@@ -82,6 +221,7 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
         genetic_findings_instance.save()
         return genetic_findings_instance
 
+
     def update(self, instance, validated_data):
         """
         Update each attribute of the instance with validated data
@@ -96,9 +236,28 @@ class GeneticFindingsSerializer(serializers.ModelSerializer):
             instance.additional_family_members_with_variant.set(
                 additional_family_members
             )
-        instance.save()
+        # instance.save()
 
         return instance
+
+
+class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
+    # declare JSON fields explicitly (no encoder kw)
+    experiment_id = serializers.ListField(child=serializers.CharField(), default=list)
+    variant_type = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+    gene_of_interest = serializers.ListField(child=serializers.CharField(), default=list, allow_null=True)
+    condition_inheritance = serializers.ListField(child=serializers.CharField(), default=list, allow_empty=True)
+    method_of_discovery = serializers.ListField(child=serializers.CharField(), default=list, allow_empty=True)
+
+    # ManyToMany: read-only on the output serializer
+    additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = GeneticFindings
+        fields = "__all__"
 
 
 class AnalyteSerializer(serializers.ModelSerializer):
@@ -398,8 +557,8 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
             "output_serializer": FamilySerializer,
         },
         "genetic_findings": {
-            "input_serializer": GeneticFindingsSerializer,
-            "output_serializer": GeneticFindingsSerializer,
+            "input_serializer": GeneticFindingsInputSerializer,
+            "output_serializer": GeneticFindingsOutputSerializer,
             "parsed_data": lambda datum: genetic_findings_parser(
                 genetic_findings=datum
             ),
@@ -494,8 +653,8 @@ def update_metadata_entry(
             "output_serializer": FamilySerializer,
         },
         "genetic_findings": {
-            "input_serializer": GeneticFindingsSerializer,
-            "output_serializer": GeneticFindingsSerializer,
+            "input_serializer": GeneticFindingsInputSerializer,
+            "output_serializer": GeneticFindingsOutputSerializer,
             "parsed_data": lambda datum: genetic_findings_parser(
                 genetic_findings=datum
             ),
@@ -538,13 +697,11 @@ def update_metadata_entry(
             old_data=output_serializer(model_instance).data,
             new_data=datum,
         )
-        # import pdb; pdb.set_trace()
+
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
             updated_instance = serializer.save()
-
-            # import pdb; pdb.set_trace()
 
             message = (
                 f"{table_name} {identifier} updated."
@@ -566,7 +723,6 @@ def update_metadata_entry(
                 ),
                 "accepted_request",
             )
-
         else:
             error_data = [{item: serializer.errors[item]} for item in serializer.errors]
             return (

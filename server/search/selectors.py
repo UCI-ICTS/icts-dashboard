@@ -29,7 +29,8 @@ from metadata.services import (
     AnalyteSerializer,
     BiobankSerializer,
     FamilySerializer,
-    GeneticFindingsSerializer,
+    GeneticFindingsInputSerializer,
+    GeneticFindingsOutputSerializer,
     ParticipantOutputSerializer,
     PhenotypeSerializer,
 )
@@ -167,7 +168,7 @@ def get_all_tables():
     serialized_phenotypes = PhenotypeSerializer(
         Phenotype.objects.all(), many=True
     )
-    serialized_genetic_findings = GeneticFindingsSerializer(
+    serialized_genetic_findings = GeneticFindingsOutputSerializer(
         GeneticFindings.objects.all(), many=True
     )
     serialized_biobank_entries = BiobankSerializer(
@@ -436,7 +437,7 @@ def get_family_detail(participant_id:str) -> dict:
         serialized_participant = ParticipantOutputSerializer(participant)
         serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True) 
         serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
-        serialized_genetic_findings = GeneticFindingsSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
+        serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
         experiments = Experiment.objects.filter(participant_id=participant)
         serialized_sequencing = []
         for exp in experiments:
@@ -450,7 +451,6 @@ def get_family_detail(participant_id:str) -> dict:
         serialized_alignments = []
         # import pdb;pdb.set_trace()
         for aln in aligned:
-            print(aln.table_name)
             model = table_serializers[aln.table_name]["model"]
             serializer = table_serializers[aln.table_name]["output_serializer"]
             alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
