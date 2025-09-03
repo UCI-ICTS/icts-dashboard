@@ -236,7 +236,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             instance.additional_family_members_with_variant.set(
                 additional_family_members
             )
-        # instance.save()
+        instance.save()
 
         return instance
 
@@ -702,7 +702,6 @@ def update_metadata_entry(
 
         if serializer.is_valid():
             updated_instance = serializer.save()
-
             message = (
                 f"{table_name} {identifier} updated."
                 if changes
