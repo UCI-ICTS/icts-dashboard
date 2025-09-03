@@ -1,8 +1,5 @@
 // src/services/error.service.js
 
-
-const APIDB = process.env.REACT_APP_APIDB;
-
 const printErrorMessages = (error) => {
   let errorMessage = "";
 
@@ -11,9 +8,13 @@ const printErrorMessages = (error) => {
   if (error.name === "AxiosError"){
     if (error.response) {
       // Check if there's a top-level errorMessage.
-      if (error.response.message) { errorMessage = error.response.message; }
-      // Otherwise, if error.response.data is an array and has at least one element:
-      else if (
+      if (error.response.status === 401) {
+        console.log("Token not valid");
+        errorMessage = "Token is not valid. Please log in again."
+      }
+      if (error.response.message) {
+        errorMessage = error.response.message; 
+      } else if ( // Otherwise, if error.response.data is an array and has at least one element:
         error.response.data &&
         Array.isArray(error.response.data) &&
         error.response.data.length > 0
