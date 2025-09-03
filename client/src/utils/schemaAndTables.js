@@ -112,8 +112,16 @@ export const getValidationRules = (key, schema, requiredFields = [], getValue = 
       validator: (_, value) => {
         if (value == null) return Promise.resolve(); // handled by required rule if needed
         if (!Array.isArray(value)) {
-          return Promise.reject(new Error(`${key} must be a list`));
+          // Try to coerce string to array
+          if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if (trimmed === '') return Promise.resolve();
+            value = trimmed.split('|').map(s => s.trim());
+          } else {
+            return Promise.reject(new Error(`${key} must be a list`));
+          }
         }
+
         const bad = value.filter(v => !schema.items.enum.includes(v));
         return bad.length
           ? Promise.reject(new Error(`${key} contains invalid value(s): ${bad.join(", ")}. Allowed: ${schema.items.enum.join(", ")}`))

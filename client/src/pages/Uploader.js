@@ -20,7 +20,7 @@ export const Uploader = () => {
   const { tableView, tableID } = useSelector(state => state.data);
   const tableName = getCollectionName(tableView)
   const tableData = useSelector(state => state.data[tableView])
-  const initialRows = jsonData?.slice(1) || [];
+  const initialRows = jsonData || [];
   const schema = schemas[tableView] || { properties: {} };
   const defaultHeaders = Object.keys(schema.properties || {});
   const [form] = Form.useForm();
@@ -30,7 +30,6 @@ export const Uploader = () => {
   const handleChange = (value) => {
     const selectedTable = TABLE_MAPPING.find((table) => table.schema === value);
     if (selectedTable) {
-        console.log(selectedTable)
       dispatch(setTableView(selectedTable));
     }
   };
@@ -45,7 +44,14 @@ export const Uploader = () => {
       setIsLoading(false);
       return;
     }
-    dispatch(setJsonData(sheet));
+
+      // Add key if needed for Ant Design Table
+    const sheetWithKeys = sheet.map((row, index) => ({
+      key: row.phenotype_id || index,  // fallback to index if missing
+      ...row,
+    }));
+
+    dispatch(setJsonData(sheetWithKeys));
   };
 
   const handleClear = () => {
@@ -121,7 +127,7 @@ export const Uploader = () => {
 
   useEffect(() => {
     if (jsonData) {
-      form.setFieldsValue({ rows: jsonData.slice(1) });
+      form.setFieldsValue({ rows: jsonData });
 
       const timeout = setTimeout(() => {
         form.validateFields()
