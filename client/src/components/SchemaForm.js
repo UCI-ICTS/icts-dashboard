@@ -10,6 +10,9 @@ import errorService from "../services/error.service";
 
 const { Option } = Select;
 
+const defaultFilterOption = (input, option) =>
+  (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
   const listContainerRef = useRef(null);
@@ -52,10 +55,15 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   }, [dispatch, foreignMap, foreignData]);
 
   if (foreignMap) {
-    // support labelKey for display; fallback to apiKey for backward-compat
     const { valueKey, apiKey, labelKey = apiKey } = foreignMap;
 
+    const foreignOptions = (foreignData || []).map(item => ({
+      value: item[valueKey],
+      label: String(item[labelKey] ?? item[valueKey] ?? ""),
+    }));
+
     if (schema.type === "array") {
+      // multi-select
       return (
         <Form.Item
           key={keyName}
@@ -68,23 +76,16 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             mode="multiple"
             showSearch
             allowClear
-            optionFilterProp="label"
             disabled={readOnly}
-          >
-            {foreignData.map((item) => (
-              <Select.Option
-                key={item[valueKey]}
-                value={item[valueKey]}
-                label={item[labelKey]}
-              >
-                {item[labelKey]}
-              </Select.Option>
-            ))}
-          </Select>
+            optionFilterProp="label"
+            filterOption={defaultFilterOption}
+            options={foreignOptions}
+          />
         </Form.Item>
       );
     }
 
+    // single-select
     return (
       <Form.Item
         key={keyName}
@@ -93,24 +94,23 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
-          {foreignData.map((item) => (
-            <Select.Option
-              key={item[valueKey]}
-              value={item[valueKey]}
-              label={item[labelKey]}
-            >
-              {item[labelKey]}
-            </Select.Option>
-          ))}
-        </Select>
+        <Select
+          showSearch
+          allowClear
+          disabled={readOnly}
+          optionFilterProp="label"
+          filterOption={defaultFilterOption}
+          options={foreignOptions}
+        />
       </Form.Item>
     );
   }
 
-  // ---------- Enums with special mapping ----------
+  // ---------- Enums ----------
   if (schema.enum) {
-    if (keyName === "specimen_type") {
+    // special enums handled below; otherwise the generic enum select:
+    if (keyName !== "onset_age_range" && keyName !== "specimen_type") {
+      const options = schema.enum.map(opt => ({ value: opt, label: String(opt) }));
       return (
         <Form.Item
           key={keyName}
@@ -119,37 +119,25 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           dependencies={deps}
           rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
         >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
-            {schema.enum.map((option) => (
-              <Option key={option} value={option} label={`${option}; ${specimenType[option]}`}>
-                {option}; {specimenType[option]}
-              </Option>
-            ))}
-          </Select>
+          <Select
+            disabled={readOnly}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            filterOption={defaultFilterOption}
+            options={options}
+          />
         </Form.Item>
       );
     }
+  }
 
-    if (keyName === "onset_age_range") {
-      return (
-        <Form.Item
-          key={keyName}
-          name={keyName}
-          label={label}
-          dependencies={deps}
-          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
-        >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
-            {schema.enum.map((option) => (
-              <Option key={option} value={option} label={`${option}; ${onsetAgeRange[option]}`}>
-                {option}; {onsetAgeRange[option]}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-      );
-    }
-
+// ---------- Enums with special mapping ----------
+  if (schema.enum && keyName === "onset_age_range") {
+    const options = schema.enum.map(opt => ({
+      value: opt,
+      label: `${opt}; ${onsetAgeRange[opt]}`,
+    }));
     return (
       <Form.Item
         key={keyName}
@@ -158,13 +146,62 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <Select disabled={readOnly} showSearch allowClear>
-          {schema.enum.map((option) => (
-            <Option key={option} value={option}>
-              {option}
-            </Option>
-          ))}
-        </Select>
+        <Select
+          disabled={readOnly}
+          showSearch
+          allowClear
+          optionFilterProp="label"
+          filterOption={defaultFilterOption}
+          options={options}
+        />
+      </Form.Item>
+    );
+  }
+  if (schema.enum && keyName === "specimen_type") {
+    const options = schema.enum.map(opt => ({
+      value: opt,
+      label: `${opt}; ${specimenType[opt]}`,
+    }));
+    return (
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
+        <Select
+          disabled={readOnly}
+          showSearch
+          allowClear
+          optionFilterProp="label"
+          filterOption={defaultFilterOption}
+          options={options}
+        />
+      </Form.Item>
+    );
+  }
+
+  // ---------- List of Enums ----------
+  if (schema.type === "array" && schema.items?.enum) {
+    const options = schema.items.enum.map(opt => ({ value: opt, label: String(opt) }));
+    return (
+      <Form.Item
+        key={keyName}
+        name={keyName}
+        label={label}
+        dependencies={deps}
+        rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+      >
+        <Select
+          mode="multiple"
+          disabled={readOnly}
+          showSearch
+          allowClear
+          optionFilterProp="label"
+          filterOption={defaultFilterOption}
+          options={options}
+        />
       </Form.Item>
     );
   }
