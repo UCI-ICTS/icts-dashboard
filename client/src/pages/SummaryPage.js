@@ -24,7 +24,7 @@ const SummaryPage = () => {
   const fetchSummary = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${APIDB}/api/search/summary/`);
+      const response = await axios.get(`${APIDB}api/search/summary/`);
       setSummary(response.data);
       setError(null);
     } catch (err) {

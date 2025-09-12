@@ -236,7 +236,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             instance.additional_family_members_with_variant.set(
                 additional_family_members
             )
-        # instance.save()
+        instance.save()
 
         return instance
 
