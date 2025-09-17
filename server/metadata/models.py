@@ -341,7 +341,7 @@ class GeneticFindings(models.Model):
         help_text="ClinGen Allele ID for cross table reference",
     )
     gene_of_interest = models.JSONField(
-        
+
         default=list,
         blank=True,
         null=True,
@@ -615,6 +615,12 @@ class Biobank(models.Model):
         on_delete=models.PROTECT,
         related_name="biobank_samples",
         help_text="Participant associated with the sample",
+    )
+    collection_source = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Name of institution who collected the biosample",
     )
     received_date = models.DateField(
         blank=True, null=True, help_text="Date when the biosample was created"
