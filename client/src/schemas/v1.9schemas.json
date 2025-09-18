@@ -2728,6 +2728,10 @@
                 "type": "string",
                 "description": "printed on tube, automatically reference with participant table"
             },
+            "collection_source": {
+                "type": "string",
+                "description": "Name of institution who collected the biosample"
+            },
             "received_date": {
                 "type": "string",
                 "description": "8-digit date as MM/DD/YYYY, printed on tube"
