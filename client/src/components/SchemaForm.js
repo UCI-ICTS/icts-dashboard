@@ -2,13 +2,17 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message } from "antd";
+import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, freezerId } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 
 const { Option } = Select;
+
+const onChange = (date, dateString) => {
+  console.log(date, dateString);
+};
 
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
@@ -195,7 +199,38 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           <Input disabled={true}/>
         </Form.Item>
       );
-    } else {
+    } else if (keyName === "received_date") {
+      return (
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <DatePicker onChange={onChange} disabled={readOnly} />
+        </Form.Item>
+      )
+    } /* else if (tableName === "biobank" && keyName === "freezer_id") {
+      console.log(freezerId)
+      return (
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+        >
+          <Select disabled={readOnly} mode="multiple" showSearch allowClear>
+            {freezerId.enum.map((option) => (
+              <Option key={option} value={option}>
+                {option}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      )
+    } */ else {
       return (
         <Form.Item
           key={keyName}

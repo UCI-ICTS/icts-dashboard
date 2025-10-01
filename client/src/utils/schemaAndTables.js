@@ -341,6 +341,18 @@ export const specimenType = {
   "XR": "Extracted RNA"
 }
 
+export const freezerId = {
+  "Banana": "Thermo Scientific TSV20RPSA +4C (next to lab door)",
+  "Pom Pom Purin": "Kenmore +4C (next to office)",
+  "Dalgona": "PHCBI MDF-U731M-PA -20C (right-most -20C)",
+  "Bruno Mars": "-20C",
+  "Appa": "-20C",
+  "Eevee": "Kenmore -20C (left-most -20C)",
+  "Hatsune Miku": "Striling Ultracold -80C (right-side -80C)",
+  "Lebron James": "Stirling Ultracold -80C (left-side -80C)",
+  "Boris Yeltsin": "LN2 dewer (next to office)"
+}
+
 export const TABLE_MAPPING = [
   { name: "Participants", schema: "participants", identifier: "participant_id" },
   { name: "Families", schema: "families", identifier: "family_id" },
@@ -374,7 +386,7 @@ export const getCollectionName = (schema) => {
  * @returns {string|null} Schema key
  */
 export const getTableName = (collectionName) => {
-  const entry = TABLE_MAPPING.find(item => 
+  const entry = TABLE_MAPPING.find(item =>
     item.identifier.replace(/_id$/, "") === collectionName
   );
   if (collectionName === "aligned") {
