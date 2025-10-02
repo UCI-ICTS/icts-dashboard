@@ -199,7 +199,8 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           <Input disabled={true}/>
         </Form.Item>
       );
-    } else if (keyName === "received_date") {
+    } else if (tableName === "biobank") {  // Biobank block
+      /* if (keyName === "received_date") {
       return (
         <Form.Item
           key={keyName}
@@ -211,26 +212,40 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           <DatePicker onChange={onChange} disabled={readOnly} />
         </Form.Item>
       )
-    } /* else if (tableName === "biobank" && keyName === "freezer_id") {
-      console.log(freezerId)
-      return (
-        <Form.Item
-          key={keyName}
-          name={keyName}
-          label={label}
-          dependencies={deps}
-          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
-        >
-          <Select disabled={readOnly} mode="multiple" showSearch allowClear>
-            {freezerId.enum.map((option) => (
-              <Option key={option} value={option}>
-                {option}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-      )
-    } */ else {
+    } */
+      if (keyName === "freezer_id") {
+        return (
+          <Form.Item
+            key={keyName}
+            name={keyName}
+            label={label}
+            dependencies={deps}
+            rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+          >
+            <Select
+              disabled={readOnly}
+              showSearch
+              allowClear
+              optionFilterProp="label"
+              options={freezerId}
+              />
+          </Form.Item>
+        )
+      }
+      else {
+        return (
+          <Form.Item
+            key={keyName}
+            name={keyName}
+            label={label}
+            dependencies={deps}
+            rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+          >
+            <Input disabled={readOnly}/>
+          </Form.Item>
+        );
+      }
+    } else {
       return (
         <Form.Item
           key={keyName}

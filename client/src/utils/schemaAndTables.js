@@ -341,17 +341,17 @@ export const specimenType = {
   "XR": "Extracted RNA"
 }
 
-export const freezerId = {
-  "Banana": "Thermo Scientific TSV20RPSA +4C (next to lab door)",
-  "Pom Pom Purin": "Kenmore +4C (next to office)",
-  "Dalgona": "PHCBI MDF-U731M-PA -20C (right-most -20C)",
-  "Bruno Mars": "-20C",
-  "Appa": "-20C",
-  "Eevee": "Kenmore -20C (left-most -20C)",
-  "Hatsune Miku": "Striling Ultracold -80C (right-side -80C)",
-  "Lebron James": "Stirling Ultracold -80C (left-side -80C)",
-  "Boris Yeltsin": "LN2 dewer (next to office)"
-}
+export const freezerId = [
+  { value: "Banana", label: "Banana Fridge: +4C (next to lab door)"},
+  { value: "Pom Pom Purin", label: "Pom Pom Purin: +4C (next to office)"},
+  { value: "Dalgona", label: "Dalgona: -20C (right-most -20C)"},
+  { value: "Bruno Mars", label: "Bruno Mars: -20C"},
+  { value: "Appa", label: "Appa: -20C"},
+  { value: "Eevee", label: "Eevee: -20C (left-most -20C)"},
+  { value: "Hatsune Miku", label: "Hatsune Miku: -80C (right-side -80C)"},
+  { value: "Lebron James", label: "Lebron James: -80C (left-side -80C)"},
+  { value: "Boris Yeltsin", label: "Boris Yeltsin: LN2 dewer (next to office)"}
+]
 
 export const TABLE_MAPPING = [
   { name: "Participants", schema: "participants", identifier: "participant_id" },
