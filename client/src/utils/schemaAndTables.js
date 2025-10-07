@@ -331,7 +331,7 @@ export const primaryBiosample = {
 	"UBERON:0001133": "cardiac tissue"
 }
 
-export const specimenType = {
+export const specimenType = {  // Biobank specific mappings
   "D": "EDTA in Cryovial",
   "R": "PAX Tube",
   "OG": "OGR-500 saliva collection kit",
@@ -339,6 +339,87 @@ export const specimenType = {
   "SG": "OGR-675 buccal collection kit",
   "X": "Extracted DNA",
   "XR": "Extracted RNA"
+}
+
+export const collectionSource = [
+  { value: "Clinical Lab CNH", label: "Clinical Lab CNH" },
+  { value: "CRU", label: "CRU" },
+  { value: "Inpatient", label: "Inpatient" },
+  { value: "Mailed Buccal", label: "Mailed Buccal" },
+  { value: "mobile phlebotomy", label: "mobile phlebotomy" },
+  { value: "Offsite", label: "Offsite" },
+  { value: "other", label: "other" },
+  { value: "Outpatient", label: "Outpatient" },
+  { value: "UCI CCR", label: "UCI CCR" },
+]
+
+export const currentLocation = [
+  { value: "Ambry", label: "Ambry Genetics" },
+  { value: "CNH", label: "Children's National Hospital" },
+  { value: "Invitae", label: "Invitae" },
+  { value: "PacBio", label: "PacBio" },
+  { value: "Seqmatic", label: "Seqmatic" },
+  { value: "UCI", label: "UCI Vilain Lab" },
+  { value: "UCSC", label: "UCSC" },
+]
+
+export const freezerId = [
+  { value: "Banana", label: "Banana Fridge: +4C (next to lab door)" },
+  { value: "Pom Pom Purin", label: "Pom Pom Purin: +4C (next to office)" },
+  { value: "Dalgona", label: "Dalgona: -20C (right-most -20C)" },
+  { value: "Bruno Mars", label: "Bruno Mars: -20C" },
+  { value: "Appa", label: "Appa: -20C" },
+  { value: "Eevee", label: "Eevee: -20C (left-most -20C)" },
+  { value: "Hatsune Miku", label: "Hatsune Miku: -80C (right-side -80C)" },
+  { value: "Lebron James", label: "Lebron James: -80C (left-side -80C)" },
+  { value: "Boris Yeltsin", label: "Boris Yeltsin: LN2 dewer (next to office)" },
+]
+
+export const shelfId = [
+  { value: "1", label: "1: Top shelf" },
+  { value: "2", label: "2: Middle shelf" },
+  { value: "3", label: "3: Middle lower shelf" },
+  { value: "4", label: "4: Bottom shelf" },
+]
+
+export const rackId = [
+  { value: "PMGRC-Frozen-Blood", label: "PMGRC Frozen Blood" },
+  { value: "PAX RNA Rack 1", label: "PAX RNA Rack 1" },
+  { value: "PAX RNA Rack 2", label: "PAX RNA Rack 2" },
+  { value: "Saliva rack 1", label: "Saliva rack 1" },
+  { value: "Saliva rack 2", label: "Saliva rack 2" },
+  { value: "Saliva rack 3", label: "Saliva rack 3" },
+]
+
+export const testIndication = [
+  { value: "Research", label: "Research" },
+]
+
+export const requestedTest = [
+  { value: "10500", label: "10500" },
+  { value: "10525", label: "10525" },
+  { value: "Invitae WGS", label: "Invitae WGS" },
+  { value: "CNH WGS", label: "CNH WGS" },
+  { value: "Seqmatic RNA-seq", label: "Seqmatic RNA-seq" },
+]
+
+export const internalAnalysis = [
+  { value: "wgs-calling v.0.7.0", label: "SR-GS snakemake" },
+  { value: "leafcutter pipeline", label: "SR-RNAseq leafcutter pipeline" },
+  { value: "PacBio-HiFi-human-WGS-WDL-v1.0", label: "PacBio WGS WDL v1.0" },
+  { value: "PacBio-HiFi-human-WGS-WDL-v2.0", label: "PacBio WGS WDL v2.0" },
+  { value: "UCSC Nanopore pipeline", label: "UCSC Nanopore pipeline" },
+]
+
+export const biobankMapping = {
+  "collection_source": collectionSource,
+  "current_location": currentLocation,
+  "freezer_id": freezerId,
+  "shelf_id": shelfId,
+  "rack_id": rackId,
+  "test_indication": testIndication,
+  "requested_test": requestedTest,
+  "internal_analysis": internalAnalysis,
 }
 
 export const TABLE_MAPPING = [
@@ -374,7 +455,7 @@ export const getCollectionName = (schema) => {
  * @returns {string|null} Schema key
  */
 export const getTableName = (collectionName) => {
-  const entry = TABLE_MAPPING.find(item => 
+  const entry = TABLE_MAPPING.find(item =>
     item.identifier.replace(/_id$/, "") === collectionName
   );
   if (collectionName === "aligned") {
