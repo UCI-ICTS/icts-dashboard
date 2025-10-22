@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from hpo.services import phenotype_extraction
+from config.selectors import response_constructor
 
 class GetHPOs(APIView):
     """
@@ -38,14 +39,21 @@ class GetHPOs(APIView):
     def post(self, request):
         response_data = []
         data = request.data
-        print(data['raw_text'])
+        phenotypes = phenotype_extraction(data['raw_text'])
         # import pdb; pdb.set_trace()
-        res = phenotype_extraction(data['raw_text'])
-        for r in res:
-            print(r)
-            response_data.append(r)
+        # for phenotype in phenotypes:
+        #     response_data.append(
+        #         response_constructor(
+        #             identifier=phenotype["hpo_id"],
+        #             request_status="SUCCESS",
+        #             code=200,
+        #             message=phenotype["rationale"],
+        #             data=phenotype
+
+        #         )
+        #     )
         try:
-            return Response(status=status.HTTP_200_OK, data=response_data)
+            return Response(status=status.HTTP_200_OK, data=phenotypes)
         except Exception as error:
             response_data.insert(0, str(error))
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)

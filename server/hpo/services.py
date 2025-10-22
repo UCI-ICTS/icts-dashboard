@@ -444,6 +444,7 @@ def verify_term_count(min_expected: int = 18000) -> int:
 
 _FAISS_CACHE = None  # singleton cache to avoid reloading for every query
 
+
 def _load_faiss_once() -> Tuple[faiss.Index, np.ndarray, np.ndarray, np.ndarray]:
     """
     Lazy-load FAISS + NPZ into memory.
@@ -468,49 +469,58 @@ def _load_faiss_once() -> Tuple[faiss.Index, np.ndarray, np.ndarray, np.ndarray]
 
 def embed_texts(
     texts: List[str],
-    provider: str = "openai",
     openai_api_key: Optional[str] = None,
     openai_base_url: str = "https://api.openai.com/v1",
     embed_model: str = "text-embedding-3-large",
-    local_model: str = "sentence-transformers/all-MiniLM-L6-v2",
+    batch_size: int = 128
 ) -> np.ndarray:
     """
-    Compute embeddings for arbitrary text list using OpenAI or local model.
+    Compute embeddings for a list of texts using OpenAI model.
+    Returns a 2D numpy array (n_texts x dim).
     """
-    if provider == "openai":
-        client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"), base_url=openai_base_url)
-        resp = client.embeddings.create(model=embed_model, input=texts)
-        vecs = [d.embedding for d in resp.data]
-        return np.asarray(vecs, dtype="float32")
-    else:
-        from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer(local_model, device="cpu")
-        return np.asarray(model.encode(texts, normalize_embeddings=True), dtype="float32")
+    if not texts:
+        return np.zeros((0,0), dtype="float32")
+    
+    client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"), base_url=openai_base_url)
+    all_vectors: list[list[float]] =[]
+    for i in range(0, len(texts), batch_size):
+        chunk = texts[i:i + batch_size]
+        response = client.embeddings.create(model=embed_model, input=chunk)
+        all_vectors.extend(d.embedding for d in response.data)
+    return np.asarray(all_vectors, dtype="float32")
 
 
 def search_hpo(
     query_text: list,
     k: int = 20,
-    provider: str = "openai",
     **embed_kwargs,
 ) -> List[dict]:
     """
     Perform a semantic search over the FAISS index.
     Returns: list of {rank, score, hpo_id, label}.
+
+    Input:  phrases -> List[str]   length Q
+    Output: List[List[dict]]       length Q, each inner list has k dicts
     """
+
     index, ids, labels, _ = _load_faiss_once()
-    query_vec = embed_texts(query_text, provider=provider, **embed_kwargs)
+    Q = len(query_text)
+    query_vec = embed_texts(query_text, **embed_kwargs)
     faiss.normalize_L2(query_vec)
     scores, idxs = index.search(query_vec, k)
-    results = []
-    for rank, (score, idx) in enumerate(zip(scores[0], idxs[0]), start=1):
-        results.append({
-            "rank": rank,
-            "score": float(score),
-            "hpo_id": str(ids[idx]),
-            "label": str(labels[idx]),
-        })
-    return results
+    results_per_query = []
+    for qi in range(Q):
+        row = []
+        for rank, (score, idx) in enumerate(zip(scores[0], idxs[0]), start=1):
+            row.append({
+                "rank": rank,
+                "score": float(score),
+                "hpo_id": str(ids[idx]),
+                "label": str(labels[idx]),
+            })
+        results_per_query.append(row)
+    return results_per_query
+
 
 def _coerce_json(txt: str) -> dict:
     s = txt.strip()
@@ -538,18 +548,127 @@ def extract_phrases(
     data = _coerce_json(response_text)
     return data
 
+
+def best_match(
+    phrase: str,
+    candidates: List[Dict],
+    prompt: str,
+    *,
+    sentence_context: Optional[str] = None,     # if your extractor provides it
+    openai_api_key: Optional[str] = None,
+    openai_base_url: str = "https://api.openai.com/v1",
+    model: str = "gpt-4o-mini",
+    temperature: float = 0.0,
+    max_output_tokens: int = 128,
+) -> Dict:
+    """
+    Ask the LLM to pick exactly one HPO ID from the provided candidate list.
+    Returns: {'hpo_id','label','rank','score','source','rationale'}
+             (falls back to cosine top-1 if anything goes wrong)
+    """
+    # 0) Guard: empty candidates → no-op
+    if not candidates:
+        return {"hpo_id": None, "label": None, "rank": None, "score": None,
+                "source": "fallback-empty", "rationale": "No candidates provided."}
+
+    # 1) Prepare payload
+    cand_ids = {c["hpo_id"] for c in candidates}
+    user_payload = {
+        "phrase": phrase,
+        "context": sentence_context or "",
+        "candidates": candidates
+    }
+
+    # 2) Build client
+    client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"),
+                    base_url=openai_base_url)
+
+    # 3) Call LLM (SDK 2.6.0: no response_format, ask for raw JSON explicitly)
+    #    Keep the user content short: one compact JSON blob + an instruction line
+    user_content = (
+        "Given the JSON below, choose the single best HPO candidate.\n"
+        "Return ONLY a JSON object like: {\"hpo_id\":\"HP:0000000\", \"reason\":\"...\"} (no markdown).\n\n"
+        + json.dumps(user_payload, ensure_ascii=False)
+    )
+
+    try:
+        resp = client.responses.create(
+            model=model,
+            input=[
+                {"role": "system", "content": prompt},
+                {"role": "user",   "content": user_content},
+            ],
+            temperature=temperature,
+            max_output_tokens=max_output_tokens,
+        )
+        text = getattr(resp, "output_text", None) or resp.output[0].content[0].text
+        parsed = _coerce_json(text)  # {'hpo_id': 'HP:...', 'reason': '...'}
+        hpo_id = (parsed.get("hpo_id") or "").strip()
+
+        # 4) Validate chosen ID is in the candidate set
+        if hpo_id in cand_ids:
+            # find matching candidate to bring back rank/score/label
+            chosen = next(c for c in candidates if c["hpo_id"] == hpo_id)
+            return {
+                "hpo_id": hpo_id,
+                "label": chosen["label"],
+                "rank": chosen["rank"],
+                "score": chosen["score"],
+                "source": "llm-select",
+                "rationale": parsed.get("reason", ""),
+            }
+
+        # 5) If the model returned an unknown ID, fall back to cosine top-1
+        top = candidates[0]
+        return {
+            "hpo_id": top["hpo_id"],
+            "label": top["label"],
+            "rank": top["rank"],
+            "score": float(top["score"]),
+            "source": "fallback-top1",
+            "rationale": f"Model returned unknown id ({hpo_id}); fell back to cosine top-1.",
+        }
+
+    except Exception as e:
+        # 6) Robust fallback on any error
+        top = candidates[0]
+        return {
+            "hpo_id": top["hpo_id"],
+            "label": top["label"],
+            "rank": top["rank"],
+            "score": float(top["score"]),
+            "source": f"fallback-error:{type(e).__name__}",
+            "rationale": str(e),
+        }
+
+
 def phenotype_extraction(note: str) -> list:
     """"""
-    data = []
+
     prompts = load_prompts()
-    phrases = extract_phrases(note, prompts['system_message_I'])
-    validated_phrases = extract_phrases(str(phrases), prompts['system_message_double_check'])
-    for index, phrase in enumerate(validated_phrases):
-        if phrase['verdict'] != "keep":
-            import pdb; pdb.set_trace()
-    lists = []
-    for phrase in phrases:
-        lists.append(phrase['phrase'])
-    thing = search_hpo(lists)
-    import pdb; pdb.set_trace()
-    return data
+    sys_I = prompts['system_message_I']
+    sys_II = prompts['system_message_II']
+    sys_dc = prompts['system_message_double_check']
+
+    phrases = extract_phrases(note, sys_I)
+    if isinstance(phrases, dict): 
+        phrases = phrases.get("phenotypes",[])
+
+    evaluated_phrases = extract_phrases(str(phrases), sys_dc)
+    validated_phrases = []
+    for index, phrase in enumerate(evaluated_phrases):
+        if phrase['verdict'] == "keep":
+            validated_phrases.append(phrases[index]|phrase)
+
+    hpo_candidates = search_hpo([p["phrase"] for p in validated_phrases])
+    
+    for index, candidate in enumerate(hpo_candidates):
+        phrases[index].update(
+            best_match(
+                phrase=phrases[index]["phrase"],
+                candidates=candidate,
+                prompt=sys_II
+            )
+        )   
+
+    return phrases
