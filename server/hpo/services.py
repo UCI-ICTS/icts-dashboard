@@ -18,6 +18,7 @@ from django.db import connection, transaction
 from io import StringIO
 from openai import OpenAI
 from pathlib import Path
+from rest_framework import serializers
 from typing import Iterable, List, Optional, Tuple, Dict
 
 from .models import HPOTerm, HPOEdge, HPOArtifact
@@ -76,6 +77,42 @@ Search freshness: re-run backfill_search_tsv() at the end of any import; or add 
 Vectors: FAISS/NPZ are files on disk—only paths live in Postgres via HPOArtifact.
 """
 
+# ---------- Serializers ----------
+class HPOTermLiteSerializer(serializers.Serializer):
+    hpo_id     = serializers.CharField()
+    label      = serializers.CharField()
+    snippet    = serializers.CharField()   # short text (label/syn/def mashup)
+    deprecated = serializers.BooleanField()
+    score      = serializers.FloatField()
+
+class PhenotypeExtractRequestSerializer(serializers.Serializer):
+    raw_text = serializers.CharField(
+        help_text="Text to decode for HPO terms",
+        default="gait instability with ataxia and seizures since childhood."
+    )
+
+class PhenotypeChoiceSerializer(serializers.Serializer):
+    id     = serializers.CharField()
+    hpo_id = serializers.CharField(allow_null=True)
+    label  = serializers.CharField(allow_null=True, required=False)
+    rank   = serializers.IntegerField(allow_null=True, required=False)
+    score  = serializers.FloatField(allow_null=True, required=False)
+    source = serializers.CharField(required=False, allow_null=True)
+    reason = serializers.CharField(required=False, allow_blank=True)
+
+class PhenotypePhraseSerializer(serializers.Serializer):
+    id         = serializers.CharField()
+    phrase     = serializers.CharField()
+    sentence   = serializers.CharField(required=False, allow_blank=True)
+    verdict    = serializers.CharField(required=False, allow_blank=True)
+    reason     = serializers.CharField(required=False, allow_blank=True)
+    candidates = serializers.ListField(child=serializers.DictField(), required=False)
+    choice     = PhenotypeChoiceSerializer(required=False)
+
+class PhenotypeExtractResponseSerializer(serializers.Serializer):
+    phrases = PhenotypePhraseSerializer(many=True)
+    matches = PhenotypeChoiceSerializer(many=True, required=False)
+    meta    = serializers.DictField()
 
 # ---------- Config helpers ----------
 _FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE | re.DOTALL)
@@ -503,15 +540,22 @@ def search_hpo(
     Output: List[List[dict]]       length Q, each inner list has k dicts
     """
 
+    # 1) Load FAISS + metadata
     index, ids, labels, _ = _load_faiss_once()
+    
+    # 2) Embed all phrases at once => (Q, D)
     Q = len(query_text)
     query_vec = embed_texts(query_text, **embed_kwargs)
     faiss.normalize_L2(query_vec)
+
+    # 3) Search all queries in one call
     scores, idxs = index.search(query_vec, k)
+    
+    # 4) Build a per-query result list
     results_per_query = []
     for qi in range(Q):
         row = []
-        for rank, (score, idx) in enumerate(zip(scores[0], idxs[0]), start=1):
+        for rank, (score, idx) in enumerate(zip(scores[qi], idxs[qi]), start=1):
             row.append({
                 "rank": rank,
                 "score": float(score),
@@ -529,11 +573,27 @@ def _coerce_json(txt: str) -> dict:
     return json.loads(s)
 
 
+def _mk_items_with_ids(extracted: List[Dict]) -> List[Dict]:
+    """Normalize extracted list -> [{'id','phrase','sentence'}...]"""
+    items = []
+    for i, it in enumerate(extracted):
+        phrase = (it.get("phrase") or "").strip()
+        if not phrase:
+            continue
+        items.append({
+            "id": f"p{i}",
+            "phrase": phrase,
+            "sentence": (it.get("sentence") or "").strip()
+        })
+    return items
+
+
 def extract_phrases(
     note: str,
     prompt: str, 
     openai_api_key: Optional[str] = None,
-    openai_base_url: str = "https://api.openai.com/v1") -> list:
+    openai_base_url: str = "https://api.openai.com/v1"
+) -> list:
     """"""
 
     client = OpenAI(api_key=openai_api_key, base_url=openai_base_url)
@@ -549,126 +609,313 @@ def extract_phrases(
     return data
 
 
+def _slim_candidates(cands: List[Dict], topn: int = 10) -> List[Dict]:
+    """Trim and shorten keys for token efficiency."""
+    out = []
+    for c in cands[:topn]:
+        out.append({
+            "id": c["hpo_id"],
+            "l":  c["label"],
+            "s":  round(float(c["score"]), 3),
+            "r":  int(c["rank"]),
+            # optionally include a one-sentence definition: "d": c.get("definition","")[:180]
+        })
+    return out
+
+
 def best_match(
-    phrase: str,
-    candidates: List[Dict],
+    validated_phrases: List[Dict],
     prompt: str,
     *,
-    sentence_context: Optional[str] = None,     # if your extractor provides it
     openai_api_key: Optional[str] = None,
     openai_base_url: str = "https://api.openai.com/v1",
     model: str = "gpt-4o-mini",
     temperature: float = 0.0,
-    max_output_tokens: int = 128,
+    max_output_tokens: int = 512,
+    chunk_size: int = 24,          # #items per request (keep small for latency)
+    topn_for_llm: int = 10,        # send fewer than FAISS k to save tokens
+    accept_null: bool = True,      # allow {"hpo_id": null} rather than forcing fallback
 ) -> Dict:
     """
     Ask the LLM to pick exactly one HPO ID from the provided candidate list.
-    Returns: {'hpo_id','label','rank','score','source','rationale'}
-             (falls back to cosine top-1 if anything goes wrong)
+    
+    validated_phrases: 
+        [{id, phrase, candidates:[{hpo_id,label,rank,score,...}], sentence?}, ...]
+    returns: 
+        [{id, hpo_id, source, reason, label, rank, score}, ...]
+    
+    (falls back to cosine top-1 if anything goes wrong)
     """
     # 0) Guard: empty candidates → no-op
-    if not candidates:
-        return {"hpo_id": None, "label": None, "rank": None, "score": None,
-                "source": "fallback-empty", "rationale": "No candidates provided."}
+    if not validated_phrases:
+        return []
 
-    # 1) Prepare payload
-    cand_ids = {c["hpo_id"] for c in candidates}
-    user_payload = {
-        "phrase": phrase,
-        "context": sentence_context or "",
-        "candidates": candidates
-    }
-
-    # 2) Build client
+    # 1) Build client and initialize results
+    results: List[Dict] = []
     client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"),
                     base_url=openai_base_url)
+    
+    
+    # 2) Prepare payload
+    for start in range(0, len(validated_phrases), chunk_size):
+        batch = validated_phrases[start:start+chunk_size]
+        # Build compact payload + per-item id→candidate-set for validation
+        id_to_candset: Dict[str, set] = {}
+        id_to_fullcands: Dict[str, List[Dict]] = {}
+        payload_items = []
 
-    # 3) Call LLM (SDK 2.6.0: no response_format, ask for raw JSON explicitly)
-    #    Keep the user content short: one compact JSON blob + an instruction line
-    user_content = (
-        "Given the JSON below, choose the single best HPO candidate.\n"
-        "Return ONLY a JSON object like: {\"hpo_id\":\"HP:0000000\", \"reason\":\"...\"} (no markdown).\n\n"
-        + json.dumps(user_payload, ensure_ascii=False)
-    )
+        for it in batch:
+            pid   = it["id"]
+            phrase = it["phrase"]
+            slim  = _slim_candidates(it["candidates"], topn=topn_for_llm)
+            id_to_candset[pid] = {c["id"] for c in slim}
+            id_to_fullcands[pid] = it["candidates"]  # full list (with rank/score/label)
 
-    try:
+            payload_items.append({
+                "id": pid,
+                "p": phrase,
+                "ctx": it.get("sentence", "") or "",
+                "cands": slim,
+            })
+
+        # System-only rules; user is pure JSON
+        # keep system text SHORT for speed
+        sys_msg = (
+            "You map phenotype phrases to HPO IDs.\n"
+            "For each object in 'items', choose exactly one HPO from its 'cands' list.\n\n"
+            "Input JSON shape:\n"
+            '{"items":[{"id":"p0","p":"<phrase>","ctx":"<optional context>",'
+            '"cands":[{"id":"HP:#######","l":"<label>","s":0.000,"r":1}, ...]}]}\n\n'
+            "Return ONLY JSON (no markdown):\n"
+            '[{"id":"p0","hpo_id":"HP:#######" | null, "reason":"<short rationale>"}]\n\n'
+            "Rules:\n"
+            "- Choose only from the provided candidate IDs.\n"
+            "- Use context (ctx) for nuance if available.\n"
+            "- If none fits clearly, set hpo_id to null.\n"
+            "- Be concise and consistent.\n"
+        )
+
+        system_text = prompt or sys_msg
+
+        user_json = {"items": payload_items}
+
         resp = client.responses.create(
             model=model,
             input=[
-                {"role": "system", "content": prompt},
-                {"role": "user",   "content": user_content},
+                {"role": "system", "content": system_text},
+                {"role": "user",   "content": json.dumps(user_json, ensure_ascii=False)},
             ],
             temperature=temperature,
             max_output_tokens=max_output_tokens,
         )
         text = getattr(resp, "output_text", None) or resp.output[0].content[0].text
-        parsed = _coerce_json(text)  # {'hpo_id': 'HP:...', 'reason': '...'}
-        hpo_id = (parsed.get("hpo_id") or "").strip()
+        arr = _coerce_json(text)
 
-        # 4) Validate chosen ID is in the candidate set
-        if hpo_id in cand_ids:
-            # find matching candidate to bring back rank/score/label
-            chosen = next(c for c in candidates if c["hpo_id"] == hpo_id)
-            return {
-                "hpo_id": hpo_id,
-                "label": chosen["label"],
-                "rank": chosen["rank"],
-                "score": chosen["score"],
-                "source": "llm-select",
-                "rationale": parsed.get("reason", ""),
-            }
+        # Some models may wrap the array in an object {items:[...]}
+        if isinstance(arr, dict):
+            arr = arr.get("items") or arr.get("results") or []
 
-        # 5) If the model returned an unknown ID, fall back to cosine top-1
-        top = candidates[0]
-        return {
-            "hpo_id": top["hpo_id"],
-            "label": top["label"],
-            "rank": top["rank"],
-            "score": float(top["score"]),
-            "source": "fallback-top1",
-            "rationale": f"Model returned unknown id ({hpo_id}); fell back to cosine top-1.",
+        # Build per-item choice with validation + optional fallback
+        for row in arr or []:
+            pid   = row.get("id")
+            hpo_id = (row.get("hpo_id") or None)
+            reason = (row.get("reason") or "")
+
+            if pid not in id_to_candset:
+                continue  # unknown id, skip
+
+            candset = id_to_candset[pid]
+            fullcands = id_to_fullcands[pid]
+
+            if hpo_id is None and accept_null:
+                results.append({
+                    "id": pid, "hpo_id": None, "label": None, "rank": None, "score": None,
+                    "source": "llm-null", "reason": reason
+                })
+                continue
+
+            if hpo_id in candset:
+                chosen = next(c for c in fullcands if c["hpo_id"] == hpo_id)
+                results.append({
+                    "id": pid,
+                    "hpo_id": hpo_id,
+                    "label": chosen["label"],
+                    "rank": chosen["rank"],
+                    "score": float(chosen["score"]),
+                    "source": "llm-select",
+                    "reason": reason,
+                })
+            else:
+                # fallback policy
+                top = fullcands[0]
+                results.append({
+                    "id": pid,
+                    "hpo_id": top["hpo_id"],
+                    "label": top["label"],
+                    "rank": top["rank"],
+                    "score": float(top["score"]),
+                    "source": "fallback-top1" if not accept_null else "fallback-unknown-id",
+                    "reason": f"Unknown id {hpo_id!r}; used top-1." if hpo_id else reason,
+                })
+
+        # Also handle any items missing from arr at all (defensive)
+        present = {r["id"] for r in results[-len(batch):]}
+        for it in batch:
+            if it["id"] in present:
+                continue
+            # No response for this id; choose policy:
+            if accept_null:
+                results.append({
+                    "id": it["id"], "hpo_id": None, "label": None, "rank": None, "score": None,
+                    "source": "llm-missing", "reason": "No entry returned for this id."
+                })
+            else:
+                top = it["candidates"][0]
+                results.append({
+                    "id": it["id"],
+                    "hpo_id": top["hpo_id"], "label": top["label"],
+                    "rank": top["rank"], "score": float(top["score"]),
+                    "source": "fallback-missing", "reason": "No entry; used top-1."
+                })
+
+    # Keep original order if helpful: sort by numeric suffix of 'p#'
+    try:
+        results.sort(key=lambda r: int(str(r["id"]).lstrip("p")))
+    except Exception:
+        pass
+    return results
+
+
+def validate_phrases_bulk(
+    extracted: List[Dict],
+    system_message_double_check: str,
+    *,
+    openai_api_key: Optional[str] = None,
+    openai_base_url: str = "https://api.openai.com/v1",
+    model: str = "gpt-4o-mini",
+    temperature: float = 0.0,
+    max_output_tokens: int = 512,
+    chunk_size: int = 50,   # safety for very long lists
+) -> Dict[str, Dict]:
+    """
+    Input  : extracted -> [{'phrase':..., 'sentence':...}, ...]  (or your extractor’s dicts)
+    Output : verdict_map -> { id: {'id':..,'verdict':'keep|drop','reason':'...'}, ... }
+    """
+    client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"),
+                    base_url=openai_base_url)
+
+    items = _mk_items_with_ids(extracted)  # [{'id','phrase','sentence'}...]
+    verdict_map: Dict[str, Dict] = {}
+
+    for start in range(0, len(items), chunk_size):
+        chunk = items[start:start+chunk_size]
+
+        # Keep user content compact to save tokens
+        user_payload = {
+            "items": chunk,
+            "rules": "Return only a JSON array of {id, verdict, reason}. No markdown."
         }
 
-    except Exception as e:
-        # 6) Robust fallback on any error
-        top = candidates[0]
-        return {
-            "hpo_id": top["hpo_id"],
-            "label": top["label"],
-            "rank": top["rank"],
-            "score": float(top["score"]),
-            "source": f"fallback-error:{type(e).__name__}",
-            "rationale": str(e),
-        }
+        resp = client.responses.create(
+            model=model,
+            input=[
+                {"role": "system", "content": system_message_double_check},
+                {"role": "user",   "content": json.dumps(user_payload, ensure_ascii=False)},
+            ],
+            temperature=temperature,
+            max_output_tokens=max_output_tokens,
+        )
+
+        text = getattr(resp, "output_text", None) or resp.output[0].content[0].text
+        arr = _coerce_json(text)  # expect a JSON array
+        if isinstance(arr, dict):  # if model returns object, try to unwrap a common pattern
+            arr = arr.get("items") or arr.get("results") or []
+
+        for row in arr or []:
+            rid = row.get("id")
+            if not rid:
+                continue
+            verdict = (row.get("verdict") or "").strip().lower()
+            reason  = (row.get("reason")  or "").strip()
+            if verdict not in {"keep", "drop"}:
+                # default to 'keep' if uncertain; adjust policy as you like
+                verdict = "keep"
+            verdict_map[rid] = {"id": rid, "verdict": verdict, "reason": reason}
+
+    return verdict_map
 
 
 def phenotype_extraction(note: str) -> list:
-    """"""
+    """
+    extract -> bulk validate -> batch retrieve candidates
+    returns a structured dict to the API
+    """
 
     prompts = load_prompts()
     sys_I = prompts['system_message_I']
     sys_II = prompts['system_message_II']
     sys_dc = prompts['system_message_double_check']
 
+    # 1) extract => list[dict]
     phrases = extract_phrases(note, sys_I)
     if isinstance(phrases, dict): 
         phrases = phrases.get("phenotypes",[])
-
-    evaluated_phrases = extract_phrases(str(phrases), sys_dc)
-    validated_phrases = []
-    for index, phrase in enumerate(evaluated_phrases):
-        if phrase['verdict'] == "keep":
-            validated_phrases.append(phrases[index]|phrase)
-
-    hpo_candidates = search_hpo([p["phrase"] for p in validated_phrases])
     
-    for index, candidate in enumerate(hpo_candidates):
-        phrases[index].update(
-            best_match(
-                phrase=phrases[index]["phrase"],
-                candidates=candidate,
-                prompt=sys_II
-            )
-        )   
+    # ensure each item has a stable ID for mapping, same order as 
+    for index, phrase in enumerate(phrases):
+        phrase["id"] = f"p{index}"
+    
+    # 2) bulk validate
+    verdicts = validate_phrases_bulk(phrases, sys_dc)
+    # phrases = [
+    #     {'phrase': 'residual left-sided hemiplegia', 'category': 'Abnormal', 'id': 'p0'}, 
+    #     {'phrase': 'right ear pain', 'category': 'Abnormal', 'id': 'p1'}, 
+    #     {'phrase': 'purulent discharge', 'category': 'Abnormal', 'id': 'p2'}, 
+    #     {'phrase': 'bilateral decrease in hearing', 'category': 'Abnormal', 'id': 'p3'}, 
+    #     {'phrase': 'right ear soft granular tissue mass', 'category': 'Abnormal', 'id': 'p4'}, 
+    #     {'phrase': 'bleeding on touch', 'category': 'Abnormal', 'id': 'p5'}, 
+    #     {'phrase': 'otalgia', 'category': 'Abnormal', 'id': 'p6'}, 
+    #     {'phrase': 'oedematous canal', 'category': 'Abnormal', 'id': 'p7'}, 
+    #     {'phrase': 'non-visible tympanic membrane', 'category': 'Abnormal', 'id': 'p8'}
+    # ]
+    # verdicts = {
+    #     'p0': {'id': 'p0', 'verdict': 'keep', 'reason': 'describes an abnormal physical sign (hemiplegia)'}, 
+    #     'p1': {'id': 'p1', 'verdict': 'keep', 'reason': 'describes an abnormal symptom (ear pain)'},
+    #     'p2': {'id': 'p2', 'verdict': 'keep', 'reason': 'describes an abnormal finding (purulent discharge)'},
+    #     'p3': {'id': 'p3', 'verdict': 'keep', 'reason': 'describes an abnormal finding (decrease in hearing)'},
+    #     'p4': {'id': 'p4', 'verdict': 'keep', 'reason': 'describes an abnormal finding (soft granular tissue mass)'},
+    #     'p5': {'id': 'p5', 'verdict': 'keep', 'reason': 'describes an abnormal finding (bleeding on touch)'},
+    #     'p6': {'id': 'p6', 'verdict': 'keep', 'reason': 'describes an abnormal symptom (otalgia)'},
+    #     'p7': {'id': 'p7', 'verdict': 'keep', 'reason': 'describes an abnormal finding (oedematous canal)'},
+    #     'p8': {'id': 'p8', 'verdict': 'keep', 'reason': 'describes an abnormal finding (non-visible tympanic membrane)'}
+    # }
+    
+    # 3) Build validated list with no deleting
+    validated_phrases: List[Dict] = []
+    for phrase in phrases:
+        verdict = verdicts.get(phrase["id"])
+        if not verdict:
+            continue
+        if verdict['verdict'] == "keep":
+            validated_phrases.append(phrase | verdict)
+    
+    if not validated_phrases:
+        return {"phrases": [], "candidates": [], "meta": {"k": 20, "count": 0}}
 
-    return phrases
+    # 4) Batch retrieval (or top-l per phrase)
+    hpo_candidates = search_hpo([p["phrase"] for p in validated_phrases])
+    for phrase, candidate in zip(validated_phrases, hpo_candidates):
+        phrase["candidates"] = candidate
+    
+    choices = best_match(
+        validated_phrases=validated_phrases,
+        prompt=None,
+        topn_for_llm=10,
+        accept_null=True
+    )
+    # attach back by id
+    choice_by_id = {c["id"]: c for c in choices}
+    for it in validated_phrases:
+        it["choice"] = choice_by_id.get(it["id"])
+
+    return validated_phrases
