@@ -42,16 +42,16 @@ export default function GregorDataSheets({ renderDetail=false }) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [detailLoading, setDetailLoding ] = useState(true)
 // ---- Table URL state ----
-  
+
   const tableValid = useMemo(() => !!schemas[table], [table]);
-  
+
   // create object for setTableView
   const meta = (schema) => ({
     schema,
     identifier: schemas[schema]?.identifier || `${schema}_id`,
     name: schemas[schema]?.title || schema,
   })
-  
+
   // Sync URL (only when NOT at ParticipantDetail)
   useEffect(() => {
     if (renderDetail) return;
@@ -61,7 +61,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     }
   }, [renderDetail, tableValid, table, tableView, dispatch]);
 
-  // Enforce “participants” in detail mode 
+  // Enforce “participants” in detail mode
   useEffect(() => {
     if (!renderDetail) return;
     if (tableView !== "participants") {
@@ -92,7 +92,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     storagePrefix: "uci:tableSettings", // namespace for table preferences
   });
 
-  const { sorter, filters, setSorter, setFilters } = dataTable;
+  const { sorter, filters, keys, setSorter, setFilters } = dataTable;
 
   const columns = buildColumns({ schema, visible: dataTable.visible, widths: dataTable.widths });
 
@@ -115,6 +115,15 @@ export default function GregorDataSheets({ renderDetail=false }) {
   // ---- Apply global search + advanced filters + header filters + sorting ----
   const displayData = useMemo(() => {
     let rows = [...data];
+
+    // 0) Clear existing filters if any of them do not apply to the table shown
+    for (const key of Object.keys(filters)) {
+      if (!keys.includes(key)) {
+        console.log(`Clearing filters for value '${filters[key]}' from key '${key}'`)
+        setFilters(draft);  // Clear filters in table header
+        setDraft({});  // Clear advanced filters
+      }
+    }
 
     // 1) Global search (regex or contains) across all fields
     if (search.trim()) {
@@ -222,7 +231,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
 
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
-  
+
     } else if (exportFormat === "JSON") {
       fileExtension = "json";
       mimeType = "application/json;charset=utf-8";
@@ -243,7 +252,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     message.success(`Current data exported as ${exportFormat}`);
     setExportOpen(false); // Close modal after download
   };
-  
+
   const handleRefresh = () => {
     if (tableView) {
       dispatch(fetchTable(getCollectionName(tableView)));
@@ -255,7 +264,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     setSelectedRow(record);
     dispatch(familyDetail(record.participant_id))
   };
-  
+
   return (
     <Layout className="admin-layout">
       {renderDetail ? (
@@ -280,8 +289,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
           <Title className="primary-title">GREGoR Data Sheets</Title>
         </Header>
       )}
-      
-      
+
+
       <TableToolBar
         schema={schema}
         visibleColumns={dataTable.visible}
