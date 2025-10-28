@@ -89,6 +89,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
     tableView,
     defaults: defaultVisibleColumns[tableView] || [],
     persist: rememberUI,  // switch persistence on/off
+    //persist: false,
     storagePrefix: "uci:tableSettings", // namespace for table preferences
   });
 
@@ -113,13 +114,6 @@ export default function GregorDataSheets({ renderDetail=false }) {
   );
 
   // ---- Apply global search + advanced filters + header filters + sorting ----
-  let filterCache = {};
-  if("uci:filterCache" in localStorage) {
-    filterCache = JSON.parse(localStorage.getItem("uci:filterCache"));
-    if(table in filterCache) {
-      console.log(table, filterCache[table]);
-    }
-  }
   const displayData = useMemo(() => {
     let rows = [...data];
 
@@ -171,8 +165,6 @@ export default function GregorDataSheets({ renderDetail=false }) {
         return str.toLowerCase().includes(String(val).toLowerCase());
       })
     );
-    filterCache[table] = filters;
-    localStorage.setItem("uci:filterCache", JSON.stringify(filterCache));
 
     // 3) Sort
     if (sorter?.key && sorter.order) {
