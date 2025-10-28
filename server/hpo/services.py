@@ -1,6 +1,60 @@
 #!/usr/bin/env python
 # hpo/services.py
 
+"""
+RAG-HPO services
+================
+
+What this module does
+---------------------
+1) Ingest HPO
+   - download hp.obo (or use an existing CSV)
+   - parse terms + synonyms + definitions + is_a edges
+   - upsert into Postgres (HPOTerm / HPOEdge)
+   - materialize helpers:
+     * label_normalized (ASCII, lowercased)
+     * synonyms_concat (semicolon-joined)
+     * search_tsv (tsvector over label + synonyms_concat + definition)
+   - record an HPOArtifact row (paths & metadata)
+
+2) Build vectors (optional but recommended)
+   - read the CSV (label + synonyms + definition)
+   - build text per term: "<label>  <synonyms…>  <definition>"
+   - compute embeddings (OpenAI or local ST), L2-normalize
+   - write FAISS index + NPZ (ids/labels/vecs)
+   - attach to the active HPOArtifact
+
+3) Runtime search & mapping
+   - autocomplete/search endpoints use Postgres trigram + full-text over
+     label, synonyms, and definition (no LLM, very fast)
+   - semantic retrieval (FAISS) returns top-k HPO candidates per phrase
+   - LLM selector chooses exactly one HPO ID from each candidate list
+     (batch prompts; strict JSON out; null allowed)
+
+Key functions
+-------------
+refresh_from_obo(...)                 # end-to-end: download → parse → import → index → artifact
+build_vectors_from_csv(...)           # compute embeddings & write FAISS/NPZ
+attach_vectors_to_release(...)        # attach FAISS/NPZ to an HPO release (and mark active)
+search_hpo_batch([...], k=20, ...)    # FAISS retrieval for many phrases at once
+phenotype_extraction(note)            # extract → validate → retrieve → LLM select (returns structured result)
+
+Synonyms handling
+-----------------
+- Parsed from OBO 'synonym' stanzas (quoted text extracted).
+- Stored as JSON array in HPOTerm.synonyms (use psycopg2.extras.Json on upsert).
+- Flattened into synonyms_concat for trigram/FTS.
+- Included in embedding text so FAISS captures synonymy.
+
+Operational notes
+-----------------
+- Requires Postgres extensions: 'pg_trgm' + 'fuzzystrmatch' (enabled via migrations).
+- GIN/trigram indexes must exist (see models.py).
+- The active HPOArtifact determines which FAISS/NPZ gets loaded at runtime.
+- OPENAI_API_KEY read from environment when provider='openai'.
+
+"""
+
 from __future__ import annotations
 import csv
 import datetime as dt
@@ -20,62 +74,8 @@ from openai import OpenAI
 from pathlib import Path
 from rest_framework import serializers
 from typing import Iterable, List, Optional, Tuple, Dict
-
-from .models import HPOTerm, HPOEdge, HPOArtifact
-
-"""Utilities to fetch, parse, import, and index HPO data.
-Usage:
-
-A) One-shot: fetch + import + index (no vectors yet)
-from hpo.services import refresh_from_obo, verify_term_count
-csv_path, terms, edges = refresh_from_obo()   # downloads from hp.obo, imports terms/edges, builds search_tsv, records artifact
-verify_term_count()
-
-B) Build vectors and attach to the active release
-
-OpenAI embeddings
-
-from hpo.services import get_active_artifact, build_vectors_from_csv, attach_vectors_to_release
-art = get_active_artifact()
-faiss_p, npz_p, used_model = build_vectors_from_csv(Path(art.csv_path), provider="openai")
-attach_vectors_to_release(art.release, faiss_p, npz_p, used_model, set_active=True)
-
-
-Local embeddings (no API)
-
-faiss_p, npz_p, used_model = build_vectors_from_csv(Path(art.csv_path), provider="local", local_model="sentence-transformers/all-MiniLM-L6-v2")
-attach_vectors_to_release(art.release, faiss_p, npz_p, used_model, set_active=True)
-
-C) Only import from an existing CSV (skip download/parse)
-from hpo.services import upsert_terms, backfill_search_tsv, record_artifact
-import csv, json
-rows = []
-with open("data/hpo/hpo_texts_2025-10-01.csv", newline="", encoding="utf-8") as f:
-    r = csv.DictReader(f)
-    for row in r:
-        rows.append({
-            "hpo_id": row["hpo_id"],
-            "label": row["label"],
-            "definition": row.get("definition",""),
-            "synonyms": json.loads(row.get("synonyms_json","[]")),
-            "deprecated": False,
-        })
-upsert_terms(rows, release="2025-10-01")
-backfill_search_tsv()
-record_artifact("2025-10-01", "local-csv", Path("data/hpo/hpo_texts_2025-10-01.csv"), active=True)
-
-Notes & guardrails
-
-Extensions: make sure you previously enabled pg_trgm (migration with RunSQL), and created your GIN indexes.
-
-Transactions: refresh_from_obo wraps upserts + tsv backfill + artifact record in a single transaction.
-
-Upserts: uses INSERT … ON CONFLICT DO UPDATE; requires hpo_id as PK (you already have it).
-
-Search freshness: re-run backfill_search_tsv() at the end of any import; or add a DB trigger later if you want it automatic.
-
-Vectors: FAISS/NPZ are files on disk—only paths live in Postgres via HPOArtifact.
-"""
+from psycopg2.extras import Json, execute_values
+from hpo.models import HPOTerm, HPOEdge, HPOArtifact
 
 # ---------- Serializers ----------
 class HPOTermLiteSerializer(serializers.Serializer):
@@ -113,6 +113,18 @@ class PhenotypeExtractResponseSerializer(serializers.Serializer):
     phrases = PhenotypePhraseSerializer(many=True)
     matches = PhenotypeChoiceSerializer(many=True, required=False)
     meta    = serializers.DictField()
+
+class HPOLookupIDSerializer(serializers.Serializer):
+    hpo_id     = serializers.CharField()
+    label      = serializers.CharField(allow_null=True, required=False)
+    definition = serializers.CharField(allow_null=True, required=False)
+    synonyms   = serializers.ListField(child=serializers.CharField(), required=False)
+    release    = serializers.CharField(allow_null=True, required=False)
+    deprecated = serializers.BooleanField(required=False)
+    error      = serializers.CharField(required=False)  # present only if not found
+
+class HPOLookupIDResponseSerializer(serializers.Serializer):
+    results = HPOLookupIDSerializer(many=True)
 
 # ---------- Config helpers ----------
 _FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE | re.DOTALL)
@@ -267,13 +279,19 @@ def upsert_terms(term_rows: List[Dict], release: str, batch: int = 2000):
         ln = _normalize_ascii_lower(r["label"])
         syn_concat = _concat_synonyms(r["synonyms"])
         return (
-            r["hpo_id"], r["label"], r["definition"], json.dumps(r["synonyms"]),
-            release, r["deprecated"],
-            ln, syn_concat, None,  # search_tsv backfilled later
-            dt.datetime.utcnow(), dt.datetime.utcnow()
+            r["hpo_id"],
+            r["label"],
+            r["definition"],
+            Json(r["synonyms"]),   # <— instead of json.dumps(...)
+            release,
+            r["deprecated"],
+            ln,
+            syn_concat,
+            None,                  # search_tsv backfilled later
+            dt.datetime.utcnow(),
+            dt.datetime.utcnow(),
         )
 
-    from psycopg2.extras import execute_values
     with connection.cursor() as cur:
         buf: List[tuple] = []
         for r in term_rows:

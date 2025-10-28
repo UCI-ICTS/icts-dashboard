@@ -14,11 +14,43 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hpo.models import HPOTerm
+from hpo.selectors import get_hpo_term_by_id
 from hpo.services import (
     phenotype_extraction,
     PhenotypeExtractRequestSerializer,
     PhenotypeExtractResponseSerializer
 )
+
+
+class HPOLookupIDView(APIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_id="reverse_lookup",
+        tags=["HPO"],
+        manual_parameters=[
+            openapi.Parameter(
+                "hpo_ids",
+                openapi.IN_QUERY,
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(
+                    description="HPO term ID (e.g. HP:0001251)",
+                    default="HP:0001251",
+                    type=openapi.TYPE_STRING
+                )
+            )
+        ],
+        responses={200: "Term found", 404: "Not found"},
+    )
+    def get(self, request):
+        hpo_ids = request.GET.get("hpo_ids").split(',')
+        if not hpo_ids:
+            return Response({"error": "Missing hpo_id parameter"}, status=400)
+
+        data = get_hpo_term_by_id(hpo_ids)
+        if "error" in data:
+            return Response(data, status=404)
+        return Response(data, status=200)
 
 
 class HPOAutocompleteView(APIView):
