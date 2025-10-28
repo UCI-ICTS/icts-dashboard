@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import SummaryPage from './pages/SummaryPage';
 import GregorDataSheets from './pages/GregorDataSheets';
+import RAGHPO from './pages/RAGHPO';
 import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import PrivateRout from "./components/PrivateRoute";
 import AccountService from "./services/account.service";
@@ -81,6 +82,7 @@ const AppRoutes = () => {
         <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="rag-hpo" element={<RAGHPO />} />
       </Route>
 
       {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}
