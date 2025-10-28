@@ -113,13 +113,20 @@ export default function GregorDataSheets({ renderDetail=false }) {
   );
 
   // ---- Apply global search + advanced filters + header filters + sorting ----
+  let filterCache = {};
+  if("uci:filterCache" in localStorage) {
+    filterCache = JSON.parse(localStorage.getItem("uci:filterCache"));
+    if(table in filterCache) {
+      console.log(table, filterCache[table]);
+    }
+  }
   const displayData = useMemo(() => {
     let rows = [...data];
 
     // 0) Clear existing filters if any of them do not apply to the table shown
     for (const key of Object.keys(filters)) {
       if (!keys.includes(key)) {
-        console.log(`Clearing filters for value '${filters[key]}' from key '${key}'`)
+        console.log(`Clearing filters for value '${filters[key]}' from key '${key}'`);
         setFilters(draft);  // Clear filters in table header
         setDraft({});  // Clear advanced filters
       }
@@ -164,6 +171,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
         return str.toLowerCase().includes(String(val).toLowerCase());
       })
     );
+    filterCache[table] = filters;
+    localStorage.setItem("uci:filterCache", JSON.stringify(filterCache));
 
     // 3) Sort
     if (sorter?.key && sorter.order) {
