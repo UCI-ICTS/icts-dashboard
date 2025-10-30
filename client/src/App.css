@@ -861,3 +861,7 @@ table-search-input .anticon {
 .icon-blue {
   color: var(--uci-blue) !important;
 }
+
+.text-area-input {
+  color: var(--uci-blue) !important;
+}
