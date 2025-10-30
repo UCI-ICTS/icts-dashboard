@@ -86,7 +86,7 @@ class HPOTermLiteSerializer(serializers.Serializer):
     score      = serializers.FloatField()
 
 class PhenotypeExtractRequestSerializer(serializers.Serializer):
-    raw_text = serializers.CharField(
+    userText = serializers.CharField(
         help_text="Text to decode for HPO terms",
         default="gait instability with ataxia and seizures since childhood."
     )
@@ -511,6 +511,7 @@ def _load_faiss_once() -> Tuple[faiss.Index, np.ndarray, np.ndarray, np.ndarray]
 
     art = get_active_artifact()
     if not art or not art.faiss_path or not art.npz_path:
+        import pdb; pdb.set_trace()
         raise RuntimeError("No active HPOArtifact with FAISS/NPZ found.")
 
     index = faiss.read_index(str(art.faiss_path))
