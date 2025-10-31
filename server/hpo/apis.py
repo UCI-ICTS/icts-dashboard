@@ -271,7 +271,6 @@ class HPOExtractPhenotypesView(APIView):
         },
     )
     def post(self, request):
-        import pdb; pdb.set_trace()
         ser = PhenotypeExtractRequestSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
