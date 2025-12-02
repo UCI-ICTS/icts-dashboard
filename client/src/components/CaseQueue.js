@@ -47,7 +47,6 @@ export default function CaseQueue({
             for (const aln in rows[row].alignments) {
               const alignment = rows[row].alignments[aln]
               if (alignment["aligned_dna_short_read_id"]) {
-                console.log(alignment["aligned_dna_short_read_id"])
                 seqStatus["Complete"]["sr_dna"].push(pid)
               }
               else if (alignment["aligned_pac_bio_id"]) {
