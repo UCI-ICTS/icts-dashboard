@@ -8,6 +8,7 @@ import {
   HomeOutlined,
   LogoutOutlined,
   ProfileOutlined,
+  ScheduleOutlined,
   SettingOutlined,
   UploadOutlined,
   UserOutlined
@@ -40,6 +41,7 @@ const Dashboard = () => {
     { key: 'summary', icon: <DotChartOutlined />, label: <Link to="/gregor-summary">Summary Page</Link> },
     { key: 'table-data', icon: <DatabaseOutlined />, label: <Link to="table-data">GREGoR Tables</Link> },
     { key: 'participant-detail', icon: <UserOutlined />, label: <Link to="participant-detail">Participant Detail</Link> },
+    { key: 'case-queue', icon: <ScheduleOutlined />, label: <Link to="case-queue">Case Queue</Link> },
     { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
     { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),

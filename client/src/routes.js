@@ -77,6 +77,8 @@ const AppRoutes = () => {
         <Route path="table-data/:table" element={<GregorDataSheets />} />
         <Route path="participant-detail/" element={<GregorDataSheets renderDetail={true} />} />
         <Route path="participant-detail/:pid" element={<GregorDataSheets renderDetail={true} />} />
+        <Route path="case-queue/" element={<GregorDataSheets renderQueue={true} />} />
+        <Route path="case-queue/:pid" element={<GregorDataSheets renderQueue={true} />} />
         <Route path="admin" element={<AdminPage />} />
         <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />

@@ -483,35 +483,38 @@ def get_case_queue(participant_id:str) -> dict:
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
         analytes = Analyte.objects.filter(participant_id=participant)
-        serialized_analytes = []
-        serialized_sequencing = []
-        serialized_alignments = []
-        serialized_biobank_entries = []
+        dna_analytes = []
+        pac_bio_sequencing = []
+        pac_bio_alignments = []
 
         for analyte in analytes:
-            biobank_entries = Biobank.objects.filter(child_analytes=analyte)
-            serialized_biobank_entries.append(BiobankSerializer(biobank_entries, many=True).data)  # Allow for multiple biobank entries returned
             if analyte.analyte_type != "DNA":
                 continue
-            serialized_analytes.append(AnalyteSerializer(analyte).data)
+            dna_analytes.append(analyte.analyte_id)
             pac_bio_experiment = ExperimentPacBio.objects.filter(analyte_id=analyte)  # each analyte should have one experiment
             if not pac_bio_experiment:
                 continue
-            serialized_sequencing.append(ExperimentPacBioSerializer(pac_bio_experiment[0]).data)
+            pac_bio_sequencing.append(pac_bio_experiment[0].experiment_pac_bio_id)
             pac_bio_alignment = AlignedPacBio.objects.filter(experiment_pac_bio_id=pac_bio_experiment[0])
             if not pac_bio_alignment:
                 continue
-            serialized_alignments.append(AlignedPacBioSerializer(pac_bio_alignment[0]).data)
+            pac_bio_alignments.append(pac_bio_alignment[0].aligned_pac_bio_id)
             analysis_ready[participant.participant_id] = True  # avoid adding duplicates
+
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=dna_analytes), many=True)
+        serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=dna_analytes), many=True)
+        serialized_sequencing = ExperimentPacBioSerializer(ExperimentPacBio.objects.filter(pk__in=pac_bio_sequencing), many=True)
+        serialized_alignments = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
 
         items = {
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
             "family_id": participant.family_id_id,
             "family_size": len(participants),
-            "biobank": serialized_biobank_entries,
-            "sequencing": serialized_sequencing,
-            "alignments": serialized_alignments,
+            "biobank": serialized_biobanks.data,
+            "analytes": serialized_analytes.data,
+            "sequencing": serialized_sequencing.data,
+            "alignments": serialized_alignments.data,
             }
         case_queue.append(items)
 
