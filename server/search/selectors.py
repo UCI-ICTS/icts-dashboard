@@ -474,61 +474,51 @@ def get_family_detail(participant_id:str) -> dict:
 
 def get_case_queue(participant_id:str) -> dict:
     """
+    Only collect families with completed PacBio alignments
     """
     case_queue = []
+    analysis_ready = {}
     participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)  # Get related participants
 
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
-        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True)
-        serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
-        serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
+        analytes = Analyte.objects.filter(participant_id=participant)
+        serialized_analytes = []
         serialized_sequencing = []
-
-        biobank_entries = Biobank.objects.filter(participant_id__exact=participant)
-        analytes = Analyte.objects.filter(participant_id__exact=participant)
         serialized_alignments = []
         serialized_biobank_entries = []
-        serialized_analytes = []
 
-        for a in analytes:
-            if a.analyte_type != "DNA":
+        for analyte in analytes:
+            biobank_entries = Biobank.objects.filter(child_analytes=analyte)
+            serialized_biobank_entries.append(BiobankSerializer(biobank_entries, many=True).data)  # Allow for multiple biobank entries returned
+            if analyte.analyte_type != "DNA":
                 continue
-            import pdb; pdb.set_trace()
-            serialized_analytes.append(a)
-            try:
-                exp = Experiment.objects.filter(analyte_id__exact=a)  # each analyte should have one experiment
-                if exp.table_name != "ExperimentPacBio":
-                    continue
-                experiment_serializer = table_serializers[exp.table_name]["output_serializer"]
-                experiment = experiment_serializer(Experiment.objects.get(pk=exp.id_in_table)).data
-                experiment["table_type"] = exp.table_name
-                serialized_sequencing.append(experiment)
-                try:
-                    aln = Aligned.objects.filter(experiment_id=experiment)
-                    aligned_serializer = table_serializers[aln.table_name]["output_serializer"]
-                    alignment = aligned_serializer(Aligned.objects.get(pk=aln.id_in_table)).data
-                    alignment["table_type"] = aln.table_name
-                    serialized_alignments.append(alignment)
-                except:
-                    print(f"No alignments for {exp}")
-            except:
-                print(f"No experiments for {a}")
-            bb = Biobank.objects.filter(child_analytes__in=a)
-            biobank_serializer = table_serializers[bb.table_name]["output_serializer"]
-            biobank_entries = biobank_serializer(Biobank.objects.get(pk=bb.id_in_table)).data
-            serialized_biobank_entries.append(biobank_entries)
-
+            serialized_analytes.append(AnalyteSerializer(analyte).data)
+            pac_bio_experiment = ExperimentPacBio.objects.filter(analyte_id=analyte)  # each analyte should have one experiment
+            if not pac_bio_experiment:
+                continue
+            serialized_sequencing.append(ExperimentPacBioSerializer(pac_bio_experiment[0]).data)
+            pac_bio_alignment = AlignedPacBio.objects.filter(experiment_pac_bio_id=pac_bio_experiment[0])
+            if not pac_bio_alignment:
+                continue
+            serialized_alignments.append(AlignedPacBioSerializer(pac_bio_alignment[0]).data)
+            analysis_ready[participant.participant_id] = True  # avoid adding duplicates
 
         items = {
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
             "family_id": participant.family_id_id,
             "family_size": len(participants),
-            "biobank": serialized_biobanks.data,
+            "biobank": serialized_biobank_entries,
             "sequencing": serialized_sequencing,
             "alignments": serialized_alignments,
             }
         case_queue.append(items)
+
+    for p in case_queue:
+        if len(analysis_ready) == p["family_size"]:
+            p["cohort_analysis"] = "ready"
+        else:
+            p["cohort_analysis"] = "incomplete"
 
     return case_queue
