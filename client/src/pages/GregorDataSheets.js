@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Typography, Spin, Modal, Form, Input, Select, Button, message } from "antd";
 import { useTableSettings, buildColumns } from "../utils/tableSettings";
-import { setTableView, fetchTable, familyDetail } from "../slices/dataSlice";
+import { setTableView, fetchTable, familyDetail, caseQueue } from "../slices/dataSlice";
 import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
@@ -18,7 +18,7 @@ const { Header } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 
-export default function GregorDataSheets({ renderDetail=false }) {
+export default function GregorDataSheets({ renderDetail=false, renderQueue=false }) {
   const { table } = useParams();
   const dispatch = useDispatch();
   const isAdmin  = useSelector((state) => state.account.user.is_superuser);
@@ -38,10 +38,11 @@ export default function GregorDataSheets({ renderDetail=false }) {
 // ----Export modal state ----
   const [exportOpen, setExportOpen] = useState(false);
   const [exportFormat, setExportFormat] = useState("TSV"); // Default format
-
 // ----Participant Detail state ----
   const [selectedRow, setSelectedRow] = useState(null);
-  const [detailLoading, setDetailLoding ] = useState(true)
+  const [detailLoading, setDetailLoading ] = useState(true)
+// ----Case Queue state ----
+  const [queueLoading, setQueueLoading ] = useState(true)
 // ---- Table URL state ----
 
   const tableValid = useMemo(() => !!schemas[table], [table]);
@@ -56,19 +57,21 @@ export default function GregorDataSheets({ renderDetail=false }) {
   // Sync URL (only when NOT at ParticipantDetail)
   useEffect(() => {
     if (renderDetail) return;
+    if (renderQueue) return;
     if (!tableValid) return;
     if (tableView !== table) {
       dispatch(setTableView(meta(table))); // one-way sync
     }
-  }, [renderDetail, tableValid, table, tableView, dispatch]);
+  }, [renderDetail, renderQueue, tableValid, table, tableView, dispatch]);
 
   // Enforce “participants” in detail mode
   useEffect(() => {
     if (!renderDetail) return;
+    if (!renderQueue) return;
     if (tableView !== "participants") {
       dispatch(setTableView(meta("participants")));
     }
-  }, [renderDetail, tableView, dispatch]);
+  }, [renderDetail, renderQueue, tableView, dispatch]);
 
   // Fetch data for the current table when empty
   useEffect(() => {
@@ -257,6 +260,12 @@ export default function GregorDataSheets({ renderDetail=false }) {
     dispatch(familyDetail(record.participant_id))
   };
 
+  const handleQueue = (record) => {
+    console.log(record);
+    setSelectedRow(record);
+    dispatch(caseQueue(record.participant_id))
+  };
+
   return (
     <Layout className="admin-layout">
       {renderDetail ? (
@@ -271,10 +280,13 @@ export default function GregorDataSheets({ renderDetail=false }) {
               setSelectedRow={setSelectedRow}
               onRow={(record)=> {}}
               detailLoading={detailLoading}
-              setDetailLoding={setDetailLoding}
+              setDetailLoading={setDetailLoading}
               openModal={openModal}
             />
           ) : null}
+        </>
+      ) : renderQueue ? (
+        <>
           <Header className="secondary-header">
             <Title className="secondary-title">GREGoR Case Queue</Title>
           </Header>
@@ -284,8 +296,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
               selectedRow={selectedRow}
               setSelectedRow={setSelectedRow}
               onRow={(record)=> {}}
-              detailLoading={detailLoading}
-              setDetailLoding={setDetailLoding}
+              queueLoading={queueLoading}
+              setQueueLoading={setQueueLoading}
               openModal={openModal}
             />
           ) : null}
@@ -315,6 +327,7 @@ export default function GregorDataSheets({ renderDetail=false }) {
         recordCount={displayData.length}
         onRefresh={handleRefresh}
         renderDetail={renderDetail}
+        renderQueue={renderQueue}
       />
       {status === "loading" ? (
         <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: 20 }}>
@@ -329,6 +342,8 @@ export default function GregorDataSheets({ renderDetail=false }) {
           onRow={(record) => ({ onClick: () => {
             renderDetail ? (
               handleDetail(record)
+            ) : renderQueue ? (
+              handleQueue(record)
             ) : (
               openModal("edit", { record })
             )

@@ -11,7 +11,7 @@ export default function ParticipantDetail({
   setSelectedRow,
   onRow,
   detailLoading,
-  setDetailLoding,
+  setDetailLoading,
   openModal
 }) {
   const familyData =  useSelector((state) => state.data.familyDetail)
