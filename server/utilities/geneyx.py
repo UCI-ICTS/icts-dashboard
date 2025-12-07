@@ -160,8 +160,17 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
     """
     Upload SNV and SV VCFs to Geneyx
     """
+
+    specimen_map = {
+        "D": "Blood",
+        "OG": "Saliva",
+        "SC": "Buccal",
+        "SG": "Buccal",
+        "X": "Other"
+    }
     url_expiration = 604800  # 7 days
     participant_id = lrs_manifest_row['current_id']
+    specimen_type = specimen_map[lrs_manifest_row['UCI_ID2'].split('-')[-2]]
     ambry_id = lrs_manifest_row['ambry_id']
     analysis_out = lrs_manifest_row['snv_vcf'][0:lrs_manifest_row['snv_vcf'].index('out')]
 
