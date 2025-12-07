@@ -40,14 +40,23 @@ def get_dashboard_token(dashboard_login):
         return dashboard_login
 
 
-def get_all_dashboard_tables(dashboard_login):
+def get_all_dashboard_tables(dashboard_login, dashboard_tables):
     """
     Get all tables to minimize API calls
     """
-    all_tables_url = f"{dashboard_login['server']}/api/search/get_all_tables"
-    response = requests.get(all_tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
-    if response.status_code == 200:
-        return response.json()
+    if not dashboard_tables:
+        tables_url = f"{dashboard_login['server']}/api/search/get_all_tables"
+        response = requests.get(tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
+        if response.status_code == 200:
+            return response.json()
+    else:
+        for app in dashboard_tables:
+            for model in dashboard_tables[app]:
+                table_url = f"{dashboard_login['server']}/api/{app}/{model}/all"
+                response = requests.get(tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
+                if response.status_code == 200:
+                    dashboard_tables[app][model] = response.json()
+        return dashboard_tables
 
 
 def get_lrs_manifest(s3_client):
@@ -204,24 +213,11 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
 
     family = table_query(all_tables['familes'], 'family_id', participant['family_id'])[0]
 
-    analytes = table_query(all_tables['analytes'], 'participant_id', participant_id)
-    sample_sources = {
-        "UBERON:0000178": "Blood",
-        "UBERON:0006956": "Buccal",
-        "UBERON:0001836": "Saliva",
-    }
-    sample_source = "Other"  # default value
-    for analyte in analytes:
-        if analyte['analyte_id'].endswith('.PB'):  # Only process pacbio analytes
-            if analyte['primary_biosample'] in sample_sources:
-                sample_source = sample_sources[analyte['primary_biosample']]
-                break
-
     geneyx_sample_upload = [{  # sample POST request template with default values
         "ApiUserKey": ga_config["apiUserKey"],
         "ApiUserID": ga_config["apiUserID"],
         "SampleSerialNumber": participant_id,  # participant_id
-        "SampleSource": sample_source,  # biobank or analyte source
+        "SampleSource": specimen_type,  # biobank or analyte source
         "SampleSequenceMachineId": "REVIO",
         "SampleEnrichmentKitId": "Long Read Sequencing no CADD",  # Current default smart filter set
         "SampleTarget": "WholeGenomeLongRead",
@@ -304,7 +300,8 @@ def main(dryrun=True):
         }
     }
     dashboard_login = get_dashboard_token(dashboard_login)
-    all_tables = get_all_dashboard_tables(dashboard_login)
+    dashboard_tables = {"metadata": ["family", "participant", "phenotype"]}
+    all_tables = get_all_dashboard_tables(dashboard_login, dashboard_tables)
     lrs_manifest_csv = get_lrs_manifest(s3_client)
     process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dryrun)
 
