@@ -10,8 +10,6 @@ import requests
 import sys
 import yaml
 
-from metadata.models import Family, Participant, Phenotype, Analyte, Biobank
-
 
 def get_s3_bucket_prefix(s3_uri):
     """
@@ -24,7 +22,32 @@ def get_s3_bucket_prefix(s3_uri):
 
 
 def get_s3_client(service='s3', region_name='us-east-2'):
-    return boto3.client(service, region_name=region_name)
+    try:
+        return boto3.client(service, region_name=region_name)
+    except:
+        print("Check if aws has been configured yet")
+        sys.exit(1)
+
+
+def get_dashboard_token(dashboard_login):
+    """
+    Get bearer token for API calls
+    """
+    login_url = f"{dashboard_login['server']}/api/auth/token/login"
+    response = requests.post(login_url, data=dashboard_login['credentials'], headers=dashboard_login['headers'], verify=dashboard_login['verify'])
+    if response.status_code == 200:
+        dashboard_login['header']['Authorization'] = f"Bearer {response.json()['access']}"
+        return dashboard_login
+
+
+def get_all_dashboard_tables(dashboard_login):
+    """
+    Get all tables to minimize API calls
+    """
+    all_tables_url = f"{dashboard_login['server']}/api/search/get_all_tables"
+    response = requests.get(all_tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
+    if response.status_code == 200:
+        return response.json()
 
 
 def get_lrs_manifest(s3_client):
@@ -40,7 +63,7 @@ def get_lrs_manifest(s3_client):
     return csv.DictReader(lrs_manifest_obj['Body'].read().decode(encoding).splitlines(), delimiter='\t')
 
 
-def process_lrs_manifest(ga_config, lrs_manifest_csv):
+def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dryrun):
     url = f"{ga_config['server']}/api/Samples"
     response = requests.post(url, data=ga_config)
     if response.json()['Code'] == 'Success':
@@ -54,8 +77,7 @@ def process_lrs_manifest(ga_config, lrs_manifest_csv):
         if row['current_id'] in ga_samples:
             continue
         else:
-            sample_uploader(ga_config, row['current_id'])
-
+            sample_uploader(s3_client, ga_config, row['current_id'], all_tables, dryrun)
 
 
 def create_presigned_urls(s3_client, s3_uri, expiration):
@@ -76,34 +98,42 @@ def create_presigned_urls(s3_client, s3_uri, expiration):
     return response
 
 
-def get_s3_binary(s3_client, s3_uri):
-    bucket, key = get_s3_bucket_prefix(s3_uri)
-    return s3_client.get_object(Bucket=bucket, Key=key)['Body'].read()
+def find_s3_object(s3_client, analysis_out, ambry_id, suffix):
+    """
+    Docstring for find_s3_object
+
+    :param s3_client: Description
+    :param analysis_out: Description
+    :param ambry_id: Description
+    :param suffix: Description
+    """
+    bucket, prefix = get_s3_bucket_prefix(analysis_out)
+    objects = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+    for object in objects['Contents']:
+        if ambry_id in object['Key'] and object['Key'].endswith(suffix):
+            return f"s3://{bucket}/{object['Key']}"
 
 
 def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     """
     Find the following SV VCFs for the pacbio_unify script
-    * hifiCNV
-    * pbsv
-    * trgt
+    * hificnv -> cnv
+    * pbsv -> sv_vcf
+    * trgt -> trgt
     """
     bucket, prefix = get_s3_bucket_prefix(analysis_out)
     objects = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-    vcfs = {}
+    sv_keys = ["cnv", "sv_vcf", "trgt"]
+    sv_vcfs = {}
     for object in objects['Contents']:
-        if ambry_id in object['Key'] and object['Key'].endswith('.vcf.gz'):
-            if "cnv" in object['Key']:
-                vcfs['hificnv'] = s3_client.get_object(Bucket=bucket, Key=object['Key'])['Body'].read()
-            elif "sv_vcf" in object['Key']:
-                vcfs['pbsv'] = s3_client.get_object(Bucket=bucket, Key=object['Key'])['Body'].read()
-            elif "trgt" in object['Key']:
-                vcfs['trgt'] = s3_client.get_object(Bucket=bucket, Key=object['Key'])['Body'].read()
-    if "hificnv" in vcfs and "pbsv" in vcfs and "trgt" in vcfs:
-        return vcfs
-    else:
-        print(f"{ambry_id} is missing an structural vcf")
-        sys.exit(1)
+        if ambry_id in object['Key'] and object['Key'].endswith('.vcf.gz'):  # Object is a VCF with an Ambry ID in the name
+            for key in sv_keys:
+                if key in object['Key']:
+                    sv_vcfs[key] = s3_client.get_object(Bucket=bucket, Key=object['Key'])['Body'].read()
+    for key in sv_keys:
+        if key not in sv_vcfs:
+            print(f"{ambry_id} is missing its {key} VCF")
+    return sv_vcfs
 
 
 def load_ga_config():
@@ -118,37 +148,71 @@ def load_ga_config():
         return yaml.safe_load(f)
 
 
-def sample_uploader(ga_config, s3_client, lrs_manifest_row):
+def table_query(table, attribute, key):
+    return_rows = []
+    for row in table:
+        if row[attribute] == key:
+            return_rows.append(row)
+    return return_rows
+
+
+def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=True):
     """
     Upload SNV and SV VCFs to Geneyx
     """
     url_expiration = 604800  # 7 days
     participant_id = lrs_manifest_row['current_id']
+    ambry_id = lrs_manifest_row['ambry_id']
+    analysis_out = lrs_manifest_row['snv_vcf'][0:lrs_manifest_row['snv_vcf'].index('out')]
+
+    # Get AWS objects
+    bam_basename = lrs_manifest_row['aligned_bam'].split(';')[0].split('/')[-1]
     bam_url = create_presigned_urls(s3_client, lrs_manifest_row['aligned_bam'], expiration=url_expiration)
-    bucket, snv_key = get_s3_bucket_prefix(lrs_manifest_row['snv_vcf'])
-    snv_basename = lrs_manifest_row['snv_vcf'].split('/')[-1]
-    sv_basename = f"{lrs_manifest_row['current_id']}.GRCh38.geneyx.unify.sv.vcf.gz"
-    wdl_out = lrs_manifest_row['snv_vcf'][0:lrs_manifest_row['snv_vcf'].index('out')]
-    sv_vcfs = find_sv_vcfs(s3_client, wdl_out, lrs_manifest_row['ambry_id'])
+    bai_uri = find_s3_object(s3_client, ambry_id, '.bai')
+    bai_url = create_presigned_urls(s3_client, bai_uri, expiration=url_expiration)
+    methyl_bed_uri = find_s3_object(s3_client, ambry_id, '.bed')
+    methyl_bed_url = create_presigned_urls(s3_client, methyl_bed_uri, expiration=url_expiration)
 
+    snv_basename = lrs_manifest_row['snv_vcf'].split(';')[0].split('/')[-1]
+    sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf.gz"
+
+    sv_vcfs = find_sv_vcfs(s3_client, analysis_out, ambry_id)
+    unify_vcf = pacbio_unify_sv(sv_vcfs)
+
+    bucket, snv_vcf_key = get_s3_bucket_prefix(lrs_manifest_row['snv_vcf'])
     files = {  # load binary contents of gzipped files
-        'snvFile': s3_client.get_object(Bucket=bucket, Key=snv_key)['Body'].read(),
-
+        'snvFile': s3_client.get_object(Bucket=bucket, Key=snv_vcf_key)['Body'].read(),
+        'svFile': unify_vcf,
     }
 
-    url = f"{ga_config['server']}/api/CreateSample"
-    participant = Participant.objects.get(pk=participant_id)
-    sample_relation = participant.proband_relationship
+    ga_url = f"{ga_config['server']}/api/CreateSample"
+
+    participant = table_query(all_tables['participants'], 'participant_id', participant_id)[0]
+
+    sample_relation = participant['proband_relationship']
     if sample_relation == "Self":
         sample_relation = "Matched"
-    family = Family.objects.get(pk=participant.family_id)
-    analytes = Analyte.objects.filter(participant_id=participant_id)
+
+    family = table_query(all_tables['familes'], 'family_id', participant['family_id'])[0]
+
+    analytes = table_query(all_tables['analytes'], 'participant_id', participant_id)
+    sample_sources = {
+        "UBERON:0000178": "Blood",
+        "UBERON:0006956": "Buccal",
+        "UBERON:0001836": "Saliva",
+    }
+    sample_source = "Other"  # default value
+    for analyte in analytes:
+        if analyte['analyte_id'].endswith('.PB'):  # Only process pacbio analytes
+            if analyte['primary_biosample'] in sample_sources:
+                sample_source = sample_sources[analyte['primary_biosample']]
+                break
 
     geneyx_sample_upload = [{  # sample POST request template with default values
         "ApiUserKey": ga_config["apiUserKey"],
         "ApiUserID": ga_config["apiUserID"],
-        "SampleSerialNumber": participant.participant_id,  # participant_id
-        "SampleSource": "",  # biobank or analyte source
+        "SampleSerialNumber": participant_id,  # participant_id
+        "SampleSource": sample_source,  # biobank or analyte source
         "SampleSequenceMachineId": "REVIO",
         "SampleEnrichmentKitId": "Long Read Sequencing no CADD",  # Current default smart filter set
         "SampleTarget": "WholeGenomeLongRead",
@@ -156,65 +220,84 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row):
         "SampleRelation": sample_relation,
         "ExcludeFromLAF": False,
         "bamUrl": bam_url,
-        "methylationUrl": "",
+        "methylationUrl": methyl_bed_url,
         "SnvFile": snv_basename,  # SNV VCF basename
         "StructFile": sv_basename,  # SV VCF basename. Must be Unify SV VCF or Sawfish VCF
-        "SubjectId": participant.participant_id,
-        "SubjectGender": participant.sex,
-        "SubjectConsanguinity": family.consanguinity,
-        "SubjectPopulationType": participant.reported_race,
-        "SubjectPaternalAncestry": participant.paternal_id,
-        "SubjectMaternalAncestry": participant.maternal_id,
-        "SubjectFamilyHistory": family.family_history_detail,
+        "SubjectId": participant_id,
+        "SubjectGender": participant["sex"],
+        "SubjectConsanguinity": family["consanguinity"],
+        "SubjectPopulationType": participant["reported_race"],
+        "SubjectPaternalAncestry": participant["paternal_id"],
+        "SubjectMaternalAncestry": participant["maternal_id"],
+        "SubjectFamilyHistory": family["family_history_detail"],
         "SubjectHasBioSample": True,
         "SubjectUseConsentPersonal": True,  # GRU?
         "SubjectUSeConsentClinical": False,
         "SkipAnnotation": False,
     }]
-    response = requests.post(url, data=geneyx_sample_upload, files=files)
+    if not dryrun:
+        response = requests.post(ga_url, data=geneyx_sample_upload, files=files)
+        return response.json()['Code']
 
-    return response.json()['Code']
 
-
-def case_maker(ga_config, family_id):
+def case_maker(ga_config, family_id, all_tables, dryrun=True):
     """
     Create Geneyx cases
     """
-    url = f"{ga_config['server']}/api/CreateCase"
-    family_members = Participant.objects.filter(family_id=family_id)
+    ga_url = f"{ga_config['server']}/api/CreateCase"
+    all_participants = all_tables['participants']
+    family_members = []
+    for participant in all_participants:
+        if participant["family_id_id"] == family_id:
+            family_members.append(participant)
 
     associated_samples = []
     for member in family_members:
         if member.proband_relationship == "Self":
-            phenotypes = Phenotype.objects.filter(participant_id=member.participant_id)
+            phenotypes = all_tables['phenotypes']
             phenotype_list = [p.term_id for p in phenotypes]
             geneyx_case = [{
                 "ApiUserKey": ga_config["apiUserKey"],
                 "ApiUserID": ga_config["apiUserID"],
-                "SerialNumber": member.participant_id,
-                "Description": member.phenotype_description,
+                "SerialNumber": member["participant_id"],
+                "Description": member["phenotype_description"],
                 "Phenotypes": ','.join(phenotype_list),  # Comma delimited list of HPO IDs from the Phenotype table
                 "ProtocolId": "LR_seq",  # Currently the only Geneyx protocol for Revio
-                "SubjectId": member.participant_id,
-                "ProbandSampleId": member.participant_id,
+                "SubjectId": member["participant_id"],
+                "ProbandSampleId": member["participant_id"],
             }]
         else:  # Only add associated samples that exist in Geneyx
             associated_samples.append({
-                "SampleId": member.participant_id,
-                "Relation": member.proband_relationship,
-                "Affected": member.affected_status,
+                "SampleId": member["participant_id"],
+                "Relation": member["proband_relationship"],
+                "Affected": member["affected_status"],
             })
     geneyx_case["AssociatedSamples"] = associated_samples  # Add associated samples
-    response = requests.post(url, data=geneyx_case)
+    if not dryrun:
+        response = requests.post(ga_url, data=geneyx_case)
+        return response.json()['Code']
 
-    return response.json()['Code']
 
-
-def main():
+def main(dryrun=True):
     ga_config = load_ga_config()
     s3_client = get_s3_client()
+    dashboard_login = {
+        "server": "https://genomics.icts.uci.edu",
+        "headers": {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "",
+        },
+        "verify": False,
+        "credentials": {
+            "username": "idedios",
+            "password": "iBPNlvj79a^tZHQyje#QM@Q5*ULaXJOo",
+        }
+    }
+    dashboard_login = get_dashboard_token(dashboard_login)
+    all_tables = get_all_dashboard_tables(dashboard_login)
     lrs_manifest_csv = get_lrs_manifest(s3_client)
-    process_lrs_manifest(ga_config, lrs_manifest_csv)
+    process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dryrun)
 
 
 if __name__ == '__main__':
