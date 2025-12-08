@@ -4,6 +4,7 @@
 import re
 from django.db import transaction, IntegrityError
 from django.db.models import Q
+from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from rest_framework import serializers
 from config.selectors import (
@@ -43,8 +44,17 @@ from submodels.models import (
     DiscoveryMethod
 )
 
-class GeneticFindingsInputSerializer(serializers.ModelSerializer):
+
+class UserHistorySerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(default=None, read_only=True)
+    updated_by = serializers.StringRelatedField(default=None, read_only=True)
+    class Meta:
+        abstract = True
+
+
+class GeneticFindingsInputSerializer(UserHistorySerializer):
     """
+    Validate fields for GeneticFindings
     """
 
     additional_family_members_with_variant = serializers.PrimaryKeyRelatedField(
@@ -60,7 +70,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneticFindings
         fields = "__all__"
-    
+
     def _partial_helper(self, attrs):
         """
         For partial updates, combine existing instance values with incoming attrs.
@@ -68,13 +78,13 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         """
         if not self.instance:
             return dict(attrs)
-        
+
         combined = { }
         for name in self.fields.keys():
             combined[name] = getattr(self.instance, name, None)
         combined.update(attrs)
         return combined
-    
+
 
     def validate(self, attrs):
         data = self._partial_helper(attrs)
@@ -88,12 +98,12 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
 
         variant_types = set(data.get("variant_type") or [])
         experiment_ids = set(data.get("experiment_id" or []))
-        
+
         if not isinstance(data.get("variant_type"), list):
             errors.setdefault("variant_type", []).append("variant_types must be a list")
         if not isinstance(data.get("experiment_id"), list):
             errors.setdefault("experiment_id", []).append("experiment_id must be a list")
-        
+
         missing_experiment_ids = [e for e in experiment_ids if not Experiment.objects.filter(pk=e).exists()]
         if missing_experiment_ids:
             errors.setdefault("experiment_id", []).append(
@@ -105,7 +115,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             errors.setdefault("variant_types", []).append(
                 f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
             )
-    
+
         # Required ref/alt for SNV/INDEL/RE
         if variant_types & {"SNV", "INDEL", "RE"}:
             if not data.get("ref"):
@@ -129,20 +139,20 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             errors.setdefault("phenotype_contribution", []).append(
                 "If 'gene_known_for_phenotype' is 'Candidate, 'phenotype_contribution' must be 'Uncertain'"
             )
-        
+
         if gene_known_for_phenotype == "known":
             # require known_condition_name
             if not (data.get("known_condition_name") or "").strip():
                 errors.setdefault("known_condition_name", []).append(
                     "known_condition_name is required for a known gene/phenotype."
                 )
-            
+
             # condition_id must be `OMIM:` or `MONDO:`
             condition_id = (data.get("condition_id") or "").strip()
 
             if condition_id and not re.match(r"^(OMIM|MONDO):\S+$", condition_id):
                 errors.setdefault("condition_id", []).append(f"{condition_id} must be OMIM:... or MONDO:...")
-            
+
             # if known gene_known_for_phenotype then valid_condition_inheritance is required
             condition_inheritance = data.get("condition_inheritance")
             if not condition_inheritance:
@@ -183,7 +193,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             errors.setdefault("linked_variant", []).append(
                 f"'linked_variant' {linked_variant} does not match any 'genetic_findings_id'"
             )
-        
+
         # partial_contribution_explained terms must be valid HPO in phenotype table
         partial_contribution_explained = data.get("partial_contribution_explained") or []
         if partial_contribution_explained and isinstance(partial_contribution_explained, list):
@@ -204,7 +214,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError(errors)
         return attrs
-    
+
 
     def create(self, validated_data):
         """
@@ -241,7 +251,10 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
+class GeneticFindingsOutputSerializer(UserHistorySerializer):
+    """
+    Docstring for GeneticFindingsOutputSerializer
+    """
     # declare JSON fields explicitly (no encoder kw)
     experiment_id = serializers.ListField(child=serializers.CharField(), default=list)
     variant_type = serializers.ListField(
@@ -260,7 +273,11 @@ class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AnalyteSerializer(serializers.ModelSerializer):
+class AnalyteSerializer(UserHistorySerializer):
+    """
+    Docstring for AnalyteSerializer
+    """
+
     class Meta:
         model = Analyte
         fields = "__all__"
@@ -285,7 +302,7 @@ class AnalyteSerializer(serializers.ModelSerializer):
         return instance
 
 
-class BiobankSerializer(serializers.ModelSerializer):
+class BiobankSerializer(UserHistorySerializer):
     """
     Serializer for the Biobank model.
     Handles full serialization and deserialization of nested ManyToMany and ForeignKey fields.
@@ -316,36 +333,13 @@ class BiobankSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Biobank
-        fields = [
-            "biobank_id",
-            "participant_id",
-            "received_date",
-            "specimen_type",
-            "current_location",
-            "freezer_id",
-            "shelf_id",
-            "rack_id",
-            "box_type",
-            "box_id",
-            "box_position",
-            "tube_barcode",
-            "plate_barcode",
-            "status",
-            "shipment_date",
-            "tracking_number",
-            "test_indication",
-            "requested_test",
-            "external_id",
-            "internal_analysis",
-            "comments",
-            "child_analytes",
-            "experiments",
-            "alignments",
-            "completed",
-        ]
+        fields = "__all__"
 
 
-class PhenotypeSerializer(serializers.ModelSerializer):
+class PhenotypeSerializer(UserHistorySerializer):
+    """
+    Docstring for PhenotypeSerializer
+    """
     class Meta:
         model = Phenotype
         fields = "__all__"
@@ -363,7 +357,11 @@ class PhenotypeSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FamilySerializer(serializers.ModelSerializer):
+class FamilySerializer(UserHistorySerializer):
+    """
+    Docstring for FamilySerializer
+    """
+
     class Meta:
         model = Family
         fields = "__all__"
@@ -384,13 +382,19 @@ class FamilySerializer(serializers.ModelSerializer):
         return instance
 
 
-class ParticipantOutputSerializer(serializers.ModelSerializer):
+class ParticipantOutputSerializer(UserHistorySerializer):
+    """
+    Docstring for ParticipantOutputSerializer
+    """
     class Meta:
         model = Participant
         fields = "__all__"
 
 
-class ParticipantInputSerializer(serializers.ModelSerializer):
+class ParticipantInputSerializer(UserHistorySerializer):
+    """
+    Docstring for ParticipantInputSerializer
+    """
     prior_testing = serializers.ListField(
         child=serializers.CharField(),
         required=False,
@@ -534,7 +538,7 @@ def get_or_create_sub_models(datum: dict) -> dict:
     return datum
 
 
-def create_metadata(table_name: str, identifier: str, datum: dict):
+def create_metadata(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new model instance based on the provided data.
 
@@ -593,7 +597,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(created_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -628,7 +632,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
 
 
 def update_metadata_entry(
-    table_name: str, identifier: str, model_instance, datum: dict
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User
 ):
     """
     Update an existing model instance based on the provided data.
@@ -701,7 +705,7 @@ def update_metadata_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save()
+            updated_instance = serializer.save(updated_by=current_user)
             message = (
                 f"{table_name} {identifier} updated."
                 if changes

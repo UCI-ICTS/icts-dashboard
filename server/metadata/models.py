@@ -4,6 +4,7 @@
 """ """
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from submodels.models import (
     ReportedRace,
@@ -26,7 +27,29 @@ from submodels.models import (
 )
 
 
-class Family(models.Model):
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        blank=True,
+        null=True
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Family(TimeStampedModel):
     family_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -57,7 +80,7 @@ class Family(models.Model):
     )
 
 
-class Participant(models.Model):
+class Participant(TimeStampedModel):
     participant_id = models.CharField(
         unique=True,
         primary_key=True,
@@ -206,7 +229,7 @@ class Participant(models.Model):
         return list(self.pmid_id.values_list("id", flat=True))
 
 
-class Phenotype(models.Model):
+class Phenotype(TimeStampedModel):
     phenotype_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -290,7 +313,7 @@ class Phenotype(models.Model):
         return f"{self.participant_id.participant_id} - {self.term_id}"
 
 
-class GeneticFindings(models.Model):
+class GeneticFindings(TimeStampedModel):
     genetic_findings_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -472,7 +495,7 @@ class GeneticFindings(models.Model):
         return self.genetic_findings_id
 
 
-class Analyte(models.Model):
+class Analyte(TimeStampedModel):
     analyte_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -596,7 +619,7 @@ class Analyte(models.Model):
         return f"Analyte {self.analyte_id} from participant {self.participant_id.participant_id}"
 
 
-class Biobank(models.Model):
+class Biobank(TimeStampedModel):
     """
     Unified model for tracking a biosample from physical storage
     through sequencing, alignment, and variant calling.

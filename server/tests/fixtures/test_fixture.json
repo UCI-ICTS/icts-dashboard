@@ -21,6 +21,10 @@
     "model": "metadata.family",
     "pk": "GREGoR_test_delete-001",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "consanguinity": "Suspected",
       "consanguinity_detail": "",
       "pedigree_file": "",
@@ -32,6 +36,10 @@
     "model": "metadata.family",
     "pk": "GREGoR_test-001",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "consanguinity": "Suspected",
       "consanguinity_detail": "",
       "pedigree_file": "",
@@ -43,6 +51,10 @@
     "model": "metadata.family",
     "pk": "GREGoR_test-004",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "consanguinity": "None suspected",
       "consanguinity_detail": "",
       "pedigree_file": "",
@@ -54,6 +66,10 @@
     "model": "metadata.family",
     "pk": "GREGoR_test-006",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "consanguinity": "Unknown",
       "consanguinity_detail": "",
       "pedigree_file": "",
@@ -65,6 +81,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-001-001-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -103,6 +123,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-002-001-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -139,6 +163,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-003-001-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -177,6 +205,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-004-004-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -217,6 +249,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-005-004-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -253,6 +289,10 @@
     "model": "metadata.participant",
     "pk": "GREGoR_test-006-006-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "gregor_center": "UCI",
       "consent_code": "GRU",
       "recontactable": "Yes",
@@ -293,6 +333,10 @@
     "model": "metadata.phenotype",
     "pk": "1.2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0002194",
       "presence": "Present",
@@ -307,6 +351,10 @@
     "model": "metadata.phenotype",
     "pk": "1.3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "term_id": "HP:0002076",
       "presence": "Present",
@@ -321,6 +369,10 @@
     "model": "metadata.phenotype",
     "pk": "1.4",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0000733",
       "presence": "Present",
@@ -335,6 +387,10 @@
     "model": "metadata.phenotype",
     "pk": "1.5",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0001260",
       "presence": "Present",
@@ -349,6 +405,10 @@
     "model": "metadata.phenotype",
     "pk": "1.6",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "term_id": "HP:0032322",
       "presence": "Present",
@@ -363,6 +423,10 @@
     "model": "metadata.phenotype",
     "pk": "1.7",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0001324",
       "presence": "Present",
@@ -377,6 +441,10 @@
     "model": "metadata.phenotype",
     "pk": "1.8",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0008936",
       "presence": "Present",
@@ -391,6 +459,10 @@
     "model": "metadata.phenotype",
     "pk": "1.9",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "term_id": "HP:0000729",
       "presence": "Present",
@@ -405,6 +477,10 @@
     "model": "metadata.phenotype",
     "pk": "2.1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0008936",
       "presence": "Present",
@@ -419,6 +495,10 @@
     "model": "metadata.phenotype",
     "pk": "2.10",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "term_id": "HP:0032322",
       "presence": "Present",
@@ -433,6 +513,10 @@
     "model": "metadata.phenotype",
     "pk": "2.11",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0000486",
       "presence": "Present",
@@ -447,6 +531,10 @@
     "model": "metadata.phenotype",
     "pk": "2.2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0001257",
       "presence": "Present",
@@ -461,6 +549,10 @@
     "model": "metadata.phenotype",
     "pk": "2.3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0000565",
       "presence": "Present",
@@ -475,6 +567,10 @@
     "model": "metadata.phenotype",
     "pk": "2.4",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0001269",
       "presence": "Present",
@@ -489,6 +585,10 @@
     "model": "metadata.phenotype",
     "pk": "2.5",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0002126",
       "presence": "Present",
@@ -503,6 +603,10 @@
     "model": "metadata.phenotype",
     "pk": "2.6",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0030724",
       "presence": "Present",
@@ -517,6 +621,10 @@
     "model": "metadata.phenotype",
     "pk": "2.7",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0002282",
       "presence": "Present",
@@ -531,6 +639,10 @@
     "model": "metadata.phenotype",
     "pk": "2.8",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "term_id": "HP:0001263",
       "presence": "Present",
@@ -545,6 +657,10 @@
     "model": "metadata.phenotype",
     "pk": "2.9",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "term_id": "HP:0032322",
       "presence": "Present",
@@ -559,6 +675,10 @@
     "model": "metadata.phenotype",
     "pk": "3.10",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "term_id": "HP:0001631",
       "presence": "Present",
@@ -573,6 +693,10 @@
     "model": "metadata.phenotype",
     "pk": "3.11",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "term_id": "HP:0025666",
       "presence": "Present",
@@ -587,6 +711,10 @@
     "model": "metadata.phenotype",
     "pk": "3.12",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "term_id": "HP:0000207",
       "presence": "Present",
@@ -601,6 +729,10 @@
     "model": "metadata.geneticfindings",
     "pk": "10_73792184_GREGoR_test-001-001-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
@@ -659,6 +791,10 @@
     "model": "metadata.geneticfindings",
     "pk": "11_64660831_GREGoR_test-004-004-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "experiment_id": [
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1"
@@ -710,6 +846,10 @@
     "model": "metadata.geneticfindings",
     "pk": "2_6849938_GREGoR_test-001-001-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
@@ -763,6 +903,10 @@
     "model": "metadata.geneticfindings",
     "pk": "2_6865407_GREGoR_test-001-001-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
@@ -816,6 +960,10 @@
     "model": "metadata.geneticfindings",
     "pk": "5_98899555_GREGoR_test-001-001-0",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
         "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
@@ -869,6 +1017,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -891,6 +1043,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -913,6 +1069,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -935,6 +1095,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-OG-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -957,6 +1121,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "RNA",
       "analyte_processing_details": null,
@@ -979,6 +1147,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-R-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "RNA",
       "analyte_processing_details": "PAXgene Tube",
@@ -1001,6 +1173,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-001-001-0-X-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "analyte_type": "DNA",
       "analyte_processing_details": "DNA isolated with the Oragene Isolation Kit",
@@ -1023,6 +1199,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-002-001-2-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1045,6 +1225,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-002-001-2-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1067,6 +1251,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-002-001-2-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "analyte_type": "RNA",
       "analyte_processing_details": null,
@@ -1089,6 +1277,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-003-001-1-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1111,6 +1303,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-003-001-1-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1133,6 +1329,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-003-001-1-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "analyte_type": "RNA",
       "analyte_processing_details": "PAXgene Tube",
@@ -1155,6 +1355,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-004-004-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1177,6 +1381,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-004-004-0-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1199,6 +1407,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-004-004-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1221,6 +1433,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-004-004-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "analyte_type": "RNA",
       "analyte_processing_details": "PAXgene Tube",
@@ -1243,6 +1459,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-005-004-2-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1265,6 +1485,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-005-004-2-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1287,6 +1511,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-005-004-2-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1309,6 +1537,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-005-004-2-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "analyte_type": "RNA",
       "analyte_processing_details": "PAXgene Tube",
@@ -1331,6 +1563,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1353,6 +1589,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1375,6 +1615,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1397,6 +1641,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "RNA",
       "analyte_processing_details": null,
@@ -1419,6 +1667,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-R-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "RNA",
       "analyte_processing_details": null,
@@ -1441,6 +1693,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-SC-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1463,6 +1719,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-SC-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1485,6 +1745,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-X-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "DNA",
       "analyte_processing_details": null,
@@ -1507,6 +1771,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-XR-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "RNA",
       "analyte_processing_details": "RNA isolate extracted with PAXgene kit",
@@ -1529,6 +1797,10 @@
     "model": "metadata.analyte",
     "pk": "GREGoR_test-006-006-0-XR-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "analyte_type": "RNA",
       "analyte_processing_details": "RNA isolate extracted with PAXgene kit",
@@ -1551,6 +1823,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1587,6 +1863,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1623,6 +1903,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1659,6 +1943,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-OG-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-09-18",
       "specimen_type": "OG",
@@ -1691,6 +1979,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-04-11",
       "specimen_type": "R",
@@ -1727,6 +2019,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-001-001-0-X-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-001-001-0",
       "received_date": "2022-09-25",
       "specimen_type": "SC",
@@ -1760,6 +2056,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1796,6 +2096,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1832,6 +2136,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-002-001-2-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-002-001-2",
       "received_date": "2022-04-11",
       "specimen_type": "R",
@@ -1864,6 +2172,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1900,6 +2212,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-D-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "received_date": "2022-04-11",
       "specimen_type": "D",
@@ -1936,6 +2252,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-003-001-1-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-003-001-1",
       "received_date": "2022-04-11",
       "specimen_type": "R",
@@ -1968,6 +2288,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "received_date": "2022-07-03",
       "specimen_type": "D",
@@ -2004,6 +2328,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "received_date": "2022-05-03",
       "specimen_type": "D",
@@ -2040,6 +2368,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-004-004-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-004-004-0",
       "received_date": "2022-05-03",
       "specimen_type": "R",
@@ -2072,6 +2404,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-005-004-2-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "received_date": "2022-07-03",
       "specimen_type": "D",
@@ -2108,6 +2444,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-005-004-2-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-005-004-2",
       "received_date": "2022-05-03",
       "specimen_type": "R",
@@ -2140,6 +2480,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-D-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-11",
       "specimen_type": "D",
@@ -2176,6 +2520,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-D-3",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-05-03",
       "specimen_type": "D",
@@ -2212,6 +2560,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-R-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-11",
       "specimen_type": "R",
@@ -2244,6 +2596,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-R-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-11",
       "specimen_type": "R",
@@ -2276,6 +2632,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-SC-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-18",
       "specimen_type": "SC",
@@ -2308,6 +2668,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-SC-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-18",
       "specimen_type": "SC",
@@ -2340,6 +2704,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-X-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-18",
       "specimen_type": "SC",
@@ -2374,6 +2742,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-XR-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-18",
       "specimen_type": "XR",
@@ -2407,6 +2779,10 @@
     "model": "metadata.biobank",
     "pk": "GREGoR_test-006-006-0-XR-2",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "participant_id": "GREGoR_test-006-006-0",
       "received_date": "2022-09-18",
       "specimen_type": "XR",
@@ -2440,6 +2816,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
       "participant_id": "GREGoR_test-001-001-0"
@@ -2449,6 +2829,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
       "participant_id": "GREGoR_test-002-001-2"
@@ -2458,6 +2842,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-003-001-1-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-003-001-1-D-1_DNA_1",
       "participant_id": "GREGoR_test-003-001-1"
@@ -2467,6 +2855,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-004-004-0-D-1_DNA_1",
       "participant_id": "GREGoR_test-004-004-0"
@@ -2476,6 +2868,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-005-004-2-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-005-004-2-D-1_DNA_1",
       "participant_id": "GREGoR_test-005-004-2"
@@ -2485,6 +2881,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_dna_short_read.UCI_GREGoR_test-006-006-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-006-006-0-D-1_DNA_1",
       "participant_id": "GREGoR_test-006-006-0"
@@ -2494,6 +2894,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_nanopore",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
       "participant_id": "GREGoR_test-001-001-0"
@@ -2503,6 +2907,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_nanopore",
       "id_in_table": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
       "participant_id": "GREGoR_test-004-004-0"
@@ -2512,6 +2920,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_nanopore.UCI_GREGoR_test-006-006-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_nanopore",
       "id_in_table": "UCI_GREGoR_test-006-006-0-D-3_NANO_1",
       "participant_id": "GREGoR_test-006-006-0"
@@ -2521,6 +2933,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_pac_bio",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
       "participant_id": "GREGoR_test-001-001-0"
@@ -2530,6 +2946,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_pac_bio.UCI_GREGoR_test-002-001-2-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_pac_bio",
       "id_in_table": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
       "participant_id": "GREGoR_test-002-001-2"
@@ -2539,6 +2959,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_pac_bio.UCI_GREGoR_test-003-001-1-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_pac_bio",
       "id_in_table": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
       "participant_id": "GREGoR_test-003-001-1"
@@ -2548,6 +2972,10 @@
     "model": "experiments.experiment",
     "pk": "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "experiment_rna_short_read",
       "id_in_table": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
       "participant_id": "GREGoR_test-001-001-0"
@@ -2557,6 +2985,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-001-001-0",
@@ -2568,6 +3000,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-002-001-2",
@@ -2579,6 +3015,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-003-001-1",
@@ -2590,6 +3030,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-004-004-0",
@@ -2601,6 +3045,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-005-004-2",
@@ -2612,6 +3060,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_dna_short_read.UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_dna_short_read",
       "id_in_table": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1",
       "participant_id": "GREGoR_test-006-006-0",
@@ -2623,6 +3075,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_nanopore.UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_nanopore",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1",
       "participant_id": "GREGoR_test-001-001-0",
@@ -2634,6 +3090,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_nanopore",
       "id_in_table": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1",
       "participant_id": "GREGoR_test-004-004-0",
@@ -2645,6 +3105,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_nanopore.UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_nanopore",
       "id_in_table": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1",
       "participant_id": "GREGoR_test-006-006-0",
@@ -2656,6 +3120,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_pac_bio",
       "id_in_table": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
       "participant_id": "GREGoR_test-001-001-0",
@@ -2667,6 +3135,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_pac_bio.UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_pac_bio",
       "id_in_table": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
       "participant_id": "GREGoR_test-002-001-2",
@@ -2678,6 +3150,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_pac_bio.UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_pac_bio",
       "id_in_table": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
       "participant_id": "GREGoR_test-003-001-1",
@@ -2689,6 +3165,10 @@
     "model": "experiments.aligned",
     "pk": "aligned_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "table_name": "aligned_rna_short_read",
       "id_in_table": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
       "participant_id": "GREGoR_test-001-001-0",
@@ -2700,6 +3180,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-001-001-0-D-1",
       "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2717,6 +3201,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-002-001-2-D-1",
       "experiment_sample_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_2",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2734,6 +3222,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-003-001-1-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-003-001-1-D-1",
       "experiment_sample_id": "GREGoR_test-003-001-1-D-1_DNA_1",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2751,6 +3243,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-004-004-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-004-004-0-D-1",
       "experiment_sample_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2768,6 +3264,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-005-004-2-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-005-004-2-D-1",
       "experiment_sample_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2785,6 +3285,10 @@
     "model": "experiments.experimentdnashortread",
     "pk": "UCI_GREGoR_test-006-006-0-D-1_DNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-006-006-0-D-1",
       "experiment_sample_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1",
       "seq_library_prep_kit_method": "IDT xGen DNA EZ library preparation, Custom 2S Turbo for Invitae",
@@ -2802,6 +3306,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.crai",
@@ -2819,6 +3327,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.crai",
@@ -2836,6 +3348,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1.crai",
@@ -2853,6 +3369,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-004-004-0-D-1_SQ6125.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-004-004-0-D-1_SQ6125.crai",
@@ -2870,6 +3390,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-005-004-2-D-1_DNA.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-005-004-2-D-1_DNA.crai",
@@ -2887,6 +3411,10 @@
     "model": "experiments.aligneddnashortread",
     "pk": "UCI_GREGoR_test-006-006-1-D-1_DNA_1-Aligned-1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned-1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned-1.crai",
@@ -2904,6 +3432,10 @@
     "model": "experiments.librarypreptype",
     "pk": 1,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "stranded poly-A pulldown",
       "display_name": "stranded poly-A pulldown"
     }
@@ -2912,6 +3444,10 @@
     "model": "experiments.librarypreptype",
     "pk": 2,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "stranded total RNA",
       "display_name": "stranded total RNA"
     }
@@ -2920,6 +3456,10 @@
     "model": "experiments.librarypreptype",
     "pk": 3,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "rRNA depletion",
       "display_name": "rRNA depletion"
     }
@@ -2928,6 +3468,10 @@
     "model": "experiments.librarypreptype",
     "pk": 4,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "globin depletion",
       "display_name": "globin depletion"
     }
@@ -2936,6 +3480,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 1,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "Illumina Ribo-Zero Plus rRNA Depletion Kit",
       "display_name": "Illumina Ribo-Zero Plus rRNA Depletion Kit"
     }
@@ -2944,6 +3492,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 2,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)",
       "display_name": "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)"
     }
@@ -2952,6 +3504,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 3,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "NEBNext rRNA & Globin mRNA Depletion Kit (Human/Mouse/Rat)",
       "display_name": "NEBNext rRNA & Globin mRNA Depletion Kit (Human/Mouse/Rat)"
     }
@@ -2960,6 +3516,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 4,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "Watchmaker Polaris Depletion",
       "display_name": "Watchmaker Polaris Depletion"
     }
@@ -2968,6 +3528,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 5,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "KAPA RiboErase (HMR)",
       "display_name": "KAPA RiboErase (HMR)"
     }
@@ -2976,6 +3540,10 @@
     "model": "experiments.preptargetsdetail",
     "pk": 5,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "KAPA RiboErase (HMR) Globin",
       "display_name": "KAPA RiboErase (HMR) Globin"
     }
@@ -2984,6 +3552,10 @@
     "model": "experiments.experimenttype",
     "pk": 1,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "single-end",
       "display_name": "single-end"
     }
@@ -2992,6 +3564,10 @@
     "model": "experiments.experimenttype",
     "pk": 2,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "paired-end",
       "display_name": "paired-end"
     }
@@ -3000,6 +3576,10 @@
     "model": "experiments.experimenttype",
     "pk": 3,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "targeted",
       "display_name": "targeted"
     }
@@ -3008,6 +3588,10 @@
     "model": "experiments.experimenttype",
     "pk": 4,
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "name": "untargeted",
       "display_name": "untargeted"
     }
@@ -3016,6 +3600,10 @@
     "model": "experiments.experimentrnashortread",
     "pk": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-001-001-0-R-1",
       "experiment_sample_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
       "seq_library_prep_kit_method": "Watchmaker ribosomal and globin depletion",
@@ -3036,6 +3624,10 @@
     "model": "experiments.alignedrnashortread",
     "pk": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
       "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1.cram",
       "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1.cram.crai",
@@ -3068,6 +3660,10 @@
     "model": "experiments.experimentnanopore",
     "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-001-001-0-D-3",
       "experiment_sample_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
       "seq_library_prep_kit_method": "Kit 14",
@@ -3086,6 +3682,10 @@
     "model": "experiments.experimentnanopore",
     "pk": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-004-004-0-D-3",
       "experiment_sample_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
       "seq_library_prep_kit_method": "Kit 14",
@@ -3104,6 +3704,10 @@
     "model": "experiments.experimentnanopore",
     "pk": "UCI_GREGoR_test-006-006-0-D-3_NANO_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-006-006-0-D-3",
       "experiment_sample_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1",
       "seq_library_prep_kit_method": "Kit 14",
@@ -3122,6 +3726,10 @@
     "model": "experiments.alignednanopore",
     "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-001-001-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-001-001-0-D-3.bai",
@@ -3149,6 +3757,10 @@
     "model": "experiments.alignednanopore",
     "pk": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-004-004-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-004-004-0-D-3.bai",
@@ -3176,6 +3788,10 @@
     "model": "experiments.alignednanopore",
     "pk": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-006-006-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-006-006-0-D-3.bai",
@@ -3203,6 +3819,10 @@
     "model": "experiments.experimentpacbio",
     "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-001-001-0-D-2",
       "experiment_sample_id": "UCI-014",
       "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -3234,6 +3854,10 @@
     "model": "experiments.experimentpacbio",
     "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-002-001-2-D-2",
       "experiment_sample_id": "UCI-068",
       "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -3265,6 +3889,10 @@
     "model": "experiments.experimentpacbio",
     "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "analyte_id": "GREGoR_test-003-001-1-D-2",
       "experiment_sample_id": "UCI-056",
       "seq_library_prep_kit_method": "SMRTbell prep kit 3.0",
@@ -3296,6 +3924,10 @@
     "model": "experiments.alignedpacbio",
     "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0-D-2.bai",
@@ -3323,6 +3955,10 @@
     "model": "experiments.alignedpacbio",
     "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2-D-2.bai",
@@ -3350,6 +3986,10 @@
     "model": "experiments.alignedpacbio",
     "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
     "fields": {
+      "created_at": "2025-12-08T00:00:00.000000Z",
+      "created_by_id": 2,
+      "updated_at": "2025-12-08T00:00:00.000000Z",
+      "updated_by_id": null,
       "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1-D-2.bai",

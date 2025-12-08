@@ -32,7 +32,7 @@ class AllTablesAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="get_tables",
+        operation_id="get_all_tables",
         responses={
             200: "Submission successfull",
             400: "Bad request",
@@ -88,7 +88,7 @@ class FamilyDetail(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
-        operation_id="family-detail",
+        operation_id="get_family_detail",
         responses={
             200: "Submission successfull",
             400: "Bad request",
@@ -101,7 +101,7 @@ class FamilyDetail(APIView):
             participant_ids = request.GET.get("ids", "").split(",")
             print(participant_ids)
             for participant_id in participant_ids:
-                response.append(get_family_detail(participant_id)) 
+                response.append(get_family_detail(participant_id))
 
             return Response(status=status.HTTP_200_OK, data=response)
 

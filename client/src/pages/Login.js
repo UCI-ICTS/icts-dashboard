@@ -61,7 +61,7 @@ const Login = () => {
             >
               <Input
                 prefix={<UserOutlined />}
-                placeholder="Username"
+                placeholder="Username (your email before the @)"
                 autoComplete="username"
               />
             </Form.Item>

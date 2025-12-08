@@ -106,7 +106,7 @@ INSTALLED_APPS = [
     "authentication",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
-    "submodels"
+    "submodels",
 ]
 
 MIDDLEWARE = [

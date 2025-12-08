@@ -6,11 +6,11 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from metadata.models import Analyte, Participant, VariantType
+from metadata.models import Analyte, Participant, VariantType, TimeStampedModel
 from config.selectors import validate_url
 
 
-class Experiment(models.Model):
+class Experiment(TimeStampedModel):
     EXPERIMENT_TYPES = [
         ("experiment_dna_short_read", "DNA Short Read"),
         ("experiment_rna_short_read", "RNA Short Read"),
@@ -46,7 +46,7 @@ class Experiment(models.Model):
         return f"{self.table_name} - {self.experiment_id}"
 
 
-class Aligned(models.Model):
+class Aligned(TimeStampedModel):
     aligned_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -98,7 +98,7 @@ class Aligned(models.Model):
         return self.aligned_id
 
 
-class ExperimentDNAShortRead(models.Model):
+class ExperimentDNAShortRead(TimeStampedModel):
     experiment_dna_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -152,7 +152,7 @@ class ExperimentDNAShortRead(models.Model):
     )
 
 
-class AlignedDNAShortRead(models.Model):
+class AlignedDNAShortRead(TimeStampedModel):
     aligned_dna_short_read_id = models.CharField(max_length=255, primary_key=True)
     experiment_dna_short_read_id = models.ForeignKey(
         "ExperimentDNAShortRead",
@@ -192,7 +192,7 @@ class AlignedDNAShortRead(models.Model):
         return self.aligned_dna_short_read_id
 
 
-class AlignedDNAShortReadSet(models.Model):
+class AlignedDNAShortReadSet(TimeStampedModel):
     aligned_dna_short_read_set_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -219,7 +219,7 @@ class AlignedDNAShortReadSet(models.Model):
     # application.
 
 
-class CalledVariantsDNAShortRead(models.Model):
+class CalledVariantsDNAShortRead(TimeStampedModel):
     """
     The variant_types field is simplified to a CharField but might want
     to implement it as a ManyToManyField using a separate model if
@@ -248,7 +248,7 @@ class CalledVariantsDNAShortRead(models.Model):
         return self.called_variants_dna_short_read_id
 
 
-class LibraryPrepType(models.Model):
+class LibraryPrepType(TimeStampedModel):
     name = models.CharField(
         max_length=255,
         unique=True,
@@ -266,7 +266,7 @@ class LibraryPrepType(models.Model):
         return self.display_name
 
 
-class PrepTargetsDetail(models.Model):
+class PrepTargetsDetail(TimeStampedModel):
     name = models.CharField(max_length=255, unique=True, blank=True, null=True)
     display_name = models.CharField(max_length=255)
 
@@ -274,7 +274,7 @@ class PrepTargetsDetail(models.Model):
         return self.display_name
 
 
-class ExperimentType(models.Model):
+class ExperimentType(TimeStampedModel):
     name = models.CharField(
         max_length=255,
         unique=True,
@@ -291,7 +291,7 @@ class ExperimentType(models.Model):
         return self.display_name
 
 
-class ExperimentRNAShortRead(models.Model):
+class ExperimentRNAShortRead(TimeStampedModel):
     experiment_rna_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -363,7 +363,7 @@ class ExperimentRNAShortRead(models.Model):
         return self.experiment_rna_short_read_id
 
 
-class AlignedRNAShortRead(models.Model):
+class AlignedRNAShortRead(TimeStampedModel):
     aligned_rna_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -495,7 +495,7 @@ class AlignedRNAShortRead(models.Model):
         return self.aligned_rna_short_read_id
 
 
-class ExperimentNanopore(models.Model):
+class ExperimentNanopore(TimeStampedModel):
     experiment_nanopore_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -583,7 +583,7 @@ class ExperimentNanopore(models.Model):
         return self.experiment_nanopore_id
 
 
-class AlignedNanopore(models.Model):
+class AlignedNanopore(TimeStampedModel):
     aligned_nanopore_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -701,7 +701,7 @@ class AlignedNanopore(models.Model):
         return self.aligned_nanopore_id
 
 
-class AlignedNanoporeSet(models.Model):
+class AlignedNanoporeSet(TimeStampedModel):
     aligned_nanopore_set_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -717,7 +717,7 @@ class AlignedNanoporeSet(models.Model):
         return self.aligned_nanopore_set_id
 
 
-class CalledVariantsNanopore(models.Model):
+class CalledVariantsNanopore(TimeStampedModel):
     called_variants_nanopore_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -756,7 +756,7 @@ class CalledVariantsNanopore(models.Model):
         return self.called_variants_nanopore_id
 
 
-class ExperimentPacBio(models.Model):
+class ExperimentPacBio(TimeStampedModel):
     experiment_pac_bio_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -875,7 +875,7 @@ class ExperimentPacBio(models.Model):
     )
 
 
-class AlignedPacBio(models.Model):
+class AlignedPacBio(TimeStampedModel):
     aligned_pac_bio_id = models.CharField(
         max_length=255,
         unique=True,
@@ -986,7 +986,7 @@ class AlignedPacBio(models.Model):
     )
 
 
-class AlignedPacBioSet(models.Model):
+class AlignedPacBioSet(TimeStampedModel):
     aligned_pac_bio_set_id = models.CharField(
         max_length=255,
         unique=True,
@@ -1003,7 +1003,7 @@ class AlignedPacBioSet(models.Model):
         return self.aligned_pac_bio_set_id
 
 
-class CalledVariantsPacBio(models.Model):
+class CalledVariantsPacBio(TimeStampedModel):
     called_variants_pac_bio_id = models.CharField(
         max_length=255,
         unique=True,
@@ -1042,7 +1042,7 @@ class CalledVariantsPacBio(models.Model):
         return self.called_variants_pac_bio_id
 
 
-class ExperimentATACShortRead(models.Model):
+class ExperimentATACShortRead(TimeStampedModel):
     experiment_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -1096,7 +1096,7 @@ class ExperimentATACShortRead(models.Model):
         return self.experiment_atac_short_read_id
 
 
-class AlignedATACShortRead(models.Model):
+class AlignedATACShortRead(TimeStampedModel):
     aligned_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -1154,7 +1154,7 @@ class AlignedATACShortRead(models.Model):
         return self.aligned_atac_short_read_id
 
 
-class CalledPeaksATACShortRead(models.Model):
+class CalledPeaksATACShortRead(TimeStampedModel):
     called_peaks_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -1195,7 +1195,7 @@ class CalledPeaksATACShortRead(models.Model):
         return self.called_peaks_atac_short_read_id
 
 
-class AlleleSpecificATACShortRead(models.Model):
+class AlleleSpecificATACShortRead(TimeStampedModel):
     asc_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
