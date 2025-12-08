@@ -5,7 +5,6 @@ from botocore.exceptions import ClientError
 import csv
 import gzip
 import logging
-import os
 import requests
 import sys
 import yaml
@@ -33,11 +32,14 @@ def get_dashboard_token(dashboard_login):
     """
     Get bearer token for API calls
     """
-    login_url = f"{dashboard_login['server']}/api/auth/token/login"
-    response = requests.post(login_url, data=dashboard_login['credentials'], headers=dashboard_login['headers'], verify=dashboard_login['verify'])
-    if response.status_code == 200:
-        dashboard_login['header']['Authorization'] = f"Bearer {response.json()['access']}"
+    login_url = f"{dashboard_login['server']}/api/auth/token/login/"
+    response = requests.post(login_url, data=dashboard_login['credentials'], verify=dashboard_login['verify'])
+    if response.ok:
+        dashboard_login['header'] = {'Authorization': f"Bearer {response.json()['access']}"}
         return dashboard_login
+    else:
+        print(response.text)
+        sys.exit(1)
 
 
 def get_all_dashboard_tables(dashboard_login, dashboard_tables):
@@ -45,17 +47,23 @@ def get_all_dashboard_tables(dashboard_login, dashboard_tables):
     Get all tables to minimize API calls
     """
     if not dashboard_tables:
-        tables_url = f"{dashboard_login['server']}/api/search/get_all_tables"
-        response = requests.get(tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
-        if response.status_code == 200:
+        tables_url = f"{dashboard_login['server']}/api/search/get_all_tables/"
+        response = requests.get(tables_url, verify=dashboard_login['verify'])
+        if response.ok:
             return response.json()
+        else:
+            print(response.text)
+            sys.exit(1)
     else:
         for app in dashboard_tables:
             for model in dashboard_tables[app]:
-                table_url = f"{dashboard_login['server']}/api/{app}/{model}/all"
-                response = requests.get(tables_url, headers=dashboard_login['headers'], verify=dashboard_login['verify'])
-                if response.status_code == 200:
+                table_url = f"{dashboard_login['server']}/api/{app}/{model}/all/"
+                response = requests.get(table_url, headers=dashboard_login['header'], verify=dashboard_login['verify'])
+                if response.ok:
                     dashboard_tables[app][model] = response.json()
+                else:
+                    print(response.text)
+                    sys.exit(1)
         return dashboard_tables
 
 
@@ -73,7 +81,7 @@ def get_lrs_manifest(s3_client):
 
 
 def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dryrun):
-    url = f"{ga_config['server']}/api/Samples"
+    url = f"{ga_config['server']}/api/Samples/"
     response = requests.post(url, data=ga_config)
     if response.json()['Code'] == 'Success':
         ga_samples = response.json()['Data']
@@ -123,6 +131,10 @@ def find_s3_object(s3_client, analysis_out, ambry_id, suffix):
             return f"s3://{bucket}/{object['Key']}"
 
 
+def get_s3_object(s3_client, bucket, object):
+    return s3_client.get_object(Bucket=bucket, Key=object['Key'])
+
+
 def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     """
     Find the following SV VCFs for the pacbio_unify script
@@ -132,13 +144,20 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     """
     bucket, prefix = get_s3_bucket_prefix(analysis_out)
     objects = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-    sv_keys = ["cnv", "sv_vcf", "trgt"]
+    sv_keys = ["sv_vcf", "trgt", "cnv"]
     sv_vcfs = {}
     for object in objects['Contents']:
         if ambry_id in object['Key'] and object['Key'].endswith('.vcf.gz'):  # Object is a VCF with an Ambry ID in the name
             for key in sv_keys:
                 if key in object['Key']:
-                    sv_vcfs[key] = s3_client.get_object(Bucket=bucket, Key=object['Key'])['Body'].read()
+                    with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object)['Body']) as svVcfGzFile:
+                        sv_vcfs[key] = svVcfGzFile.readline()
+        elif ambry_id in object['Key'] and '.bcftools_roh.out' in object['Key']:  # Get ROH bed file
+            if object['Key'].endswith('.gz'):
+                with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object)['Body']) as rohBedGzFile:
+                    sv_vcfs["roh"] = rohBedGzFile.readline()
+            else:
+                sv_vcfs["roh"] = get_s3_object(s3_client, bucket, object)['Body']
     for key in sv_keys:
         if key not in sv_vcfs:
             print(f"{ambry_id} is missing its {key} VCF")
@@ -158,11 +177,96 @@ def load_ga_config():
 
 
 def table_query(table, attribute, key):
+    """
+    Query any dashboard table for one or many rows based on a provided attribute matching a key
+    """
     return_rows = []
     for row in table:
         if row[attribute] == key:
             return_rows.append(row)
     return return_rows
+
+
+def create_roh_variant(line_list):
+    # Include ROH bed calls in unify sv
+    chrom = line_list[0]
+    pos_start = int(line_list[1])
+    pos_end = int(line_list[2])
+    roh_score = line_list[3]
+    vcf_pos = str(min([pos_start, pos_end]) + 1)  # Bed files are 0-based; Vcf files are 1-based
+    vcf_pos_end = str(max([pos_start, pos_end]))
+    roh_variant = '\t'.join([
+        chrom,
+        vcf_pos,
+        ".",
+        "N",
+        "<ROH>",
+        ".",
+        "PASS",
+        f"END={vcf_pos_end}",
+        f"SVTYPE=ROH;ROH_SCORE={roh_score}",
+        "GT",
+        "1/1\n"
+    ])
+    return roh_variant
+
+
+def append_trgt_info_field(line_list):
+    # Append SVTYPE=REP to all INFO fields for TRGT variants
+    line_list[7] = line_list[7] + ";SVTYPE=REP"
+    return '\t'.join(line_list)
+
+
+def coordinate_sort_variants(variants):
+    """
+    Sort unified variants to and return a list of lines
+    """
+    unsorted_variants = {}
+    sorted_variants = []
+    for v in variants:
+        v_line = v.split('\t')
+        unsorted_variants[v_line[0]] = {v_line[1]: v_line[2:]}
+    for chrom in unsorted_variants.sort():
+        for pos in unsorted_variants[chrom].sort():
+            sorted_variants.append('\t'.join([chrom, pos] + unsorted_variants[chrom][pos]))
+    return sorted_variants
+
+
+def pacbio_unify_sv(sv_vcfs):
+    """
+    Docstring for pacbio_unify_sv
+
+    :param sv_vcfs: Description
+    """
+    sv_keys = ["roh", "sv_vcf", "trgt", "cnv"]
+    unified_variants = []
+    for key in sv_keys:
+        if key not in sv_vcfs:
+            print(f"Cannot unify vcfs, missing {key} VCF")
+            sys.exit(1)
+        sv_vcf_header = []
+        for line in sv_vcfs[key]:
+            # Save sv_vcf header for UnifyVCF output
+            if line.startswith("#"):
+                if key == "sv_vcf":
+                    sv_vcf_header.append(line)
+            else:
+                line_list = line.split('\t')
+                if key == "roh":
+                    # Include ROH bed calls in unify sv
+                    unified_variants.append(create_roh_variant(line_list))
+                else:
+                    info = line_list[7]
+                    format = line_list[8]
+                    gt_idx = format.split(':').index('GT')
+                    gt = format.split(':')[gt_idx]
+                    if key == "trgt":
+                        line = append_trgt_info_field(line_list)
+                    elif gt_idx == 0 or gt == "./.":
+                        # Skip non SV calls or ref/ref calls
+                        continue
+                    unified_variants.append(line)
+    unified_variants = sv_vcf_header + coordinate_sort_variants(unified_variants)
 
 
 def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=True):
@@ -198,20 +302,22 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
     unify_vcf = pacbio_unify_sv(sv_vcfs)
 
     bucket, snv_vcf_key = get_s3_bucket_prefix(lrs_manifest_row['snv_vcf'])
-    files = {  # load binary contents of gzipped files
-        'snvFile': s3_client.get_object(Bucket=bucket, Key=snv_vcf_key)['Body'].read(),
+    with gzip.GzipFile(fileobj=s3_client.get_object(Bucket=bucket,Key=snv_vcf_key)['Body']) as snvVcfGzFile:
+        snvFile = snvVcfGzFile.read()
+    files = {  # load complete file contents in bulk
+        'snvFile': snvFile,
         'svFile': unify_vcf,
     }
 
-    ga_url = f"{ga_config['server']}/api/CreateSample"
+    ga_url = f"{ga_config['server']}/api/CreateSample/"
 
-    participant = table_query(all_tables['participants'], 'participant_id', participant_id)[0]
+    participant = table_query(all_tables['participant'], 'participant_id', participant_id)[0]
 
     sample_relation = participant['proband_relationship']
     if sample_relation == "Self":
         sample_relation = "Matched"
 
-    family = table_query(all_tables['familes'], 'family_id', participant['family_id'])[0]
+    family = table_query(all_tables['family'], 'family_id', participant['family_id'])[0]
 
     geneyx_sample_upload = [{  # sample POST request template with default values
         "ApiUserKey": ga_config["apiUserKey"],
@@ -249,24 +355,20 @@ def case_maker(ga_config, family_id, all_tables, dryrun=True):
     """
     Create Geneyx cases
     """
-    ga_url = f"{ga_config['server']}/api/CreateCase"
-    all_participants = all_tables['participants']
-    family_members = []
-    for participant in all_participants:
-        if participant["family_id_id"] == family_id:
-            family_members.append(participant)
+    ga_url = f"{ga_config['server']}/api/CreateCase/"
+    family_members = table_query(all_tables['participant'], 'family_id', family_id)
 
     associated_samples = []
     for member in family_members:
         if member.proband_relationship == "Self":
-            phenotypes = all_tables['phenotypes']
-            phenotype_list = [p.term_id for p in phenotypes]
+            phenotypes = table_query(all_tables['phenotype'], 'participant_id', member['participant_id'])
+            phenotype_list = ','.join([p.term_id for p in phenotypes])
             geneyx_case = [{
                 "ApiUserKey": ga_config["apiUserKey"],
                 "ApiUserID": ga_config["apiUserID"],
                 "SerialNumber": member["participant_id"],
                 "Description": member["phenotype_description"],
-                "Phenotypes": ','.join(phenotype_list),  # Comma delimited list of HPO IDs from the Phenotype table
+                "Phenotypes": phenotype_list,  # Comma delimited list of HPO IDs from the Phenotype table
                 "ProtocolId": "LR_seq",  # Currently the only Geneyx protocol for Revio
                 "SubjectId": member["participant_id"],
                 "ProbandSampleId": member["participant_id"],
@@ -284,15 +386,15 @@ def case_maker(ga_config, family_id, all_tables, dryrun=True):
 
 
 def main(dryrun=True):
-    ga_config = load_ga_config()
+    ga_config = {
+        "server": "https://analysis.geneyx.com",
+        "apiUserId": "MJoD+yyHWMm2qDpXys12kg==",
+        "apiUserKey": "SLOTIS2V/4oaI76IQYWQsWotWZhU55ClRRTDqc8BdfzbW9bazQRbvQ==",
+        "pageSize": 1000,
+    }
     s3_client = get_s3_client()
     dashboard_login = {
         "server": "https://genomics.icts.uci.edu",
-        "headers": {
-            "accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": "",
-        },
         "verify": False,
         "credentials": {
             "username": "idedios",
@@ -300,7 +402,13 @@ def main(dryrun=True):
         }
     }
     dashboard_login = get_dashboard_token(dashboard_login)
-    dashboard_tables = {"metadata": ["family", "participant", "phenotype"]}
+    dashboard_tables = {
+        "metadata": {
+            "family": None,
+            "participant": None,
+            "phenotype": None,
+        }
+    }
     all_tables = get_all_dashboard_tables(dashboard_login, dashboard_tables)
     lrs_manifest_csv = get_lrs_manifest(s3_client)
     process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dryrun)
