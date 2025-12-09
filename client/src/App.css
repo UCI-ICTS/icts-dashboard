@@ -518,7 +518,7 @@ body, html {
 .card-title {
   font-size: 24px;
   font-weight: 800;
-  color: var(--uci-blue);
+  color: var(--uci-blue) !important;
   line-height: 1.2;
 }
 
