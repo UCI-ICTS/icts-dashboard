@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import gzip
-import requests
+from io import BytesIO
 import os
+import requests
 import sys
 import yaml
 import aws_calls, dashboard_calls
@@ -16,15 +16,17 @@ def load_ga_config():
     * ApiUserID
     * server - defaults to https://analysis.geneyx.com
     """
+    print("\tLoading geneyx config")
     if os.path.isfile('ga.config.yml'):
         with open('ga.config.yml') as f:
             return yaml.safe_load(f)
 
 
 def get_ga_samples(ga_config):
+    print("\tGetting samples from Geneyx")
     url = f"{ga_config['server']}/api/Samples/"
     response = requests.post(url, data=ga_config)
-    if not response.json()['Code'] == 'Success':
+    if not response.json()['Code'].lower() == 'success':
         print("Error with Geneyx API request Samples")
         sys.exit(1)
     else:
@@ -33,9 +35,10 @@ def get_ga_samples(ga_config):
 
 
 def get_ga_cases(ga_config):
+    print("\tGetting cases from Geneyx")
     url = f"{ga_config['server']}/api/Cases/"
     response = requests.post(url, data=ga_config)
-    if not response.json()['Code'] == 'Success':
+    if not response.json()['Code'].lower() == 'success':
         print("Error with Geneyx API request Cases")
         sys.exit(1)
     else:
@@ -45,26 +48,22 @@ def get_ga_cases(ga_config):
 
 def create_roh_variant(line_list):
     # Include ROH bed calls in unify sv
-    chrom = line_list[0]
-    pos_start = int(line_list[1])
-    pos_end = int(line_list[2])
-    roh_score = line_list[3]
-    vcf_pos = str(min([pos_start, pos_end]) + 1)  # Bed files are 0-based; Vcf files are 1-based
-    vcf_pos_end = str(max([pos_start, pos_end]))
-    roh_variant = '\t'.join([
-        chrom,
-        vcf_pos,
-        ".",
-        "N",
-        "<ROH>",
-        ".",
-        "PASS",
-        f"END={vcf_pos_end}",
-        f"SVTYPE=ROH;ROH_SCORE={roh_score}",
-        "GT",
-        "1/1\n"
+    return '\t'.join([
+        line_list[0],  # CHROM
+        str(int(line_list[1]) + 1),  # POS; Bed files are 0-based; Vcf files are 1-based
+        ".",  # ID
+        "N",  # REF
+        "<ROH>",  # ALT
+        ".",  # QUAL
+        "PASS",  # FILTER
+        ';'.join([  # INFO
+            f"END={str(int(line_list[2]))}",  # Bed end pos
+            f"SVTYPE=ROH",
+            f"ROH_SCORE={line_list[3]}"  # Bed score
+            ]),
+        "GT",  # FORMAT
+        "1/1"  # _
     ])
-    return roh_variant
 
 
 def append_trgt_info_field(line_list):
@@ -94,8 +93,8 @@ def coordinate_sort_variants(variants):
     for v in variants:
         v_line = v.split('\t')
         unsorted_variants[v_line[0]] = {v_line[1]: v_line[2:]}
-    for chrom in unsorted_variants.sort():
-        for pos in unsorted_variants[chrom].sort():
+    for chrom in sorted(unsorted_variants.keys()):
+        for pos in sorted(unsorted_variants[chrom].keys()):
             sorted_variants.append('\t'.join([chrom, pos] + unsorted_variants[chrom][pos]))
     return sorted_variants
 
@@ -106,13 +105,14 @@ def pacbio_unify_sv(sv_vcfs):
 
     :param sv_vcfs: Description
     """
+    print(f"\tUnifying SVs")
     sv_keys = ["roh", "sv_vcf", "trgt", "cnv"]
+    sv_vcf_header = []
     unified_variants = []
     for key in sv_keys:
         if key not in sv_vcfs:
             print(f"Cannot unify vcfs, missing {key} VCF")
             sys.exit(1)
-        sv_vcf_header = []
         for line in sv_vcfs[key]:
             # Save sv_vcf header for UnifyVCF output
             if line.startswith("#"):
@@ -129,16 +129,18 @@ def pacbio_unify_sv(sv_vcfs):
                     if not valid_variant(line_list):
                         continue
                     unified_variants.append(line)
-    return ''.join([sv_vcf_header + coordinate_sort_variants(unified_variants)])  # Lines already have \n endings
+    return '\n'.join(sv_vcf_header + coordinate_sort_variants(unified_variants))
 
 
-def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=True):
+def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun):
     """
     Upload SNV and SV VCFs to Geneyx
     """
     url_expiration = 604800  # 7 days
+    encoding = "utf-8"
 
     participant_id = lrs_manifest_row['current_id']
+    print(f"\tUploading {participant_id} VCFs to Geneyx")
     ambry_id = lrs_manifest_row['ambry_id']
     analysis_out = lrs_manifest_row['snv_vcf'][0:lrs_manifest_row['snv_vcf'].index('out')]
 
@@ -158,32 +160,39 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
     methyl_bed_url = aws_calls.find_cpg_bed(s3_client, analysis_out, ambry_id, url_expiration)
 
     snv_basename = lrs_manifest_row['snv_vcf'].split(';')[0].split('/')[-1]
-    sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf.gz"
+    unify_sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf.gz"
+
+    snv_vcf = aws_calls.get_snv_vcf(s3_client, lrs_manifest_row['snv_vcf'])
 
     sv_vcfs = aws_calls.find_sv_vcfs(s3_client, analysis_out, ambry_id)
-    unify_vcf = pacbio_unify_sv(sv_vcfs)
+    unify_sv_vcf = pacbio_unify_sv(sv_vcfs)
 
-    bucket, snv_vcf_key = aws_calls.get_s3_bucket_prefix(lrs_manifest_row['snv_vcf'])
-    with gzip.GzipFile(fileobj=s3_client.get_object(Bucket=bucket,Key=snv_vcf_key)['Body']) as snvVcfGzFile:
-        snvFile = snvVcfGzFile.read()
     files = {  # load complete file contents in bulk
-        'snvFile': snvFile,
-        'svFile': unify_vcf,
+        'snvFile': (
+            snv_basename,
+            BytesIO(snv_vcf.encode(encoding)),
+            'text/plain'
+        ),
+        'svFile': (
+            unify_sv_basename,
+            BytesIO(unify_sv_vcf.encode(encoding)),
+            'text/plain'
+        ),
     }
 
     ga_url = f"{ga_config['server']}/api/CreateSample/"
 
-    participant = dashboard_calls.table_query(all_tables['participant'], 'participant_id', participant_id)[0]
+    participant = dashboard_calls.table_query(all_tables['metadata']['participant'], 'participant_id', participant_id)[0]
 
     sample_relation = participant['proband_relationship']
     if sample_relation == "Self":
         sample_relation = "Matched"
 
-    family = dashboard_calls.table_query(all_tables['family'], 'family_id', participant['family_id'])[0]
+    family = dashboard_calls.table_query(all_tables['metadata']['family'], 'family_id', participant['family_id'])[0]
 
-    geneyx_sample_upload = [{  # sample POST request template with default values
+    geneyx_sample_upload = {  # sample POST request template with default values
         "ApiUserKey": ga_config["apiUserKey"],
-        "ApiUserID": ga_config["apiUserID"],
+        "ApiUserID": ga_config["apiUserId"],
         "SampleSerialNumber": participant_id,  # participant_id
         "SampleSource": specimen_type,  # biobank or analyte source
         "SampleSequenceMachineId": "REVIO",
@@ -195,11 +204,11 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
         "bamUrl": bam_url,
         "methylationUrl": methyl_bed_url,
         "SnvFile": snv_basename,  # SNV VCF basename
-        "StructFile": sv_basename,  # SV VCF basename. Must be Unify SV VCF or Sawfish VCF
+        "StructFile": unify_sv_basename,  # SV VCF basename. Must be Unify SV VCF or Sawfish VCF
         "SubjectId": participant_id,
         "SubjectGender": participant["sex"],
         "SubjectConsanguinity": family["consanguinity"],
-        "SubjectPopulationType": participant["reported_race"],
+        "SubjectPopulationType": participant["reported_race"][0],  # only provide the first race if multiple are present
         "SubjectPaternalAncestry": participant["paternal_id"],
         "SubjectMaternalAncestry": participant["maternal_id"],
         "SubjectFamilyHistory": family["family_history_detail"],
@@ -207,43 +216,54 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun=T
         "SubjectUseConsentPersonal": True,  # GRU?
         "SubjectUSeConsentClinical": False,
         "SkipAnnotation": False,
-    }]
+    }
     if not dryrun:
         response = requests.post(ga_url, data=geneyx_sample_upload, files=files)
+        import pdb; pdb.set_trace()
+        if response.json()['Code'].lower() != "success":
+            print(f"\t{response.json()}")
+        else:
+            print(f"\tCompleted upload of {participant_id} VCFs to Geneyx")
+    else:
+        print(f"\tCompleted mock upload of {participant_id} VCFs to Geneyx")
 
-        return response.json()['Code']
 
-
-def case_maker(ga_config, family_id, all_tables, dryrun=True):
+def case_maker(ga_config, ga_samples, ga_cases, family_members, all_tables, dryrun):
     """
     Create Geneyx cases
     """
     ga_url = f"{ga_config['server']}/api/CreateCase/"
-    family_members = dashboard_calls.table_query(all_tables['participant'], 'family_id', family_id)
 
     associated_samples = []
     for member in family_members:
-        if member.proband_relationship == "Self":
-            phenotypes = dashboard_calls.table_query(all_tables['phenotype'], 'participant_id', member['participant_id'])
-            phenotype_list = ','.join([p.term_id for p in phenotypes])
-            geneyx_case = [{
-                "ApiUserKey": ga_config["apiUserKey"],
-                "ApiUserID": ga_config["apiUserID"],
-                "SerialNumber": member["participant_id"],
-                "Description": member["phenotype_description"],
-                "Phenotypes": phenotype_list,  # Comma delimited list of HPO IDs from the Phenotype table
-                "ProtocolId": "LR_seq",  # Currently the only Geneyx protocol for Revio
-                "SubjectId": member["participant_id"],
-                "ProbandSampleId": member["participant_id"],
-            }]
-        else:  # Only add associated samples that exist in Geneyx
-            associated_samples.append({
-                "SampleId": member["participant_id"],
-                "Relation": member["proband_relationship"],
-                "Affected": member["affected_status"],
-            })
+        if member in ga_samples:  # Only include previously uploaded samples
+            if member["proband_relationship"] == "Self":
+                print(f"\tCreating Geneyx case for {member['participant_id']}")
+                phenotypes = dashboard_calls.table_query(all_tables['metadata']['phenotype'], 'participant_id', member['participant_id'])
+                phenotype_list = ','.join([p["term_id"] for p in phenotypes])
+                geneyx_case = {
+                    "ApiUserKey": ga_config["apiUserKey"],
+                    "ApiUserID": ga_config["apiUserId"],
+                    "SerialNumber": member["participant_id"],
+                    "Description": member["phenotype_description"],
+                    "Phenotypes": phenotype_list,  # Comma delimited list of HPO IDs from the Phenotype table
+                    "ProtocolId": "LR_seq",  # Currently the only Geneyx protocol for Revio
+                    "SubjectId": member["participant_id"],
+                    "ProbandSampleId": member["participant_id"],
+                }
+            else:  # Only add associated samples that exist in Geneyx
+                associated_samples.append({
+                    "SampleId": member["participant_id"],
+                    "Relation": member["proband_relationship"],
+                    "Affected": member["affected_status"],
+                })
     geneyx_case["AssociatedSamples"] = associated_samples  # Add associated samples
     if not dryrun:
         response = requests.post(ga_url, data=geneyx_case)
 
-        return response.json()['Code']
+        if response.json()['Code'].lower() != "success":
+            print(f"\t{response.json()}")
+        else:
+            print(f"\tCompleted creating Geneyx case for {member['participant_id']}")
+    else:
+        print(f"\tCompleted creating mock Geneyx case for {member['participant_id']}")

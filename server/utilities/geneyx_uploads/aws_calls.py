@@ -8,6 +8,10 @@ import logging
 import sys
 
 
+# Global vars
+encoding = "utf-8"
+
+
 def get_s3_bucket_prefix(s3_uri):
     """
     Convert an aws s3 uri to discrete bucket name and key path
@@ -34,7 +38,6 @@ def get_lrs_manifest(s3_client):
     """
     bucket = 'pmgrc-wgs-long-read-derived-data'
     prefix = 'alignments/ambry/lrs-manifest'
-    encoding = 'utf-8'
     lrs_manifest_key = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)['Contents'][0]['Key']  # there should only be one lrs-manifest present
     lrs_manifest_obj = s3_client.get_object(Bucket=bucket, Key=lrs_manifest_key)
 
@@ -76,9 +79,18 @@ def find_s3_object(s3_client, analysis_out, ambry_id, suffix):
             return f"s3://{bucket}/{object['Key']}"
 
 
-def get_s3_object(s3_client, bucket, object):
+def get_s3_object(s3_client, bucket, prefix):
 
-    return s3_client.get_object(Bucket=bucket, Key=object['Key'])
+    return s3_client.get_object(Bucket=bucket, Key=prefix)
+
+
+def get_snv_vcf(s3_client, vcf_path):
+    bucket, snv_vcf_key = get_s3_bucket_prefix(vcf_path)
+    if snv_vcf_key.endswith(".gz"):
+        with gzip.GzipFile(fileobj=s3_client.get_object(Bucket=bucket,Key=snv_vcf_key)['Body']) as snvVcfGzFile:
+            return snvVcfGzFile.read().decode(encoding)
+    else:
+        return get_s3_object(s3_client, bucket, snv_vcf_key)['Body'].read().decode(encoding)
 
 
 def find_sv_vcfs(s3_client, analysis_out, ambry_id):
@@ -94,17 +106,21 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     sv_keys = ["sv_vcf", "trgt", "cnv"]
     sv_vcfs = {}
     for object in objects['Contents']:
-        if ambry_id in object['Key'] and object['Key'].endswith('.vcf.gz'):  # Object is a VCF with an Ambry ID in the name
+        if ambry_id in object['Key'] and ".vcf" in object['Key'] and not object['Key'].endswith(".tbi"):  # Object is a VCF with an Ambry ID in the name
             for key in sv_keys:
                 if key in object['Key']:
-                    with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object)['Body']) as svVcfGzFile:
-                        sv_vcfs[key] = svVcfGzFile.readline()
-        elif ambry_id in object['Key'] and '.bcftools_roh.out' in object['Key']:  # Get ROH bed file
+                    if object['Key'].endswith(".gz"):
+                        with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as svVcfGzFile:
+                            sv_vcfs[key] = svVcfGzFile.read().decode(encoding).splitlines()
+                    else:  # Also allow for uncompressed files
+                        print(object['Key'])
+                        sv_vcfs[key] = get_s3_object(s3_client, bucket, object['Key'])['Body'].read().decode(encoding).splitlines()
+        elif ambry_id in object['Key'] and 'roh.bed' in object['Key']:  # Get ROH bed file
             if object['Key'].endswith('.gz'):
-                with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object)['Body']) as rohBedGzFile:
-                    sv_vcfs["roh"] = rohBedGzFile.readline()
+                with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as rohBedGzFile:
+                    sv_vcfs["roh"] = rohBedGzFile.read().decode(encoding).splitlines()
             else:
-                sv_vcfs["roh"] = get_s3_object(s3_client, bucket, object)['Body']
+                sv_vcfs["roh"] = get_s3_object(s3_client, bucket, object['Key'])['Body'].read().decode(encoding).splitlines()
     for key in sv_keys:
         if key not in sv_vcfs:
             print(f"{ambry_id} is missing its {key} VCF")
