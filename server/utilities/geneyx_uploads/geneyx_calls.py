@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+import bgzip
 from io import BytesIO
+import json
 import os
 import requests
+import subprocess
 import sys
 import yaml
 import aws_calls, dashboard_calls
@@ -26,7 +29,7 @@ def get_ga_samples(ga_config):
     print("\tGetting samples from Geneyx")
     url = f"{ga_config['server']}/api/Samples/"
     response = requests.post(url, data=ga_config)
-    if not response.json()['Code'].lower() == 'success':
+    if not response.ok:
         print("Error with Geneyx API request Samples")
         sys.exit(1)
     else:
@@ -38,7 +41,7 @@ def get_ga_cases(ga_config):
     print("\tGetting cases from Geneyx")
     url = f"{ga_config['server']}/api/Cases/"
     response = requests.post(url, data=ga_config)
-    if not response.json()['Code'].lower() == 'success':
+    if not response.ok:
         print("Error with Geneyx API request Cases")
         sys.exit(1)
     else:
@@ -50,14 +53,14 @@ def create_roh_variant(line_list):
     # Include ROH bed calls in unify sv
     return '\t'.join([
         line_list[0],  # CHROM
-        str(int(line_list[1]) + 1),  # POS; Bed files are 0-based; Vcf files are 1-based
+        str(int(line_list[1])+1),  # POS; Bed files are 0-based; Vcf files are 1-based
         ".",  # ID
         "N",  # REF
         "<ROH>",  # ALT
         ".",  # QUAL
         "PASS",  # FILTER
         ';'.join([  # INFO
-            f"END={str(int(line_list[2]))}",  # Bed end pos
+            f"END={line_list[2]}",  # Bed end pos
             f"SVTYPE=ROH",
             f"ROH_SCORE={line_list[3]}"  # Bed score
             ]),
@@ -126,8 +129,8 @@ def pacbio_unify_sv(sv_vcfs):
                 else:
                     if key == "trgt":
                         line = append_trgt_info_field(line_list)
-                    if not valid_variant(line_list):
-                        continue
+                    #if not valid_variant(line_list):
+                    #    continue
                     unified_variants.append(line)
     return '\n'.join(sv_vcf_header + coordinate_sort_variants(unified_variants))
 
@@ -137,12 +140,13 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun):
     Upload SNV and SV VCFs to Geneyx
     """
     url_expiration = 604800  # 7 days
-    encoding = "utf-8"
+    encoding = 'utf-8'
 
     participant_id = lrs_manifest_row['current_id']
-    print(f"\tUploading {participant_id} VCFs to Geneyx")
+    print(f"\tStarting Geneyx VCF uploader for {participant_id}")
     ambry_id = lrs_manifest_row['ambry_id']
-    analysis_out = lrs_manifest_row['snv_vcf'][0:lrs_manifest_row['snv_vcf'].index('out')]
+    snv_vcf_uri = lrs_manifest_row['snv_vcf'].split(';')[0]
+    analysis_out = snv_vcf_uri[0:snv_vcf_uri.index('out')]
 
     specimen_map = {
         "D": "Blood",
@@ -154,43 +158,58 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun):
     specimen_type = specimen_map[lrs_manifest_row['UCI_ID2'].split('-')[-2]]
 
     # Get AWS objects
-    bam_basename = lrs_manifest_row['aligned_bam'].split(';')[0].split('/')[-1]
-    bam_url = aws_calls.create_presigned_urls(s3_client, lrs_manifest_row['aligned_bam'], url_expiration)
-    bai_url = aws_calls.find_bai(s3_client, analysis_out, bam_basename, url_expiration)
-    methyl_bed_url = aws_calls.find_cpg_bed(s3_client, analysis_out, ambry_id, url_expiration)
+    bam_uri = lrs_manifest_row['aligned_bam'].split(';')[0]  # Only process the first bam
+    bam_url, bai_url = aws_calls.get_bam_bai_temp_urls(s3_client, analysis_out, bam_uri, url_expiration)
+    methyl_bed_url = aws_calls.get_cpg_bed_temp_url(s3_client, analysis_out, ambry_id, url_expiration)
 
-    snv_basename = lrs_manifest_row['snv_vcf'].split(';')[0].split('/')[-1]
-    unify_sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf.gz"
+    file_out = f"sample_uploader/{participant_id}/"
+    if not os.path.exists(file_out):
+        os.makedirs(file_out)
 
-    snv_vcf = aws_calls.get_snv_vcf(s3_client, lrs_manifest_row['snv_vcf'])
+    print(f"\tDownloading SNV VCF")
+    snv_vcf_binary = aws_calls.get_snv_vcf(s3_client, snv_vcf_uri)
+    snv_basename = snv_vcf_uri.split('/')[-1]  # If there are multiple, only process the first
+    with open(f"{file_out}/{snv_basename}", 'wb') as raw:
+        raw.write(snv_vcf_binary)
 
+    print(f"\tDownloading SV VCFs")
     sv_vcfs = aws_calls.find_sv_vcfs(s3_client, analysis_out, ambry_id)
+    print(f"\tUnifying SV VCFs")
     unify_sv_vcf = pacbio_unify_sv(sv_vcfs)
+    unify_sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf"
+    with open(f"{file_out}/{unify_sv_basename}.gz", 'wb') as raw:
+        with bgzip.BGZipWriter(raw) as fh:
+            fh.write(bytes(unify_sv_vcf, encoding=encoding))
 
     files = {  # load complete file contents in bulk
         'snvFile': (
             snv_basename,
-            BytesIO(snv_vcf.encode(encoding)),
-            'text/plain'
+            BytesIO(snv_vcf_binary)
         ),
         'svFile': (
             unify_sv_basename,
-            BytesIO(unify_sv_vcf.encode(encoding)),
-            'text/plain'
+            BytesIO(unify_sv_vcf.encode(encoding))
         ),
     }
 
-    ga_url = f"{ga_config['server']}/api/CreateSample/"
+    ga_url = f"{ga_config['server']}/api/createSample"
 
     participant = dashboard_calls.table_query(all_tables['metadata']['participant'], 'participant_id', participant_id)[0]
-
     sample_relation = participant['proband_relationship']
     if sample_relation == "Self":
         sample_relation = "Matched"
+    sample_notes = '|'.join(participant['phenotype_description'])
+    population_type = '|'.join(participant["reported_race"] + participant["reported_ethnicity"])
 
     family = dashboard_calls.table_query(all_tables['metadata']['family'], 'family_id', participant['family_id'])[0]
+    subject_consanguinity = {
+        "None suspected": "Non-Consanguineous",
+        "Suspected": "Consanguineous",
+        "Present": "Consanguineous",
+        "Unknown": "Unknown",
+    }
 
-    geneyx_sample_upload = {  # sample POST request template with default values
+    geneyx_sample = {  # sample POST request template
         "ApiUserKey": ga_config["apiUserKey"],
         "ApiUserID": ga_config["apiUserId"],
         "SampleSerialNumber": participant_id,  # participant_id
@@ -200,27 +219,40 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun):
         "SampleTarget": "WholeGenomeLongRead",
         "SampleGenomeBuild": "hg38",
         "SampleRelation": sample_relation,
+        "SampleNotes": sample_notes,
         "ExcludeFromLAF": False,
-        "bamUrl": bam_url,
+        "BamUrl": bam_url,
         "methylationUrl": methyl_bed_url,
         "SnvFile": snv_basename,  # SNV VCF basename
         "StructFile": unify_sv_basename,  # SV VCF basename. Must be Unify SV VCF or Sawfish VCF
         "SubjectId": participant_id,
-        "SubjectGender": participant["sex"],
-        "SubjectConsanguinity": family["consanguinity"],
-        "SubjectPopulationType": participant["reported_race"][0],  # only provide the first race if multiple are present
-        "SubjectPaternalAncestry": participant["paternal_id"],
-        "SubjectMaternalAncestry": participant["maternal_id"],
-        "SubjectFamilyHistory": family["family_history_detail"],
+        "SubjectPopulationType": population_type,
+        "SubjectConsanguinity": subject_consanguinity[family["consanguinity"]],
         "SubjectHasBioSample": True,
         "SubjectUseConsentPersonal": True,  # GRU?
         "SubjectUSeConsentClinical": False,
         "SkipAnnotation": False,
     }
+
+    # Optional fields that should only be set if they have allowed values
+    if participant["sex"] != "Unknown":
+        geneyx_sample['SubjectGender'] = participant["sex"][0],  # First character of sex only
+    if participant["paternal_id"] != "0":
+        geneyx_sample["SubjectPaternalAncestry"] = participant["paternal_id"]
+    if participant["maternal_id"] != "0":
+        geneyx_sample["SubjectMaternalAncestry"] = participant["maternal_id"]
+    if family["family_history_detail"]:
+        geneyx_sample["SubjectFamilyHistory"] = family["family_history_detail"]
+
+    # Save finalized POST request to file
+    with open(f"{file_out}/{participant_id}.json", 'wt') as f:
+        json.dump(geneyx_sample, f)
+
+    # Send POST request
     if not dryrun:
-        response = requests.post(ga_url, data=geneyx_sample_upload, files=files)
-        import pdb; pdb.set_trace()
-        if response.json()['Code'].lower() != "success":
+        print(f"\tGeneyx Request POST CreateSample {participant_id}")
+        response = requests.post(ga_url, data=geneyx_sample, files=files)
+        if response.ok:
             print(f"\t{response.json()}")
         else:
             print(f"\tCompleted upload of {participant_id} VCFs to Geneyx")
@@ -228,17 +260,19 @@ def sample_uploader(ga_config, s3_client, lrs_manifest_row, all_tables, dryrun):
         print(f"\tCompleted mock upload of {participant_id} VCFs to Geneyx")
 
 
+
 def case_maker(ga_config, ga_samples, ga_cases, family_members, all_tables, dryrun):
     """
     Create Geneyx cases
     """
-    ga_url = f"{ga_config['server']}/api/CreateCase/"
+    ga_url = f"{ga_config['server']}/api/CreateCase"
 
     associated_samples = []
     for member in family_members:
         if member in ga_samples:  # Only include previously uploaded samples
             if member["proband_relationship"] == "Self":
-                print(f"\tCreating Geneyx case for {member['participant_id']}")
+                proband_id = member["participant_id"]
+                print(f"\tCreating Geneyx case for proband {member['participant_id']}")
                 phenotypes = dashboard_calls.table_query(all_tables['metadata']['phenotype'], 'participant_id', member['participant_id'])
                 phenotype_list = ','.join([p["term_id"] for p in phenotypes])
                 geneyx_case = {
@@ -258,7 +292,13 @@ def case_maker(ga_config, ga_samples, ga_cases, family_members, all_tables, dryr
                     "Affected": member["affected_status"],
                 })
     geneyx_case["AssociatedSamples"] = associated_samples  # Add associated samples
+    file_out = f"case_maker/{proband_id}/"
+    if not os.path.exists(file_out):
+        os.makedirs(file_out)
+    with open(f"{file_out}/{proband_id}.json", 'wt') as f:
+        json.dump(geneyx_case, f)
     if not dryrun:
+        print(f"\tSending POST request for {proband_id}")
         response = requests.post(ga_url, data=geneyx_case)
 
         if response.json()['Code'].lower() != "success":
@@ -267,3 +307,7 @@ def case_maker(ga_config, ga_samples, ga_cases, family_members, all_tables, dryr
             print(f"\tCompleted creating Geneyx case for {member['participant_id']}")
     else:
         print(f"\tCompleted creating mock Geneyx case for {member['participant_id']}")
+
+
+if __name__ == '__main__':
+    pacbio_unify_sv()  # Troubleshoot discrepancies of unify_sv

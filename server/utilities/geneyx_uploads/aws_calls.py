@@ -86,11 +86,7 @@ def get_s3_object(s3_client, bucket, prefix):
 
 def get_snv_vcf(s3_client, vcf_path):
     bucket, snv_vcf_key = get_s3_bucket_prefix(vcf_path)
-    if snv_vcf_key.endswith(".gz"):
-        with gzip.GzipFile(fileobj=s3_client.get_object(Bucket=bucket,Key=snv_vcf_key)['Body']) as snvVcfGzFile:
-            return snvVcfGzFile.read().decode(encoding)
-    else:
-        return get_s3_object(s3_client, bucket, snv_vcf_key)['Body'].read().decode(encoding)
+    return get_s3_object(s3_client, bucket, snv_vcf_key)['Body'].read()  # Do not decompress or parse
 
 
 def find_sv_vcfs(s3_client, analysis_out, ambry_id):
@@ -106,17 +102,13 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     sv_keys = ["sv_vcf", "trgt", "cnv"]
     sv_vcfs = {}
     for object in objects['Contents']:
-        if ambry_id in object['Key'] and ".vcf" in object['Key'] and not object['Key'].endswith(".tbi"):  # Object is a VCF with an Ambry ID in the name
+        if ambry_id in object['Key'] and ".vcf.gz" in object['Key'] and not object['Key'].endswith(".tbi"):  # Object is a VCF with an Ambry ID in the name
             for key in sv_keys:
                 if key in object['Key']:
-                    if object['Key'].endswith(".gz"):
-                        with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as svVcfGzFile:
-                            sv_vcfs[key] = svVcfGzFile.read().decode(encoding).splitlines()
-                    else:  # Also allow for uncompressed files
-                        print(object['Key'])
-                        sv_vcfs[key] = get_s3_object(s3_client, bucket, object['Key'])['Body'].read().decode(encoding).splitlines()
+                    with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as svVcfGzFile:
+                        sv_vcfs[key] = svVcfGzFile.read().decode(encoding).splitlines()
         elif ambry_id in object['Key'] and 'roh.bed' in object['Key']:  # Get ROH bed file
-            if object['Key'].endswith('.gz'):
+            if object['Key'].endswith('.gz'):  # sometimes it's compressed
                 with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as rohBedGzFile:
                     sv_vcfs["roh"] = rohBedGzFile.read().decode(encoding).splitlines()
             else:
@@ -128,11 +120,12 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     return sv_vcfs
 
 
-def find_cpg_bed(s3_client, analysis_out, ambry_id, expiration):
+def get_cpg_bed_temp_url(s3_client, analysis_out, ambry_id, expiration):
     """
-    Find combined cpg bed file, with the suffix 'combined.bed', and return a shareable url
+    Get shareable temporary URL for the CpG BED file, which can go by a few different names
     """
     bucket, prefix = get_s3_bucket_prefix(analysis_out)
+
     objects = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
     for object in objects['Contents']:
         if ambry_id in object['Key'] \
@@ -142,12 +135,17 @@ def find_cpg_bed(s3_client, analysis_out, ambry_id, expiration):
             return create_presigned_urls(s3_client, f"s3://{bucket}/{object['Key']}", expiration)
 
 
-def find_bai(s3_client, analysis_out, bam_basename, expiration):
+def get_bam_bai_temp_urls(s3_client, analysis_out, bam_uri, expiration):
     """
-    Find the bam index given the bam basename, and return a shareable url
+    Get shareable temporary URLs for the BAM and BAI
     """
     bucket, prefix = get_s3_bucket_prefix(analysis_out)
+
+    bam = create_presigned_urls(s3_client, f"s3://{bucket}/{bam_uri}", expiration)
+    bam_basename = bam_uri.split('/')[-1]
+
     objects = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
     for object in objects['Contents']:
         if f"{bam_basename}.bai" in object['Key']:
-            return create_presigned_urls(s3_client, f"s3://{bucket}/{object['Key']}", expiration)
+            bai = create_presigned_urls(s3_client, f"s3://{bucket}/{object['Key']}", expiration)
+            return bam, bai

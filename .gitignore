@@ -15,6 +15,8 @@ server/config/fixtures/local_data.json
 server/gregor-google-key.json
 server/utilities/anvil**
 server/utilities/ga.config.yml
+server/utilities/geneyx_uploads/sample_uploader
+server/utilities/geneyx_uploads/case_maker
 server/static*
 server/tests/results*
 
