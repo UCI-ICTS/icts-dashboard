@@ -107,12 +107,12 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
                 if key in object['Key']:
                     with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as svVcfGzFile:
                         sv_vcfs[key] = svVcfGzFile.read().decode(encoding).splitlines()
-        elif ambry_id in object['Key'] and 'roh.bed' in object['Key']:  # Get ROH bed file
-            if object['Key'].endswith('.gz'):  # sometimes it's compressed
-                with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as rohBedGzFile:
-                    sv_vcfs["roh"] = rohBedGzFile.read().decode(encoding).splitlines()
-            else:
-                sv_vcfs["roh"] = get_s3_object(s3_client, bucket, object['Key'])['Body'].read().decode(encoding).splitlines()
+        #elif ambry_id in object['Key'] and 'roh.bed' in object['Key']:  # Get ROH bed file
+        #    if object['Key'].endswith('.gz'):  # sometimes it's compressed
+        #        with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as rohBedGzFile:
+        #            sv_vcfs["roh"] = rohBedGzFile.read().decode(encoding).splitlines()
+        #    else:
+        #        sv_vcfs["roh"] = get_s3_object(s3_client, bucket, object['Key'])['Body'].read().decode(encoding).splitlines()
     for key in sv_keys:
         if key not in sv_vcfs:
             print(f"{ambry_id} is missing its {key} VCF")
