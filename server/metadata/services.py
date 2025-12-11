@@ -46,10 +46,13 @@ from submodels.models import (
 
 
 class UserHistorySerializer(serializers.ModelSerializer):
-    created_by = serializers.StringRelatedField(default=None, read_only=True)
-    updated_by = serializers.StringRelatedField(default=None, read_only=True)
+    created_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
+    updated_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
+
     class Meta:
         abstract = True
+        fields = "__all__"
+
 
 
 class GeneticFindingsInputSerializer(UserHistorySerializer):

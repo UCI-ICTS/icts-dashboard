@@ -131,7 +131,7 @@ class AlignedViewSet(viewsets.ViewSet):
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
 
-        aligned = bulk_retrieve(Aligned, ids, "aligned_id")
+        aligned = AlignedSerializer(bulk_retrieve(Aligned, ids, "aligned_id"))
         response_data, accepted, rejected = [], False, False
 
         for aligned_id in ids:
