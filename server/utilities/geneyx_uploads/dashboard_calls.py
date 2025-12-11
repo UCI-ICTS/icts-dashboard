@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import requests
-import sys
 
 
 def get_dashboard_token(dashboard_login):
@@ -16,7 +15,7 @@ def get_dashboard_token(dashboard_login):
         return dashboard_login
     else:
         print(response.text)
-        sys.exit(1)
+        return None
 
 
 def get_all_dashboard_tables(dashboard_login, dashboard_tables):
@@ -31,7 +30,7 @@ def get_all_dashboard_tables(dashboard_login, dashboard_tables):
             return response.json()
         else:
             print(response.text)
-            sys.exit(1)
+            return None
     else:
         for app in dashboard_tables:
             for model in dashboard_tables[app]:
@@ -42,7 +41,7 @@ def get_all_dashboard_tables(dashboard_login, dashboard_tables):
                     dashboard_tables[app][model] = response.json()
                 else:
                     print(response.text)
-                    sys.exit(1)
+                    return None
         return dashboard_tables
 
 

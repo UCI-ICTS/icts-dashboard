@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import boto3
-from botocore.exceptions import ClientError
 import csv
 import gzip
-import logging
-import sys
 
 
 # Global vars
@@ -29,7 +26,7 @@ def get_s3_client(service='s3', region_name='us-east-2'):
         return boto3.client(service, region_name=region_name)
     except:
         print("Check if aws has been configured yet")
-        sys.exit(1)
+        return None
 
 
 def get_lrs_manifest(s3_client):
@@ -48,16 +45,12 @@ def create_presigned_urls(s3_client, s3_uri, expiration):
     """
     Create presigned urls for shareable objects for up to 7 days
     """
-    try:
-        bucket, key = get_s3_bucket_prefix(s3_uri)
-        response = s3_client.generate_presigned_url(
-            'get_object',
-            Params={'Bucket': bucket, 'Key': key},
-            ExpiresIn=expiration,
-        )
-    except ClientError as e:
-        logging.error(e)
-        return None
+    bucket, key = get_s3_bucket_prefix(s3_uri)
+    response = s3_client.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': bucket, 'Key': key},
+        ExpiresIn=expiration,
+    )
 
     return response
 
