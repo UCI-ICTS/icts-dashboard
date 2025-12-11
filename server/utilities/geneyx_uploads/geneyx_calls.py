@@ -349,30 +349,3 @@ def update_temp_links(s3_client, ga_config, lrs_manifest_csv, dryrun):
                 print(f"\t{response.json()}")
         else:
             print(f"\tCompleted mock update of {participant_id} BAM links to Geneyx")
-
-
-if __name__ == '__main__':
-    s3_client = aws_calls.get_s3_client()
-    encoding = 'utf-8'
-
-    lrs_manifest_row = {
-        "ambry_id": "25-224970",
-        "current_id": "PMGRC-501-503-3",
-        "snv_vcf": "s3://pmgrc-wgs-long-read-derived-data/alignments/ambry/000101/Analysis_out/9327419/out/sample_phased_small_variant_vcfs/0/data/25-224970.GRCh38.deepvariant.phased.vcf.gz",
-    }
-    participant_id = lrs_manifest_row['current_id']
-    print(f"\tStarting Geneyx VCF uploader for {participant_id}")
-    ambry_id = lrs_manifest_row['ambry_id']
-    snv_vcf_uri = lrs_manifest_row['snv_vcf'].split(';')[0]
-    analysis_out = snv_vcf_uri[0:snv_vcf_uri.index('out')]
-
-    file_out = f"geneyx_cache/sample_uploader/{participant_id}/"
-    if not os.path.exists(file_out):
-        os.makedirs(file_out)
-
-    sv_vcfs = aws_calls.find_sv_vcfs(s3_client, analysis_out, ambry_id)
-    unify_sv_vcf = pacbio_unify_sv(sv_vcfs)
-    unify_sv_basename = f"{participant_id}.GRCh38.geneyx.unify.sv.vcf"
-    with open(f"{file_out}/{unify_sv_basename}.gz", 'wb') as raw:
-        with bgzip.BGZipWriter(raw) as fh:
-            fh.write(bytes(unify_sv_vcf, encoding=encoding))
