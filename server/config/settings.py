@@ -87,6 +87,13 @@ DATABASES = {
     }
 }
 
+# RAG+HPO
+HPO_DATA_DIR=secrets.get("RAG+HPO", "HPO_DATA_DIR", fallback="OOPS")
+HPO_SOURCE_URL=secrets.get("RAG+HPO", "HPO_SOURCE_URL", fallback="OOPS")
+EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="OOPS")
+EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
+EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="OOPS")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -94,6 +101,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.postgres",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -107,6 +115,7 @@ INSTALLED_APPS = [
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels",
+    "hpo.apps.HpoConfig"
 ]
 
 MIDDLEWARE = [

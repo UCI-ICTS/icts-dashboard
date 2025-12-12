@@ -113,12 +113,12 @@ const initialState = user
         })
 
         .addCase(addUser.fulfilled, (state, action) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(addUser.pending, (state, action) => {
           const user = action.payload;
           state.staff.push(user);
+        })
+        .addCase(addUser.pending, (state, action) => {
+          state.loading = true;
+          state.error = null;
         })
         .addCase(addUser.rejected, (state, action) => {
           state.loading = false;

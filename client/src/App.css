@@ -518,7 +518,7 @@ body, html {
 .card-title {
   font-size: 24px;
   font-weight: 800;
-  color: var(--uci-blue);
+  color: var(--uci-blue) !important;
   line-height: 1.2;
 }
 
@@ -673,6 +673,8 @@ body, html {
   padding: 24px;
   background-color: #fafafa; /* Light background */
   font-size: 16px;
+  max-height: 70vh; /* constrain vertical height */
+  overflow-y: auto; /* allow scrolling if content overflows */
 }
 
 /* Modal footer */
@@ -859,5 +861,9 @@ table-search-input .anticon {
 }
 
 .icon-blue {
+  color: var(--uci-blue) !important;
+}
+
+.text-area-input {
   color: var(--uci-blue) !important;
 }

@@ -7,6 +7,7 @@ import {
   DotChartOutlined,
   HomeOutlined,
   LogoutOutlined,
+  OpenAIOutlined,
   ProfileOutlined,
   SettingOutlined,
   UploadOutlined,
@@ -42,6 +43,7 @@ const Dashboard = () => {
     { key: 'participant-detail', icon: <UserOutlined />, label: <Link to="participant-detail">Participant Detail</Link> },
     { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
     { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
+    { key: 'raghpo', icon: <OpenAIOutlined />, label: <Link to="rag-hpo">RAG-HPO</Link> },
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
   ];
 

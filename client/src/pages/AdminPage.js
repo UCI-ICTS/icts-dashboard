@@ -99,22 +99,34 @@ const ManageAdministrators = () => {
       title: "Given Name",
       key: "first_name",
       render: (text, record) => `${record.first_name}`,
+      sorter: (a, b) => a.first_name.length - b.first_name.length,
     },
     {
       title: "Family Name",
       key: "last_name",
       render: (text, record) => `${record.last_name}`,
+      sorter: (a, b) => a.last_name.length - b.last_name.length,
     },
     { title: "Email", dataIndex: "email" },
     {
       title: "Role",
       render: (_, record) => (record.is_superuser ? "Admin" : record.is_staff ? "Staff" : "User"),
-      dataIndex: "role"
+      dataIndex: "role",
+      filters:[{text: "Admin", value: "is_superuser"},{text:"Staff", value: "is_staff"}],
+      onFilter: (value, record) => {
+        if (value === "is_superuser") {
+          return record.is_superuser === true
+        }
+        if (value === "is_staff") {
+          return record.is_superuser === false
+        }
+      },
     },
     {
       title: "Date Joined",
       dataIndex: "date_joined",
       render: (date) => date ? dayjs(date).format("MMM D, YYYY h:mm A") : "N/A",
+      sorter: (a, b) => dayjs(a.date_joined) - dayjs(b.date_joined)
     },
     {
       title: "Actions",

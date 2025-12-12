@@ -46,7 +46,7 @@ export default function PasswordReset({ open, setOpen }) {
         <Form.Item name="email">
         <Input
           type="email"
-          autoComplete="username"
+          autoComplete="email"
           style={{
             position: "absolute",
             width: 1,
