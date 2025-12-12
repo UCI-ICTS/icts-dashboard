@@ -35,6 +35,9 @@ export const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
+    clearRagHpos: (state) => {
+      state.rag_hpos = [];
+    },
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
     },
@@ -281,9 +284,13 @@ export const createEntry = createAsyncThunk(
   "createEntry",
   async ({table, data}, thunkAPI) => {
     try {
+      console.log(table, data)
       const response = await dataService.createEntry(table, data);
       const payload = {response: response.data, table}
-      message.success(`${payload.table} ${response.data[0].identifier} updated successfuly`);
+      response.data.forEach((item) => {
+        const identifier = item.identifier
+        message.success(`${table} ${identifier} updated successfuly`);
+      })
       return payload
     } catch (error) {
       message.error(errorService.printErrorMessages(error));
@@ -342,6 +349,7 @@ export const extractPhenotypes = createAsyncThunk(
 )
 
 export const {
+  clearRagHpos,
   setJsonData,
   clearJsonData,
   setTableView

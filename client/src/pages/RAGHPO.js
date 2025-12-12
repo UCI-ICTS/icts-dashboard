@@ -1,7 +1,7 @@
 // src/pages/RAGHPO.js
 
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { 
   Alert,
@@ -10,6 +10,7 @@ import {
   Form,
   Input,
   Layout,
+  Modal,
   Row,
   Select,
   Space,
@@ -18,8 +19,9 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import { extractPhenotypes } from "../slices/dataSlice";
-
+import { extractPhenotypes, createEntry, clearRagHpos } from "../slices/dataSlice";
+import { HPODownloadModal, PhenotypeImportFormModal } from "../components/Modals"
+import { dataDownload } from "../utils/utilitiyFunctions"; 
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -27,9 +29,60 @@ const { TextArea } = Input;
 const { Column, ColumnGroup } = Table;
 
 const RAGHPO = () => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const isLoading = useSelector((state) => state.data.status);
-  const rag_hpos = useSelector((state) => state.data.rag_hpos);
+  const {rag_hpos, participants, status} = useSelector((state) => state.data);
+  const [expandedRowKey, setExpandedRowKey] = useState(null);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [flattenedRows, setFlattenedRows] = useState([]);
+  const [importParticipantId, setImportParticipantId] = useState(null);
+
+  const handleSubmit = ({ action, exportFormat, participant }) => {
+    const filename = "rag_hpo_export";
+    if (exportFormat === "JSON" && action === "download") {
+      // Full state export
+      dataDownload({
+        filename,
+        displayData: rag_hpos,
+        visibleKeys: null, // Will use all keys
+        exportFormat,
+      });
+    } else {
+      // Flatten visible table rows (LLM choice only)
+      const flattenedData = rag_hpos.map((row) => ({
+        hpo_id: row.choice?.hpo_id,
+        label: row.choice?.label,
+        score: row.choice?.score,
+        rank: row.choice?.rank,
+        source: row.choice?.source,
+        reason: row.choice?.reason,
+        phrase: row.phrase,
+      }));
+      
+      if (action === "import") {
+        setImportParticipantId(participant);
+        setFlattenedRows(rag_hpos.map((row) => ({
+          ...row.choice,
+          phrase: row.phrase
+        })).filter((row) => row.source !== "llm-null"));
+        setImportOpen(true);
+        console.log("here", action, participant, flattenedRows)
+      } else {
+        const visibleKeys = ["hpo_id","label","score","rank","source","reason","phrase"];
+        dataDownload({
+          filename,
+          displayData: flattenedData,
+          visibleKeys,
+          exportFormat,
+        });
+      }
+    }
+  };
+
+  const handleExpand = (expanded, record) => {
+    setExpandedRowKey(expanded ? record.key : null);
+  };
   
   const onFinish = (userText) => {
     console.log(userText)
@@ -39,18 +92,32 @@ const RAGHPO = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  
+  const expandedRowRender = (record) => (
+    <Table
+      dataSource={record.candidates} 
+      columns={candidateColumns} 
+      
+      pagination={false}
+    />
+  );
 
-  useEffect(()=> {
-    console.log(isLoading)
-  },[isLoading])
-
+  const candidateColumns =  [
+    { title: "HPO Term",dataIndex: "hpo_id",key: "hpo_id" },
+    { title: "Label",dataIndex: "label",key: "label" },
+    { title: "score",dataIndex: "score",key: "score" },
+    { title: "rank", dataIndex: "rank", key: "rank" },
+    { title: "Replace"}
+    ]
+  
   return (
     <Layout className="layout-container">
       <Header className="primary-header">
         <Title className="primary-title">RAG-HPO</Title>
       </Header>
-      <Spin tip="Extracting HPOs from phenotype description...This may take a while" spinning={isLoading === "loading"}>
+      <Spin tip="Extracting HPOs from phenotype description...This may take a while" spinning={status === "loading"}>
         <Form
+          form={form}
           name="phenotype_text"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
@@ -69,12 +136,43 @@ const RAGHPO = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="logout-button">
-              Submit
-            </Button>
+            <Space>
+              {status === "fulfilled"  && rag_hpos.length > 0 ? (
+                <Button 
+                  type="primary" 
+                  className="logout-button"
+                  onClick={() => setActionsOpen(true)} 
+                >
+                  Import/Download
+                </Button>
+              ) : (
+                <Button type="primary" htmlType="submit" className="logout-button">
+                  Submit
+                </Button>
+              )}
+              <Button
+                danger
+                type="default"
+                className="logout-button"
+                onClick={() => {
+                  dispatch(clearRagHpos());
+                  form.resetFields();
+                }}
+              >Clear</Button>
+            </Space>
           </Form.Item>
         </Form>
-        <Table dataSource={rag_hpos} className="table">
+        <Table
+          key={"id"}
+          className="table"
+          dataSource={rag_hpos.map((item, index) => ({ ...item, key: item.id || index }))}
+          scroll
+          expandable={{
+            expandedRowRender,
+            expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+            onExpand: handleExpand,
+          }}
+        >
           <ColumnGroup title="LLM Choice">
             <Column 
               title="HPO Term" 
@@ -125,6 +223,26 @@ const RAGHPO = () => {
             key="phrase"
           />
         </Table>
+          <HPODownloadModal 
+            visible={actionsOpen}
+            onCancel={() => setActionsOpen(false)}
+            handleSubmit={handleSubmit}
+          />
+
+        <PhenotypeImportFormModal
+          visible={importOpen}
+          onCancel={() => setImportOpen(false)}
+          onSubmit={(finalEntries) => {
+            dispatch(createEntry( {table:"phenotype", data:finalEntries})); 
+            console.log(finalEntries)
+            setImportOpen(false);
+            form.resetFields(); // Clear form
+            dispatch(clearRagHpos()); // Clear table (rag_hpos)
+          }}
+          flattenedData={flattenedRows}
+          participantId={importParticipantId}
+        />
+
       </Spin>
     </Layout>
   )
