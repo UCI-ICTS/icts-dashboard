@@ -79,6 +79,7 @@ def get_s3_object(s3_client, bucket, prefix):
 
 def get_snv_vcf(s3_client, vcf_path):
     bucket, snv_vcf_key = get_s3_bucket_prefix(vcf_path)
+
     return get_s3_object(s3_client, bucket, snv_vcf_key)['Body'].read()  # Do not decompress or parse
 
 
@@ -95,7 +96,7 @@ def find_sv_vcfs(s3_client, analysis_out, ambry_id):
     sv_keys = ["sv_vcf", "trgt", "cnv"]
     sv_vcfs = {}
     for object in objects['Contents']:
-        if ambry_id in object['Key'] and ".vcf.gz" in object['Key'] and not object['Key'].endswith(".tbi"):  # Object is a VCF with an Ambry ID in the name
+        if ambry_id in object['Key'] and object['Key'].endswith(".vcf.gz"):  # Object is a VCF with an Ambry ID in the name
             for key in sv_keys:
                 if key in object['Key']:
                     with gzip.GzipFile(fileobj=get_s3_object(s3_client, bucket, object['Key'])['Body']) as svVcfGzFile:

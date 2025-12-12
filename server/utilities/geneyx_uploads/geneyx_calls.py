@@ -140,7 +140,7 @@ def sample_uploader(ga_config, s3_client, participant, family, dryrun):
     print(f"\tStarting Geneyx VCF uploader for {participant_id}")
     ambry_id = lrs_manifest_row['ambry_id']
     snv_vcf_uri = lrs_manifest_row['snv_vcf'].split(';')[0]
-    analysis_out = snv_vcf_uri[0:snv_vcf_uri.index('out')]
+    analysis_out = snv_vcf_uri[0:snv_vcf_uri.index('/out/')+5]
 
     specimen_map = {
         "D": "Blood",
@@ -254,11 +254,13 @@ def sample_uploader(ga_config, s3_client, participant, family, dryrun):
         print(f"\tGeneyx Request POST CreateSample {participant_id}")
         response = requests.post(ga_url, data=geneyx_sample, files=files)
         if response.json()['Code'] == 'success':
-            print(f"\t{response.json()}")
-        else:
             print(f"\tCompleted upload of {participant_id} VCFs to Geneyx")
+        else:
+            print(f"\t{response.json()}")
+        return response.json()['Code']
     else:
         print(f"\tCompleted mock upload of {participant_id} VCFs to Geneyx")
+        return None
 
 
 def case_maker(ga_config, ga_samples, family_members, dryrun):
@@ -267,6 +269,7 @@ def case_maker(ga_config, ga_samples, family_members, dryrun):
     """
     ga_url = f"{ga_config['server']}/api/CreateCase"
 
+    proband_id = ""
     associated_samples = []
     for member in family_members:
         participant = family_members[member]
@@ -293,7 +296,9 @@ def case_maker(ga_config, ga_samples, family_members, dryrun):
                     "Affected": participant["affected_status"],
                 })
         else:
-            return None
+            continue
+    if not proband_id:
+        return None
     geneyx_case["AssociatedSamples"] = associated_samples  # Add associated samples
     file_out = f"geneyx_cache/case_maker/{proband_id}/"
     if not os.path.exists(file_out):
@@ -308,8 +313,11 @@ def case_maker(ga_config, ga_samples, family_members, dryrun):
             print(f"\tCompleted creating Geneyx case for {proband_id}")
         else:
             print(f"{response.json()}")
+            return None
+        return response.json()['Code']
     else:
         print(f"\tCompleted creating mock Geneyx case for {proband_id}")
+        return None
 
 
 def update_temp_links(s3_client, ga_config, lrs_manifest_csv, dryrun):

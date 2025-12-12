@@ -9,6 +9,11 @@ def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dry
     ga_samples = geneyx_calls.get_ga_samples(ga_config)
     ga_cases_current = geneyx_calls.get_ga_cases(ga_config)
 
+    ga_samples_sanitized = []
+    for sample in ga_samples:  # sanitize geneyx sample IDs
+        ga_samples_sanitized.append(sample.split('_')[0])
+    ga_samples = ga_samples_sanitized
+
     print(f"Processing lrs_manifest_csv")
     families = {}
     for row in lrs_manifest_csv:  # Get participant metadata, relationship, and family structure
@@ -36,11 +41,12 @@ def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dry
             if case not in ga_cases_current:  # Remove cases deleted upstream
                 del ga_cases_json[case]
                 continue
-            main_sample = ga_cases_json[case]["MainSampleSerialNumber"]
-            ga_cases_main_samples.append(main_sample)
-        for case in ga_cases_current:  # Add new cases created upstream
-            if case not in ga_cases_json:
-                ga_cases_json[case] = geneyx_calls.get_ga_case(ga_config, case)
+            else:
+                main_sample = ga_cases_json[case]["MainSampleSerialNumber"]
+                ga_cases_main_samples.append(main_sample)
+        for upstream_case in ga_cases_current:  # Add new cases created upstream to the cache
+            if upstream_case not in ga_cases_json:
+                ga_cases_json[upstream_case] = geneyx_calls.get_ga_case(ga_config, upstream_case)
     else:
         ga_cases_json = {}
         for case in ga_cases_current:
@@ -48,10 +54,10 @@ def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dry
             ga_cases_json[case] = ga_case
             ga_cases_main_samples.append(ga_case["MainSampleSerialNumber"])
 
-        if not os.path.exists(ga_cache.split('/')[0]):  # save Geneyx cases to file
-            os.makedirs(ga_cache.split('/')[0])
-        with open(ga_cache, "wt") as f:
-            json.dump(ga_cases_json, f)
+    if not os.path.exists(ga_cache.split('/')[0]):  # save Geneyx cases to file
+        os.makedirs(ga_cache.split('/')[0])
+    with open(ga_cache, "wt") as f:
+        json.dump(ga_cases_json, f)
 
     for family_id in sorted_family_list:
         family_id = "PMGRC-" + str(family_id)
@@ -67,11 +73,18 @@ def process_lrs_manifest(s3_client, ga_config, lrs_manifest_csv, all_tables, dry
                 continue
             print(f"Calling Geneyx Sample Uploader for {participant_id}")
             participant = families[family_id][participant_id]
-            geneyx_calls.sample_uploader(ga_config, s3_client, participant, family, dryrun)
+            sample_upload_response = geneyx_calls.sample_uploader(ga_config, s3_client, participant, family, dryrun)
+            if sample_upload_response == 'success':
+                ga_samples.append(participant_id)
 
         if proband and proband not in ga_cases_main_samples:  # Only create new cases
             print(f"Calling Geneyx Case Maker for {family_id}")
-            geneyx_calls.case_maker(ga_config, ga_samples, families[family_id], dryrun)
+            case_maker_response = geneyx_calls.case_maker(ga_config, ga_samples, families[family_id], dryrun)
+            if case_maker_response == 'success':
+                ga_cases_current.append(proband)
+
+    with open(ga_cache, "wt") as f:  # Save changes before exit
+        json.dump(ga_cases_json, f)
 
 
 def main(dryrun=False):
