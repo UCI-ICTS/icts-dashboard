@@ -39,76 +39,75 @@ function TitleMenu({
 
   return (
     <Space size={6}>
-<Dropdown
-  trigger={["click"]}
-  placement="bottomRight"
-  dropdownRender={() => (
-    <div
-      className="column-filter-menu"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="column-filter-header">
-        <div className="column-filter-title">{title}</div>
-        <button
-          type="button"
-          className="column-filter-reset"
-          onClick={() => {
-            onChangeSort(null);
-            onClearFilter(colKey);
-          }}
-        >
-          Reset
-        </button>
-      </div>
-
-      <div className="column-filter-section">
-        <div className="column-filter-label">Sort</div>
-        <Radio.Group
-          size="small"
-          value={sortOrder || "none"}
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val === "none") onChangeSort(null);
-            else onChangeSort({ key: colKey, order: val });
-          }}
-        >
-          <Radio.Button value="ascend">Asc</Radio.Button>
-          <Radio.Button value="descend">Desc</Radio.Button>
-          <Radio.Button value="none">None</Radio.Button>
-        </Radio.Group>
-      </div>
-
-      <div className="column-filter-divider" />
-
-      <div className="column-filter-section">
-        <div className="column-filter-label">Filter (contains)</div>
-        <div className="column-filter-inputrow">
-          <Input
-            size="small"
-            placeholder="Type to filter…"
-            value={filters?.[colKey] ?? ""}
-            onChange={(e) => onChangeFilter(colKey, e.target.value)}
-          />
-          <Button
-            size="small"
-            className="column-filter-clear"
-            onClick={() => onClearFilter(colKey)}
+      <Dropdown
+        trigger={["click"]}
+        placement="bottomRight"
+        dropdownRender={() => (
+          <div
+            className="column-filter-menu"
+            onClick={(e) => e.stopPropagation()}
           >
-            Clear
-          </Button>
-        </div>
-      </div>
-    </div>
-  )}
->
-  <Button
-    size="small"
-    className="header-button"
-    icon={<FunnelPlotOutlined />}
-    onClick={(e) => e.stopPropagation()}
-  />
-</Dropdown>
+            <div className="column-filter-header">
+              <div className="column-filter-title">{title}</div>
+              <button
+                type="button"
+                className="column-filter-reset"
+                onClick={() => {
+                  onChangeSort(null);
+                  onClearFilter(colKey);
+                }}
+              >
+                Reset
+              </button>
+            </div>
 
+            <div className="column-filter-section">
+              <div className="column-filter-label">Sort</div>
+              <Radio.Group
+                size="small"
+                value={sortOrder || "none"}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "none") onChangeSort(null);
+                  else onChangeSort({ key: colKey, order: val });
+                }}
+              >
+                <Radio.Button value="ascend">Asc</Radio.Button>
+                <Radio.Button value="descend">Desc</Radio.Button>
+                <Radio.Button value="none">None</Radio.Button>
+              </Radio.Group>
+            </div>
+
+            <div className="column-filter-divider" />
+
+            <div className="column-filter-section">
+              <div className="column-filter-label">Filter (contains)</div>
+              <div className="column-filter-inputrow">
+                <Input
+                  size="small"
+                  placeholder="Type to filter…"
+                  value={filters?.[colKey] ?? ""}
+                  onChange={(e) => onChangeFilter(colKey, e.target.value)}
+                />
+                <Button
+                  size="small"
+                  className="column-filter-clear"
+                  onClick={() => onClearFilter(colKey)}
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      >
+        <Button
+          size="small"
+          className="header-button"
+          icon={<FunnelPlotOutlined />}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </Dropdown>
       <span>{title}</span>
     </Space>
   );
