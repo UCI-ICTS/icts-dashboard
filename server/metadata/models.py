@@ -31,20 +31,25 @@ class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        to_field="username",
         on_delete=models.PROTECT,
         related_name='+',
-        default=0,
+        default="wheel",
     )
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        to_field="username",
         on_delete=models.PROTECT,
         related_name='+',
-        default=0,
+        default="wheel",
     )
 
     class Meta:
         abstract = True
+
+    def get_created_by(self):
+        return str(self.created_by)
 
 
 class Family(TimeStampedModel):
