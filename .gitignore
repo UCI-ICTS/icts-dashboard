@@ -14,6 +14,7 @@ server/env
 server/config/fixtures/local_data.json
 server/gregor-google-key.json
 server/utilities/anvil**
+server/utilities/geneyx*
 server/static*
 server/tests/results*
 
