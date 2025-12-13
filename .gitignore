@@ -18,6 +18,8 @@ server/dump.json
 server/egress
 server/env
 server/gregor-google-key.json
+server/utilities/anvil**
+server/utilities/geneyx*
 server/static*
 server/tests/results*
 server/tests/.coverage
