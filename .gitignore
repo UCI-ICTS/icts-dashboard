@@ -29,6 +29,7 @@ server/tests/results*
 server/tests/.coverage
 server/tests/fixtures/U09_flattened_sampled_dump.json
 server/utilities/anvil**
+server/utilities/geneyx**
 server/utilities/db_reset.sh
 server/utilities/hpo_artifacts**
 

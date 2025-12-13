@@ -54,7 +54,6 @@ class UserHistorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class GeneticFindingsInputSerializer(UserHistorySerializer):
     """
     Validate fields for GeneticFindings
