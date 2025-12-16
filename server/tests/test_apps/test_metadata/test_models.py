@@ -94,3 +94,9 @@ class SelectorTests(TestCase):
         self.assertIsInstance(parsed_data["twin_id"], list)
         self.assertEqual(parsed_data["age_at_last_observation"], 30.0)
         self.assertEqual(parsed_data["age_at_enrollment"], 25.0)
+
+    def test_bad_participant_parser(self):
+        test_data = {"age_at_last_observation": "", "age_at_enrollment": "NA"}
+        parsed_data = participant_parser(test_data)
+        self.assertEqual(parsed_data["age_at_last_observation"], None)
+        self.assertEqual(parsed_data["age_at_enrollment"], None)

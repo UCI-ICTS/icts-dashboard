@@ -125,7 +125,6 @@ def participant_parser(participant: dict) -> dict:
     Notes:
     - 'twin_id' and 'internal_project_id': Splits the string by '|' into a list if not 'NA'.
     - 'prior_testing': Converts the string to a list containing the original string if not 'NA'.
-    - 'age_at_last_observation' and 'age_at_enrollment': Converts the string to a float. Sets to 0 if conversion fails.
     """
     from config.selectors import multi_value_split
 
@@ -147,6 +146,20 @@ def participant_parser(participant: dict) -> dict:
     if "reported_ethnicity" in participant:
         if participant["reported_ethnicity"] == "Unknown":
             participant["reported_ethnicity"] = ["NA"]
+
+    if "age_at_last_observation" in participant:
+        try:
+            participant["age_at_last_observation"] = float(
+                participant["age_at_last_observation"]
+            )
+        except ValueError:
+            participant["age_at_last_observation"] = None
+
+    if "age_at_enrollment" in participant:
+        try:
+            participant["age_at_enrollment"] = float(participant["age_at_enrollment"])
+        except ValueError:
+            participant["age_at_enrollment"] = None
 
     split_participant = multi_value_split(participant)
 
