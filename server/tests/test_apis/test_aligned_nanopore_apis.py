@@ -5,6 +5,43 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Aligned
+from datetime import datetime
+
+
+testuser = "testuser"
+
+
+def created_by(self, response_dict, created_user):
+    """
+    Assert created_by username matches expected created_by username
+    """
+    self.assertEqual(response_dict["data"]["instance"]["created_by"], created_user)
+
+
+def usernames(self, response_dict):
+    """
+    Assert updated_by and created_by usernames differ after a successful update
+    """
+    self.assertNotEqual(
+        response_dict["data"]["instance"]["updated_by"],
+        response_dict["data"]["instance"]["created_by"]
+    )
+
+
+def timestamps(self, response_dict):
+    """
+    Assert updated_at and created_at times differ after a successful update
+    """
+    updated_at = datetime.strptime(
+            response_dict["data"]["instance"]["updated_at"].rstrip('Z').split('.')[0],
+            "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+    created_at = datetime.strptime(
+            response_dict["data"]["instance"]["created_at"].rstrip('Z').split('.')[0],
+            "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+    self.assertGreater(updated_at, created_at)
+
 
 class APITestCaseWithAuth(APITestCase):
     fixtures = ['tests/fixtures/test_fixture.json']
@@ -122,9 +159,11 @@ class CreateAlignedNanoporeAPITest(APITestCaseWithAuth):
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_200.data[0]["request_status"], "CREATED")
+        created_by(self, response_200.data[0], testuser)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "BAD REQUEST")
         self.assertEqual(response_207.data[1]["request_status"], "CREATED")
+        created_by(self, response_207.data[1], testuser)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -185,9 +224,13 @@ class UpdateAlignedNanoporeAPITest(APITestCaseWithAuth):
         response_207 = self.client.post(url, [aligned2, aligned3], format='json')
         response_400 = self.client.post(url, [aligned3], format='json')
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+        usernames(self, response_200.data[0])
+        timestamps(self, response_200.data[0])
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        usernames(self, response_207.data[0])
+        timestamps(self, response_207.data[0])
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 

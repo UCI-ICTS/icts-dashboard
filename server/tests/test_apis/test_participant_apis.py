@@ -41,6 +41,7 @@ def timestamps(self, response_dict):
             ).timestamp()
     self.assertGreater(updated_at, created_at)
 
+
 class APITestCaseWithAuth(APITestCase):
     fixtures = ["tests/fixtures/test_fixture.json"]
 
