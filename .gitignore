@@ -8,14 +8,24 @@ maintenance/maintenance.flag
 server/.env*
 server/.python-version
 server/.secrets
+server/config/fixtures/local_data.json
+server/config/fixtures/full_local_data.json
+server/config/fixtures/dump.json
+server/config/fixtures/dump.json
+server/config/fixtures/U09_dump.json
 server/db.sqlite3
+server/dump.json
 server/egress
 server/env
-server/config/fixtures/local_data.json
 server/gregor-google-key.json
-server/utilities/anvil**
 server/static*
 server/tests/results*
+server/tests/.coverage
+server/tests/fixtures/U09_flattened_sampled_dump.json
+server/utilities/anvil**
+server/utilities/db_reset.sh
+server/utilities/hpo_artifacts**
+
 
 #Client Items
 #Client dependencies
@@ -38,12 +48,3 @@ client/.env.production.local
 client/npm-debug.log*
 client/yarn-debug.log*
 client/yarn-error.log*
-
-server/config/fixtures/full_local_data.json
-db.sqlite
-server/config/fixtures/dump.json
-server/tests/.coverage
-server/tests/fixtures/U09_flattened_sampled_dump.json
-server/config/fixtures/dump.json
-server/config/fixtures/U09_dump.json
-server/dump.json

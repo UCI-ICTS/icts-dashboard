@@ -42,9 +42,6 @@ const HomePage = () => {
     <Layout className="fullscreen-bg">
         <Title level={1} className='site-title'>UCI Institute for Clinical & Translational Science </Title>
         <Content className="site-content">
-          
-          {/* Resources */}
-          <Title level={0} className='site-subtitle'>Resources </Title>
           <Row gutter={[16, 16]} className="cards-equal-row" >
             <Col className="card-col flex-col">
               <Popover
@@ -99,10 +96,9 @@ const HomePage = () => {
             <Col className="card-col flex-col">
               <Popover
               overlayClassName="themed-popover"
-              title="Medical Information Assistant (MIA)"
+              title="Kauro by University of California, Irvine"
               content={
                 <span className="card-label">
-                  Our virtual Medical Information Assistant (Mia)
                   A consentbot that facilitates virtual conversations with patients.
                 </span>
               }>
@@ -112,12 +108,12 @@ const HomePage = () => {
                   onClick={()=> {window.open(`${MIA}`, "_blank")}}
                 >
                   <img
-                    src="/miaLogo192.png"
+                    src="/kauro192.png"
                     alt="MIA logo"
                     className="card-icon"
                     style={{width: 60}}
                   />
-                  <span className="home-card">Medical<br/>Information<br/>Assistant (MIA)</span>
+                  <span className="home-card">Kauro<br/>by<br/> UCI</span>
                     
                 </Card>
               </Popover>
@@ -149,11 +145,7 @@ const HomePage = () => {
             </Col>
           </Row>
         {/* Collabs */}
-          <Row gutter={[16, 16]} className="cards-equal-row">
-            <Col span={24}>
-              <Title level={2} className="site-subtitle">Resources</Title>
-            </Col>
-          </Row>
+          
             <Row gutter={[16, 16]} className="cards-equal-row" >
               <Col className="card-col flex-col">
                 <Popover

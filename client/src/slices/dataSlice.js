@@ -28,6 +28,7 @@ const initialState = {
   aligned_nanopore: [],
   aligned_pac_bio: [],
   aligned_rna_short_read: [],
+  rag_hpos: [],
   status: "idle"
 };
 
@@ -35,6 +36,9 @@ export const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
+    clearRagHpos: (state) => {
+      state.rag_hpos = [];
+    },
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
     },
@@ -225,16 +229,18 @@ export const dataSlice = createSlice({
         state.familyDetail = action.payload
         state.status = "fulfilled";
       })
-        .addCase(caseQueue.pending, (state, action) => {
-        state.status = "loading";
-      })
-      .addCase(caseQueue.rejected, (state, action) => {
+
+      .addCase(extractPhenotypes.rejected, (state, action) => {
         state.status = "rejected";
       })
-      .addCase(caseQueue.fulfilled, (state, action) => {
-        state.caseQueue = action.payload
+      .addCase(extractPhenotypes.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(extractPhenotypes.fulfilled, (state, action) => {
+        state.rag_hpos = action.payload
         state.status = "fulfilled";
       })
+
   }
 });
 
@@ -295,9 +301,13 @@ export const createEntry = createAsyncThunk(
   "createEntry",
   async ({table, data}, thunkAPI) => {
     try {
+      console.log(table, data)
       const response = await dataService.createEntry(table, data);
       const payload = {response: response.data, table}
-      message.success(`${payload.table} ${response.data[0].identifier} updated successfuly`);
+      response.data.forEach((item) => {
+        const identifier = item.identifier
+        message.success(`${table} ${identifier} updated successfuly`);
+      })
       return payload
     } catch (error) {
       message.error(errorService.printErrorMessages(error));
@@ -342,7 +352,21 @@ export const deleteEntry = createAsyncThunk(
   }
 )
 
+export const extractPhenotypes = createAsyncThunk(
+  "extractPhenotypes",
+  async ({userText}, thunkAPI) => {
+    try {
+      const response = await dataService.extractPhenotypes(userText);
+      return response.data
+    } catch (error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
+    }
+  }
+)
+
 export const {
+  clearRagHpos,
   setJsonData,
   clearJsonData,
   setTableView

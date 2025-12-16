@@ -7,6 +7,7 @@ import {
   DotChartOutlined,
   HomeOutlined,
   LogoutOutlined,
+  OpenAIOutlined,
   ProfileOutlined,
   ScheduleOutlined,
   SettingOutlined,
@@ -44,6 +45,7 @@ const Dashboard = () => {
     { key: 'case-queue', icon: <ScheduleOutlined />, label: <Link to="case-queue">Case Queue</Link> },
     { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
     { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
+    { key: 'raghpo', icon: <OpenAIOutlined />, label: <Link to="rag-hpo">RAG-HPO</Link> },
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
   ];
 

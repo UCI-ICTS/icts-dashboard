@@ -48,6 +48,7 @@ urlpatterns = [
     path("api/metadata/", include("metadata.urls")),
     path("api/experiments/", include("experiments.urls")),
     path("api/search/", include("search.urls")),
+    path("api/hpo/", include("hpo.urls")),
     path(
         "api/swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),

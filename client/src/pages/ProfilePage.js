@@ -8,6 +8,8 @@ import PasswordReset from "../components/PasswordReset";
 import { updateProfile } from "../slices/accountSlice";
 import "../App.css";
 
+const { Title } = Typography;
+
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -27,12 +29,9 @@ const ProfilePage = () => {
   };
 
   return (
-    <Card title={<span className="card-title">User Profile</span>} className="secondary-card">
-      <PasswordReset open={open} setOpen={setOpen} />
-
-      <Button onClick={() => setOpen(true)} className="action-btn">
-        Change Password
-      </Button>
+    <div>
+    
+      
 
       <Form
         className="profile-form"
@@ -41,6 +40,7 @@ const ProfilePage = () => {
         initialValues={user}
         onFinish={handleSubmit}
       >
+        <Title level={2} className="card-title">User Profile</Title>
         <Form.Item label="Given Name" name="first_name">
           <Input />
         </Form.Item>
@@ -83,9 +83,14 @@ const ProfilePage = () => {
           <Button className="logout-button" htmlType="submit" loading={loading}>
             Update Profile
           </Button>
+          <></>
+          <Button onClick={() => setOpen(true)} className="logout-button">
+            Change Password
+          </Button>
         </Form.Item>
       </Form>
-    </Card>
+      <PasswordReset open={open} setOpen={setOpen} />
+    </div>
   );
 };
 

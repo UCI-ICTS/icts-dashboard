@@ -83,6 +83,11 @@ const deleteEntry = async (table, idList) => {
   }
 }
 
+const extractPhenotypes = async (userText) => {
+  const response = api.post(APIDB + `api/hpo/extract_phenotypes/`, {"userText": userText}, {headers: getAuthHeaders()})
+  return response
+}
+
 const dataService = {
   createEntry,
   familyDetail,
@@ -90,7 +95,8 @@ const dataService = {
   fetchTable,
   updateEntry,
   deleteEntry,
-  getAllTables
+  getAllTables,
+  extractPhenotypes
 }
 
 export default dataService;
