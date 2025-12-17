@@ -18,6 +18,24 @@
       }
   },
   {
+      "model": "auth.user",
+      "pk": 3,
+      "fields": {
+          "password": "demo_user",
+          "last_login": "2025-12-17T13:20:38.034Z",
+          "is_superuser": false,
+          "username": "demouser",
+          "first_name": "",
+          "last_name": "",
+          "email": "demouser@wheel.tst",
+          "is_staff": true,
+          "is_active": true,
+          "date_joined": "2024-12-14T18:21:45.897Z",
+          "groups": [],
+          "user_permissions": []
+      }
+  },
+  {
     "model": "metadata.family",
     "pk": "GREGoR_test_delete-001",
     "fields": {
