@@ -11,6 +11,7 @@ const initialState = {
   tableName: "Participants",
   jsonData: null,
   familyDetail: null,
+  caseQueue: null,
   participants: [],
   families: [],
   genetic_findings: [],
@@ -46,6 +47,9 @@ export const dataSlice = createSlice({
     },
     clearFamilyDetail: (state, action) => {
       state.familyDetail = null;
+    },
+    clearCaseQueue: (state, action) => {
+      state.caseQueue = null;
     },
     setTableView: (state, action) => {
       state.tableView = action.payload.schema;
@@ -257,6 +261,19 @@ export const familyDetail = createAsyncThunk(
   async (participant_id, thunkAPI) => {
     try {
       const response = await dataService.familyDetail(participant_id);
+      return response.data
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
+    }
+  }
+)
+
+export const caseQueue = createAsyncThunk(
+  "caseQueue",
+  async (participant_id, thunkAPI) => {
+    try {
+      const response = await dataService.caseQueue(participant_id);
       return response.data
     } catch(error) {
       message.error(errorService.printErrorMessages(error));

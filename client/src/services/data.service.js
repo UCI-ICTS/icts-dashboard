@@ -34,6 +34,11 @@ const familyDetail = async (participant_id) => {
     return response
 }
 
+const caseQueue = async (participant_id) => {
+    const response = api.get(APIDB + `api/search/case_queue/?ids=${participant_id}`, {headers: getAuthHeaders()})
+    return response
+}
+
 const fetchTable = async (table) => {
   if (metadata.includes(table)) {
     const response = api.get(APIDB + `api/metadata/${table}/all/`, {headers: getAuthHeaders()})
@@ -86,6 +91,7 @@ const extractPhenotypes = async (userText) => {
 const dataService = {
   createEntry,
   familyDetail,
+  caseQueue,
   fetchTable,
   updateEntry,
   deleteEntry,
