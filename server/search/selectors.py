@@ -291,12 +291,12 @@ def get_summary_stats():
 
     # --- Biobank status ---
     biobank_status = dict(Counter(biobank.values_list("status", flat=True)))
-    
+
     # --- Ontology Terms ---
     ontology_terms = dict()
     ontology_terms_sorted = dict(
         sorted(Counter(Phenotype.objects.all().
-                values_list("term_id", 
+                values_list("term_id",
                 flat=True)).items(),
                 key=lambda item: item[1],
                 reverse=True
@@ -310,10 +310,10 @@ def get_summary_stats():
             "count": count,
             "name": json.loads(term.text)['name']
         }
-        
+
     # --- Proband reported reace ---
     proband_reported_reace = dict(Counter(probands.values_list("reported_race", flat=True)))
-    
+
     # --- Analyte counts ---
     analyte_biosample = dict(Counter(analytes.values_list("primary_biosample", flat=True)))
     analyte_type = dict(Counter(analytes.values_list("analyte_type", flat=True)))
@@ -362,7 +362,7 @@ def get_summary_stats():
 
     # (Optional) keep a per-participant label if you want to display later
     participant_experiment_category = {}
-    
+
     for pid in all_exp_participants:
         has_sr = pid in sr_participants
         has_lr = pid in lr_participants
@@ -395,7 +395,7 @@ def get_summary_stats():
     }
     participants_sorted = sorted(participants, key=lambda x: x.family_id_id)
     family_types, families = families_by_type(participants_sorted)
-    
+
     lr_participants_sorted = sorted(
         Participant.objects.filter(
             pk__in=lr_participants),
@@ -435,7 +435,7 @@ def get_family_detail(participant_id:str) -> dict:
     participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
-        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True) 
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True)
         serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
         serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
         experiments = Experiment.objects.filter(participant_id=participant)
@@ -447,7 +447,7 @@ def get_family_detail(participant_id:str) -> dict:
             sequence["table_type"] = exp.table_name
             serialized_sequencing.append(sequence)
 
-        aligned = Aligned.objects.filter(participant_id=participant)    
+        aligned = Aligned.objects.filter(participant_id=participant)
         serialized_alignments = []
         # import pdb;pdb.set_trace()
         for aln in aligned:
@@ -456,7 +456,7 @@ def get_family_detail(participant_id:str) -> dict:
             alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
             alignment["table_type"] = aln.table_name
             serialized_alignments.append(alignment)
-        
+
         items = {
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
@@ -468,5 +468,60 @@ def get_family_detail(participant_id:str) -> dict:
             "alignments": serialized_alignments,
             }
         family_detail.append(items)
-    
+
     return family_detail
+
+
+def get_case_queue(participant_id:str) -> dict:
+    """
+    Only collect families with completed PacBio alignments
+    """
+    case_queue = []
+    analysis_ready = {}
+    participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)  # Get related participants
+
+    for participant in participants:
+        serialized_participant = ParticipantOutputSerializer(participant)
+        analytes = Analyte.objects.filter(participant_id=participant)
+        dna_analytes = []
+        pac_bio_sequencing = []
+        pac_bio_alignments = []
+
+        for analyte in analytes:
+            if analyte.analyte_type != "DNA":
+                continue
+            dna_analytes.append(analyte.analyte_id)
+            pac_bio_experiment = ExperimentPacBio.objects.filter(analyte_id=analyte)  # each analyte should have one experiment
+            if not pac_bio_experiment:
+                continue
+            pac_bio_sequencing.append(pac_bio_experiment[0].experiment_pac_bio_id)
+            pac_bio_alignment = AlignedPacBio.objects.filter(experiment_pac_bio_id=pac_bio_experiment[0])
+            if not pac_bio_alignment:
+                continue
+            pac_bio_alignments.append(pac_bio_alignment[0].aligned_pac_bio_id)
+            analysis_ready[participant.participant_id] = True  # avoid adding duplicates
+
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=dna_analytes), many=True)
+        serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=dna_analytes), many=True)
+        serialized_sequencing = ExperimentPacBioSerializer(ExperimentPacBio.objects.filter(pk__in=pac_bio_sequencing), many=True)
+        serialized_alignments = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
+
+        items = {
+            "participant": serialized_participant.data,
+            "proband_relationship": participant.proband_relationship,
+            "family_id": participant.family_id_id,
+            "family_size": len(participants),
+            "biobank": serialized_biobanks.data,
+            "analytes": serialized_analytes.data,
+            "sequencing": serialized_sequencing.data,
+            "alignments": serialized_alignments.data,
+            }
+        case_queue.append(items)
+
+    for p in case_queue:
+        if len(analysis_ready) == p["family_size"]:
+            p["cohort_analysis"] = "ready"
+        else:
+            p["cohort_analysis"] = "incomplete"
+
+    return case_queue

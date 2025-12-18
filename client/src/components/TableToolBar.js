@@ -23,6 +23,7 @@ export default function TableToolBar({
   recordCount,
   onRefresh,
   renderDetail,
+  renderQueue,
   extra,
 }) {
   const [open, setOpen] = useState(false);
@@ -128,6 +129,27 @@ export default function TableToolBar({
   return (
     <>
     {!renderDetail ?(
+      <Space wrap>
+        <Tooltip title="Add new row">&nbsp;
+          <Button
+            className="action-btn"
+            icon={<PlusOutlined />}
+            onClick={() => onOpenModal("add")}
+          >Add Row</Button>
+        </Tooltip>&nbsp;
+        <TableSelector />&nbsp;
+        <Tooltip title="Refresh Data">
+          <Button
+            className="action-btn"
+            icon={<ReloadOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRefresh?.(); // trigger the parent fetch
+            }}
+          >Refresh data</Button>&nbsp;
+        </Tooltip>
+      </Space>
+    ) : !renderQueue ?(
       <Space wrap>
         <Tooltip title="Add new row">&nbsp;
           <Button
