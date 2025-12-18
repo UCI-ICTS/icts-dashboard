@@ -19,7 +19,8 @@ from search.selectors import (
     get_anvil_tables,
     get_all_tables,
     get_summary_stats,
-    get_family_detail
+    get_family_detail,
+    get_case_queue,
 )
 
 from search.services import FamilyDetailInputSerializer
@@ -34,7 +35,7 @@ class AllTablesAPI(APIView):
     @swagger_auto_schema(
         operation_id="get_tables",
         responses={
-            200: "Submission successfull",
+            200: "Submission successful",
             400: "Bad request",
         },
         tags=["Search"],
@@ -54,7 +55,7 @@ class SummaryAPI(APIView):
     @swagger_auto_schema(
         operation_id="summary",
         responses={
-            200: "Submission successfull",
+            200: "Submission successful",
             400: "Bad request",
         },
         tags=["Search"],
@@ -90,7 +91,7 @@ class FamilyDetail(APIView):
         ],
         operation_id="family-detail",
         responses={
-            200: "Submission successfull",
+            200: "Submission successful",
             400: "Bad request",
         },
         tags=["Search"],
@@ -101,7 +102,7 @@ class FamilyDetail(APIView):
             participant_ids = request.GET.get("ids", "").split(",")
             print(participant_ids)
             for participant_id in participant_ids:
-                response.append(get_family_detail(participant_id)) 
+                response.append(get_family_detail(participant_id))
 
             return Response(status=status.HTTP_200_OK, data=response)
 
@@ -110,6 +111,46 @@ class FamilyDetail(APIView):
                 {"error": str(error)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class CaseQueue(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of `participant_id`s ",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        operation_id="case-queue",
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Search"],
+    )
+    def get(self, request):
+        response = []
+        try:
+            participant_ids = request.GET.get("ids", "").split(",")
+            print(participant_ids)
+            for participant_id in participant_ids:
+                response.append(get_case_queue(participant_id))
+
+            return Response(status=status.HTTP_200_OK, data=response)
+
+        except Exception as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 ## DEACTIVATED APIs
 class DownloadTablesAPI(APIView):
     """AnVIL upload table generation."""
