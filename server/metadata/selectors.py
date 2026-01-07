@@ -147,20 +147,6 @@ def participant_parser(participant: dict) -> dict:
         if participant["reported_ethnicity"] == "Unknown":
             participant["reported_ethnicity"] = ["NA"]
 
-    if "age_at_last_observation" in participant:
-        try:
-            participant["age_at_last_observation"] = float(
-                participant["age_at_last_observation"]
-            )
-        except ValueError:
-            participant["age_at_last_observation"] = None
-
-    if "age_at_enrollment" in participant:
-        try:
-            participant["age_at_enrollment"] = float(participant["age_at_enrollment"])
-        except ValueError:
-            participant["age_at_enrollment"] = None
-
     split_participant = multi_value_split(participant)
 
     for key in multi_value:

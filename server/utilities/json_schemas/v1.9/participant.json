@@ -215,7 +215,7 @@
             ]
         },
         "age_at_last_observation": {
-            "type": "number",
+            "type": ["number", "null"],
             "description": "Age at last observation, aka age in years at the last time the center can vouch for the accuracy phenotype data. For conditions with later age of onset, this field lets users know if individuals marked as unaffected were younger or older than the age when the phenotype is expected to appear.",
             "examples": [
                 "21",
