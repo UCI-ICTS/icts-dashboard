@@ -254,7 +254,12 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <InputNumber style={{ width: "100%" }} disabled={readOnly} />
+        <InputNumber
+          style={{ width: "100%" }}
+          disabled={readOnly}
+          parser={(value) => value === "" ? null : parseFloat(value)}
+          formatter={(value) => value}
+        />
       </Form.Item>
     );
   }
