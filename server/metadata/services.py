@@ -45,16 +45,7 @@ from submodels.models import (
 )
 
 
-class UserHistorySerializer(serializers.ModelSerializer):
-    created_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
-    updated_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
-
-    class Meta:
-        abstract = True
-        fields = "__all__"
-
-
-class GeneticFindingsInputSerializer(UserHistorySerializer):
+class GeneticFindingsInputSerializer(serializers.ModelSerializer):
     """
     Validate fields for GeneticFindings
     """
@@ -253,7 +244,7 @@ class GeneticFindingsInputSerializer(UserHistorySerializer):
         return instance
 
 
-class GeneticFindingsOutputSerializer(UserHistorySerializer):
+class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for GeneticFindingsOutputSerializer
     """
@@ -275,7 +266,7 @@ class GeneticFindingsOutputSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class AnalyteSerializer(UserHistorySerializer):
+class AnalyteSerializer(serializers.ModelSerializer):
     """
     Docstring for AnalyteSerializer
     """
@@ -305,7 +296,7 @@ class AnalyteSerializer(UserHistorySerializer):
         return instance
 
 
-class BiobankSerializer(UserHistorySerializer):
+class BiobankSerializer(serializers.ModelSerializer):
     """
     Serializer for the Biobank model.
     Handles full serialization and deserialization of nested ManyToMany and ForeignKey fields.
@@ -339,7 +330,7 @@ class BiobankSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class PhenotypeSerializer(UserHistorySerializer):
+class PhenotypeSerializer(serializers.ModelSerializer):
     """
     Docstring for PhenotypeSerializer
     """
@@ -360,7 +351,7 @@ class PhenotypeSerializer(UserHistorySerializer):
         return instance
 
 
-class FamilySerializer(UserHistorySerializer):
+class FamilySerializer(serializers.ModelSerializer):
     """
     Docstring for FamilySerializer
     """
@@ -385,7 +376,7 @@ class FamilySerializer(UserHistorySerializer):
         return instance
 
 
-class ParticipantOutputSerializer(UserHistorySerializer):
+class ParticipantOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for ParticipantOutputSerializer
     """
@@ -394,7 +385,7 @@ class ParticipantOutputSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class ParticipantInputSerializer(UserHistorySerializer):
+class ParticipantInputSerializer(serializers.ModelSerializer):
     """
     Docstring for ParticipantInputSerializer
     """
@@ -708,7 +699,7 @@ def update_metadata_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save(updated_by=current_user)
+            updated_instance = serializer.save()
             message = (
                 f"{table_name} {identifier} updated."
                 if changes

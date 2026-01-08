@@ -25,25 +25,14 @@ from submodels.models import (
     ReportedEthnicity,
     GREGoRVariantClassification
 )
+from simple_history.models import HistoricalRecords
 
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # set to default=django.utils.timezone.now before migrating. Revert after migration
-    created_by = models.ForeignKey(  # Change 'default="wheel"' to an appropriate existing username
-        settings.AUTH_USER_MODEL,
-        to_field="username",
-        on_delete=models.PROTECT,
-        related_name='+',
-        default="wheel",
-    )
     updated_at = models.DateTimeField(auto_now=True)  # set to default=django.utils.timezone.now before migrating. Revert after migration
-    updated_by = models.ForeignKey(  # Change 'default="wheel"' to an appropriate existing username
-        settings.AUTH_USER_MODEL,
-        to_field="username",
-        on_delete=models.PROTECT,
-        related_name='+',
-        default="wheel",
-    )
+    needs_review = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     class Meta:
         abstract = True

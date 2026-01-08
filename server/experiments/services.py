@@ -43,10 +43,8 @@ from metadata.selectors import get_analyte
 from rest_framework import serializers
 from experiments.models import ExperimentRNAShortRead, LibraryPrepType, ExperimentType
 
-from metadata.services import UserHistorySerializer
 
-
-class LibraryPrepTypeSerializer(UserHistorySerializer):
+class LibraryPrepTypeSerializer(serializers.ModelSerializer):
     """
     Docstring for LibraryPrepTypeSerializer
     """
@@ -55,7 +53,7 @@ class LibraryPrepTypeSerializer(UserHistorySerializer):
         fields = ["name"]
 
 
-class ExperimentTypeSerializer(UserHistorySerializer):
+class ExperimentTypeSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentTypeSerializer
     """
@@ -64,7 +62,7 @@ class ExperimentTypeSerializer(UserHistorySerializer):
         fields = ["name"]
 
 
-class ExperimentRNAInputSerializer(UserHistorySerializer):
+class ExperimentRNAInputSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentRNAInputSerializer
     """
@@ -127,7 +125,7 @@ class ExperimentRNAInputSerializer(UserHistorySerializer):
         return instance
 
 
-class ExperimentRNAOutputSerializer(UserHistorySerializer):
+class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentRNAOutputSerializer
     """
@@ -146,7 +144,7 @@ class ExperimentRNAOutputSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class ExperimentDNAInputSerializer(UserHistorySerializer):
+class ExperimentDNAInputSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentDNAInputSerializer
     """
@@ -157,7 +155,7 @@ class ExperimentDNAInputSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class ExperimentDNAOutputSerializer(UserHistorySerializer):
+class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentDNAOutputSerializer
     """
@@ -171,7 +169,7 @@ class ExperimentDNAOutputSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class ExperimentNanoporeSerializer(UserHistorySerializer):
+class ExperimentNanoporeSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentNanoporeSerializer
     """
@@ -197,7 +195,7 @@ class ExperimentNanoporeSerializer(UserHistorySerializer):
         return instance
 
 
-class ExperimentPacBioSerializer(UserHistorySerializer):
+class ExperimentPacBioSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentPacBioSerializer
     """
@@ -223,7 +221,7 @@ class ExperimentPacBioSerializer(UserHistorySerializer):
         return instance
 
 
-class ExperimentSerializer(UserHistorySerializer):
+class ExperimentSerializer(serializers.ModelSerializer):
     """
     Docstring for ExperimentSerializer
     """
@@ -288,7 +286,7 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
-class AlignedRNAShortReadInputSerializer(UserHistorySerializer):
+class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedRNAShortReadInputSerializer
     """
@@ -337,7 +335,7 @@ class AlignedRNAShortReadInputSerializer(UserHistorySerializer):
         return instance
 
 
-class AlignedRNAShortReadOutputSerializer(UserHistorySerializer):
+class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedRNAShortReadOutputSerializer
     """
@@ -353,7 +351,7 @@ class AlignedRNAShortReadOutputSerializer(UserHistorySerializer):
         return data
 
 
-class AlignedDNAShortReadSerializer(UserHistorySerializer):
+class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedDNAShortReadSerializer
     """
@@ -377,7 +375,7 @@ class AlignedDNAShortReadSerializer(UserHistorySerializer):
         return instance
 
 
-class AlignedSerializer(UserHistorySerializer):
+class AlignedSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedSerializer
     """
@@ -402,7 +400,7 @@ class AlignedSerializer(UserHistorySerializer):
         return instance
 
 
-class AlignedDNAShortReadSerializer(UserHistorySerializer):
+class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedDNAShortReadSerializer
     """
@@ -411,7 +409,7 @@ class AlignedDNAShortReadSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class AlignedPacBioSerializer(UserHistorySerializer):
+class AlignedPacBioSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedPacBioSerializer
     """
@@ -420,7 +418,7 @@ class AlignedPacBioSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class AlignedNanoporeSerializer(UserHistorySerializer):
+class AlignedNanoporeSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedNanoporeSerializer
     """
@@ -429,7 +427,7 @@ class AlignedNanoporeSerializer(UserHistorySerializer):
         fields = "__all__"
 
 
-class AlignedRNASerializer(UserHistorySerializer):
+class AlignedRNASerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedRNASerializer
     """
@@ -702,7 +700,7 @@ def update_experiments_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save(updated_by=current_user)
+            updated_instance = serializer.save()
 
             message = (
                 f"{table_name} {identifier} updated."
@@ -994,7 +992,7 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
     serializer = table_serializers.get(table_name)
 
     if serializer.is_valid():
-        updated_instance = serializer.save(updated_by=current_user)
+        updated_instance = serializer.save()
         changes = compare_data(
             old_data=table_serializers[table_name]["output_serializer"](
                 model_instance

@@ -79,7 +79,7 @@ class ParticipantViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_metadata("participant", participant_id, datum, self.request.user)
+                data, result = create_metadata("participant", participant_id, datum)
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -151,7 +151,7 @@ class ParticipantViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = update_metadata_entry(
-                    "participant", participant_id, participant[participant_id], datum, self.request.user
+                    "participant", participant_id, participant[participant_id], datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -249,7 +249,7 @@ class FamilyViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_metadata("family", family_id, datum, self.request.user)
+                data, result = create_metadata("family", family_id, datum)
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -321,7 +321,7 @@ class FamilyViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = update_metadata_entry(
-                    "family", family_id, family[family_id], datum, self.request.user
+                    "family", family_id, family[family_id], datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -417,7 +417,7 @@ class AnalyteViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_metadata("analyte", analyte_id, datum, self.request.user)
+                data, result = create_metadata("analyte", analyte_id, datum)
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -489,7 +489,7 @@ class AnalyteViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = update_metadata_entry(
-                    "analyte", analyte_id, analyte[analyte_id], datum, self.request.user
+                    "analyte", analyte_id, analyte[analyte_id], datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -585,7 +585,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_metadata("phenotype", phenotype_id, datum, self.request.user)
+                data, result = create_metadata("phenotype", phenotype_id, datum)
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -657,7 +657,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = update_metadata_entry(
-                    "phenotype", phenotype_id, phenotype[phenotype_id], datum, self.request.user
+                    "phenotype", phenotype_id, phenotype[phenotype_id], datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -758,7 +758,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_metadata(
-                    "genetic_findings", genetic_findings_id, datum, self.request.user
+                    "genetic_findings", genetic_findings_id, datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -837,8 +837,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                     "genetic_findings",
                     genetic_findings_id,
                     genetic_findings[genetic_findings_id],
-                    datum,
-                    self.request.user
+                    datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -956,7 +955,7 @@ class BiobankViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_metadata("biobank", biobank_id, datum, self.request.user)
+                data, result = create_metadata("biobank", biobank_id, datum)
                 response_data.append(data)
                 accepted |= result == "accepted_request"
                 rejected |= result != "accepted_request"
@@ -1035,7 +1034,7 @@ class BiobankViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = update_metadata_entry(
-                    "biobank", biobank_id, biobank[biobank_id], datum, self.request.user
+                    "biobank", biobank_id, biobank[biobank_id], datum
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"

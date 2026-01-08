@@ -72,7 +72,8 @@
         "pk": 1,
         "fields": {
             "name": "single-end",
-            "display_name": "single-end"
+            "display_name": "single-end",
+            "needs_review": false
         }
     },
     {
@@ -80,7 +81,8 @@
         "pk": 2,
         "fields": {
             "name": "paired-end",
-            "display_name": "paired-end"
+            "display_name": "paired-end",
+            "needs_review": false
         }
     },
     {
@@ -88,7 +90,8 @@
         "pk": 3,
         "fields": {
             "name": "targeted",
-            "display_name": "targeted"
+            "display_name": "targeted",
+            "needs_review": false
         }
     },
     {
@@ -96,7 +99,8 @@
         "pk": 4,
         "fields": {
             "name": "untargeted",
-            "display_name": "untargeted"
+            "display_name": "untargeted",
+            "needs_review": false
         }
     },
     {
@@ -104,7 +108,8 @@
         "pk": 1,
         "fields": {
             "name": "stranded poly-A pulldown",
-            "display_name": "stranded poly-A pulldown"
+            "display_name": "stranded poly-A pulldown",
+            "needs_review": false
         }
     },
     {
@@ -112,7 +117,8 @@
         "pk": 2,
         "fields": {
             "name": "stranded total RNA",
-            "display_name": "stranded total RNA"
+            "display_name": "stranded total RNA",
+            "needs_review": false
         }
     },
     {
@@ -120,7 +126,8 @@
         "pk": 3,
         "fields": {
             "name": "rRNA depletion",
-            "display_name": "rRNA depletion"
+            "display_name": "rRNA depletion",
+            "needs_review": false
         }
     },
     {
@@ -128,7 +135,8 @@
         "pk": 4,
         "fields": {
             "name": "globin depletion",
-            "display_name": "globin depletion"
+            "display_name": "globin depletion",
+            "needs_review": false
         }
     }
 ]
