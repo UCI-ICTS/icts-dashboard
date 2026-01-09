@@ -73,6 +73,8 @@
         "fields": {
             "name": "single-end",
             "display_name": "single-end",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -82,6 +84,8 @@
         "fields": {
             "name": "paired-end",
             "display_name": "paired-end",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -91,6 +95,8 @@
         "fields": {
             "name": "targeted",
             "display_name": "targeted",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -100,6 +106,8 @@
         "fields": {
             "name": "untargeted",
             "display_name": "untargeted",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -109,6 +117,8 @@
         "fields": {
             "name": "stranded poly-A pulldown",
             "display_name": "stranded poly-A pulldown",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -118,6 +128,8 @@
         "fields": {
             "name": "stranded total RNA",
             "display_name": "stranded total RNA",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -127,6 +139,8 @@
         "fields": {
             "name": "rRNA depletion",
             "display_name": "rRNA depletion",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     },
@@ -136,6 +150,8 @@
         "fields": {
             "name": "globin depletion",
             "display_name": "globin depletion",
+            "created_at": "2025-12-08T00:00:00.000000Z",
+            "updated_at": "2025-12-08T00:00:00.000000Z",
             "needs_review": false
         }
     }
