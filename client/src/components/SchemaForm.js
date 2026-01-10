@@ -260,7 +260,6 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           parser={(value) => value === "" ? null : parseFloat(value)}
           formatter={(value) => value}
         />
-
       </Form.Item>
     );
   }
