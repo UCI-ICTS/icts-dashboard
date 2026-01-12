@@ -485,7 +485,7 @@ class AlignedService:
         return validator.get_validation_results()
 
 
-def create_experiment(table_name: str, identifier: str, datum: dict, current_user: User):
+def create_experiment(table_name: str, identifier: str, datum: dict):
     """
     Create a new experiment instance based on the provided data.
 
@@ -564,7 +564,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict, current_use
             experiment_data
         )
         if serializer.is_valid() and experiment_serializer.is_valid():
-            new_instance = serializer.save(created_by=current_user)
+            new_instance = serializer.save()
             return (
                 response_constructor(
                     identifier=identifier,
@@ -610,8 +610,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict, current_use
 
 
 def update_experiments_entry(
-    table_name: str, identifier: str, model_instance, datum: dict, current_user: User
-):
+    table_name: str, identifier: str, model_instance, datum: dict):
     """
     Update an existing experiment instance based on the provided data.
 
@@ -811,7 +810,7 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
         )
 
 
-def create_aligned(table_name: str, identifier: str, datum: dict, current_user: User):
+def create_aligned(table_name: str, identifier: str, datum: dict):
     """
     Create a new alignment instance based on the provided data.
 
@@ -903,7 +902,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
         serializer = table_serializers[table_name]["input_serializer"](data=datum)
         aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
         if serializer.is_valid() and aligned_serializer.is_valid():
-            new_instance = serializer.save(created_by=current_user)
+            new_instance = serializer.save()
             return (
                 response_constructor(
                     identifier=identifier,
@@ -948,7 +947,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
         )
 
 
-def update_aligned(table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
+def update_aligned(table_name: str, identifier: str, model_instance, datum: dict):
     """
     Update an existing alignment instance based on the provided data.
 

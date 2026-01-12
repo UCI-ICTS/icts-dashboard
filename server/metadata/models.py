@@ -29,10 +29,13 @@ from simple_history.models import HistoricalRecords
 
 
 class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)  # set to default=django.utils.timezone.now before migrating. Revert after migration
-    updated_at = models.DateTimeField(auto_now=True)  # set to default=django.utils.timezone.now before migrating. Revert after migration
+    # set to default=django.utils.timezone.now before migrating. Revert after migration
+    created_at = models.DateTimeField(auto_now_add=True)
+    # set to default=django.utils.timezone.now before migrating. Revert after migration
+    updated_at = models.DateTimeField(auto_now=True)
     needs_review = models.BooleanField(default=False)
-    history = HistoricalRecords()
+    # `inherit=True` forces every subclass of TimeStampedModel to get history
+    history = HistoricalRecords(inherit=True)
 
     class Meta:
         abstract = True

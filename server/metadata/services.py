@@ -532,7 +532,7 @@ def get_or_create_sub_models(datum: dict) -> dict:
     return datum
 
 
-def create_metadata(table_name: str, identifier: str, datum: dict, current_user: User):
+def create_metadata(table_name: str, identifier: str, datum: dict):
     """
     Create a new model instance based on the provided data.
 
@@ -591,7 +591,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict, current_user:
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
-            new_instance = serializer.save(created_by=current_user)
+            new_instance = serializer.save()
             return (
                 response_constructor(
                     identifier=identifier,
@@ -626,8 +626,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict, current_user:
 
 
 def update_metadata_entry(
-    table_name: str, identifier: str, model_instance, datum: dict, current_user: User
-):
+    table_name: str, identifier: str, model_instance, datum: dict):
     """
     Update an existing model instance based on the provided data.
 
