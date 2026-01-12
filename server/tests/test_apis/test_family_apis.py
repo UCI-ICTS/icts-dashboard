@@ -14,16 +14,16 @@ def created_by(self, response_dict, created_user):
     """
     Assert created_by username matches expected created_by username
     """
-    self.assertEqual(response_dict["data"]["instance"]["created_by"], created_user)
+    self.assertEqual(response_dict["data"]["instance"]["changed_by"], created_user)
 
 
-def usernames(self, response_dict):
+def usernames(self, response_dict, created_user):
     """
     Assert updated_by and created_by usernames differ after a successful update
     """
     self.assertNotEqual(
-        response_dict["data"]["instance"]["updated_by"],
-        response_dict["data"]["instance"]["created_by"]
+        response_dict["data"]["instance"]["changed_by"],
+        created_user
     )
 
 
@@ -132,11 +132,11 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_400 = self.client.post(url, [part2, part2], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
-        usernames(self, response_200.data[0])
+        usernames(self, response_200.data[0], testuser)
         timestamps(self, response_200.data[0])
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
-        usernames(self, response_200.data[0])
+        usernames(self, response_200.data[0], testuser)
         timestamps(self, response_207.data[0])
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)

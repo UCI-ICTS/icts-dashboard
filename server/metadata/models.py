@@ -36,9 +36,25 @@ class TimeStampedModel(models.Model):
     needs_review = models.BooleanField(default=False)
     # `inherit=True` forces every subclass of TimeStampedModel to get history
     history = HistoricalRecords(inherit=True)
+    # Track user modifications on who last edited a given model. Change default 'wheel' to an existing username
+    changed_by = models.ForeignKey(
+        'auth.User',
+        to_field='username',
+        on_delete=models.PROTECT,
+        related_name='+',
+        default='wheel',
+    )
 
     class Meta:
         abstract = True
+
+    @property
+    def _history_user(self):
+        return self.changed_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.changed_by = value
 
 
 class Family(TimeStampedModel):
