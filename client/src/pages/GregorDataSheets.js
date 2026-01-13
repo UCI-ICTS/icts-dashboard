@@ -255,7 +255,6 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
   };
 
   const handleDetail = (record) => {
-    console.log(record);
     setSelectedRow(record);
     dispatch(familyDetail(record.participant_id))
   };

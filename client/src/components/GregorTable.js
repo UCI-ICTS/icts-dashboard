@@ -175,6 +175,7 @@ export default function GregorTable({ rowKey, data, columns, onResizeColumn, onR
       tableLayout="fixed"
       scroll={{ x: totalWidth }}
       onRow={onRow}
+      rowClassName={(record) => (record.needs_review ? "needs-review" : "")}
       pagination={{
         current: page,
         pageSize,
