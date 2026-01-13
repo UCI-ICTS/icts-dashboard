@@ -209,14 +209,14 @@ def get_all_tables():
 
     serilized_return_data = {
         # Metadata Tables
-        "participants": serialized_participants.data,
-        "families": serialized_families.data,
+        "participant": serialized_participants.data,
+        "family": serialized_families.data,
         "genetic_findings": serialized_genetic_findings.data,
-        "analytes": serialized_analytes.data,
-        "phenotypes": serialized_phenotypes.data,
-        "biobank_entries": serialized_biobank_entries.data,
+        "analyte": serialized_analytes.data,
+        "phenotype": serialized_phenotypes.data,
+        "biobank": serialized_biobank_entries.data,
         # Experiment Tables
-        "experiments": serialized_experiments.data,
+        "experiment": serialized_experiments.data,
         "experiment_dna_short_read": serialized_dna.data,
         "experiment_nanopore": serialized_nanopore.data,
         "experiment_pac_bio": serialized_pacbio.data,

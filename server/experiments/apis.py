@@ -78,8 +78,6 @@ class ExperimentViewSet(viewsets.ViewSet):
         ids = request.GET.get("ids", "").split(",")
         experiments = bulk_retrieve(Experiment, ids, "experiment_id")
         response_data, accepted, rejected = [], False, False
-
-        # import pdb; pdb.set_trace()
         for experiment_id in ids:
             if experiment_id in experiments:
                 response_data.append(
@@ -132,7 +130,6 @@ class AlignedViewSet(viewsets.ViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-
         aligned = bulk_retrieve(Aligned, ids, "aligned_id")
         response_data, accepted, rejected = [], False, False
 
@@ -206,7 +203,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_experiment(
-                    "experiment_rna_short_read", experiment_rna_short_read_id, datum
+                    "experiment_rna_short_read", experiment_rna_short_read_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -287,6 +284,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
                     experiment_rna_short_read_id,
                     experiment_rna_short_read[experiment_rna_short_read_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -397,7 +395,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_aligned(
-                    "aligned_rna_short_read", aligned_rna_short_read_id, datum
+                    "aligned_rna_short_read", aligned_rna_short_read_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -478,6 +476,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
                     aligned_rna_short_read_id,
                     aligned_rna_short_read[aligned_rna_short_read_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -585,7 +584,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_experiment(
-                    "experiment_dna_short_read", experiment_dna_short_read_id, datum
+                    "experiment_dna_short_read", experiment_dna_short_read_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -666,6 +665,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
                     experiment_dna_short_read_id,
                     experiment_dna_short_read[experiment_dna_short_read_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -773,7 +773,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_aligned(
-                    "aligned_dna_short_read", aligned_dna_short_read_id, datum
+                    "aligned_dna_short_read", aligned_dna_short_read_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -854,6 +854,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                     aligned_dna_short_read_id,
                     aligned_dna_short_read[aligned_dna_short_read_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -958,7 +959,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_experiment(
-                    "experiment_pac_bio", experiment_pac_bio_id, datum
+                    "experiment_pac_bio", experiment_pac_bio_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1039,6 +1040,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
                     experiment_pac_bio_id,
                     experiment_pac_bio[experiment_pac_bio_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1141,7 +1143,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_aligned(
-                    "aligned_pac_bio", aligned_pac_bio_id, datum
+                    "aligned_pac_bio", aligned_pac_bio_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1220,6 +1222,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                     aligned_pac_bio_id,
                     aligned_pac_bio[aligned_pac_bio_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1320,7 +1323,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_experiment(
-                    "experiment_nanopore", experiment_nanopore_id, datum
+                    "experiment_nanopore", experiment_nanopore_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1401,6 +1404,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
                     experiment_nanopore_id,
                     experiment_nanopore[experiment_nanopore_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1505,7 +1509,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 rejected = True
             else:
                 data, result = create_aligned(
-                    "aligned_nanopore", aligned_nanopore_id, datum
+                    "aligned_nanopore", aligned_nanopore_id, datum, self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"
@@ -1584,6 +1588,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                     aligned_nanopore_id,
                     aligned_nanopore[aligned_nanopore_id],
                     datum,
+                    self.request.user
                 )
                 response_data.append(data)
                 accepted |= result == "accepted_request"

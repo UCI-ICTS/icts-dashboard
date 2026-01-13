@@ -45,8 +45,9 @@ export default function ParticipantDetail({
       columns={[
         { title: "Participant ID", key: "participant",
           render: (_, record) => {
+            const needsReview = record?.participant?.needs_review;
             return (
-              <div className="action-btn">
+              <div className={needsReview ? "cell-needs-review" : ""}>
                 <Button
                     type="link"
                     style={{ padding: 0 }}
@@ -69,10 +70,10 @@ export default function ParticipantDetail({
                   const schemaKey = "biobank_entries";
                   const idField = getIdentifier(schemaKey);
                   const label = entry[idField] ||  "✓";
+                  const needsReview = entry?.needs_review
                   return (
-                    <div className="action-btn">
+                    <div className={needsReview ? "cell-needs-review" : ""} key={index}>
                       <Button
-                        key={index}
                         type="link"
                         style={{ padding: 0 }}
                         onClick={() => {handleOpen(schemaKey, entry)}}
@@ -90,16 +91,17 @@ export default function ParticipantDetail({
             const items = Array.isArray(record.phenotypes) ? record.phenotypes : [];
             return items.length ? (
               <div>
-                {items.map((entry, index) => (
-                  <div className="action-btn">
-                    <Button
-                      key={index}
-                      type="link"
-                      style={{ padding: 0 }}
-                      onClick={() => handleOpen("phenotypes", entry)}
-                    >{entry.term_id || "✓"}</Button>
-                  </div>
-                ))}
+                {items.map((entry, index) => {
+                  const needsReview = entry?.needs_review;
+                  return (
+                    <div className={needsReview ? "cell-needs-review" : ""} key={index}>
+                      <Button
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => handleOpen("phenotypes", entry)}
+                      >{entry.term_id || "✓"}</Button>
+                    </div>
+                )})}
               </div>
             ) : "-";
           }
@@ -109,16 +111,17 @@ export default function ParticipantDetail({
             const items = Array.isArray(record.genetic_findings) ? record.genetic_findings : [];
             return items.length ? (
               <div>
-                {items.map((entry, index) => (
-                  <div className="action-btn">
-                    <Button
-                      key={index}
-                      type="link"
-                      style={{ padding: 0 }}
-                      onClick={() => handleOpen("genetic_findings", entry)}
-                    >{entry.genetic_findings_id || "✓"}</Button>
-                  </div>
-                ))}
+                {items.map((entry, index) => {
+                  const needsReview = entry?.needs_review;
+                  return (
+                    <div className={needsReview ? "cell-needs-review" : ""} key={index}>
+                      <Button
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => handleOpen("genetic_findings", entry)}
+                      >{entry.genetic_findings_id || "✓"}</Button>
+                    </div>
+                )})}
               </div>
             ) : "-";
           }
@@ -134,9 +137,8 @@ export default function ParticipantDetail({
                   const idField = getIdentifier(schemaKey);
                   const label = entry[idField] ||  "✓";
                   return (
-                    <div className="action-btn">
+                    <div className="action-btn" key={index}>
                       <Button
-                        key={index}
                         type="link"
                         style={{ padding: 0 }}
                         onClick={() => {handleOpen(schemaKey, entry)}}
@@ -158,9 +160,8 @@ export default function ParticipantDetail({
                   const idField = getIdentifier(schemaKey);
                   const label = entry[idField] ||  "✓";
                   return (
-                    <div className="action-btn">
+                    <div className="action-btn" key={index}>
                     <Button
-                      key={index}
                       type="link"
                       style={{ padding: 0 }}
                       onClick={() => {handleOpen(schemaKey, entry)}}
