@@ -42,7 +42,6 @@ class TimeStampedModel(models.Model):
         to_field='username',
         on_delete=models.PROTECT,
         related_name='+',
-        default='wheel',
     )
 
     class Meta:

@@ -57,6 +57,7 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
     def test_create_family_api(self):
         url = "/api/metadata/family/create/"
         part1 = {  # Valid submission
+            "changed_by": testuser,
             "family_id": "P-101",
             "consanguinity": "Unknown",
             "consanguinity_detail": "",
@@ -65,6 +66,7 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": "",
         }
         part2 = {  # Valid submission 2
+            "changed_by": testuser,
             "family_id": "P-102",
             "consanguinity": "Present",
             "consanguinity_detail": "",
@@ -73,6 +75,7 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": "",
         }
         part3 = {  # Invalid submission; missing consanguinity
+            "changed_by": testuser,
             "family_id": "P-103",
             "consanguinity": "",
             "consanguinity_detail": "",
@@ -154,6 +157,7 @@ class DeleteFamilyAPITest(APITestCaseWithAuth):
     def test_create_and_delete_family_api(self):
         create_url = "/api/metadata/family/create/"
         fam1 = {  # Valid submission
+            "changed_by": testuser,
             "family_id": "P-101",
             "consanguinity": "Unknown",
             "consanguinity_detail": "",
