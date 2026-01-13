@@ -45,6 +45,24 @@ from submodels.models import (
 )
 
 
+class TrackedModelSerializer(serializers.ModelSerializer):
+    """
+    Base serializer that assigns request.user to _history_user
+    on create. Requires 'context["request"]'.
+    """
+
+    def _set_history_user(self, instance):
+        request = self.context.get("request")
+        if request and request.user and request.user.is_authenticated:
+            instance._history_user = request.user
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        self._set_history_user(instance)
+        instance.save()  # triggers history save with user
+        return instance
+
+
 class GeneticFindingsInputSerializer(serializers.ModelSerializer):
     """
     Validate fields for GeneticFindings
@@ -532,7 +550,7 @@ def get_or_create_sub_models(datum: dict) -> dict:
     return datum
 
 
-def create_metadata(table_name: str, identifier: str, datum: dict):
+def create_metadata(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new model instance based on the provided data.
 
@@ -591,7 +609,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(changed_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -626,7 +644,7 @@ def create_metadata(table_name: str, identifier: str, datum: dict):
 
 
 def update_metadata_entry(
-    table_name: str, identifier: str, model_instance, datum: dict):
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing model instance based on the provided data.
 
@@ -698,7 +716,7 @@ def update_metadata_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save()
+            updated_instance = serializer.save(changed_by=current_user)
             message = (
                 f"{table_name} {identifier} updated."
                 if changes

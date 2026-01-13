@@ -10,21 +10,11 @@ from datetime import datetime
 testuser = "testuser"
 
 
-def created_by(self, response_dict, created_user):
+def changed_by(self, response_dict, changed_by):
     """
-    Assert created_by username matches expected created_by username
+    Assert changed_by username matches expected changed_by username
     """
-    self.assertEqual(response_dict["data"]["instance"]["changed_by"], created_user)
-
-
-def usernames(self, response_dict, created_user):
-    """
-    Assert updated_by and created_by usernames differ after a successful update
-    """
-    self.assertNotEqual(
-        response_dict["data"]["instance"]["changed_by"],
-        created_user
-    )
+    self.assertEqual(response_dict["data"]["instance"]["changed_by"], changed_by)
 
 
 def timestamps(self, response_dict):
@@ -57,7 +47,6 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
     def test_create_family_api(self):
         url = "/api/metadata/family/create/"
         part1 = {  # Valid submission
-            "changed_by": testuser,
             "family_id": "P-101",
             "consanguinity": "Unknown",
             "consanguinity_detail": "",
@@ -66,7 +55,6 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": "",
         }
         part2 = {  # Valid submission 2
-            "changed_by": testuser,
             "family_id": "P-102",
             "consanguinity": "Present",
             "consanguinity_detail": "",
@@ -75,7 +63,6 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
             "family_history_detail": "",
         }
         part3 = {  # Invalid submission; missing consanguinity
-            "changed_by": testuser,
             "family_id": "P-103",
             "consanguinity": "",
             "consanguinity_detail": "",
@@ -86,12 +73,12 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_207 = self.client.post(url, [part2, part3], format="json")
         response_400 = self.client.post(url, [part3], format="json")
-        created_by(self, response_200.data[0], testuser)
+        changed_by(self, response_200.data[0], testuser)
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
-        created_by(self, response_207.data[0], testuser)
+        changed_by(self, response_207.data[0], testuser)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -135,11 +122,11 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_400 = self.client.post(url, [part2, part2], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
-        usernames(self, response_200.data[0], testuser)
+        changed_by(self, response_200.data[0], testuser)
         timestamps(self, response_200.data[0])
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
-        usernames(self, response_200.data[0], testuser)
+        changed_by(self, response_200.data[0], testuser)
         timestamps(self, response_207.data[0])
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)

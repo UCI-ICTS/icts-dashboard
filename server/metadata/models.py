@@ -41,6 +41,8 @@ class TimeStampedModel(models.Model):
         'auth.User',
         to_field='username',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name='+',
     )
 

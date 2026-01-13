@@ -485,7 +485,7 @@ class AlignedService:
         return validator.get_validation_results()
 
 
-def create_experiment(table_name: str, identifier: str, datum: dict):
+def create_experiment(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new experiment instance based on the provided data.
 
@@ -564,7 +564,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
             experiment_data
         )
         if serializer.is_valid() and experiment_serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(changed_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -610,7 +610,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
 
 
 def update_experiments_entry(
-    table_name: str, identifier: str, model_instance, datum: dict):
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing experiment instance based on the provided data.
 
@@ -699,7 +699,7 @@ def update_experiments_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save()
+            updated_instance = serializer.save(changed_by=current_user)
 
             message = (
                 f"{table_name} {identifier} updated."
@@ -810,7 +810,7 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
         )
 
 
-def create_aligned(table_name: str, identifier: str, datum: dict):
+def create_aligned(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new alignment instance based on the provided data.
 
@@ -902,7 +902,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         serializer = table_serializers[table_name]["input_serializer"](data=datum)
         aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
         if serializer.is_valid() and aligned_serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(changed_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -947,7 +947,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         )
 
 
-def update_aligned(table_name: str, identifier: str, model_instance, datum: dict):
+def update_aligned(table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing alignment instance based on the provided data.
 
@@ -991,7 +991,7 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
     serializer = table_serializers.get(table_name)
 
     if serializer.is_valid():
-        updated_instance = serializer.save()
+        updated_instance = serializer.save(changed_by=current_user)
         changes = compare_data(
             old_data=table_serializers[table_name]["output_serializer"](
                 model_instance
