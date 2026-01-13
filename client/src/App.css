@@ -867,3 +867,15 @@ table-search-input .anticon {
 .text-area-input {
   color: var(--uci-blue) !important;
 }
+
+.needs-review {
+  background-color: #f7eb5f !important; 
+  font-weight: bold;
+}
+
+.cell-needs-review {
+  background-color: #f7eb5f;
+  font-weight: bold !important;
+  padding: 2px 4px;
+  border-radius: 4px;
+}

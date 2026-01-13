@@ -4,6 +4,32 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
+from datetime import datetime
+
+
+testuser = "testuser"
+
+
+def changed_by(self, response_dict, changed_by):
+    """
+    Assert changed_by username matches expected changed_by username
+    """
+    self.assertEqual(response_dict["data"]["instance"]["changed_by"], changed_by)
+
+
+def timestamps(self, response_dict):
+    """
+    Assert updated_at and created_at times differ after a successful update
+    """
+    updated_at = datetime.strptime(
+            response_dict["data"]["instance"]["updated_at"].rstrip('Z').split('.')[0],
+            "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+    created_at = datetime.strptime(
+            response_dict["data"]["instance"]["created_at"].rstrip('Z').split('.')[0],
+            "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+    self.assertGreater(updated_at, created_at)
 
 
 class APITestCaseWithAuth(APITestCase):
@@ -149,8 +175,10 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
         response_400 = self.client.post(url, [part3], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+        changed_by(self, response_200.data[0], testuser)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
+        changed_by(self, response_207.data[0], testuser)
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -183,7 +211,7 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
             "gene_of_interest": ["ME"],
             "phenotype_contribution": "Uncertain",
             "linked_variant": "11_64660831_GREGoR_test-004-004-0"
-            
+
         }
 
         part2 = {  # Invalid submission; missing zygosity
@@ -199,8 +227,12 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part1], format="json")
         response_400 = self.client.post(url, [part3], format="json")
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
+        changed_by(self, response_200.data[0], testuser)
+        timestamps(self, response_200.data[0])
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
+        changed_by(self, response_207.data[0], testuser)
+        timestamps(self, response_207.data[0])
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 

@@ -2,6 +2,7 @@
 # experiments/servces.py
 
 from django.db import transaction
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from config.selectors import (
     remove_na,
@@ -44,18 +45,27 @@ from experiments.models import ExperimentRNAShortRead, LibraryPrepType, Experime
 
 
 class LibraryPrepTypeSerializer(serializers.ModelSerializer):
+    """
+    Docstring for LibraryPrepTypeSerializer
+    """
     class Meta:
         model = LibraryPrepType
         fields = ["name"]
 
 
 class ExperimentTypeSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentTypeSerializer
+    """
     class Meta:
         model = ExperimentType
         fields = ["name"]
 
 
 class ExperimentRNAInputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentRNAInputSerializer
+    """
     library_prep_type = serializers.SlugRelatedField(
         many=True,
         slug_field="name",
@@ -116,6 +126,9 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
 
 
 class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentRNAOutputSerializer
+    """
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -132,7 +145,9 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
 
 
 class ExperimentDNAInputSerializer(serializers.ModelSerializer):
-
+    """
+    Docstring for ExperimentDNAInputSerializer
+    """
     experiment_type = serializers.ChoiceField(choices=["targeted", "genome", "exome"])
 
     class Meta:
@@ -141,6 +156,9 @@ class ExperimentDNAInputSerializer(serializers.ModelSerializer):
 
 
 class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentDNAOutputSerializer
+    """
     library_prep_type = serializers.SlugRelatedField(
         many=True, slug_field="name", read_only=True
     )
@@ -152,6 +170,9 @@ class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
 
 
 class ExperimentNanoporeSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentNanoporeSerializer
+    """
     class Meta:
         model = ExperimentNanopore
         fields = "__all__"
@@ -175,6 +196,9 @@ class ExperimentNanoporeSerializer(serializers.ModelSerializer):
 
 
 class ExperimentPacBioSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentPacBioSerializer
+    """
     class Meta:
         model = ExperimentPacBio
         fields = "__all__"
@@ -198,6 +222,9 @@ class ExperimentPacBioSerializer(serializers.ModelSerializer):
 
 
 class ExperimentSerializer(serializers.ModelSerializer):
+    """
+    Docstring for ExperimentSerializer
+    """
     class Meta:
         model = Experiment
         fields = "__all__"
@@ -260,6 +287,9 @@ class ExperimentService:
 
 
 class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedRNAShortReadInputSerializer
+    """
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
@@ -306,6 +336,9 @@ class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
 
 
 class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedRNAShortReadOutputSerializer
+    """
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
@@ -319,6 +352,9 @@ class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
 
 
 class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedDNAShortReadSerializer
+    """
     class Meta:
         model = AlignedDNAShortRead
         fields = "__all__"
@@ -340,6 +376,9 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
 
 
 class AlignedSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedSerializer
+    """
     class Meta:
         model = Aligned
         fields = "__all__"
@@ -362,24 +401,36 @@ class AlignedSerializer(serializers.ModelSerializer):
 
 
 class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedDNAShortReadSerializer
+    """
     class Meta:
         model = AlignedDNAShortRead
         fields = "__all__"
 
 
 class AlignedPacBioSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedPacBioSerializer
+    """
     class Meta:
         model = AlignedPacBio
         fields = "__all__"
 
 
 class AlignedNanoporeSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedNanoporeSerializer
+    """
     class Meta:
         model = AlignedNanopore
         fields = "__all__"
 
 
 class AlignedRNASerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedRNASerializer
+    """
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
@@ -434,7 +485,7 @@ class AlignedService:
         return validator.get_validation_results()
 
 
-def create_experiment(table_name: str, identifier: str, datum: dict):
+def create_experiment(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new experiment instance based on the provided data.
 
@@ -513,7 +564,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
             experiment_data
         )
         if serializer.is_valid() and experiment_serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(changed_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -559,8 +610,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict):
 
 
 def update_experiments_entry(
-    table_name: str, identifier: str, model_instance, datum: dict
-):
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing experiment instance based on the provided data.
 
@@ -649,7 +699,7 @@ def update_experiments_entry(
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
-            updated_instance = serializer.save()
+            updated_instance = serializer.save(changed_by=current_user)
 
             message = (
                 f"{table_name} {identifier} updated."
@@ -760,7 +810,7 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
         )
 
 
-def create_aligned(table_name: str, identifier: str, datum: dict):
+def create_aligned(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new alignment instance based on the provided data.
 
@@ -852,7 +902,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         serializer = table_serializers[table_name]["input_serializer"](data=datum)
         aligned_serializer = AlignedService.create_or_update_aligned(aligned_data)
         if serializer.is_valid() and aligned_serializer.is_valid():
-            new_instance = serializer.save()
+            new_instance = serializer.save(changed_by=current_user)
             return (
                 response_constructor(
                     identifier=identifier,
@@ -897,7 +947,7 @@ def create_aligned(table_name: str, identifier: str, datum: dict):
         )
 
 
-def update_aligned(table_name: str, identifier: str, model_instance, datum: dict):
+def update_aligned(table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing alignment instance based on the provided data.
 
@@ -941,7 +991,7 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
     serializer = table_serializers.get(table_name)
 
     if serializer.is_valid():
-        updated_instance = serializer.save()
+        updated_instance = serializer.save(changed_by=current_user)
         changes = compare_data(
             old_data=table_serializers[table_name]["output_serializer"](
                 model_instance

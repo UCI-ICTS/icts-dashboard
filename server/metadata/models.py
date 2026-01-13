@@ -4,6 +4,7 @@
 """ """
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from submodels.models import (
     ReportedRace,
@@ -24,9 +25,40 @@ from submodels.models import (
     ReportedEthnicity,
     GREGoRVariantClassification
 )
+from simple_history.models import HistoricalRecords
 
 
-class Family(models.Model):
+class TimeStampedModel(models.Model):
+    # set to default=django.utils.timezone.now before migrating. Revert after migration
+    created_at = models.DateTimeField(auto_now_add=True)
+    # set to default=django.utils.timezone.now before migrating. Revert after migration
+    updated_at = models.DateTimeField(auto_now=True)
+    needs_review = models.BooleanField(default=False)
+    # `inherit=True` forces every subclass of TimeStampedModel to get history
+    history = HistoricalRecords(inherit=True)
+    # Track user modifications on who last edited a given model. Change default 'wheel' to an existing username
+    changed_by = models.ForeignKey(
+        'auth.User',
+        to_field='username',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='+',
+    )
+
+    class Meta:
+        abstract = True
+
+    @property
+    def _history_user(self):
+        return self.changed_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.changed_by = value
+
+
+class Family(TimeStampedModel):
     family_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -57,7 +89,7 @@ class Family(models.Model):
     )
 
 
-class Participant(models.Model):
+class Participant(TimeStampedModel):
     participant_id = models.CharField(
         unique=True,
         primary_key=True,
@@ -206,7 +238,7 @@ class Participant(models.Model):
         return list(self.pmid_id.values_list("id", flat=True))
 
 
-class Phenotype(models.Model):
+class Phenotype(TimeStampedModel):
     phenotype_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -290,7 +322,7 @@ class Phenotype(models.Model):
         return f"{self.participant_id.participant_id} - {self.term_id}"
 
 
-class GeneticFindings(models.Model):
+class GeneticFindings(TimeStampedModel):
     genetic_findings_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -472,7 +504,7 @@ class GeneticFindings(models.Model):
         return self.genetic_findings_id
 
 
-class Analyte(models.Model):
+class Analyte(TimeStampedModel):
     analyte_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -596,7 +628,7 @@ class Analyte(models.Model):
         return f"Analyte {self.analyte_id} from participant {self.participant_id.participant_id}"
 
 
-class Biobank(models.Model):
+class Biobank(TimeStampedModel):
     """
     Unified model for tracking a biosample from physical storage
     through sequencing, alignment, and variant calling.

@@ -33,7 +33,7 @@ class AllTablesAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="get_tables",
+        operation_id="get_all_tables",
         responses={
             200: "Submission successful",
             400: "Bad request",
@@ -89,7 +89,7 @@ class FamilyDetail(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
-        operation_id="family-detail",
+        operation_id="get_family_detail",
         responses={
             200: "Submission successful",
             400: "Bad request",
