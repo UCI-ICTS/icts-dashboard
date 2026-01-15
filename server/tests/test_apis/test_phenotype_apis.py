@@ -93,8 +93,8 @@ class CreatePhenotypeAPITest(APITestCaseWithAuth):
 
 class ReadPhenotypeAPITest(APITestCaseWithAuth):
     def test_read_phenotype_success(self):
-        url1 = "/api/metadata/phenotype/?ids=1.2,1.3"
-        url2 = "/api/metadata/phenotype/?ids=1.2,1.3,1.99"
+        url1 = "/api/metadata/phenotype/?ids=1.2,1.7"
+        url2 = "/api/metadata/phenotype/?ids=1.2,1.7,1.99"
         url3 = "/api/metadata/phenotype/?ids=1.99,1.100"
 
         response_200 = self.client.get(url1, format="json")
@@ -118,15 +118,15 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
         }
 
         part2 = {  # Invalid submission; invalid syndromic
-            "phenotype_id": "1.3",
-            "participant_id": "GREGoR_test-002-001-2",
-            "term_id": "HP:0002076",
+            "phenotype_id": "1.4",
+            "term_id": "HP:0000733",
             "presence": "Present",
             "ontology": "HPO",
-            "additional_details": "migraines",
+            "additional_details": "Stereotypic behavior",
             "onset_age_range": "HP:0003621",
-            "additional_modifiers": ["feeding difficulties"],
+            "additional_modifiers": [],
             "syndromic": "Invalid submission",
+            "participant_id": "GREGoR_test-001-001-0"
         }
         response_207 = self.client.post(url, [part1, part2], format="json")
         response_200 = self.client.post(url, [part1], format="json")
