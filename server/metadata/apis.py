@@ -14,6 +14,7 @@ from config.selectors import (
     response_status,
     bulk_retrieve,
     bulk_model_retrieve,
+    get_visible_objects
 )
 
 from metadata.models import (
@@ -52,7 +53,10 @@ class ParticipantViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Participant.objects.all()
+        queryset = get_visible_objects(
+            model=Participant,
+            superuser=self.request.user.is_superuser
+        )
         serializer = ParticipantOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -99,21 +103,34 @@ class ParticipantViewSet(viewsets.ViewSet):
         tags=["Participant"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
-        participant = bulk_retrieve(Participant, ids, "participant_id")
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        participants = bulk_retrieve(Participant, ids, "participant_id")
+            
         response_data, accepted, rejected = [], False, False
 
         for participant_id in ids:
-            if participant_id in participant:
-                response_data.append(
-                    response_constructor(
-                        identifier=participant_id,
-                        request_status="SUCCESS",
-                        code=200,
-                        data=participant[participant_id],
+            if participant_id in participants:
+                if not superuser and participants[participant_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
                     )
-                )
-                accepted = True
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=participants[participant_id],
+                        )
+                    )
+                    accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -134,12 +151,12 @@ class ParticipantViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_participant(self, request):
-        participant = bulk_model_retrieve(request.data, Participant, "participant_id")
+        participants = bulk_model_retrieve(request.data, Participant, "participant_id")
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
             participant_id = datum.get("participant_id")
-            if participant_id not in participant:
+            if participant_id not in participants:
                 response_data.append(
                     response_constructor(
                         identifier=participant_id,
@@ -150,16 +167,27 @@ class ParticipantViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "participant",
-                    participant_id,
-                    participant[participant_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                    and participants[participant_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "participant",
+                        participant_id,
+                        participants[participant_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 
@@ -226,7 +254,10 @@ class FamilyViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Family.objects.all()
+        queryset = get_visible_objects(
+            superuser=self.request.user.is_superuser,
+            model=Family
+        )
         serializer = FamilySerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -273,21 +304,33 @@ class FamilyViewSet(viewsets.ViewSet):
         tags=["Family"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
         family = bulk_retrieve(Family, ids, "family_id")
         response_data, accepted, rejected = [], False, False
 
         for family_id in ids:
             if family_id in family:
-                response_data.append(
-                    response_constructor(
-                        identifier=family_id,
-                        request_status="SUCCESS",
-                        code=200,
-                        data=family[family_id],
+                if not superuser and family[family_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
                     )
-                )
-                accepted = True
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=family[family_id],
+                        )
+                    )
+                    accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -324,16 +367,27 @@ class FamilyViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "family",
-                    family_id,
-                    family[family_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                    and family[family_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "family",
+                        family_id,
+                        family[family_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 
@@ -398,7 +452,10 @@ class AnalyteViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Analyte.objects.all()
+        queryset = get_visible_objects(
+            model=Analyte,
+            superuser=self.request.user.is_superuser
+        )
         serializer = AnalyteSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -445,21 +502,32 @@ class AnalyteViewSet(viewsets.ViewSet):
         tags=["Analyte"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
         analyte = bulk_retrieve(Analyte, ids, "analyte_id")
         response_data, accepted, rejected = [], False, False
 
         for analyte_id in ids:
             if analyte_id in analyte:
-                response_data.append(
-                    response_constructor(
-                        identifier=analyte_id,
-                        request_status="SUCCESS",
-                        code=200,
-                        data=analyte[analyte_id],
+                if not superuser and analyte[analyte_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
                     )
-                )
-                accepted = True
+                    rejected = True
+                else:    
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=analyte[analyte_id],
+                        )
+                    )
+                    accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -496,16 +564,27 @@ class AnalyteViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "analyte",
-                    analyte_id,
-                    analyte[analyte_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                    and analyte[analyte_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "analyte",
+                        analyte_id,
+                        analyte[analyte_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 
@@ -570,7 +649,10 @@ class PhenotypeViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Phenotype.objects.all()
+        queryset = get_visible_objects(
+            model=Phenotype,
+            superuser=self.request.user.is_superuser
+        )
         serializer = PhenotypeSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -617,21 +699,33 @@ class PhenotypeViewSet(viewsets.ViewSet):
         tags=["Phenotype"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
         phenotype = bulk_retrieve(Phenotype, ids, "phenotype_id")
         response_data, accepted, rejected = [], False, False
 
         for phenotype_id in ids:
             if phenotype_id in phenotype:
-                response_data.append(
-                    response_constructor(
-                        identifier=phenotype_id,
-                        request_status="SUCCESS",
-                        code=200,
-                        data=phenotype[phenotype_id],
+                if not superuser and phenotype[phenotype_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
                     )
-                )
-                accepted = True
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=phenotype[phenotype_id],
+                        )
+                    )
+                    accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -668,16 +762,27 @@ class PhenotypeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "phenotype",
-                    phenotype_id,
-                    phenotype[phenotype_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                and phenotype[phenotype_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "phenotype",
+                        phenotype_id,
+                        phenotype[phenotype_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 
@@ -744,7 +849,10 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = GeneticFindings.objects.all()
+        queryset = get_visible_objects(
+            model=GeneticFindings,
+            superuser=self.request.user.is_superuser
+        )
         serializer = GeneticFindingsInputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -773,6 +881,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
+
                 data, result = create_metadata(
                     "genetic_findings", genetic_findings_id, datum, self.request.user
                 )
@@ -795,21 +904,31 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
         tags=["GeneticFindings"],
     )
     def list(self, request):
-        ids = request.GET.get("ids", "").split(",")
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
         genetic_findings = bulk_retrieve(GeneticFindings, ids, "genetic_findings_id")
         response_data, accepted, rejected = [], False, False
 
         for genetic_findings_id in ids:
             if genetic_findings_id in genetic_findings:
-                response_data.append(
-                    response_constructor(
-                        identifier=genetic_findings_id,
-                        request_status="SUCCESS",
-                        code=200,
-                        data=genetic_findings[genetic_findings_id],
+                if not superuser and genetic_findings[genetic_findings_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
                     )
-                )
-                accepted = True
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=genetic_findings[genetic_findings_id],
+                        )
+                    )
+                    accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -849,16 +968,27 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "genetic_findings",
-                    genetic_findings_id,
-                    genetic_findings[genetic_findings_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                    and genetic_findings[genetic_findings_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    
+                else:
+                    data, result = update_metadata_entry(
+                        "genetic_findings",
+                        genetic_findings_id,
+                        genetic_findings[genetic_findings_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 
@@ -920,35 +1050,72 @@ class BiobankViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Biobank entries",
-        responses={200: BiobankSerializer(many=True)},
+        responses={200: BiobankSerializer(many=True), 400: "Bad request"},
         tags=["Biobank"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Biobank.objects.all()
+        queryset = get_visible_objects(
+            model=Biobank,
+            superuser=self.request.user.is_superuser
+        )
         serializer = BiobankSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        responses={200: BiobankSerializer()},
         manual_parameters=[
             openapi.Parameter(
-                "id", openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True
+                "id",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+                required=True
             )
         ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Biobank"],
     )
-    @action(detail=False, methods=["get"], url_path="retrieve")
-    def retrieve_biobank(self, request):
-        biobank_id = request.GET.get("id")
-        if not biobank_id:
-            return Response({"detail": "Missing ID."}, status=400)
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        biobanks = bulk_retrieve(Biobank, ids, "bioank_id")
 
-        try:
-            obj = Biobank.objects.get(pk=biobank_id)
-            return Response(BiobankSerializer(obj).data)
-        except Biobank.DoesNotExist:
-            return Response({"detail": "Not found."}, status=404)
+        response_data, accepted, rejected = [], False, False
+
+        for biobank_id in ids:
+            if biobank_id in biobanks:
+                if not superuser and biobanks[biobank_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=biobanks[biobank_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
         request_body=BiobankSerializer(many=True),
@@ -959,6 +1126,7 @@ class BiobankViewSet(viewsets.ViewSet):
     def create_biobank(self, request):
         biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
         response_data, accepted, rejected = [], False, False
+
         for datum in request.data:
             biobank_id = datum.get("biobank_id")
             if biobank_id and biobank_id in biobank:
@@ -1050,16 +1218,27 @@ class BiobankViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_metadata_entry(
-                    "biobank",
-                    biobank_id,
-                    biobank[biobank_id],
-                    datum,
-                    self.request.user
-                )
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
+                if not self.request.user.is_superuser \
+                    and biobank[biobank_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "biobank",
+                        biobank_id,
+                        biobank[biobank_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
         return Response(response_data, status=response_status(accepted, rejected))
 

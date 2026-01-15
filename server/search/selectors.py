@@ -16,6 +16,8 @@ from django.apps import apps
 from django.db.models import Q, Count
 from itertools import chain, groupby
 
+from config.selectors import get_visible_objects
+
 from metadata.models import (
     Analyte,
     Biobank,
@@ -428,36 +430,75 @@ def get_summary_stats():
 
     return response
 
-def get_family_detail(participant_id:str) -> dict:
+
+def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict]:
     """
+    Return full family detail for a participant's family.
     """
     family_detail = []
-    participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)
+
+    root_participant = Participant.objects.get(pk=participant_id)
+
+    participants = get_visible_objects(
+        model=Participant,
+        superuser=superuser,
+    ).filter(family_id=root_participant.family_id)
+
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
-        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(participant_id=participant), many=True)
-        serialized_phenotypes = PhenotypeSerializer(Phenotype.objects.filter(participant_id=participant), many=True)
-        serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(participant_id=participant), many=True)
+
+        serialized_biobanks = BiobankSerializer(
+            get_visible_objects(
+                Biobank,
+                superuser=superuser,
+                participant_id=participant
+            ),
+            many=True,
+        )
+
+        serialized_phenotypes = PhenotypeSerializer(
+            get_visible_objects(
+                Phenotype,
+                superuser=superuser,
+                participant_id=participant
+            ),
+            many=True,
+        )
+
+        serialized_genetic_findings = GeneticFindingsOutputSerializer(
+            get_visible_objects(
+                GeneticFindings,
+                superuser=superuser,
+                participant_id=participant
+            ),
+            many=True,
+        )
+
+        # Sequencing
         experiments = Experiment.objects.filter(participant_id=participant)
         serialized_sequencing = []
+
         for exp in experiments:
             model = table_serializers[exp.table_name]["model"]
             serializer = table_serializers[exp.table_name]["output_serializer"]
+
             sequence = serializer(model.objects.get(pk=exp.id_in_table)).data
             sequence["table_type"] = exp.table_name
             serialized_sequencing.append(sequence)
 
+        # Alignments
         aligned = Aligned.objects.filter(participant_id=participant)
         serialized_alignments = []
-        # import pdb;pdb.set_trace()
+
         for aln in aligned:
             model = table_serializers[aln.table_name]["model"]
             serializer = table_serializers[aln.table_name]["output_serializer"]
+
             alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
             alignment["table_type"] = aln.table_name
             serialized_alignments.append(alignment)
 
-        items = {
+        family_detail.append({
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
             "family_id": participant.family_id_id,
@@ -466,8 +507,7 @@ def get_family_detail(participant_id:str) -> dict:
             "genetic_findings": serialized_genetic_findings.data,
             "sequencing": serialized_sequencing,
             "alignments": serialized_alignments,
-            }
-        family_detail.append(items)
+        })
 
     return family_detail
 
@@ -525,3 +565,4 @@ def get_case_queue(participant_id:str) -> dict:
             p["cohort_analysis"] = "incomplete"
 
     return case_queue
+
