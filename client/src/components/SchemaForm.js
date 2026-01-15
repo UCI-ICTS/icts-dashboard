@@ -58,6 +58,18 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   if (foreignMap) {
     // support labelKey for display; fallback to apiKey for backward-compat
     const { valueKey, apiKey, labelKey = apiKey } = foreignMap;
+    
+    // Check if foreignMap defines a default value (e.g., 0)
+    const extendedOptions = [...foreignData];
+    if (
+      foreignMap.default !== undefined && 
+      !foreignData.some(item => String(item[valueKey]) === String(foreignMap.default))
+    ) {
+      extendedOptions.unshift({
+        [valueKey]: foreignMap.default,
+        [labelKey]: `${foreignMap.default} (Not Available)`
+      });
+    }
 
     if (schema.type === "array") {
       return (
@@ -75,7 +87,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             optionFilterProp="label"
             disabled={readOnly}
           >
-            {foreignData.map((item) => (
+            {extendedOptions.map((item) => (
               <Select.Option
                 key={item[valueKey]}
                 value={item[valueKey]}
@@ -98,7 +110,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
         <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
-          {foreignData.map((item) => (
+          {extendedOptions.map((item) => (
             <Select.Option
               key={item[valueKey]}
               value={item[valueKey]}
