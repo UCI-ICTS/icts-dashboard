@@ -47,8 +47,19 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   const rawData = useSelector(state =>
     sourceTable ? state.data[sourceTable] : undefined
   );
-  const foreignData = useMemo(() => rawData || [], [rawData]);
-
+  
+  const dependantValue = foreignMap?.dependsOn ? form.getFieldValue(foreignMap.dependsOn) : null;
+  
+  const foreignData = useMemo(() => {
+    if (foreignMap?.filterBy && dependantValue) {
+      console.log(dependantValue, foreignMap.filterBy);
+      return rawData?.filter(entry => entry[foreignMap.filterBy] == dependantValue) || [];
+    }
+    return rawData || [];
+  }, [rawData, foreignMap, dependantValue]);
+  
+  console.log(foreignData)
+  
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
       dispatch(fetchTable(foreignMap.apiKey));
@@ -211,7 +222,8 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           <Input disabled={true}/>
         </Form.Item>
       );
-    }/* else if (tableName === "biobank" && keyName.includes("date")) {
+    }
+    /* else if (tableName === "biobank" && keyName.includes("date")) {
       return (
         <Form.Item
           key={keyName}

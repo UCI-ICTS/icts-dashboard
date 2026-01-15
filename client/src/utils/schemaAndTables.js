@@ -160,19 +160,19 @@ export const foreignKeyFields = {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0
+      default: 0                         // add a default of `0`
     },
     paternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0
+      default: 0                         // add a default of `0`
     },
     maternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0
+      default: 0                         // add a default of `0`
     }
   },
   phenotype: {
@@ -199,6 +199,13 @@ export const foreignKeyFields = {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
+    },
+    partial_contribution_explained: {
+      sourceTable: "phenotypes",
+      valueKey: "term_id",
+      apiKey: "phenotype",
+      filterBy: "participant_id",          // tells SchemaForm what to filter on
+      dependsOn: "participant_id"          // tells SchemaForm to watch this field
     }
   },
   biobank: {
