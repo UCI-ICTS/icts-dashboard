@@ -438,6 +438,9 @@ const SchemaForm = ({
 
   return (
     <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
+      <div className="schema-form-update">
+        <span>Last update by <b>{initialValues["changed_by"]}</b> at <b>{initialValues["updated_at"]}</b></span><br/>
+      </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
         <span>Edit Mode</span>
         <Tooltip title="Toggle edit mode">

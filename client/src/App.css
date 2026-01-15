@@ -398,6 +398,20 @@ body, html {
   padding: 8px;
 }
 
+/* Table Row highlight */
+.needs-review {
+  background-color: #f7eb5f !important; 
+  font-weight: bold;
+}
+
+/* Table cell highlight */
+.cell-needs-review {
+  background-color: #f7eb5f;
+  font-weight: bold !important;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
 /* Column resizing */
 .react-resizable {
   position: relative;
@@ -700,6 +714,12 @@ body, html {
   color: var(--uci-blue);
 }
 
+/* Text for Modal update info */
+.schema-form-update {
+  display: flex;
+  color: var(--uci-blue);
+}
+
 /* Base select style */
 .table-selector {
   min-width: 200px;
@@ -868,14 +888,3 @@ table-search-input .anticon {
   color: var(--uci-blue) !important;
 }
 
-.needs-review {
-  background-color: #f7eb5f !important; 
-  font-weight: bold;
-}
-
-.cell-needs-review {
-  background-color: #f7eb5f;
-  font-weight: bold !important;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
