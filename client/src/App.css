@@ -717,7 +717,22 @@ body, html {
 /* Text for Modal update info */
 .schema-form-update {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
   color: var(--uci-blue);
+}
+
+.schema-form-update .update-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.schema-form-update .review-actions {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 /* Base select style */

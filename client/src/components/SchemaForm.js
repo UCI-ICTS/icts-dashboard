@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, DatePicker } from "antd";
+import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
@@ -57,8 +57,6 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
     return rawData || [];
   }, [rawData, foreignMap, dependantValue]);
-  
-  console.log(foreignData)
   
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
@@ -442,6 +440,10 @@ const SchemaForm = ({
     try {
       const normalized = normalizeArrays(values, schema.properties);
       const isUpdate = !!(initialValues && Object.keys(initialValues).length);
+      if ("needs_review" in formInstance.getFieldsValue()) {
+        normalized.needs_review = formInstance.getFieldValue("needs_review");
+      }
+      console.log(values, formInstance.getFieldValue("needs_review"))
       const action = isUpdate
         ? updateEntry({ table, data: [normalized] })
         : createEntry({ table, data: [normalized] });
@@ -462,21 +464,61 @@ const SchemaForm = ({
 
   return (
     <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
-      <div className="schema-form-update">
-        <span>Last update by <b>{initialValues["changed_by"]}</b> at <b>{initialValues["updated_at"]}</b></span><br/>
-      </div>
+      <Form.Item name="needs_review" noStyle>
+        <Input type="hidden" />
+      </Form.Item>
+      {isAdmin && (
+
+<div className="schema-form-update">
+  <div className="update-info">
+    <span>
+      Last update by <b>{initialValues["changed_by"]}</b> at{" "}
+      <b>{initialValues["updated_at"]}</b>
+    </span>
+  </div>
+
+  <div className="review-actions">
+    
+    <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
+      <Button onClick={handleDelete} disabled={!editMode} danger>
+        DELETE
+      </Button>
+    </Tooltip>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <Tooltip title="Toggle NEEDS REVIEW mode">
+      <span> Needs Review </span>
+      <Form.Item label="Needs Review" shouldUpdate noStyle>
+        {({ getFieldValue, setFieldValue }) => {
+          const currentValue = getFieldValue("needs_review");
+
+          const handleToggle = () => {
+            Modal.confirm({
+              title: currentValue
+                ? "Unset needs review flag? That action will make this object viewable to everyone."
+                : "Mark this entry as needing review? That action will make this object viewable only by admins.",
+              onOk: () => setFieldValue("needs_review", !currentValue),
+            });
+          };
+
+          return (
+            <Switch
+              checked={currentValue}
+              onChange={handleToggle}
+              disabled={!editMode}
+            />
+          );
+        }}
+      </Form.Item>
+    </Tooltip>
+  </div>
+</div>
+
+      )}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
         <span>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
-        {isAdmin && (
-          <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
-            <Button onClick={handleDelete} disabled={!editMode} danger>
-              DELETE
-            </Button>
-          </Tooltip>
-        )}
       </div>
 
       {Object.entries(schema.properties || {}).map(([key, value]) => (
