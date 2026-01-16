@@ -3427,7 +3427,7 @@
   },
   {
     "model": "experiments.aligneddnashortread",
-    "pk": "UCI_GREGoR_test-006-006-1-D-1_DNA_1-Aligned-1",
+    "pk": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00.000000Z",
       "updated_at": "2025-12-08T00:00:00.000000Z",
