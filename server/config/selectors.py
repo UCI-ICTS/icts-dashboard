@@ -9,8 +9,10 @@ import jsonref
 import jsonschema
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Model, QuerySet
 from requests.models import PreparedRequest
 from rest_framework import status
+from typing import Type
 from urllib.parse import urlparse
 
 """DB Level Services
@@ -406,3 +408,29 @@ def bulk_retrieve(model_class, id_list: list, id_field: str = "id") -> dict:
 
     except Exception as e:
         return {"error": str(e)}
+
+from django.db.models import Model, QuerySet
+
+def get_visible_objects(
+    model: type[Model],
+    *,
+    superuser: bool = False,
+    **filters
+) -> QuerySet:
+    """
+    Return a queryset for `model`, applying standard visibility rules
+    and optional Django ORM filters.
+
+    Example:
+        get_visible_objects(
+            Biobank,
+            superuser=request.user.is_superuser,
+            participant_id=participant,
+        )
+    """
+    queryset = model.objects.filter(**filters)
+
+    if not superuser and hasattr(model, "needs_review"):
+        queryset = queryset.exclude(needs_review=True)
+
+    return queryset

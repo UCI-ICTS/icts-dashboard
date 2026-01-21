@@ -98,11 +98,11 @@ class FamilyDetail(APIView):
     )
     def get(self, request):
         response = []
+        superuser = self.request.user.is_superuser
         try:
             participant_ids = request.GET.get("ids", "").split(",")
-            print(participant_ids)
             for participant_id in participant_ids:
-                response.append(get_family_detail(participant_id))
+                response.append(get_family_detail(participant_id, superuser))
 
             return Response(status=status.HTTP_200_OK, data=response)
 

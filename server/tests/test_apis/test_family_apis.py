@@ -84,8 +84,8 @@ class CreateFamilyAPITest(APITestCaseWithAuth):
 
 class ReadFamilyAPITest(APITestCaseWithAuth):
     def test_read_family_success(self):
-        url1 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-004"
-        url2 = "/api/metadata/family/?ids=GREGoR_test-001,GREGoR_test-004,DNE-01"
+        url1 = "/api/metadata/family/?ids=GREGoR_test-006,GREGoR_test-004"
+        url2 = "/api/metadata/family/?ids=GREGoR_test-006,GREGoR_test-004,DNE-01"
         url3 = "/api/metadata/family/?ids=DNE-01,DNE-2"
 
         response_200 = self.client.get(url1, format="json")
@@ -103,11 +103,12 @@ class UpdateFamilyAPITest(APITestCaseWithAuth):
     def test_update_family_api(self):
         url = "/api/metadata/family/update/"
         part1 = {  # Valid submission
-            "family_id": "GREGoR_test-001",
-            "consanguinity": "Present",
-            "consanguinity_detail": "New consanguinity detail found, UPDATE",
-            "pedigree_file": "s3://gregor-data/P-101/P-101.ped",
+            "family_id": "GREGoR_test-006",
+            "consanguinity": "Unknown",
+            "consanguinity_detail": "",
+            "pedigree_file": "",
             "pedigree_file_detail": "New pedigree found",
+            "family_history_detail": "Non contributory",
         }
         part2 = {  # Invalid submission; missing consanguinity
             "family_id": "GREGoR_test-004",
