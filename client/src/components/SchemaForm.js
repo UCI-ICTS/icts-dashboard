@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, DatePicker } from "antd";
+import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
@@ -47,8 +47,17 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   const rawData = useSelector(state =>
     sourceTable ? state.data[sourceTable] : undefined
   );
-  const foreignData = useMemo(() => rawData || [], [rawData]);
-
+  
+  const dependantValue = foreignMap?.dependsOn ? form.getFieldValue(foreignMap.dependsOn) : null;
+  
+  const foreignData = useMemo(() => {
+    if (foreignMap?.filterBy && dependantValue) {
+      console.log(dependantValue, foreignMap.filterBy);
+      return rawData?.filter(entry => entry[foreignMap.filterBy] == dependantValue) || [];
+    }
+    return rawData || [];
+  }, [rawData, foreignMap, dependantValue]);
+  
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
       dispatch(fetchTable(foreignMap.apiKey));
@@ -58,6 +67,18 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   if (foreignMap) {
     // support labelKey for display; fallback to apiKey for backward-compat
     const { valueKey, apiKey, labelKey = apiKey } = foreignMap;
+    
+    // Check if foreignMap defines a default value (e.g., 0)
+    const extendedOptions = [...foreignData];
+    if (
+      foreignMap.default !== undefined && 
+      !foreignData.some(item => String(item[valueKey]) === String(foreignMap.default))
+    ) {
+      extendedOptions.unshift({
+        [valueKey]: foreignMap.default,
+        [labelKey]: `${foreignMap.default} (Not Available)`
+      });
+    }
 
     if (schema.type === "array") {
       return (
@@ -75,7 +96,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             optionFilterProp="label"
             disabled={readOnly}
           >
-            {foreignData.map((item) => (
+            {extendedOptions.map((item) => (
               <Select.Option
                 key={item[valueKey]}
                 value={item[valueKey]}
@@ -98,7 +119,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
         <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
-          {foreignData.map((item) => (
+          {extendedOptions.map((item) => (
             <Select.Option
               key={item[valueKey]}
               value={item[valueKey]}
@@ -199,7 +220,8 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           <Input disabled={true}/>
         </Form.Item>
       );
-    }/* else if (tableName === "biobank" && keyName.includes("date")) {
+    }
+    /* else if (tableName === "biobank" && keyName.includes("date")) {
       return (
         <Form.Item
           key={keyName}
@@ -418,6 +440,10 @@ const SchemaForm = ({
     try {
       const normalized = normalizeArrays(values, schema.properties);
       const isUpdate = !!(initialValues && Object.keys(initialValues).length);
+      if ("needs_review" in formInstance.getFieldsValue()) {
+        normalized.needs_review = formInstance.getFieldValue("needs_review");
+      }
+      console.log(values, formInstance.getFieldValue("needs_review"))
       const action = isUpdate
         ? updateEntry({ table, data: [normalized] })
         : createEntry({ table, data: [normalized] });
@@ -438,18 +464,61 @@ const SchemaForm = ({
 
   return (
     <Form form={formInstance} layout="horizontal" onFinish={handleSubmit} style={{ maxWidth: 600 }}>
+      <Form.Item name="needs_review" noStyle>
+        <Input type="hidden" />
+      </Form.Item>
+      {isAdmin && (
+
+<div className="schema-form-update">
+  <div className="update-info">
+    <span>
+      Last update by <b>{initialValues["changed_by"]}</b> at{" "}
+      <b>{initialValues["updated_at"]}</b>
+    </span>
+  </div>
+
+  <div className="review-actions">
+    
+    <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
+      <Button onClick={handleDelete} disabled={!editMode} danger>
+        DELETE
+      </Button>
+    </Tooltip>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <Tooltip title="Toggle NEEDS REVIEW mode">
+      <span> Needs Review </span>
+      <Form.Item label="Needs Review" shouldUpdate noStyle>
+        {({ getFieldValue, setFieldValue }) => {
+          const currentValue = getFieldValue("needs_review");
+
+          const handleToggle = () => {
+            Modal.confirm({
+              title: currentValue
+                ? "Unset needs review flag? That action will make this object viewable to everyone."
+                : "Mark this entry as needing review? That action will make this object viewable only by admins.",
+              onOk: () => setFieldValue("needs_review", !currentValue),
+            });
+          };
+
+          return (
+            <Switch
+              checked={currentValue}
+              onChange={handleToggle}
+              disabled={!editMode}
+            />
+          );
+        }}
+      </Form.Item>
+    </Tooltip>
+  </div>
+</div>
+
+      )}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
         <span>Edit Mode</span>
         <Tooltip title="Toggle edit mode">
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
-        {isAdmin && (
-          <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
-            <Button onClick={handleDelete} disabled={!editMode} danger>
-              DELETE
-            </Button>
-          </Tooltip>
-        )}
       </div>
 
       {Object.entries(schema.properties || {}).map(([key, value]) => (

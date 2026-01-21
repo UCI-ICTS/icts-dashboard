@@ -56,8 +56,11 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
 
   // Sync URL (only when NOT at ParticipantDetail)
   useEffect(() => {
-    if (renderDetail) return;
-    if (renderQueue) return;
+    if (renderDetail || renderQueue) {
+      if (tableView !== "participants") {
+        dispatch(setTableView(meta("participants")));
+      }
+    }
     if (!tableValid) return;
     if (tableView !== table) {
       dispatch(setTableView(meta(table))); // one-way sync
