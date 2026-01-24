@@ -19,7 +19,10 @@ from hpo.selectors import get_hpo_term_by_id
 from hpo.services import (
     phenotype_extraction,
     PhenotypeExtractRequestSerializer,
-    PhenotypeExtractResponseSerializer
+    PhenotypeExtractResponseSerializer,
+    refresh_from_obo,
+    build_vectors_from_csv,
+    attach_vectors_to_release,
 )
 
 
@@ -285,6 +288,29 @@ class HPOExtractPhenotypesView(APIView):
             return Response(result, status=200)
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
+
+
+class HPOSetupArtifacts(APIView):
+    permission_class = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_id="setup_artifacts",
+        tags=["HPO"],
+        request_body="",
+        responses={
+            200: "Artifacts set up",
+            400: "Error setting up artifacts"
+        },
+    )
+    def post(self, request):
+        try:
+            release, csv_path = refresh_from_obo()
+            faiss_path, npz_path, embed_model = build_vectors_from_csv(csv_path)
+            art = attach_vectors_to_release(release, faiss_path, npz_path, embed_model, True)
+            return Response({"Release": release}, status=200)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
+
 
 TEST_RETURN = [
   {

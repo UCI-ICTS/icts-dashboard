@@ -57,7 +57,7 @@ Operational notes
 
 from __future__ import annotations
 import csv
-import datetime as dt
+from datetime import datetime as dt, timezone
 import faiss
 import hashlib
 import json
@@ -139,7 +139,7 @@ def data_dir() -> Path:
     return Path(os.getenv("HPO_DATA_DIR", getattr(settings, "HPO_DATA_DIR", "utilities/hpo_artifacts"))).resolve()
 
 def now_iso() -> str:
-    return dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    return dt.now(timezone.utc).replace(microsecond=0).isoformat() + "Z"
 
 # ======================= Prompt Loading =======================
 def load_prompts(file_path="utilities/hpo_artifacts/system_prompts.json"):
@@ -171,6 +171,12 @@ def parse_obo_to_rows(obo_path: Path) -> Tuple[List[Dict], List[Tuple[str, str]]
       - term rows: [{hpo_id, label, definition, synonyms (list), deprecated(bool)}]
       - edges: [(parent_id, child_id)] for is_a relations
     """
+    release = dt.now(timezone.utc).strftime("%Y-%m-%d")
+    with open(obo_path.as_posix(), 'rt') as f:
+        for line in f:
+            if line.startswith("data-version:"):
+                release = line.strip().split(':')[1].split('/')[-1]
+                break
     g = obonet.read_obo(obo_path.as_posix())
     term_rows: List[Dict] = []
     edges: List[Tuple[str, str]] = []
@@ -213,7 +219,7 @@ def parse_obo_to_rows(obo_path: Path) -> Tuple[List[Dict], List[Tuple[str, str]]
             if str(parent).startswith("HP:"):
                 edges.append((parent, node))
 
-    return term_rows, edges
+    return release, term_rows, edges
 
 def write_hpo_csv(term_rows: List[Dict], out_csv: Path) -> Path:
     """
@@ -288,8 +294,8 @@ def upsert_terms(term_rows: List[Dict], release: str, batch: int = 2000):
             ln,
             syn_concat,
             None,                  # search_tsv backfilled later
-            dt.datetime.utcnow(),
-            dt.datetime.utcnow(),
+            dt.now(timezone.utc),
+            dt.now(timezone.utc),
         )
 
     with connection.cursor() as cur:
@@ -368,7 +374,7 @@ def get_active_artifact() -> Optional[HPOArtifact]:
 
 def refresh_from_obo(
     source_url: str = "https://purl.obolibrary.org/obo/hp.obo",
-    release: Optional[str] = None,
+    #release: Optional[str] = None,
     write_csv: bool = True,
     import_edges_flag: bool = True,
 ) -> Tuple[Path, List[Dict], List[Tuple[str, str]]]:
@@ -377,10 +383,10 @@ def refresh_from_obo(
     Returns (csv_path, terms, edges).
     """
     obo_path = download_obo(source_url)
-    terms, edges = parse_obo_to_rows(obo_path)
+    release, terms, edges = parse_obo_to_rows(obo_path)
 
     # Discover release version if not supplied (fallback to current date)
-    release = release or dt.datetime.utcnow().date().isoformat()
+    #release = release or dt.now(timezone.utc).date().isoformat()
 
     csv_path = data_dir() / f"hpo_texts_{release}.csv"
     if write_csv:
@@ -401,7 +407,7 @@ def refresh_from_obo(
             embed_model="",  # set when you build vectors
             active=True,
         )
-    return csv_path, terms, edges
+    return release, csv_path
 
 # ---------- Vector build (choose OpenAI or local ST) ----------
 
@@ -464,7 +470,7 @@ def build_vectors_from_csv(
         embed_model = local_model  # record for artifact
 
     np.savez(npz_path, ids=np.array(ids, dtype=object), labels=np.array(labels, dtype=object), vecs=X)
-    faiss.write_index(index, faiss_path)
+    faiss.write_index(index, faiss_path.as_posix())
     return faiss_path, npz_path, embed_model
 
 def attach_vectors_to_release(release: str, faiss_path: Path, npz_path: Path, embed_model: str, set_active: bool = True):
@@ -536,7 +542,7 @@ def embed_texts(
     """
     if not texts:
         return np.zeros((0,0), dtype="float32")
-    
+
     client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"), base_url=openai_base_url)
     all_vectors: list[list[float]] =[]
     for i in range(0, len(texts), batch_size):
@@ -561,7 +567,7 @@ def search_hpo(
 
     # 1) Load FAISS + metadata
     index, ids, labels, _ = _load_faiss_once()
-    
+
     # 2) Embed all phrases at once => (Q, D)
     Q = len(query_text)
     query_vec = embed_texts(query_text, **embed_kwargs)
@@ -569,7 +575,7 @@ def search_hpo(
 
     # 3) Search all queries in one call
     scores, idxs = index.search(query_vec, k)
-    
+
     # 4) Build a per-query result list
     results_per_query = []
     for qi in range(Q):
@@ -609,7 +615,7 @@ def _mk_items_with_ids(extracted: List[Dict]) -> List[Dict]:
 
 def extract_phrases(
     note: str,
-    prompt: str, 
+    prompt: str,
     openai_api_key: Optional[str] = None,
     openai_base_url: str = "https://api.openai.com/v1"
 ) -> list:
@@ -617,7 +623,7 @@ def extract_phrases(
 
     client = OpenAI(api_key=openai_api_key, base_url=openai_base_url)
     response = client.responses.create(
-        model="gpt-4o-mini", 
+        model="gpt-4o-mini",
         input=[
             {"role": "system", "content": prompt},
             {"role": "user",   "content": note},
@@ -657,12 +663,12 @@ def best_match(
 ) -> Dict:
     """
     Ask the LLM to pick exactly one HPO ID from the provided candidate list.
-    
-    validated_phrases: 
+
+    validated_phrases:
         [{id, phrase, candidates:[{hpo_id,label,rank,score,...}], sentence?}, ...]
-    returns: 
+    returns:
         [{id, hpo_id, source, reason, label, rank, score}, ...]
-    
+
     (falls back to cosine top-1 if anything goes wrong)
     """
     # 0) Guard: empty candidates → no-op
@@ -673,8 +679,8 @@ def best_match(
     results: List[Dict] = []
     client = OpenAI(api_key=openai_api_key or os.getenv("OPENAI_API_KEY"),
                     base_url=openai_base_url)
-    
-    
+
+
     # 2) Prepare payload
     for start in range(0, len(validated_phrases), chunk_size):
         batch = validated_phrases[start:start+chunk_size]
@@ -877,28 +883,28 @@ def phenotype_extraction(note: str) -> list:
 
     # 1) extract => list[dict]
     phrases = extract_phrases(note, sys_I)
-    if isinstance(phrases, dict): 
+    if isinstance(phrases, dict):
         phrases = phrases.get("phenotypes",[])
-    
-    # ensure each item has a stable ID for mapping, same order as 
+
+    # ensure each item has a stable ID for mapping, same order as
     for index, phrase in enumerate(phrases):
         phrase["id"] = f"p{index}"
-    
+
     # 2) bulk validate
     verdicts = validate_phrases_bulk(phrases, sys_dc)
     # phrases = [
-    #     {'phrase': 'residual left-sided hemiplegia', 'category': 'Abnormal', 'id': 'p0'}, 
-    #     {'phrase': 'right ear pain', 'category': 'Abnormal', 'id': 'p1'}, 
-    #     {'phrase': 'purulent discharge', 'category': 'Abnormal', 'id': 'p2'}, 
-    #     {'phrase': 'bilateral decrease in hearing', 'category': 'Abnormal', 'id': 'p3'}, 
-    #     {'phrase': 'right ear soft granular tissue mass', 'category': 'Abnormal', 'id': 'p4'}, 
-    #     {'phrase': 'bleeding on touch', 'category': 'Abnormal', 'id': 'p5'}, 
-    #     {'phrase': 'otalgia', 'category': 'Abnormal', 'id': 'p6'}, 
-    #     {'phrase': 'oedematous canal', 'category': 'Abnormal', 'id': 'p7'}, 
+    #     {'phrase': 'residual left-sided hemiplegia', 'category': 'Abnormal', 'id': 'p0'},
+    #     {'phrase': 'right ear pain', 'category': 'Abnormal', 'id': 'p1'},
+    #     {'phrase': 'purulent discharge', 'category': 'Abnormal', 'id': 'p2'},
+    #     {'phrase': 'bilateral decrease in hearing', 'category': 'Abnormal', 'id': 'p3'},
+    #     {'phrase': 'right ear soft granular tissue mass', 'category': 'Abnormal', 'id': 'p4'},
+    #     {'phrase': 'bleeding on touch', 'category': 'Abnormal', 'id': 'p5'},
+    #     {'phrase': 'otalgia', 'category': 'Abnormal', 'id': 'p6'},
+    #     {'phrase': 'oedematous canal', 'category': 'Abnormal', 'id': 'p7'},
     #     {'phrase': 'non-visible tympanic membrane', 'category': 'Abnormal', 'id': 'p8'}
     # ]
     # verdicts = {
-    #     'p0': {'id': 'p0', 'verdict': 'keep', 'reason': 'describes an abnormal physical sign (hemiplegia)'}, 
+    #     'p0': {'id': 'p0', 'verdict': 'keep', 'reason': 'describes an abnormal physical sign (hemiplegia)'},
     #     'p1': {'id': 'p1', 'verdict': 'keep', 'reason': 'describes an abnormal symptom (ear pain)'},
     #     'p2': {'id': 'p2', 'verdict': 'keep', 'reason': 'describes an abnormal finding (purulent discharge)'},
     #     'p3': {'id': 'p3', 'verdict': 'keep', 'reason': 'describes an abnormal finding (decrease in hearing)'},
@@ -908,7 +914,7 @@ def phenotype_extraction(note: str) -> list:
     #     'p7': {'id': 'p7', 'verdict': 'keep', 'reason': 'describes an abnormal finding (oedematous canal)'},
     #     'p8': {'id': 'p8', 'verdict': 'keep', 'reason': 'describes an abnormal finding (non-visible tympanic membrane)'}
     # }
-    
+
     # 3) Build validated list with no deleting
     validated_phrases: List[Dict] = []
     for phrase in phrases:
@@ -917,7 +923,7 @@ def phenotype_extraction(note: str) -> list:
             continue
         if verdict['verdict'] == "keep":
             validated_phrases.append(phrase | verdict)
-    
+
     if not validated_phrases:
         return {"phrases": [], "candidates": [], "meta": {"k": 20, "count": 0}}
 
@@ -925,7 +931,7 @@ def phenotype_extraction(note: str) -> list:
     hpo_candidates = search_hpo([p["phrase"] for p in validated_phrases])
     for phrase, candidate in zip(validated_phrases, hpo_candidates):
         phrase["candidates"] = candidate
-    
+
     choices = best_match(
         validated_phrases=validated_phrases,
         prompt=None,
