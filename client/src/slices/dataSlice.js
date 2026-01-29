@@ -38,6 +38,7 @@ export const dataSlice = createSlice({
   reducers: {
     clearRagHpos: (state) => {
       state.rag_hpos = [];
+      state.status = "idle";
     },
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
