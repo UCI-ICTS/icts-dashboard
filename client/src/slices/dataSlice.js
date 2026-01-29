@@ -3,7 +3,7 @@ import dataService from "../services/data.service";
 import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
-import { getCollectionName, getTableName } from "../utils/schemaAndTables";
+import { getTableName } from "../utils/schemaAndTables";
 
 const initialState = {
   tableView: "participants",
@@ -36,6 +36,13 @@ export const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
+    replaceRagHpoChoice: (state, action) => {
+      const {id, choice} = action.payload;
+      const index = state.rag_hpos.findIndex(item => item.id === id) 
+      if (index !== -1) {
+        state.rag_hpos[index].choice = choice
+      }
+    },
     clearRagHpos: (state) => {
       state.rag_hpos = [];
       state.status = "idle";
@@ -367,6 +374,7 @@ export const extractPhenotypes = createAsyncThunk(
 )
 
 export const {
+  replaceRagHpoChoice,
   clearRagHpos,
   setJsonData,
   clearJsonData,
