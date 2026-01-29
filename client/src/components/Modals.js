@@ -162,7 +162,7 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     name={[name, "phenotype_id"]}
                     label="Phenotype ID"
                     rules={[{ required: true }]}
-                    
+
                   >
                     <Input style={{ width: 120 }} disabled/>
                   </Form.Item>
@@ -195,10 +195,10 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     <Select style={{ width: 100 }}>
                       <Option value="HPO">HPO</Option>
                       <Option value="MONDO">MONDO</Option>
-                      <Option value="ORPHA">ORPHA</Option>
                       <Option value="OMIM">OMIM</Option>
-                      <Option value="DOID">DOID</Option>
-                      <Option value="NCIT">NCIT</Option>
+                      <Option value="ORPHA">ORPHA</Option>
+                      <Option value="SNOMED">SNOMED</Option>
+                      <Option value="ICD10">ICD10</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item

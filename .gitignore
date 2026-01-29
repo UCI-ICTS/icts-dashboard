@@ -4,6 +4,15 @@
 **__pycache__**
 maintenance/maintenance.flag
 
+
+#Admin Items
+admin/ansible_playbook.yml
+admin/icts.conf
+admin/icts.service
+admin/icts.socket
+admin/prd_icts.conf
+
+
 #Server Items
 server/.env*
 server/.python-version
@@ -24,6 +33,9 @@ server/dump.json
 server/egress
 server/env
 server/gregor-google-key.json
+server/OOPS/
+server/log/
+server/prd_dump*.json
 server/static*
 server/tests/results*
 server/tests/.coverage
