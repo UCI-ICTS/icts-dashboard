@@ -344,13 +344,15 @@ def record_artifact(
     Create (or update) an HPOArtifact row that points to CSV/FAISS/NPZ on disk.
     """
     csv_sha = sha256_file(csv_path)
+    existing = HPOArtifact.objects.filter(release=release).first()
+
     art, _ = HPOArtifact.objects.update_or_create(
         release=release,
         defaults=dict(
             source_url=source_url,
             csv_path=str(csv_path),
-            faiss_path=str(faiss_path) if faiss_path else "",
-            npz_path=str(npz_path) if npz_path else "",
+            faiss_path=str(faiss_path) if faiss_path else (existing.faiss_path if existing else ""),
+            npz_path=str(npz_path) if npz_path else (existing.npz_path if existing else ""),
             embed_model=embed_model or "",
             csv_sha256=csv_sha,
             active=active,

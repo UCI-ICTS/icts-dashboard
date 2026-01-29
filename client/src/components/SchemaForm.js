@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
+import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
@@ -468,59 +468,57 @@ const SchemaForm = ({
         <Input type="hidden" />
       </Form.Item>
       {isAdmin && (
+        <div className="schema-form-update">
+          <div className="update-info">
+            <span>
+              Last update by <b>{initialValues["changed_by"]}</b> at{" "}
+              <b>{initialValues["updated_at"]}</b>
+            </span>
+          </div>
 
-<div className="schema-form-update">
-  <div className="update-info">
-    <span>
-      Last update by <b>{initialValues["changed_by"]}</b> at{" "}
-      <b>{initialValues["updated_at"]}</b>
-    </span>
-  </div>
-
-  <div className="review-actions">
-    
-    <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
-      <Button onClick={handleDelete} disabled={!editMode} danger>
-        DELETE
-      </Button>
-    </Tooltip>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <Tooltip title="Toggle NEEDS REVIEW mode">
-      <span> Needs Review </span>
-      <Form.Item label="Needs Review" shouldUpdate noStyle>
-        {({ getFieldValue, setFieldValue }) => {
-          const currentValue = getFieldValue("needs_review");
-
-          const handleToggle = () => {
-            Modal.confirm({
-              title: currentValue
-                ? "Unset needs review flag? That action will make this object viewable to everyone."
-                : "Mark this entry as needing review? That action will make this object viewable only by admins.",
-              onOk: () => setFieldValue("needs_review", !currentValue),
-            });
-          };
-
-          return (
-            <Switch
-              checked={currentValue}
-              onChange={handleToggle}
-              disabled={!editMode}
-            />
-          );
-        }}
-      </Form.Item>
-    </Tooltip>
-  </div>
-</div>
-
+          <div className="review-actions">
+            
+            <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
+              <Button onClick={handleDelete} disabled={!editMode} danger>
+                DELETE
+              </Button>
+            </Tooltip>
+            
+          </div>
+        </div>
       )}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12, gap: 8 }}>
-        <span>Edit Mode</span>
+      <div className="schema-form-update">
+        <Tooltip title="Toggle NEEDS REVIEW mode">
+          <span> Needs Review </span>
+          <Form.Item label="Needs Review" shouldUpdate noStyle>
+            {({ getFieldValue, setFieldValue }) => {
+              const currentValue = getFieldValue("needs_review");
+
+              const handleToggle = () => {
+                Modal.confirm({
+                  title: currentValue
+                    ? "Unset needs review flag? That action will make this object viewable to everyone."
+                    : "Mark this entry as needing review? That action will make this object viewable only by admins.",
+                  onOk: () => setFieldValue("needs_review", !currentValue),
+                });
+              };
+
+              return (
+                <Switch
+                  checked={currentValue}
+                  onChange={handleToggle}
+                  disabled={!editMode}
+                />
+              );
+            }}
+          </Form.Item>
+        </Tooltip>
         <Tooltip title="Toggle edit mode">
+          <span>Edit Mode</span>&nbsp;&nbsp;
           <Switch checked={editMode} onChange={setEditMode} />
         </Tooltip>
       </div>
-
+      <Divider />
       {Object.entries(schema.properties || {}).map(([key, value]) => (
         <SchemaField
           key={key}
