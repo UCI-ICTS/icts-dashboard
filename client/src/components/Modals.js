@@ -97,7 +97,7 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
           `Source: ${row.source}`,
           `Extracted: ${row.phrase}`,
           `Label: ${row.label}`,
-          `Reaseon: ${row.reason}`
+          `Reason: ${row.reason}`
         ].filter(Boolean).join("; "),
         onset_age_range: undefined,
         additional_modifiers: undefined,
