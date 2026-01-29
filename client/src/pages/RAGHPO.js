@@ -165,7 +165,12 @@ const RAGHPO = () => {
         <Table
           key={"id"}
           className="table"
-          dataSource={rag_hpos.map((item, index) => ({ ...item, key: item.id || index }))}
+          dataSource={
+            (Array.isArray(rag_hpos)
+             ? rag_hpos 
+             : []).map((item, index) => ({ ...item, key: item.id || index })
+            ) 
+          }
           scroll
           expandable={{
             expandedRowRender,
