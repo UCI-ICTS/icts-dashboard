@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import { extractPhenotypes, createEntry, clearRagHpos } from "../slices/dataSlice";
+import { extractPhenotypes, createEntry, clearRagHpos, replaceRagHpoChoice } from "../slices/dataSlice";
 import { HPODownloadModal, PhenotypeImportFormModal } from "../components/Modals"
 import { dataDownload } from "../utils/utilitiyFunctions"; 
 
@@ -67,7 +67,6 @@ const RAGHPO = () => {
           phrase: row.phrase
         })).filter((row) => row.source !== "llm-null"));
         setImportOpen(true);
-        console.log("here", action, participant, flattenedRows)
       } else {
         const visibleKeys = ["hpo_id","label","score","rank","source","reason","phrase"];
         dataDownload({
@@ -84,8 +83,26 @@ const RAGHPO = () => {
     setExpandedRowKey(expanded ? record.key : null);
   };
   
+  const handleReplace = (candidate) => {
+    if (!expandedRowKey) return;
+
+    const newChoice = {
+      hpo_id: candidate.hpo_id,
+      label: candidate.label,
+      score: candidate.score,
+      rank: candidate.rank,
+      reason: "User selected",
+      source: "user-select"
+    }
+    dispatch(replaceRagHpoChoice({
+      id: expandedRowKey,
+      choice: newChoice,
+    }))
+
+    setExpandedRowKey(null); // collapse row after replace
+  }
+
   const onFinish = (userText) => {
-    console.log(userText)
     dispatch(extractPhenotypes(userText))
   };
 
@@ -95,9 +112,9 @@ const RAGHPO = () => {
   
   const expandedRowRender = (record) => (
     <Table
-      dataSource={record.candidates} 
+      rowKey={(caondidate) => caondidate.hpo_id}
+      dataSource={Array.isArray(record.candidates) ? record.candidates : []} 
       columns={candidateColumns} 
-      
       pagination={false}
     />
   );
@@ -107,7 +124,20 @@ const RAGHPO = () => {
     { title: "Label",dataIndex: "label",key: "label" },
     { title: "score",dataIndex: "score",key: "score" },
     { title: "rank", dataIndex: "rank", key: "rank" },
-    { title: "Replace"}
+    { 
+      title: "Replace",
+      dataIndex: "replace",
+      key: "replace",
+      render: (_, candidate, index) => ( 
+      <Tooltip title="Replace LLM choice with this candidate">
+        <Button
+          className="replace-button"
+          danger
+          size="small"
+          onClick={() => handleReplace(candidate, index)}
+        >Replace</Button>
+    </Tooltip>)
+    }
     ]
   
   return (
@@ -163,7 +193,7 @@ const RAGHPO = () => {
           </Form.Item>
         </Form>
         <Table
-          key={"id"}
+          rowKey={(record) => record.id}
           className="table"
           dataSource={
             (Array.isArray(rag_hpos)
@@ -183,42 +213,42 @@ const RAGHPO = () => {
               title="HPO Term" 
               dataIndex="hpo_id" 
               render={(text, record) => {
-                return(<>{record.choice.hpo_id}</>)
+                return(<>{record.choice?.hpo_id ?? "-"}</>)
               }}
             />
             <Column 
               title="Label" 
               dataIndex="label" 
               render={(text, record) => {
-                return(<>{record.choice.label}</>)
+                return(<>{record.choice?.label ?? "-"}</>)
               }}
             />
             <Column 
               title="Score" 
               dataIndex="score" 
               render={(text, record) => {
-                return(<>{record.choice.score}</>)
+                return(<>{record.choice?.score ?? "-"}</>)
               }}
             />
             <Column 
               title="Rank" 
               dataIndex="rank" 
               render={(text, record) => {
-                return(<>{record.choice.rank}</>)
+                return(<>{record.choice?.rank ?? "-"}</>)
               }}
             />
             <Column 
               title="Source" 
               dataIndex="source" 
               render={(text, record) => {
-                return(<>{record.choice.source}</>)
+                return(<>{record.choice?.source ?? "-"}</>)
               }}
             />
             <Column 
               title="Reason" 
               dataIndex="reason" 
               render={(text, record) => {
-                return(<>{record.choice.reason}</>)
+                return(<>{record.choice?.reason ?? "-"}</>)
               }}
             />
           </ColumnGroup>
@@ -239,7 +269,6 @@ const RAGHPO = () => {
           onCancel={() => setImportOpen(false)}
           onSubmit={(finalEntries) => {
             dispatch(createEntry( {table:"phenotype", data:finalEntries})); 
-            console.log(finalEntries)
             setImportOpen(false);
             form.resetFields(); // Clear form
             dispatch(clearRagHpos()); // Clear table (rag_hpos)
@@ -247,7 +276,6 @@ const RAGHPO = () => {
           flattenedData={flattenedRows}
           participantId={importParticipantId}
         />
-
       </Spin>
     </Layout>
   )

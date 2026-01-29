@@ -829,13 +829,24 @@ body, html {
   gap: 6px;
 }
 
-/* Clear button – match your accents */
+/* Clear button – matches accents */
 .column-filter-clear {
   border-color: var(--uci-blue) !important;
   color: var(--uci-blue) !important;
 }
 
 .column-filter-clear:hover {
+  background: var(--uci-light-yellow) !important;
+}
+
+/* Replace button – matches accents */
+.replace-button {
+  border-color: var(--uci-blue) !important;
+  color: var(--uci-dark-blue) !important;
+  background-color: var(--uci-light-gray);
+}
+
+.replace-button:hover {
   background: var(--uci-light-yellow) !important;
 }
 
