@@ -11,7 +11,7 @@ const { Content } = Layout;
 const { Title } = Typography;
 
 const APIDB = process.env.REACT_APP_APIDB;
-const MIA = process.env.REACT_APP_MIA;
+const KAURO = process.env.REACT_APP_KAURO;
 const SNP = process.env.REACT_APP_SNP;
 
 const HomePage = () => {
@@ -105,7 +105,7 @@ const HomePage = () => {
                 <Card
                   hoverable
                   className="primary-card card-fill"
-                  onClick={()=> {window.open(`${MIA}`, "_blank")}}
+                  onClick={()=> {window.open(`${KAURO}`, "_blank")}}
                 >
                   <img
                     src="/kauro192.png"

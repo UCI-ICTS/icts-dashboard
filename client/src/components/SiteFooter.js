@@ -11,7 +11,7 @@ const SiteFooter = ({ showSwagger = true, showGitHub = true }) => {
   return (
     <Footer className="site-footer">
       <Space >
-        <Tooltip title="UCI ICTS Dashboard" >©2024 UCI</Tooltip>
+        <Tooltip title="UCI ICTS Dashboard" >©2026 UCI</Tooltip>
 
         {showSwagger && (
           <Space>

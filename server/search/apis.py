@@ -76,9 +76,9 @@ class SummaryAPI(APIView):
 
 
 class FamilyDetail(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    # permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         manual_parameters=[
