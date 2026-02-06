@@ -9,7 +9,7 @@ import { setTableView, fetchTable, familyDetail, caseQueue } from "../slices/dat
 import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
-import schemas from "../schemas/v1.9schemas.json";
+import schemas from "../schemas/v1.10schemas.json";
 import TableToolBar from "../components/TableToolBar";
 import ParticipantDetail from "../components/ParticipantDetail";
 import CaseQueue from "../components/CaseQueue";

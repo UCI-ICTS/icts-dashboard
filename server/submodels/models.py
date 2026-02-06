@@ -120,7 +120,7 @@ class DiscoveryMethod(models.TextChoices):
     KARYOTYPE_REANALYSIS = "Karyotype-reanalysis", "Karyotype Reanalysis"
     SR_RNA_SEQ_REANALYSIS = "SR RNA-seq-reanalysis", "Short Read RNA-seq Reanalysis"
     LR_RNA_SEQ_REANALYSIS = "LR RNA-seq-reanalysis", "Long Read RNA-seq Reanalysis"
-
+    GENE_PANEL = "GENE PANEL", "Gene panel"
 
 
 class GregorCenter(models.TextChoices):
