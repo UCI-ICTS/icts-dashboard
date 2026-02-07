@@ -174,7 +174,7 @@ class Participant(TimeStampedModel):
         max_length=255,
         choices=BiologicalSex.choices,
         default=BiologicalSex.UNKNOWN,
-        help_text="Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the phenotype information section.",
+        help_text="Biological sex assigned at birth (aligned with All of Us). If individual has a known DSD / not expected sex chromosome karyotype, this can be noted in the sex_detail field.",
     )
     sex_detail = models.TextField(
         blank=True,

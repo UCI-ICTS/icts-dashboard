@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Table, Input, Select, Form, Spin, Typography, Layout, Row, Col, Button, Tooltip } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { setJsonData, clearJsonData, fetchTable, createEntry, setTableView } from '../slices/dataSlice';
-import schemas from '../schemas/v1.9schemas.json';
+import schemas from '../schemas/v1.10schemas.json';
 import { getValidationRules, getCollectionName, TABLE_MAPPING } from "../utils/schemaAndTables";
 
 const { Option } = Select;
