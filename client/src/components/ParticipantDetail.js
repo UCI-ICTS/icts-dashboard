@@ -3,8 +3,9 @@
 import "../App.css"
 import { useState } from "react";
 import { Button, Table, Spin } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getIdentifier } from "../utils/schemaAndTables";
+import { openReport } from "../slices/dataSlice";
 
 export default function ParticipantDetail({
   selectedRow,
@@ -14,14 +15,28 @@ export default function ParticipantDetail({
   setDetailLoading,
   openModal
 }) {
+  const dispatch = useDispatch();
   const familyData =  useSelector((state) => state.data.familyDetail)
   const rows = Array.isArray(familyData) ? familyData[0] : []
   const familyName = selectedRow.participant_id
+  
   const handleOpen = (schemaKey, record) => {
     if (openModal && record) {
       openModal("edit", { schemaKey, record });
     }
   };
+
+  const handleOpenReport = (report) => {
+    const objectKey = report.file_path.replace("s3://icts-dashboard-analysis-files/", "")
+    console.log("Report Click", objectKey)
+    console.log(report.file_path)
+    dispatch(openReport(objectKey))
+      .unwrap()
+      .then((link) => {
+        window.open(link.url,  "_blank")
+      })
+  };
+
   {detailLoading ? (
       <Spin tip="Loading related family data..." style={{ display: "block", textAlign: "center", marginTop: 20 }}>
         <div style={{ minHeight: 100 }} />
@@ -167,6 +182,29 @@ export default function ParticipantDetail({
                       onClick={() => {handleOpen(schemaKey, entry)}}
                     >{label}</Button>
                     </div>)
+                })}
+              </div>
+            )
+          }
+        },
+        { title: "QAQC Reports", key: "reports",
+          render: (_, record) => {
+            const items = Array.isArray(record.reports) ? record.reports : [];
+            console.log(items)
+            if (!items.length) return "-";
+            return (
+              <div>
+                {items.map((report, index) => {
+                  const label = report.file_name
+                  return(
+                    <div className="action-btn" key={index}>
+                    <Button
+                      type="link"
+                      style={{ padding: 0 }}
+                      onClick={() => {handleOpenReport(report)}}
+                    >{label}</Button>
+                    </div>
+                  )
                 })}
               </div>
             )

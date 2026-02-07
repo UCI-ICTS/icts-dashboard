@@ -21,7 +21,7 @@ def get_s3_client():
     return session.client("s3")
 
 
-def fetch_manifest(bucket: str, key: str = "bucket-manifest.json") -> dict:
+def fetch_manifest(bucket: str, key: str = "testManifest.json") -> dict:
     """
     Fetch and return the manifest JSON from S3.
     """

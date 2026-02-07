@@ -252,6 +252,18 @@ export const dataSlice = createSlice({
   }
 });
 
+export const openReport = createAsyncThunk(
+  "openReport",
+  async (objectKey, thunkAPI) => {
+    try {
+      const response = await dataService.openReport(objectKey);
+      return response.data
+    } catch(error) {
+      console.log("ERROR! ",error)
+    }
+  }
+);
+
 export const getAllTables = createAsyncThunk(
   "getAllTables",
   async (_, thunkAPI) => {

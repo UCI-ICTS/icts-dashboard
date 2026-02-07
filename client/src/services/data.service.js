@@ -22,6 +22,14 @@ const getAuthHeaders = () => {
   };
 };
 
+const openReport = async (objectKey) => {
+  const bucket = "icts-dashboard-analysis-files"
+  const response = api.get(`${APIDB}api/s3/get_pre_signed_url/?bucket=${bucket}&key=${objectKey}`, {
+    headers: getAuthHeaders(),
+  });
+  return response;
+};
+
 const getAllTables = async () => {
   const response = api.get(`${APIDB}api/search/get_all_tables/`, {
     headers: getAuthHeaders(),
@@ -89,6 +97,7 @@ const extractPhenotypes = async (userText) => {
 }
 
 const dataService = {
+  openReport,
   createEntry,
   familyDetail,
   caseQueue,
