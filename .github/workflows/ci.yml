@@ -49,6 +49,11 @@ jobs:
           SECRET_KEY: "ci-temp-secret-key"
         run: |
           cd server
+          rm experiments/migrations/0*.py \
+            hpo/migrations/0*.py \
+            metadata/migrations/0*.py \
+
+          python -m manage makemigrations
           python -m manage migrate
           python -m manage collectstatic --noinput
 
