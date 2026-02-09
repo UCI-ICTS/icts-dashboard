@@ -63,6 +63,8 @@ from experiments.services import (
     ExperimentRNAOutputSerializer,
 )
 
+from s3.services import fetch_manifest
+
 serializer_mapping ={
     "alignedpacbio": "AlignedPacBioSerializer",
     "experiment": "ExperimentSerializer",
@@ -436,7 +438,7 @@ def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict
     Return full family detail for a participant's family.
     """
     family_detail = []
-
+    s3_manifest = fetch_manifest("icts-dashboard-analysis-files")
     root_participant = Participant.objects.get(pk=participant_id)
 
     participants = get_visible_objects(
@@ -489,15 +491,28 @@ def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict
         # Alignments
         aligned = Aligned.objects.filter(participant_id=participant)
         serialized_alignments = []
-
+        serialized_reports = []
         for aln in aligned:
             model = table_serializers[aln.table_name]["model"]
             serializer = table_serializers[aln.table_name]["output_serializer"]
 
             alignment = serializer(model.objects.get(pk=aln.id_in_table)).data
             alignment["table_type"] = aln.table_name
+            for report in s3_manifest:
+                if report["source_analysis_file"]["table_identifier"] == aln.aligned_id:
+                    serialized_reports.append(report)
+            
+            
             serialized_alignments.append(alignment)
+            print(serialized_reports)
 
+        
+        # for aln in serialized_alignments:
+        #     for report in TEST_MANIFEST:
+        #         if report["source_analysis_file"]["table_identifier"] == aln.aligned_id:
+        #             print(report)
+        #     # if aln["alignment_id"]
+    
         family_detail.append({
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
@@ -507,6 +522,7 @@ def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict
             "genetic_findings": serialized_genetic_findings.data,
             "sequencing": serialized_sequencing,
             "alignments": serialized_alignments,
+            "reports": serialized_reports
         })
 
     return family_detail
@@ -565,4 +581,3 @@ def get_case_queue(participant_id:str) -> dict:
             p["cohort_analysis"] = "incomplete"
 
     return case_queue
-

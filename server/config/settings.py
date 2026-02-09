@@ -95,6 +95,11 @@ EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="OOPS")
 EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
 EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="OOPS")
 
+# AWS S3 
+AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="oops")
+AWS_SECRETE_ACCESS_KEY=secrets.get("AWS", "AWS_SECRETE_ACCESS_KEY", fallback="oops")
+AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="oops")
+
 # Application definition
 
 INSTALLED_APPS = [
