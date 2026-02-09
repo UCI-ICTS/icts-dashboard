@@ -306,6 +306,13 @@ class ExperimentRNAShortRead(TimeStampedModel):
         max_length=255,
         help_text="Identifier used in the data file, such as the SM tag in a BAM header or column headers for genotype fields in a VCF file.",
     )
+    rna_sample_type = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        choices=[("GREGoR_sample", "GREGoR_sample"), ("isogenic_cell_line", "isogenic_cell_line")],
+        help_text="indicates whether experiment_rna_short_read_id corresponds to study sample with analyte_id or an isogenic cell line",
+    )
     seq_library_prep_kit_method = models.CharField(
         max_length=255,
         blank=True,
@@ -696,6 +703,11 @@ class AlignedNanopore(TimeStampedModel):
         default=False,
         help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
     )
+    read_length_n50 = models.FloatField(
+        blank=True,
+        null=True,
+        help_text="N50 is the shortest read length that, when all reads are sorted by length from longest to shortest, covers 50% of the total sequence data (longer is better). Value in kilobases",
+    )
 
     def __str__(self):
         return self.aligned_nanopore_id
@@ -983,6 +995,11 @@ class AlignedPacBio(TimeStampedModel):
     fiberseq_format = models.BooleanField(
         default=False,
         help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
+    )
+    read_length_n50 = models.FloatField(
+        blank=True,
+        null=True,
+        help_text="N50 is the shortest read length that, when all reads are sorted by length from longest to shortest, covers 50% of the total sequence data (longer is better). Value in kilobases",
     )
 
 
