@@ -2837,7 +2837,7 @@
                 "description": "Notes: See participant_sample_status table in retool"
             },
             "shipment_date": {
-                "type": "string",
+                "type": "date",
                 "description": "8-digit date MM/DD/YYYY"
             },
             "tracking_number": {

@@ -2,17 +2,14 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
+import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
-
-/* const onChange = (date, dateString) => {  // From Antd DatePicker example
-  console.log(date, dateString);
-};*/
 
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
@@ -131,7 +128,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Select>
       </Form.Item>
     );
-  }
+  };
 
   // ---------- Enums with special mapping ----------
   if (schema.enum) {
@@ -192,7 +189,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Select>
       </Form.Item>
     );
-  }
+  };
 
   // ---------- Primitives ----------
   if (schema.type === "string") {
@@ -221,19 +218,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
-    /* else if (tableName === "biobank" && keyName.includes("date")) {
-      return (
-        <Form.Item
-          key={keyName}
-          name={keyName}
-          label={label}
-          dependencies={deps}
-          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
-        >
-          <DatePicker onChange={onChange} disabled={readOnly} />
-        </Form.Item>
-      )
-    } */
+
     else if (tableName === "biobank" && keyName in biobankMapping) {
       return (
         <Form.Item
@@ -265,7 +250,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
-  }
+  };
 
   if (schema.type === "number" || schema.type === "integer") {
     return (
@@ -284,7 +269,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         />
       </Form.Item>
     );
-  }
+  };
 
   if (schema.type === "boolean") {
     return (
@@ -300,7 +285,28 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         <Switch checkedChildren="Yes" unCheckedChildren="No" disabled={readOnly} />
       </Form.Item>
     );
-  }
+  };
+
+  if (schema.type === "date") {
+    return (
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+          defaultValue={dayjs(keyName)}
+          getValueProps={(i) => ({ value: dayjs(i) })}
+        >
+          <DatePicker
+            format='DD/MM/YYYY'
+            placeholder='DD/MM/YYYY'
+            disabled={readOnly}
+          />
+           {/* <Input disabled={readOnly}/> */}
+        </Form.Item>
+      );
+  };
 
   // ---------- Arrays ----------
   if (schema.type === "array") {
