@@ -14,6 +14,7 @@ const { Option } = Select;
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
   const listContainerRef = useRef(null);
+
   // Foreign-key mapping (expect: { sourceTable, apiKey, valueKey, labelKey? })
   const foreignMap = foreignKeyFields?.[tableName]?.[keyName];
 
@@ -90,7 +91,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             mode="multiple"
             showSearch
             allowClear
-            optionFilterProp="label"
+            optionFilterProp="value"
             disabled={readOnly}
           >
             {extendedOptions.map((item) => (
@@ -115,12 +116,16 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
+        <Select 
+          showSearch
+          allowClear
+          optionFilterProp="value"
+          disabled={readOnly}
+        >
           {extendedOptions.map((item) => (
             <Select.Option
               key={item[valueKey]}
-              value={item[valueKey]}
-              label={item[labelKey]}
+              value={String(item[valueKey] ?? "")}
             >
               {item[labelKey]}
             </Select.Option>
@@ -141,7 +146,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           dependencies={deps}
           rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
         >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="value">
             {schema.enum.map((option) => (
               <Option key={option} value={option} label={`${option}; ${specimenType[option]}`}>
                 {option}; {specimenType[option]}
@@ -161,7 +166,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           dependencies={deps}
           rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
         >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="value">
             {schema.enum.map((option) => (
               <Option key={option} value={option} label={`${option}; ${onsetAgeRange[option]}`}>
                 {option}; {onsetAgeRange[option]}
@@ -232,7 +237,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             disabled={readOnly}
             showSearch
             allowClear
-            optionFilterProp="label"
+            optionFilterProp="value"
             options={biobankMapping[keyName]}
             />
         </Form.Item>
@@ -302,6 +307,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             format='DD/MM/YYYY'
             placeholder='DD/MM/YYYY'
             disabled={readOnly}
+            defaultValue={null}
           />
            {/* <Input disabled={readOnly}/> */}
         </Form.Item>
