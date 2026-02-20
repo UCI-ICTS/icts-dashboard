@@ -287,23 +287,6 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
             />
           ) : null}
         </>
-      ) : renderQueue ? (
-        <>
-          <Header className="secondary-header">
-            <Title className="secondary-title">GREGoR Case Queue</Title>
-          </Header>
-
-          {selectedRow ? (
-            <CaseQueue
-              selectedRow={selectedRow}
-              setSelectedRow={setSelectedRow}
-              onRow={(record)=> {}}
-              queueLoading={queueLoading}
-              setQueueLoading={setQueueLoading}
-              openModal={openModal}
-            />
-          ) : null}
-        </>
       ) : (
         <Header className="primary-header">
           <Title className="primary-title">GREGoR Data Sheets</Title>

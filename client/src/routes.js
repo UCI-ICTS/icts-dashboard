@@ -19,6 +19,7 @@ import AccountService from "./services/account.service";
 import HomePage from './pages/Home';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { Uploader } from "./pages/Uploader";
+import BoardView from './pages/BoardView';
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000;
@@ -78,8 +79,9 @@ const AppRoutes = () => {
         <Route path="table-data/:table" element={<GregorDataSheets />} />
         <Route path="participant-detail/" element={<GregorDataSheets renderDetail={true} />} />
         <Route path="participant-detail/:pid" element={<GregorDataSheets renderDetail={true} />} />
-        <Route path="case-queue/" element={<GregorDataSheets renderQueue={true} />} />
-        <Route path="case-queue/:pid" element={<GregorDataSheets renderQueue={true} />} />
+        <Route path="board-view/" element={<BoardView />} />
+        <Route path="board-view/:boardId" element={<BoardView />} />
+        {/* <Route path="case-queue/:pid" element={<GregorDataSheets renderQueue={true} />} /> */}
         <Route path="admin" element={<AdminPage />} />
         <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />

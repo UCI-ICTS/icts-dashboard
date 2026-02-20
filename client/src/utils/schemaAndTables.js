@@ -160,19 +160,19 @@ export const foreignKeyFields = {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                         // add a default of `0`
     },
     paternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                        // add a default of `0`
     },
     maternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                         // add a default of `0`
     }
   },
   phenotype: {
