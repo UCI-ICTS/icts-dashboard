@@ -41,11 +41,12 @@ const initialState = {
       title: "Case Queue",
       source: { table: "participants", idKey: "participant_id" },
       laneKey: "solve_status",
-      lanes: {
-        unsolved: { title: "Unsolved", match: { solve_status: "Unsolved" }, ids: [] },
-        in_review: { title: "In review", match: { needs_review: true }, ids: [] },
-        solved: { title: "Solved", match: { solve_status: "Solved" }, ids: [] },
-      },
+      lanes: schemas.participants.properties.solve_status.enum,
+      // {
+      //   unsolved: { title: "Unsolved", match: { solve_status: "Unsolved" }, ids: [] },
+      //   in_review: { title: "In review", match: { needs_review: true }, ids: [] },
+      //   solved: { title: "Solved", match: { solve_status: "Solved" }, ids: [] },
+      // },
       laneOrder: ["unsolved", "in_review", "solved"],
     },
     "biobank-shipping": {

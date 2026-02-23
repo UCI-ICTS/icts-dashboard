@@ -1,4 +1,5 @@
-// src/pages/CaseQue.js
+// src/pages/BoardView.js
+
 import React, { useMemo, useState, useEffect } from "react";
 import { useSelector /*, useDispatch*/ } from "react-redux";
 import { DndContext } from "@dnd-kit/core";
@@ -22,7 +23,7 @@ function dispatchUpdateStatusPlaceholder({ biobank_id, nextStatus, payload }) {
   });
 }
 
-export default function CaseQue() {
+export default function BoardView() {
   // const dispatch = useDispatch();
   
   // Pull Board info
@@ -31,7 +32,7 @@ export default function CaseQue() {
   
   // Pull source table dynamically
   const sourceTable = activeBoard?.source?.table
-  const sourceKey = activeBoard?.source?.key
+  const sourceKey = activeBoard?.source?.idKey
   const rows = useSelector((state) => sourceTable ? state.data?.[sourceTable] : []);
   
   // local lane state
@@ -42,15 +43,15 @@ export default function CaseQue() {
   // initialize / re-initialize local lanes from redux data
   useEffect(() => {
     if (!activeBoard || !sourceKey) return;
-
+    
     const initial = {};
     for (const row of rows) {
-      if (!row?.biobank_id) continue;
+      if (!row[sourceKey]) continue;
       // fall back to a reasonable default if status missing/blank
       initial[row.biobank_id] = row.status || "Pending shipment";
     }
     setLaneById(initial);
-  }, [rows]);
+  }, [rows, sourceKey]);
 
   const lanes = activeBoard.lanes;
 
@@ -61,7 +62,7 @@ export default function CaseQue() {
       if (row?.biobank_id) map[row.biobank_id] = row;
     }
     return map;
-  }, [rows]);
+  }, [rows, sourceKey]);
 
   const cardIds = useMemo(() => Object.keys(laneById), [laneById]);
 
@@ -94,7 +95,7 @@ export default function CaseQue() {
     // Later:
     // dispatch(updateEntry({ table: "biobank", data: [payload] }));
   };
-  console.log(activeBoard, rows)
+  console.log(activeBoard, byId, laneById)
   return (
     <Layout className="admin-layout">
       <Header className="primary-header">
@@ -108,7 +109,7 @@ export default function CaseQue() {
       >
         <div style={{ padding: 12 }}>
           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
-            Biobank Shipping Board
+            {activeBoard.title}
           </div>
 
           <div
