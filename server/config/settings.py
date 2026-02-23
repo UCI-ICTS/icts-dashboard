@@ -89,16 +89,21 @@ DATABASES = {
 }
 
 # RAG+HPO
-HPO_DATA_DIR=secrets.get("RAG+HPO", "HPO_DATA_DIR", fallback="OOPS")
-HPO_SOURCE_URL=secrets.get("RAG+HPO", "HPO_SOURCE_URL", fallback="OOPS")
-EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="OOPS")
+HPO_DATA_DIR=secrets.get("RAG+HPO", "HPO_DATA_DIR", fallback="utilities/hpo_artifacts")
+HPO_SOURCE_URL=secrets.get("RAG+HPO", "HPO_SOURCE_URL", fallback="https://purl.obolibrary.org/obo/hp.obo")
+EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="https://api.openai.com/v1")
 EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
-EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="OOPS")
+EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="text-embedding-3-large")
 
-# AWS S3 
-AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="oops")
-AWS_SECRETE_ACCESS_KEY=secrets.get("AWS", "AWS_SECRETE_ACCESS_KEY", fallback="oops")
-AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="oops")
+# AWS S3
+AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="OOPS")
+AWS_SECRET_ACCESS_KEY=secrets.get("AWS", "AWS_SECRET_ACCESS_KEY", fallback="OOPS")
+AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
+
+# GENEYX
+GENEYX_USER_ID=secrets.get("GENEYX", "GENEYX_USER_ID", fallback="OOPS")
+GENEYX_USER_KEY=secrets.get("GENEYX", "GENEYX_USER_KEY", fallback="OOPS")
+GENEYX_PAGE_SIZE=secrets.get("GENEYX", "GENEYX_PAGE_SIZE", fallback="2000")
 
 # Application definition
 

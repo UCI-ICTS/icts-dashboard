@@ -19,7 +19,7 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
 ##  DJANGO_KEYS: Keys and Tokens for Django
 ### SECRET_KEY
-According to the Django docs the [SECRETE_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
+According to the Django docs the [SECRET_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
 - All sessions if you are using any other session backend than django.contrib.sessions.backends.cache, or are using the default get_session_auth_hash().
 - All messages if you are using CookieStorage or FallbackStorage.
 - All PasswordResetView tokens.
@@ -36,12 +36,12 @@ It's a boolean that turns on/off debug mode, with the default as `False`. It is 
 
 ### ALLOWED_HOSTS
 
-Django's [ALLOWED_HOSTS](https://docs.djangoproject.com/en/5.0/ref/settings/#allowed-hosts) list. Default is an empty list. 
+Django's [ALLOWED_HOSTS](https://docs.djangoproject.com/en/5.0/ref/settings/#allowed-hosts) list. Default is an empty list.
 
 "A list of strings representing the host/domain names that this Django site can serve. This is a security measure to prevent HTTP Host header attacks, which are possible even under many seemingly-safe web server configurations."
 
 ### SERVER_VERSION
-The SERVER_VERSION is displayed on the Swagger Docs page. 
+The SERVER_VERSION is displayed on the Swagger Docs page.
 
 ### DASHBOARD_URL
 The PUBLIC_HOSTNAME to be returnd in the `user_info` object. This is used by the Dashboard for interacting with a specific instance of the server (i.e. to make requests), and in the Swager Docs. It is also utilized in the API tests.
@@ -50,6 +50,6 @@ The PUBLIC_HOSTNAME to be returnd in the `user_info` object. This is used by the
 This value is used as the `"NAME"`in Django's [DATABASES](https://docs.djangoproject.com/en/5.0/ref/settings/#databases) object. The BCO DB is set up to use the default SQLITE. If you would like to have a database that is outside of the project folder and/or has a non-default name than you can provide an absolute path for the name value here.
 
 ### EMAIL_BACKEND
-Specifies which of Django's [EMAIL_BACKEND](https://docs.djangoproject.com/en/5.0/topics/email/#topic-email-backends) classes to use. 
+Specifies which of Django's [EMAIL_BACKEND](https://docs.djangoproject.com/en/5.0/topics/email/#topic-email-backends) classes to use.
 
-This app has been tested using the `django.core.mail.backends.smtp.EmailBackend` with `sendmail` and a GMail account in production, and with `django.core.mail.backends.console.EmailBackend` in local deployments. 
+This app has been tested using the `django.core.mail.backends.smtp.EmailBackend` with `sendmail` and a GMail account in production, and with `django.core.mail.backends.console.EmailBackend` in local deployments.
