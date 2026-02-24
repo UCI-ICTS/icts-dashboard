@@ -61,3 +61,32 @@ class GetCase(APIView):
             return Response(status=status.HTTP_200_OK, data=manifest)
         except Exception as error:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetCaseNotes(APIView):
+    """
+    Get json object of one Geneyx case's notes
+    """
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_id="get_case_notes",
+        manual_parameters=[
+            openapi.Parameter(
+                "id",
+                openapi.IN_QUERY,
+                description="Get Geneyx case notes as embedded HTML",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Geneyx"],
+    )
+
+    def get(self, request):
+        case_id = request.GET.get('id', '')
+        manifest = get_ga_case(case_id)
+        try:
+            return Response(status=status.HTTP_200_OK, data=manifest)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
