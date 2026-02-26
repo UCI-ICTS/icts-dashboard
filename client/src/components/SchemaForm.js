@@ -31,7 +31,18 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   const label = (
     <span>
-      {schema.title || keyName}
+      <Tooltip title="Copy value">
+        <Button
+          type="text"
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(form.getFieldValue(keyName))
+            message.success("Field value copied to clipboard")
+            console.log(form.getFieldValue(keyName))
+          }}
+        >{schema.title || keyName}</Button>
+      </Tooltip>
+      
       {schema.description && (
         <Tooltip title={schema.description}>
           <InfoCircleOutlined style={{ marginLeft: 4 }} />
