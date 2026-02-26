@@ -2,21 +2,19 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, Checkbox } from "antd";
+import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
 import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
-
-/* const onChange = (date, dateString) => {  // From Antd DatePicker example
-  console.log(date, dateString);
-};*/
 
 const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableName, addEntry }) => {
   const dispatch = useDispatch();
   const listContainerRef = useRef(null);
+
   // Foreign-key mapping (expect: { sourceTable, apiKey, valueKey, labelKey? })
   const foreignMap = foreignKeyFields?.[tableName]?.[keyName];
 
@@ -33,7 +31,18 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   const label = (
     <span>
-      {schema.title || keyName}
+      <Tooltip title="Copy value">
+        <Button
+          type="text"
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(form.getFieldValue(keyName))
+            message.success("Field value copied to clipboard")
+            console.log(form.getFieldValue(keyName))
+          }}
+        >{schema.title || keyName}</Button>
+      </Tooltip>
+      
       {schema.description && (
         <Tooltip title={schema.description}>
           <InfoCircleOutlined style={{ marginLeft: 4 }} />
@@ -93,7 +102,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             mode="multiple"
             showSearch
             allowClear
-            optionFilterProp="label"
+            optionFilterProp="value"
             disabled={readOnly}
           >
             {extendedOptions.map((item) => (
@@ -118,12 +127,16 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <Select showSearch allowClear optionFilterProp="label" disabled={readOnly}>
+        <Select 
+          showSearch
+          allowClear
+          optionFilterProp="value"
+          disabled={readOnly}
+        >
           {extendedOptions.map((item) => (
             <Select.Option
               key={item[valueKey]}
-              value={item[valueKey]}
-              label={item[labelKey]}
+              value={String(item[valueKey] ?? "")}
             >
               {item[labelKey]}
             </Select.Option>
@@ -131,7 +144,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Select>
       </Form.Item>
     );
-  }
+  };
 
   // ---------- Enums with special mapping ----------
   if (schema.enum) {
@@ -144,7 +157,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           dependencies={deps}
           rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
         >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="value">
             {schema.enum.map((option) => (
               <Option key={option} value={option} label={`${option}; ${specimenType[option]}`}>
                 {option}; {specimenType[option]}
@@ -164,7 +177,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           dependencies={deps}
           rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
         >
-          <Select disabled={readOnly} showSearch allowClear optionFilterProp="label">
+          <Select disabled={readOnly} showSearch allowClear optionFilterProp="value">
             {schema.enum.map((option) => (
               <Option key={option} value={option} label={`${option}; ${onsetAgeRange[option]}`}>
                 {option}; {onsetAgeRange[option]}
@@ -192,7 +205,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Select>
       </Form.Item>
     );
-  }
+  };
 
   // ---------- Primitives ----------
   if (schema.type === "string") {
@@ -221,19 +234,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
-    /* else if (tableName === "biobank" && keyName.includes("date")) {
-      return (
-        <Form.Item
-          key={keyName}
-          name={keyName}
-          label={label}
-          dependencies={deps}
-          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
-        >
-          <DatePicker onChange={onChange} disabled={readOnly} />
-        </Form.Item>
-      )
-    } */
+
     else if (tableName === "biobank" && keyName in biobankMapping) {
       return (
         <Form.Item
@@ -247,7 +248,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
             disabled={readOnly}
             showSearch
             allowClear
-            optionFilterProp="label"
+            optionFilterProp="value"
             options={biobankMapping[keyName]}
             />
         </Form.Item>
@@ -265,7 +266,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         </Form.Item>
       );
     }
-  }
+  };
 
   if (schema.type === "number" || schema.type === "integer") {
     return (
@@ -284,7 +285,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         />
       </Form.Item>
     );
-  }
+  };
 
   if (schema.type === "boolean") {
     return (
@@ -300,7 +301,29 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         <Switch checkedChildren="Yes" unCheckedChildren="No" disabled={readOnly} />
       </Form.Item>
     );
-  }
+  };
+
+  if (schema.type === "date") {
+    return (
+        <Form.Item
+          key={keyName}
+          name={keyName}
+          label={label}
+          dependencies={deps}
+          rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
+          defaultValue={dayjs(keyName)}
+          getValueProps={(i) => ({ value: dayjs(i) })}
+        >
+          <DatePicker
+            format='DD/MM/YYYY'
+            placeholder='DD/MM/YYYY'
+            disabled={readOnly}
+            defaultValue={null}
+          />
+           {/* <Input disabled={readOnly}/> */}
+        </Form.Item>
+      );
+  };
 
   // ---------- Arrays ----------
   if (schema.type === "array") {

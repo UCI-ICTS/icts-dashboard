@@ -34,26 +34,82 @@ export const Uploader = () => {
     }
   };
   
+  // Type coercion of cells based on schema
+  const coerceValue = (rawValue, schemapProp) => {
+    // Empty string as null
+    if (rawValue == "" || rawValue == undefined) return null;
+
+    // If PapaParse already geave number/boolean, keep it
+    const val = rawValue;
+    if (!schemapProp) return val;
+
+  // Arrays: assuming CSV stores as "a|b|c"
+    if (schemapProp.type === "array") {
+      if (Array.isArray(val)) return val;
+      return String(val)
+        .split("|")
+        .map(str => str.trim())
+        .filter(Boolean);
+    }
+
+    if (schemapProp.type === "integer") {
+      const num = Number(val);
+      return Number.isFinite(num) ? parseInt(num, 10) : null;
+    }
+
+    if (schemapProp.type === "number") {
+      const num = Number(val);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    if (schemapProp.type === "boolean") {
+      if (typeof val === "boolean") return val;
+      const str = String(val).toLowerCase().trim();
+      if (["true", "t", "yes", "y", "1"].includes(str)) return true;
+      if (["false", "f", "no", "n", "0"].includes(str)) return false;
+      return null;
+    }
+
+    // default: string
+    return String(val);
+  };
+
+  const coerceRowToSchema = (row, schema) => {
+    const schemapProps = schema?.properties || {}
+    const coercedRow = {}
+    for (const key of Object.keys(schemapProps)) {
+      coercedRow[key] = coerceValue(row[key], schemapProps[key]);
+    }
+    return coercedRow;
+  };
+
   const handleCsvUpload = (sheet, fileInfo) => {
     const expectedHeaders = Object.keys(schema.properties || {});
     const actualHeaders = Object.keys(sheet[0] || {});
     const headersValid = actualHeaders.every(h => expectedHeaders.includes(h));
+
+    // Block if CSV Headers do not match Schema
     if (!headersValid) {
       alert("CSV headers do not match the expected schema. Please check your file.");
       handleClear();
       setIsLoading(false);
       return;
     }
+    
+    // Coerce sheet before dispatch and add key for AntD
+    const coercedSheet = sheet.map((row, index) => {
+      const coerced = coerceRowToSchema(row, schema)
+      return {
+        // Edge case: phenotype_id. fallback to index if missing
+        key: coerced?.[tableID] ?? coerced?.phenotype_id ?? index,
+        ...coerced,
+      };
+    });
 
-      // Add key if needed for Ant Design Table
-    const sheetWithKeys = sheet.map((row, index) => ({
-      key: row.phenotype_id || index,  // fallback to index if missing
-      ...row,
-    }));
-
-    dispatch(setJsonData(sheetWithKeys));
+    dispatch(setJsonData(coercedSheet));
   };
 
+  // Clear Form
   const handleClear = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -63,6 +119,7 @@ export const Uploader = () => {
     setIsLoading(false);
   }
 
+  // Submit to DB
   const handleSubmit = (values) => {
     const { rows } = values
     dispatch(createEntry({ table: tableName, data: rows }));
