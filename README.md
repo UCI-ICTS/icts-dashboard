@@ -16,5 +16,5 @@ For general usage see our [User Guide](docs/user_guide.md)
 ## Development and troubleshooting
 - [Contribution Guide lines](docs/CONTRIBUTING.md)
 - [FAQ and trouble shooting](docs/faq.md)
-- [`.secretes` configuration](docs/config.md)
+- [`.secrets` configuration](docs/config.md)
 - [Testing](docs/testing.md)

@@ -10,15 +10,29 @@ from experiments.apis import (
     AlignedRNAShortReadViewSet,
     ExperimentDNAShortReadViewSet,
     AlignedDNAShortReadViewSet,
+    AlignedDNAShortReadSetViewSet,
+    CalledVariantsDNAShortReadViewSet,
     ExperimentPacBioViewSet,
     AlignedPacBioViewSet,
+    AlignedPacBioSetViewSet,
+    CalledVariantsPacBioViewSet,
     ExperimentNanoporeViewSet,
     AlignedNanoporeViewSet,
+    AlignedNanoporeSetViewSet,
+    CalledVariantsNanoporeViewSet,
 )
 
 router = DefaultRouter()
-router.register(r"experiment", ExperimentViewSet, basename="experiment")
-router.register(r"aligned", AlignedViewSet, basename="aligned")
+router.register(
+    r"experiment",
+    ExperimentViewSet,
+    basename="experiment",
+)
+router.register(
+    r"aligned",
+    AlignedViewSet,
+    basename="aligned",
+)
 router.register(
     r"experiment_rna_short_read",
     ExperimentRNAShortReadViewSet,
@@ -40,14 +54,54 @@ router.register(
     basename="aligned_dna_short_read",
 )
 router.register(
-    r"experiment_pac_bio", ExperimentPacBioViewSet, basename="experiment_pac_bio"
-)
-router.register(r"aligned_pac_bio", AlignedPacBioViewSet, basename="aligned_pac_bio")
-router.register(
-    r"experiment_nanopore", ExperimentNanoporeViewSet, basename="experiment_nanopore"
+    r"aligned_dna_short_read_set",
+    AlignedDNAShortReadSetViewSet,
+    basename="aligned_dna_short_read_set",
 )
 router.register(
-    r"aligned_nanopore", AlignedNanoporeViewSet, basename="aligned_nanopore"
+    r"called_variants_dna_short_read",
+    CalledVariantsDNAShortReadViewSet,
+    basename="called_variants_dna_short_read",
+)
+router.register(
+    r"experiment_pac_bio",
+    ExperimentPacBioViewSet,
+    basename="experiment_pac_bio",
+)
+router.register(
+    r"aligned_pac_bio",
+    AlignedPacBioViewSet,
+    basename="aligned_pac_bio",
+)
+router.register(
+    r"aligned_pac_bio_set",
+    AlignedPacBioSetViewSet,
+    basename="aligned_pac_bio_set",
+)
+router.register(
+    r"called_variants_pac_bio",
+    CalledVariantsPacBioViewSet,
+    basename="called_variants_pac_bio"
+)
+router.register(
+    r"experiment_nanopore",
+    ExperimentNanoporeViewSet,
+    basename="experiment_nanopore",
+)
+router.register(
+    r"aligned_nanopore",
+    AlignedNanoporeViewSet,
+    basename="aligned_nanopore",
+)
+router.register(
+    r"aligned_nanopore_set",
+    AlignedNanoporeSetViewSet,
+    basename="aligned_nanopore_set",
+)
+router.register(
+    r"called_variants_nanopore",
+    CalledVariantsNanoporeViewSet,
+    basename="called_variants_nanopore"
 )
 
 urlpatterns = [

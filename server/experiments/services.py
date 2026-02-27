@@ -14,8 +14,14 @@ from config.selectors import (
 from experiments.models import (
     Aligned,
     AlignedDNAShortRead,
+    AlignedDNAShortReadSet,
+    CalledVariantsDNAShortRead,
     AlignedNanopore,
+    AlignedNanoporeSet,
+    CalledVariantsNanopore,
     AlignedPacBio,
+    AlignedPacBioSet,
+    CalledVariantsPacBio,
     AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
@@ -375,6 +381,54 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedDNAShortReadSetSerializer
+    """
+    class Meta:
+        model = AlignedDNAShortReadSet
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new AlignedDNAShortReadSet instance using the validated data and set the many-to-many relationships"""
+        aligned_dna_set_instance = AlignedDNAShortReadSet.objects.create(**validated_data)
+
+        return aligned_dna_set_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsDNAShortReadSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsDNAShortReadSerializder
+    """
+    class Meta:
+        model = CalledVariantsDNAShortRead
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsDNAShortRead instance using the validated data and set the many-to-many relationships"""
+        called_variants_dna_short_read_instance = CalledVariantsDNAShortRead.objects.create(**validated_data)
+
+        return called_variants_dna_short_read_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
 class AlignedSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedSerializer
@@ -418,12 +472,48 @@ class AlignedPacBioSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AlignedPacBioSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedPacBioSetSerializer
+    """
+    class Meta:
+        model = AlignedPacBioSet
+        fields = "__all__"
+
+
+class CalledVariantsPacBioSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsPacBioSerializer
+    """
+    class Meta:
+        model = CalledVariantsPacBio
+        fields = "__all__"
+
+
 class AlignedNanoporeSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedNanoporeSerializer
     """
     class Meta:
         model = AlignedNanopore
+        fields = "__all__"
+
+
+class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedNanoporeSetSerializer
+    """
+    class Meta:
+        model = AlignedNanoporeSet
+        fields = "__all__"
+
+
+class CalledVariantsNanoporeSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsNanopore
+    """
+    class Meta:
+        model = CalledVariantsNanopore
         fields = "__all__"
 
 
@@ -831,17 +921,41 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
                 short_read_aligned=datum
             ),
         },
+        "aligned_dna_short_read_set": {
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+        },
+        "called_variants_dna_short_read": {
+            "input_serializer": CalledVariantsDNAShortReadSerializer,
+            "output_serializer": CalledVariantsDNAShortReadSerializer,
+        },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
+        "aligned_nanopore_set": {
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+        },
+        "called_variants_nanopore": {
+            "input_serializer": CalledVariantsNanoporeSerializer,
+            "output_serializer": CalledVariantsNanoporeSerializer,
+        },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
+        },
+        "aligned_pac_bio_set": {
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+        },
+        "called_variants_pac_bio": {
+            "intput_serializer": CalledVariantsPacBioSerializer,
+            "output_serializer": CalledVariantsPacBioSerializer,
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
@@ -969,17 +1083,41 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
                 short_read_aligned=datum
             ),
         },
+        "aligned_dna_short_read_set": {
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+        },
+        "called_variants_dna_short_read": {
+            "input_serializer": CalledVariantsDNAShortReadSerializer,
+            "output_serializer": CalledVariantsDNAShortReadSerializer,
+        },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
+        "aligned_nanopore_set": {
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+        },
+        "called_variants_nanopore": {
+            "input_serializer": CalledVariantsNanoporeSerializer,
+            "output_serializer": CalledVariantsNanoporeSerializer,
+        },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
+        },
+        "aligned_pac_bio_set": {
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+        },
+        "called_variants_pac_bio": {
+            "intput_serializer": CalledVariantsPacBioSerializer,
+            "output_serializer": CalledVariantsPacBioSerializer,
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
@@ -1041,8 +1179,14 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
     """
     model_mapping = {
         "aligned_dna_short_read": AlignedDNAShortRead,
+        "aligned_dna_short_read_set": AlignedDNAShortReadSet,
+        "called_variants_dna_short_read": CalledVariantsDNAShortRead,
         "aligned_nanopore": AlignedNanopore,
+        "aligned_nanopore_set": AlignedNanoporeSet,
+        "called_variants_nanopore": CalledVariantsNanopore,
         "aligned_pac_bio": AlignedPacBio,
+        "aligned_pac_bio_set": AlignedPacBioSet,
+        "called_variants_pac_bio": CalledVariantsPacBio,
         "aligned_rna_short_read": AlignedRNAShortRead,
     }
 

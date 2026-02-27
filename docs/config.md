@@ -19,7 +19,7 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
 ##  DJANGO_KEYS: Keys and Tokens for Django
 ### SECRET_KEY
-According to the Django docs the [SECRETE_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
+According to the Django docs the [SECRET_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
 - All sessions if you are using any other session backend than django.contrib.sessions.backends.cache, or are using the default get_session_auth_hash().
 - All messages if you are using CookieStorage or FallbackStorage.
 - All PasswordResetView tokens.

@@ -35,7 +35,7 @@ DEBUG = secrets.getboolean("SERVER", "DEBUG", fallback=True)
 ALLOWED_HOSTS = secrets.get("SERVER", "ALLOWED_HOSTS", fallback="localhost").split(",")
 VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
-SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.9")
+SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.11")
 
 EMAIL_BACKEND = secrets.get(
     "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
@@ -89,16 +89,16 @@ DATABASES = {
 }
 
 # RAG+HPO
-HPO_DATA_DIR=secrets.get("RAG+HPO", "HPO_DATA_DIR", fallback="OOPS")
-HPO_SOURCE_URL=secrets.get("RAG+HPO", "HPO_SOURCE_URL", fallback="OOPS")
-EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="OOPS")
+HPO_DATA_DIR=secrets.get("RAG+HPO", "HPO_DATA_DIR", fallback="utilities/hpo_artifacts")
+HPO_SOURCE_URL=secrets.get("RAG+HPO", "HPO_SOURCE_URL", fallback="https://purl.obolibrary.org/obo/hp.obo")
+EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="https://api.openai.com/v1")
 EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
-EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="OOPS")
+EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="text-embedding-3-large")
 
 # AWS S3 
-AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="oops")
-AWS_SECRETE_ACCESS_KEY=secrets.get("AWS", "AWS_SECRETE_ACCESS_KEY", fallback="oops")
-AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="oops")
+AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="OOPS")
+AWS_SECRET_ACCESS_KEY=secrets.get("AWS", "AWS_SECRET_ACCESS_KEY", fallback="OOPS")
+AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
 
 # Application definition
 

@@ -788,11 +788,27 @@ class ExperimentPacBio(TimeStampedModel):
     seq_library_prep_kit_method = models.CharField(
         max_length=255,
         choices=[
-            ("SMRTbell prep kit 3.0", "SMRTbell prep kit 3.0"),
+            (
+                "SMRTbell prep kit 3.0",
+                "SMRTbell prep kit 3.0"
+            ),
+            (
+                "SMRTbell prep kit - Revio 1.0",
+                "SMRTbell prep kit - Revio 1.0",
+            ),
             (
                 "HiFI express template prep kit 2.0",
                 "HiFI express template prep kit 2.0",
             ),
+            (
+                "Kinnex Full-Length RNA kit",
+                "Kinnex Full-Length RNA kit"
+            ),
+            (
+                "MAS-Seq for 10x Single Cell 3' kit",
+                "MAS-Seq for 10x Single Cell 3' kit"
+            ),
+            ("Unknown", "Unknown"),
         ],
         help_text="Library prep kit used",
     )

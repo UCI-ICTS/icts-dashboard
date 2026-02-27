@@ -5,15 +5,21 @@
 """
 
 from experiments.models import (
-    AlignedDNAShortRead,
-    AlignedPacBio,
-    AlignedNanopore,
-    AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
     ExperimentRNAShortRead,
+    AlignedDNAShortRead,
+    AlignedDNAShortReadSet,
+    CalledVariantsDNAShortRead,
+    AlignedPacBio,
+    AlignedPacBioSet,
+    CalledVariantsPacBio,
+    AlignedNanopore,
+    AlignedNanoporeSet,
+    CalledVariantsNanopore,
+    AlignedRNAShortRead,
 )
 
 from metadata.models import Analyte, Participant
