@@ -22,7 +22,8 @@ class Experiment(TimeStampedModel):
     experiment_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text="Unique ID of this experiment instance combining the table name and an ID within the table.",
+        help_text="Unique ID of this experiment instance combining the table "
+        + "name and an ID within the table.",
     )
     table_name = models.CharField(
         max_length=50,
@@ -107,7 +108,8 @@ class ExperimentDNAShortRead(TimeStampedModel):
     analyte_id = models.ForeignKey(
         Analyte,
         on_delete=models.PROTECT,
-        help_text="reference to an analyte from which this experiment was derived",
+        help_text="reference to an analyte from which this experiment was "
+        + "derived",
     )
     experiment_sample_id = models.CharField(
         max_length=255, help_text="identifier used in the data file"
@@ -120,7 +122,11 @@ class ExperimentDNAShortRead(TimeStampedModel):
     )
     experiment_type = models.CharField(
         max_length=50,
-        choices=[("targeted", "Targeted"), ("genome", "Genome"), ("exome", "Exome")],
+        choices=[
+            ("targeted", "Targeted"),
+            ("genome", "Genome"),
+            ("exome", "Exome")
+        ],
         help_text="type of sequencing experiment performed",
     )
     targeted_regions_method = models.CharField(
@@ -148,12 +154,16 @@ class ExperimentDNAShortRead(TimeStampedModel):
     )
     sequencing_event_details = models.TextField(
         blank=True,
-        help_text="describe if there are any sequencing-specific issues that would be important to note",
+        help_text="describe if there are any sequencing-specific issues that "
+        + "would be important to note",
     )
 
 
 class AlignedDNAShortRead(TimeStampedModel):
-    aligned_dna_short_read_id = models.CharField(max_length=255, primary_key=True)
+    aligned_dna_short_read_id = models.CharField(
+        max_length=255,
+        primary_key=True
+    )
     experiment_dna_short_read_id = models.ForeignKey(
         "ExperimentDNAShortRead",
         on_delete=models.PROTECT,
@@ -235,7 +245,10 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
     called_variants_dna_file = models.CharField(max_length=255, unique=True)
     md5sum = models.CharField(max_length=32, unique=True)
     caller_software = models.CharField(max_length=255)
-    variant_types = models.CharField(max_length=255, choices=VariantType.choices)
+    variant_types = models.CharField(
+        max_length=255,
+        choices=VariantType.choices
+    )
     analysis_details = models.TextField(
         blank=True,
         null=True,
@@ -300,23 +313,30 @@ class ExperimentRNAShortRead(TimeStampedModel):
     analyte_id = models.ForeignKey(
         Analyte,
         on_delete=models.PROTECT,
-        help_text="Reference to the analyte ID from which this experiment derives.",
+        help_text="Reference to the analyte ID from which this experiment "
+        + "derives.",
     )
     experiment_sample_id = models.CharField(
         max_length=255,
-        help_text="Identifier used in the data file, such as the SM tag in a BAM header or column headers for genotype fields in a VCF file.",
+        help_text="Identifier used in the data file, such as the SM tag in a "
+        + "BAM header or column headers for genotype fields in a VCF file.",
     )
     rna_sample_type = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        choices=[("GREGoR_sample", "GREGoR_sample"), ("isogenic_cell_line", "isogenic_cell_line")],
-        help_text="indicates whether experiment_rna_short_read_id corresponds to study sample with analyte_id or an isogenic cell line",
+        choices=[
+            ("GREGoR_sample", "GREGoR_sample"),
+            ("isogenic_cell_line", "isogenic_cell_line")
+        ],
+        help_text="indicates whether experiment_rna_short_read_id corresponds "
+        + "to study sample with analyte_id or an isogenic cell line",
     )
     seq_library_prep_kit_method = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Library prep kit used, can be missing if RC receives external data.",
+        help_text="Library prep kit used, can be missing if RC receives "
+        + "external data.",
     )
     library_prep_type = models.ManyToManyField(
         "LibraryPrepType",
@@ -333,7 +353,8 @@ class ExperimentRNAShortRead(TimeStampedModel):
         help_text="Type of RNA sequencing experiment.",
     )
     read_length = models.IntegerField(
-        help_text="Sequenced read length in base pairs; GREGoR RCs do paired end sequencing, so 100bp indicates 2x100bp."
+        help_text="Sequenced read length in base pairs; GREGoR RCs do paired "
+        + "end sequencing, so 100bp indicates 2x100bp."
     )
     single_or_paired_ends = models.CharField(
         max_length=255,
@@ -343,7 +364,8 @@ class ExperimentRNAShortRead(TimeStampedModel):
     date_data_generation = models.DateField(
         blank=True,
         null=True,
-        help_text="Date when the data was generated; format should follow ISO 8601 (YYYY-MM-DD).",
+        help_text="Date when the data was generated; format should follow ISO "
+        + "8601 (YYYY-MM-DD).",
     )
     sequencing_platform = models.CharField(
         max_length=255,
@@ -352,7 +374,8 @@ class ExperimentRNAShortRead(TimeStampedModel):
     )
     within_site_batch_name = models.CharField(
         max_length=255,
-        help_text="Batch number for the site, important for future batch correction.",
+        help_text="Batch number for the site, important for future batch "
+        + "correction.",
     )
     RIN = models.FloatField(
         null=True, blank=True, help_text="RIN number for quality of sample."
@@ -363,7 +386,8 @@ class ExperimentRNAShortRead(TimeStampedModel):
     total_reads = models.FloatField(
         null=True,
         blank=True,
-        help_text="Total number of reads; should be input as an integer despite the float type.",
+        help_text="Total number of reads; should be input as an integer "
+        + "despite the float type.",
     )
 
     def __str__(self):
@@ -390,7 +414,8 @@ class AlignedRNAShortRead(TimeStampedModel):
     aligned_rna_short_read_index_file = models.CharField(
         max_length=255,
         unique=True,
-        help_text="Name and path of index file corresponding to aligned reads file.",
+        help_text="Name and path of index file corresponding to aligned reads "
+        + "file.",
     )
     md5sum = models.CharField(
         max_length=255, unique=True, help_text="MD5 checksum for file."
@@ -410,7 +435,8 @@ class AlignedRNAShortRead(TimeStampedModel):
         help_text="URI for reference assembly file."
     )
     reference_assembly_details = models.TextField(
-        blank=True, null=True, help_text="Details about the reference assembly used."
+        blank=True, null=True, help_text="Details about the reference assembly "
+        + "used."
     )
     gene_annotation = models.CharField(
         max_length=255, help_text="Annotation file used for alignment."
@@ -441,7 +467,8 @@ class AlignedRNAShortRead(TimeStampedModel):
         max_length=255,
         blank=True,
         null=True,
-        help_text="Path of (log) file with all parameters for alignment software.",
+        help_text="Path of (log) file with all parameters for alignment "
+        + "software.",
     )
     alignment_postprocessing = models.TextField(
         blank=True, null=True, help_text="Post processing applied to alignment."
@@ -451,10 +478,12 @@ class AlignedRNAShortRead(TimeStampedModel):
         help_text="Mean coverage of either the genome or the targeted regions.",
     )
     percent_uniquely_aligned = models.FloatField(
-        null=True, help_text="Percentage of reads that aligned to just one place."
+        null=True, help_text="Percentage of reads that aligned to just one "
+        + "place."
     )
     percent_multimapped = models.FloatField(
-        null=True, help_text="Percentage of reads that aligned to multiple places."
+        null=True, help_text="Percentage of reads that aligned to multiple "
+        + "places."
     )
     percent_unaligned = models.FloatField(
         null=True, help_text="Percentage of reads that didn't align."
@@ -495,7 +524,8 @@ class AlignedRNAShortRead(TimeStampedModel):
         null=True, blank=True, help_text="GC content percentage."
     )
     percent_chrX_Y = models.FloatField(
-        null=True, blank=True, help_text="Percentage of reads from chromosome X and Y."
+        null=True, blank=True, help_text="Percentage of reads from chromosome "
+        + "X and Y."
     )
 
     def __str__(self):
@@ -531,7 +561,8 @@ class ExperimentNanopore(TimeStampedModel):
         help_text="Library prep kit used.",
     )
     fragmentation_method = models.TextField(
-        blank=True, null=True, help_text="Method used for shearing/fragmentation."
+        blank=True, null=True, help_text="Method used for shearing/"
+        + "fragmentation."
     )
     experiment_type = models.CharField(
         max_length=255,
@@ -553,7 +584,9 @@ class ExperimentNanopore(TimeStampedModel):
         validators=[validate_url],
         help_text="Name and path of bed file uploaded to workspace.",
     )
-    date_data_generation = models.DateField(help_text="Date of data generation.")
+    date_data_generation = models.DateField(
+        help_text="Date of data generation."
+    )
     sequencing_platform = models.CharField(
         max_length=255,
         choices=[
@@ -600,19 +633,22 @@ class AlignedNanopore(TimeStampedModel):
         "ExperimentNanopore",
         to_field="experiment_nanopore_id",
         on_delete=models.PROTECT,
-        help_text="Identifier for experiment, referencing the experiment_nanopore_id from the experiment_nanopore table.",
+        help_text="Identifier for experiment, referencing the "
+        + "experiment_nanopore_id from the experiment_nanopore table.",
     )
     aligned_nanopore_file = models.CharField(
         unique=True,
         max_length=1024,
         validators=[validate_url],
-        help_text="Name and path of file with aligned reads. This must be a unique path.",
+        help_text="Name and path of file with aligned reads. This must be a "
+        + "unique path.",
     )
     aligned_nanopore_index_file = models.CharField(
         unique=True,
         max_length=1024,
         validators=[validate_url],
-        help_text="Name and path of index file corresponding to aligned reads file. This must be a unique path.",
+        help_text="Name and path of index file corresponding to aligned reads "
+        + "file. This must be a unique path.",
     )
     md5sum = models.CharField(
         max_length=255,
@@ -639,7 +675,8 @@ class AlignedNanopore(TimeStampedModel):
     analysis_details = models.TextField(
         blank=True,
         null=True,
-        help_text="Brief description of the analysis pipeline used for producing the file.",
+        help_text="Brief description of the analysis pipeline used for "
+        + "producing the file.",
     )
     mean_coverage = models.FloatField(
         blank=True,
@@ -649,12 +686,14 @@ class AlignedNanopore(TimeStampedModel):
     genome_coverage = models.IntegerField(
         blank=True,
         null=True,
-        help_text="Percentage of the genome covered at a certain depth (e.g., >=90% at 10x or 20x).",
+        help_text="Percentage of the genome covered at a certain depth (e.g., "
+        + ">=90% at 10x or 20x).",
     )
     contamination = models.FloatField(
         blank=True,
         null=True,
-        help_text="Contamination level estimate, e.g., <1% (display raw fraction not percent).",
+        help_text="Contamination level estimate, e.g., <1% (display raw "
+        + "fraction not percent).",
     )
     sex_concordance = models.BooleanField(
         blank=True,
@@ -662,10 +701,12 @@ class AlignedNanopore(TimeStampedModel):
         help_text="Comparison between reported sex vs genotype sex.",
     )
     num_reads = models.IntegerField(
-        blank=True, null=True, help_text="Total reads before ignoring alignment."
+        blank=True, null=True, help_text="Total reads before ignoring "
+        + "alignment."
     )
     num_bases = models.IntegerField(
-        blank=True, null=True, help_text="Number of bases before ignoring alignment."
+        blank=True, null=True, help_text="Number of bases before ignoring "
+        + "alignment."
     )
     read_length_mean = models.IntegerField(
         blank=True,
@@ -689,24 +730,31 @@ class AlignedNanopore(TimeStampedModel):
     mapped_reads_pct = models.FloatField(
         blank=True,
         null=True,
-        help_text="Number between 1 and 100, representing the percentage of reads that mapped to the reference.",
+        help_text="Number between 1 and 100, representing the percentage of "
+        + "reads that mapped to the reference.",
     )
     methylation_called = models.BooleanField(
-        help_text="Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags."
+        help_text="Indicates whether 5mC and 6mA methylation has been called "
+        + "and annotated in the BAM file's MM and ML tags."
     )
     quality_issues = models.TextField(
         blank=True,
         null=True,
-        help_text="Describe if there are any QC issues that would be important to note.",
+        help_text="Describe if there are any QC issues that would be important "
+        + "to note.",
     )
     fiberseq_format = models.BooleanField(
         default=False,
-        help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
+        help_text="Indicates if BAM file has been formatted using fibertools "
+        + "to include nucleosome and methyltransferase-sensitive patch (MSP) "
+        + "calls"
     )
     read_length_n50 = models.FloatField(
         blank=True,
         null=True,
-        help_text="N50 is the shortest read length that, when all reads are sorted by length from longest to shortest, covers 50% of the total sequence data (longer is better). Value in kilobases",
+        help_text="N50 is the shortest read length that, when all reads are "
+        + "sorted by length from longest to shortest, covers 50% of the total "
+        + "sequence data (longer is better). Value in kilobases",
     )
 
     def __str__(self):
@@ -717,12 +765,22 @@ class AlignedNanoporeSet(TimeStampedModel):
     aligned_nanopore_set_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text="Identifier for a set of experiments (primary key). RCs make their own IDs (these must begin with center-specific prefix). This ID links the aligned_nanopore table to the called_variants_nanopore table. For centers that are only uploading single sample files, the aligned_nanopore_set_id and aligned_nanopore_id values can be identical. For centers uploading multi-sample files, they will need to come up with a value for aligned_nanopore_set_id that makes sense to them for indicating the sample group for a multi-sample callset, and use that same value in called_variants_nanopore.",
+        help_text="Identifier for a set of experiments (primary key). RCs make "
+        + "their own IDs (these must begin with center-specific prefix). This "
+        + "ID links the aligned_nanopore table to the called_variants_nanopore "
+        + "table. For centers that are only uploading single sample files, the "
+        + "aligned_nanopore_set_id and aligned_nanopore_id values can be "
+        + "identical. For centers uploading multi-sample files, they will need "
+        + "to come up with a value for aligned_nanopore_set_id that makes "
+        + "sense to them for indicating the sample group for a multi-sample "
+        + "callset, and use that same value in called_variants_nanopore.",
     )
     aligned_nanopore = models.ForeignKey(
         "AlignedNanopore",
         on_delete=models.PROTECT,
-        help_text="The identifier for a single-sample aligned_nanopore included in the read set (one per row). This refers to IDs from the aligned_nanopore table.",
+        help_text="The identifier for a single-sample aligned_nanopore "
+        + "included in the read set (one per row). This refers to IDs from the "
+        + "aligned_nanopore table.",
     )
 
     def __str__(self):
@@ -738,17 +796,20 @@ class CalledVariantsNanopore(TimeStampedModel):
     aligned_nanopore_set = models.ForeignKey(
         "AlignedNanoporeSet",
         on_delete=models.PROTECT,
-        help_text="Identifier for experiment set. This refers to IDs from the aligned_nanopore_set table.",
+        help_text="Identifier for experiment set. This refers to IDs from the "
+        + "aligned_nanopore_set table.",
     )
     called_variants_dna_file = models.CharField(
         max_length=255,
         unique=True,
-        help_text="Name and path of the file with variant calls. Stored as a unique bucket path.",
+        help_text="Name and path of the file with variant calls. Stored as a "
+        + "unique bucket path.",
     )
     md5sum = models.CharField(
         max_length=255,
         unique=True,
-        help_text="MD5 checksum for file, computed prior to upload to verify file integrity.",
+        help_text="MD5 checksum for file, computed prior to upload to verify "
+        + "file integrity.",
     )
     caller_software = models.CharField(
         max_length=255,
@@ -756,12 +817,15 @@ class CalledVariantsNanopore(TimeStampedModel):
     )
     variant_types = models.CharField(
         max_length=255,
-        help_text="Types of variants called, separated by '|'. Can include types such as SNV, INDEL, SV, CNV, RE, and MEI.",
+        help_text="Types of variants called, separated by '|'. Can include "
+        + "types such as SNV, INDEL, SV, CNV, RE, and MEI.",
     )
     analysis_details = models.TextField(
         blank=True,
         null=True,
-        help_text="Brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or GitHub repository.",
+        help_text="Brief description of the analysis pipeline used for "
+        + "producing the file; perhaps a link to something like a WDL file or "
+        + "GitHub repository.",
     )
 
     def __str__(self):
@@ -783,7 +847,8 @@ class ExperimentPacBio(TimeStampedModel):
     experiment_sample_id = models.CharField(
         max_length=255,
         blank=True,
-        help_text="identifier used in the data file (e.g., the SM tag in a BAM header, column headers for genotype fields in a VCF file)",
+        help_text="identifier used in the data file (e.g., the SM tag in a BAM "
+        + "header, column headers for genotype fields in a VCF file)",
     )
     seq_library_prep_kit_method = models.CharField(
         max_length=255,
@@ -813,7 +878,8 @@ class ExperimentPacBio(TimeStampedModel):
         help_text="Library prep kit used",
     )
     fragmentation_method = models.CharField(
-        max_length=255, blank=True, help_text="method used for shearing/fragmentation"
+        max_length=255, blank=True, help_text="method used for shearing/"
+        + "fragmentation"
     )
     experiment_type = models.CharField(
         max_length=50,
@@ -866,31 +932,39 @@ class ExperimentPacBio(TimeStampedModel):
         max_length=255, help_text="Version number of PacBio SMRTLink software"
     )
     instrument_ics_version = models.CharField(
-        max_length=255, help_text="Version number of PacBio instrument control software"
+        max_length=255, help_text="Version number of PacBio instrument control "
+        + "software"
     )
     size_selection_method = models.CharField(
-        max_length=255, blank=True, help_text="method use for library size selection"
+        max_length=255, blank=True, help_text="method use for library size "
+        + "selection"
     )
     library_size = models.CharField(
-        max_length=255, blank=True, help_text="expected size of library from FemtoPulse"
+        max_length=255, blank=True, help_text="expected size of library from "
+        + "FemtoPulse"
     )
     smrt_cell_kit = models.CharField(
         max_length=255, blank=True, help_text="part number of the SMRT Cell"
     )
     smrt_cell_id = models.CharField(
-        max_length=255, blank=True, help_text="unique serial number for SMRT Cell"
+        max_length=255, blank=True, help_text="unique serial number for SMRT "
+        + "Cell"
     )
     movie_name = models.CharField(
-        max_length=255, blank=True, help_text="unique name of sequencing collection"
+        max_length=255, blank=True, help_text="unique name of sequencing "
+        +" collection"
     )
     polymerase_kit = models.CharField(
-        max_length=255, blank=True, help_text="part number of polymerase kit used"
+        max_length=255, blank=True, help_text="part number of polymerase kit "
+        + "used"
     )
     sequencing_kit = models.CharField(
-        max_length=255, blank=True, help_text="part number of sequencing kit reagents"
+        max_length=255, blank=True, help_text="part number of sequencing kit "
+        + "reagents"
     )
     movie_length_hours = models.FloatField(
-        null=True, blank=True, help_text="length of sequencing collection, in hrs"
+        null=True, blank=True, help_text="length of sequencing collection, in "
+        + "hrs"
     )
     includes_kinetics = models.BooleanField(
         default=False, help_text="run reports base kinetics"
@@ -924,7 +998,8 @@ class AlignedPacBio(TimeStampedModel):
     aligned_pac_bio_index_file = models.CharField(
         max_length=1024,
         validators=[validate_url],
-        help_text="name and path of index file corresponding to aligned reads file",
+        help_text="name and path of index file corresponding to aligned reads "
+        + "file",
     )
     md5sum = models.CharField(
         max_length=32, unique=True, help_text="md5 checksum for file"
@@ -943,12 +1018,14 @@ class AlignedPacBio(TimeStampedModel):
         help_text="Reference assembly used",
     )
     alignment_software = models.CharField(
-        max_length=255, help_text="Software including version number used for alignment"
+        max_length=255, help_text="Software including version number used for "
+        + "alignment"
     )
     analysis_details = models.TextField(
         blank=True,
         null=True,
-        help_text="brief description of the analysis pipeline used for producing the file",
+        help_text="brief description of the analysis pipeline used for "
+        + "producing the file",
     )
     mean_coverage = models.FloatField(
         blank=True,
@@ -963,7 +1040,8 @@ class AlignedPacBio(TimeStampedModel):
     contamination = models.FloatField(
         blank=True,
         null=True,
-        help_text="Contamination level estimate., e.g. <1% (display raw fraction not percent)",
+        help_text="Contamination level estimate., e.g. <1% (display raw "
+        + "fraction not percent)",
     )
     sex_concordance = models.BooleanField(
         blank=True,
@@ -971,10 +1049,12 @@ class AlignedPacBio(TimeStampedModel):
         help_text="Comparison between reported sex vs genotype sex",
     )
     num_reads = models.IntegerField(
-        blank=True, null=True, help_text="Total reads (before/ignoring alignment)"
+        blank=True, null=True, help_text="Total reads (before/ignoring "
+        + "alignment)"
     )
     num_bases = models.IntegerField(
-        blank=True, null=True, help_text="Number of bases (before/ignoring alignment)"
+        blank=True, null=True, help_text="Number of bases (before/ignoring "
+        + "alignment)"
     )
     read_length_mean = models.IntegerField(
         blank=True,
@@ -998,24 +1078,31 @@ class AlignedPacBio(TimeStampedModel):
     mapped_reads_pct = models.FloatField(
         blank=True,
         null=True,
-        help_text="Number between 1 and 100, representing the percentage of mapped reads",
+        help_text="Number between 1 and 100, representing the percentage of "
+        + "mapped reads",
     )
     methylation_called = models.BooleanField(
-        help_text="Indicates whether 5mC and 6mA methylation has been called and annotated in the BAM file's MM and ML tags"
+        help_text="Indicates whether 5mC and 6mA methylation has been called "
+        + "and annotated in the BAM file's MM and ML tags"
     )
     quality_issues = models.TextField(
         blank=True,
         null=True,
-        help_text="Describe if there are any QC issues that would be important to note.",
+        help_text="Describe if there are any QC issues that would be important "
+        + "to note.",
     )
     fiberseq_format = models.BooleanField(
         default=False,
-        help_text="Indicates if BAM file has been formatted using fibertools to include nucleosome and methyltransferase-sensitive patch (MSP) calls"
+        help_text="Indicates if BAM file has been formatted using fibertools "
+        + "to include nucleosome and methyltransferase-sensitive patch (MSP) "
+        + "calls"
     )
     read_length_n50 = models.FloatField(
         blank=True,
         null=True,
-        help_text="N50 is the shortest read length that, when all reads are sorted by length from longest to shortest, covers 50% of the total sequence data (longer is better). Value in kilobases",
+        help_text="N50 is the shortest read length that, when all reads are "
+        + "sorted by length from longest to shortest, covers 50% of the total "
+        + "sequence data (longer is better). Value in kilobases",
     )
 
 
@@ -1024,12 +1111,20 @@ class AlignedPacBioSet(TimeStampedModel):
         max_length=255,
         unique=True,
         primary_key=True,
-        help_text="Identifier for a set of experiments (primary key). RCs make their own IDs (these must begin with center-specific prefix). For centers that are only uploading single sample files, the aligned_short_read_set_id and aligned_short_read_id values can be identical. For centers uploading multi-sample files, they will need to come up with a value for aligned_short_read_set_id that makes sense to them for indicating the sample group for a multi-sample callset, and use that same value in called_variants_short_read.",
+        help_text="Identifier for a set of experiments (primary key). RCs make "
+        + "their own IDs (these must begin with center-specific prefix). For "
+        + "centers that are only uploading single sample files, the "
+        + "aligned_short_read_set_id and aligned_short_read_id values can be "
+        + "identical. For centers uploading multi-sample files, they will need "
+        + "to come up with a value for aligned_short_read_set_id that makes "
+        + "sense to them for indicating the sample group for a multi-sample "
+        + "callset, and use that same value in called_variants_short_read.",
     )
     aligned_pac_bio = models.ForeignKey(
         "AlignedPacBio",
         on_delete=models.PROTECT,
-        help_text="The identifier for a single-sample aligned_pac_bio included in the read set (one per row).",
+        help_text="The identifier for a single-sample aligned_pac_bio included "
+        + "in the read set (one per row).",
     )
 
     def __str__(self):
@@ -1051,12 +1146,14 @@ class CalledVariantsPacBio(TimeStampedModel):
     called_variants_dna_file = models.CharField(
         max_length=255,
         unique=True,
-        help_text="Name and path of the file with variant calls. Stored on Google Cloud Storage (gs://).",
+        help_text="Name and path of the file with variant calls. Stored on "
+        + "Google Cloud Storage (gs://).",
     )
     md5sum = models.CharField(
         max_length=32,
         unique=True,
-        help_text="MD5 checksum for file. md5sum computed prior to upload (used to verify file integrity).",
+        help_text="MD5 checksum for file. md5sum computed prior to upload "
+        + "(used to verify file integrity).",
     )
     caller_software = models.CharField(
         max_length=255,
@@ -1064,11 +1161,15 @@ class CalledVariantsPacBio(TimeStampedModel):
     )
     variant_types = models.CharField(
         max_length=255,
-        help_text="Types of variants called. SNV, INDEL, SV, CNV, RE, MEI. If there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry.",
+        help_text="Types of variants called. SNV, INDEL, SV, CNV, RE, MEI. If "
+        + "there are two VCFs for SNV and Indels, there would be two different "
+        + "lines in this table; if combined in one VCF, a |-delimited entry.",
     )
     analysis_details = models.TextField(
         blank=True,
-        help_text="Brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or github repository.",
+        help_text="Brief description of the analysis pipeline used for "
+        + "producing the file; perhaps a link to something like a WDL file or "
+        + "github repository.",
     )
 
     def __str__(self):
@@ -1079,50 +1180,73 @@ class ExperimentATACShortRead(TimeStampedModel):
     experiment_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text="Identifier for experiment_atac_short_read (primary key). RCs make their own IDs, must begin with center abbreviation as defined in participant table; need to be globally unique in consortium; may be generated by prepending experiment_sample_id with center abbreviation.",
+        help_text="Identifier for experiment_atac_short_read (primary key). RCs"
+        + " make their own IDs, must begin with center abbreviation as defined "
+        + "in participant table; need to be globally unique in consortium; may "
+        + "be generated by prepending experiment_sample_id with center "
+        + "abbreviation.",
     )
     analyte_id = models.ForeignKey(
         Analyte, on_delete=models.PROTECT, help_text="Reference to analyte ID."
     )
     experiment_sample_id = models.CharField(
         max_length=255,
-        help_text="Identifier used in the data file (e.g., the SM tag in a BAM header, column headers for genotype fields in a VCF file). May be the same as experiment_short_read_id if the file does contain sample identifiers. Should be present if downstream file contains a sample_id (e.g., BAM, VCF). Some centers have one id for the sample (tube) and a different ID for the sample as named in the VCF.",
+        help_text="Identifier used in the data file (e.g., the SM tag in a BAM "
+        + "header, column headers for genotype fields in a VCF file). May be "
+        + "the same as experiment_short_read_id if the file does contain sample"
+        + " identifiers. Should be present if downstream file contains a "
+        + "sample_id (e.g., BAM, VCF). Some centers have one id for the sample "
+        + "(tube) and a different ID for the sample as named in the VCF.",
     )
     seq_library_prep_kit_method = models.CharField(
         max_length=255,
-        help_text="Library prep kit used. Can be missing if RC receives external data.",
+        help_text="Library prep kit used. Can be missing if RC receives "
+        + "external data.",
     )
     read_length = models.IntegerField(
-        help_text="Sequenced read length (bp); GREGoR RCs do paired end sequencing, so is the example of 100bp indicates 2x100bp. Can be missing if RC receives external data; all RCs are doing paired-end reads."
+        help_text="Sequenced read length (bp); GREGoR RCs do paired end "
+        + "sequencing, so is the example of 100bp indicates 2x100bp. Can be "
+        + "missing if RC receives external data; all RCs are doing paired-end "
+        + "reads."
     )
     experiment_type = models.CharField(
         max_length=255,
-        choices=[("targeted", "Targeted"), ("genome", "Genome"), ("exome", "Exome")],
-        help_text="Type of experiment. Facilitates having exome and GS-SR experiments in the same experiment_details table.",
+        choices=[
+            ("targeted", "Targeted"),
+            ("genome", "Genome"),
+            ("exome", "Exome")
+        ],
+        help_text="Type of experiment. Facilitates having exome and GS-SR "
+        + "experiments in the same experiment_details table.",
     )
     targeted_regions_method = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        help_text="Which capture kit is used. Can be missing if RC receives external data.",
+        help_text="Which capture kit is used. Can be missing if RC receives "
+        + "external data.",
     )
     targeted_region_bed_file = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        help_text="Name and path of bed file uploaded to workspace. Can be missing if RC receives external data.",
+        help_text="Name and path of bed file uploaded to workspace. Can be "
+        + "missing if RC receives external data.",
     )
     date_data_generation = models.DateField(
-        help_text="Date of data generation (First sequencing date). Can be missing if RC receives external data; ISO 8601 date format."
+        help_text="Date of data generation (First sequencing date). Can be "
+        + "missing if RC receives external data; ISO 8601 date format."
     )
     target_insert_size = models.IntegerField(
         blank=True,
         null=True,
-        help_text="Insert size the protocol targets for DNA fragments. Can be missing if RC receives external data.",
+        help_text="Insert size the protocol targets for DNA fragments. Can be "
+        + "missing if RC receives external data.",
     )
     sequencing_platform = models.CharField(
         max_length=255,
-        help_text="Sequencing platform used for the experiment. Can be missing if RC receives external data.",
+        help_text="Sequencing platform used for the experiment. Can be missing "
+        + "if RC receives external data.",
     )
 
     def __str__(self):
@@ -1133,12 +1257,14 @@ class AlignedATACShortRead(TimeStampedModel):
     aligned_atac_short_read_id = models.CharField(
         max_length=255,
         primary_key=True,
-        help_text="Identifier for aligned_atac_short_read (primary key). Experiment_short_read_id + alignment indicator.",
+        help_text="Identifier for aligned_atac_short_read (primary key). "
+        + "Experiment_short_read_id + alignment indicator.",
     )
     experiment_atac_short_read = models.ForeignKey(
         "ExperimentATACShortRead",
         on_delete=models.PROTECT,
-        help_text="Identifier for experiment. Reference to experiment_atac_short_read.experiment_atac_short_read_id.",
+        help_text="Identifier for experiment. Reference to "
+        + "experiment_atac_short_read.experiment_atac_short_read_id.",
     )
     aligned_atac_short_read_file = models.URLField(
         max_length=1024,
@@ -1148,7 +1274,8 @@ class AlignedATACShortRead(TimeStampedModel):
     aligned_atac_short_read_index_file = models.URLField(
         max_length=1024,
         unique=True,
-        help_text="Name and path of index file corresponding to aligned reads file.",
+        help_text="Name and path of index file corresponding to aligned reads "
+        + "file.",
     )
     md5sum = models.CharField(
         max_length=255, unique=True, help_text="MD5 checksum for file."
@@ -1164,12 +1291,20 @@ class AlignedATACShortRead(TimeStampedModel):
         ],
         help_text="Reference assembly used.",
     )
-    reference_assembly_uri = models.URLField(max_length=1024, blank=True, null=True)
+    reference_assembly_uri = models.URLField(
+        max_length=1024,
+        blank=True,
+        null=True
+    )
     reference_assembly_details = models.TextField(blank=True, null=True)
     alignment_software = models.CharField(
         max_length=255, help_text="Software including version number."
     )
-    gene_annotation_details = models.CharField(max_length=255, blank=True, null=True)
+    gene_annotation_details = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
     alignment_log_file = models.URLField(max_length=1024, blank=True, null=True)
     alignment_postprocessing = models.TextField(blank=True, null=True)
     mean_coverage = models.FloatField(
@@ -1181,7 +1316,9 @@ class AlignedATACShortRead(TimeStampedModel):
     percent_multimapped = models.FloatField(
         help_text="How many reads aligned to multiple places."
     )
-    percent_unaligned = models.FloatField(help_text="How many reads didn't align.")
+    percent_unaligned = models.FloatField(
+        help_text="How many reads didn't align."
+    )
 
     def __str__(self):
         return self.aligned_atac_short_read_id
@@ -1201,13 +1338,16 @@ class CalledPeaksATACShortRead(TimeStampedModel):
     called_peaks_file = models.URLField(
         max_length=1024,
         unique=True,
-        help_text="Name and path of the bed file with open chromatin peaks after QC filtering.",
+        help_text="Name and path of the bed file with open chromatin peaks "
+        + "after QC filtering.",
     )
     peaks_md5sum = models.CharField(
-        max_length=255, unique=True, help_text="MD5 checksum for called_peaks_file."
+        max_length=255, unique=True, help_text="MD5 checksum for "
+        + "called_peaks_file."
     )
     peak_caller_software = models.CharField(
-        max_length=255, help_text="Peak calling software used including version number."
+        max_length=255, help_text="Peak calling software used including version"
+        + " number."
     )
     peak_set_type = models.CharField(
         max_length=50,
@@ -1221,7 +1361,8 @@ class CalledPeaksATACShortRead(TimeStampedModel):
     analysis_details = models.TextField(
         blank=True,
         null=True,
-        help_text="Brief description of the analysis pipeline used for producing the called_peaks_file.",
+        help_text="Brief description of the analysis pipeline used for "
+        + "producing the called_peaks_file.",
     )
 
     def __str__(self):
@@ -1242,10 +1383,13 @@ class AlleleSpecificATACShortRead(TimeStampedModel):
     asc_file = models.URLField(
         max_length=1024,
         unique=True,
-        help_text="Name and path of the tsv file with allele-specific chromatin accessibility measures (logFC) at heterozygous sites after QC and significance testing.",
+        help_text="Name and path of the tsv file with allele-specific chromatin"
+        + " accessibility measures (logFC) at heterozygous sites after QC and "
+        + "significance testing.",
     )
     asc_md5sum = models.CharField(
-        max_length=255, unique=True, help_text="MD5 checksum for called_peaks_file."
+        max_length=255, unique=True, help_text="MD5 checksum for "
+        + "called_peaks_file."
     )
     peak_set_type = models.CharField(
         max_length=50,
@@ -1259,15 +1403,19 @@ class AlleleSpecificATACShortRead(TimeStampedModel):
     het_sites_file = models.URLField(
         max_length=1024,
         unique=True,
-        help_text="VCF file containing prefiltered heterozygous sites used for reference alignment bias testing and calling allele-specific chromatin accessibility events.",
+        help_text="VCF file containing prefiltered heterozygous sites used for "
+        + "reference alignment bias testing and calling allele-specific "
+        + "chromatin accessibility events.",
     )
     het_sites_md5sum = models.CharField(
-        max_length=255, unique=True, help_text="MD5 checksum for het_sites_file."
+        max_length=255, unique=True, help_text="MD5 checksum for "
+        + "het_sites_file."
     )
     analysis_details = models.TextField(
         blank=True,
         null=True,
-        help_text="Brief description of the analysis pipeline used for producing the asc_file.",
+        help_text="Brief description of the analysis pipeline used for "
+        + "producing the asc_file.",
     )
 
     def __str__(self):

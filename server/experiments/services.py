@@ -385,21 +385,33 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedDNAShortReadSetSerializer
     """
+    aligned_dna_short_reads = serializers.SlugRelatedField(
+        many=True,
+        slug_field="name",
+        queryset=AlignedDNAShortRead.objects.all(),
+        required=True,
+        allow_null=True,
+    )
     class Meta:
         model = AlignedDNAShortReadSet
         fields = "__all__"
 
     def create(self, validated_data):
         """Create a new AlignedDNAShortReadSet instance using the validated data and set the many-to-many relationships"""
+        aligned_dna_short_reads_data = validated_data.pop("aligned_dna_short_reads", [])
         aligned_dna_set_instance = AlignedDNAShortReadSet.objects.create(**validated_data)
+        aligned_dna_set_instance.aligned_dna_short_reads.set(aligned_dna_short_reads_data)
 
         return aligned_dna_set_instance
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
 
+        aligned_dna_short_reads_data = validated_data.pop("aligned_dna_short_reads", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        if aligned_dna_short_reads_data is not None:
+            instance.aligned_dna_short_reads.set(aligned_dna_short_reads_data)
 
         instance.save()
         return instance
