@@ -10,6 +10,36 @@ from metadata.models import Analyte, Participant, VariantType, TimeStampedModel
 from config.selectors import validate_url
 
 
+class Chrom(models.TextChoices):
+    """Chomosomes for VCF files"""
+    ALL = "ALL", _("ALL")
+    chr1 = "1", _("1")
+    chr2 = "2", _("2")
+    chr3 = "3", _("3")
+    chr4 = "4", _("4")
+    chr5 = "5", _("5")
+    chr6 = "6", _("6")
+    chr7 = "7", _("7")
+    chr8 = "8", _("8")
+    chr9 = "9", _("9")
+    chr10 = "10", _("10")
+    chr11 = "11", _("11")
+    chr12 = "12", _("12")
+    chr13 = "13", _("13")
+    chr14 = "14", _("14")
+    chr15 = "15", _("15")
+    chr16 = "16", _("16")
+    chr17 = "17", _("17")
+    chr18 = "18", _("18")
+    chr19 = "19", _("19")
+    chr20 = "20", _("20")
+    chr21 = "21", _("21")
+    chr22 = "22", _("22")
+    chrX = "X", _("X")
+    chrY = "Y", _("Y")
+    chrM = "MT", _("MT")
+
+
 class Experiment(TimeStampedModel):
     EXPERIMENT_TYPES = [
         ("experiment_dna_short_read", "DNA Short Read"),
@@ -212,7 +242,7 @@ class AlignedDNAShortReadSet(TimeStampedModel):
         + " them for indicating the sample group for a multi-sample "
         + "callset, and use that same value in called_variants_short_read.",
     )
-    aligned_dna_short_reads = models.ManyToManyField(
+    aligned_dna_short_read_id = models.ManyToManyField(
         AlignedDNAShortRead,
         help_text="the identifiers for single-sample aligned_dna_short_reads"
         + " included in the read_set",
@@ -242,8 +272,8 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
     aligned_dna_short_read_set_id = models.ForeignKey(
         AlignedDNAShortReadSet, on_delete=models.PROTECT
     )
-    called_variants_dna_file = models.CharField(max_length=255, unique=True)
-    md5sum = models.CharField(max_length=32, unique=True)
+    called_variants_dna_file = models.CharField(max_length=255)
+    md5sum = models.CharField(max_length=32)
     caller_software = models.CharField(max_length=255)
     variant_types = models.CharField(
         max_length=255,
@@ -255,6 +285,11 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
         help_text="brief description of the analysis pipeline used for "
         + "producing the file; perhaps a link to something like a WDL"
         + "file or github repository",
+    )
+    chrom = models.CharField(
+        max_length=10,
+        choices=Chrom,
+        help_text="chromosome of the variants in the VCF file"
     )
 
     def __str__(self):
@@ -775,9 +810,8 @@ class AlignedNanoporeSet(TimeStampedModel):
         + "sense to them for indicating the sample group for a multi-sample "
         + "callset, and use that same value in called_variants_nanopore.",
     )
-    aligned_nanopore = models.ForeignKey(
-        "AlignedNanopore",
-        on_delete=models.PROTECT,
+    aligned_nanopore_id = models.ManyToManyField(
+        AlignedNanopore,
         help_text="The identifier for a single-sample aligned_nanopore "
         + "included in the read set (one per row). This refers to IDs from the "
         + "aligned_nanopore table.",
@@ -801,13 +835,11 @@ class CalledVariantsNanopore(TimeStampedModel):
     )
     called_variants_dna_file = models.CharField(
         max_length=255,
-        unique=True,
         help_text="Name and path of the file with variant calls. Stored as a "
         + "unique bucket path.",
     )
     md5sum = models.CharField(
         max_length=255,
-        unique=True,
         help_text="MD5 checksum for file, computed prior to upload to verify "
         + "file integrity.",
     )
@@ -826,6 +858,11 @@ class CalledVariantsNanopore(TimeStampedModel):
         help_text="Brief description of the analysis pipeline used for "
         + "producing the file; perhaps a link to something like a WDL file or "
         + "GitHub repository.",
+    )
+    chrom = models.CharField(
+        max_length=10,
+        choices=Chrom,
+        help_text="chromosome of the variants in the VCF file"
     )
 
     def __str__(self):
@@ -1120,9 +1157,8 @@ class AlignedPacBioSet(TimeStampedModel):
         + "sense to them for indicating the sample group for a multi-sample "
         + "callset, and use that same value in called_variants_short_read.",
     )
-    aligned_pac_bio = models.ForeignKey(
-        "AlignedPacBio",
-        on_delete=models.PROTECT,
+    aligned_pac_bio_id = models.ManyToManyField(
+        AlignedPacBio,
         help_text="The identifier for a single-sample aligned_pac_bio included "
         + "in the read set (one per row).",
     )
@@ -1145,13 +1181,11 @@ class CalledVariantsPacBio(TimeStampedModel):
     )
     called_variants_dna_file = models.CharField(
         max_length=255,
-        unique=True,
         help_text="Name and path of the file with variant calls. Stored on "
         + "Google Cloud Storage (gs://).",
     )
     md5sum = models.CharField(
         max_length=32,
-        unique=True,
         help_text="MD5 checksum for file. md5sum computed prior to upload "
         + "(used to verify file integrity).",
     )
@@ -1170,6 +1204,11 @@ class CalledVariantsPacBio(TimeStampedModel):
         help_text="Brief description of the analysis pipeline used for "
         + "producing the file; perhaps a link to something like a WDL file or "
         + "github repository.",
+    )
+    chrom = models.CharField(
+        max_length=10,
+        choices=Chrom,
+        help_text="chromosome of the variants in the VCF file"
     )
 
     def __str__(self):

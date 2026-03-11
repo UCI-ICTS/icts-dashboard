@@ -59,6 +59,7 @@ class Zygosity(models.TextChoices):
     MOSAIC = "Mosaic", "Mosaic"
     UNKNOWN = "Unknown", "Unknown"
 
+
 class GREGoRVariantClassification(models.TextChoices):
     BENIGN = "Benign", "Benign"
     LIKELY_BENIGN = "Likely benign", "Likely benign"
@@ -71,6 +72,7 @@ class GREGoRVariantClassification(models.TextChoices):
     CURATION_IN_PROGRESS = "Curation in progress", "Curation in progress"
     WELL_ESTABLISHED = "Well-established P/LP", "Well-established P/LP"
 
+
 class VariantInheritance(models.TextChoices):
     DE_NOVO = "de novo", "De Novo"
     MATERNAL = "maternal", "Maternal"
@@ -80,17 +82,19 @@ class VariantInheritance(models.TextChoices):
     NONPATERNAL = "nonpaternal", "Nonpaternal"
     UNKNOWN = "unknown", "Unknown"
 
+
 class ConditionInheritance(models.TextChoices):
-    AUTOSOMAL_RECESSIVE = "Autosomal recessive", "autosomal recessive", 
-    AUTOSOMAL_DOMINANT = "Autosomal dominant", "autosomal dominant", 
-    X_LINKED = "X-linked", "x-linked", 
-    MITOCHONDRIAL = "Mitochondrial", "mitochondrial", 
-    Y_LINKED = "Y-linked", "y-linked", 
+    AUTOSOMAL_RECESSIVE = "Autosomal recessive", "autosomal recessive",
+    AUTOSOMAL_DOMINANT = "Autosomal dominant", "autosomal dominant",
+    X_LINKED = "X-linked", "x-linked",
+    MITOCHONDRIAL = "Mitochondrial", "mitochondrial",
+    Y_LINKED = "Y-linked", "y-linked",
     CONTIGUOUS_GENE_SYNDROM = "Contiguous gene syndrome", "contiguous gene syndrom",
     SOMATIC_MOSAICISM = "Somatic mosaicism", "somatic mosaicism",
     DIGENIC = "Digenic", "digenic",
     OTHER = "Other", "other",
-    UNKNOWN = "Unknown", "unkonwn", 
+    UNKNOWN = "Unknown", "unkonwn",
+
 
 class GeneDiseaseValidity(models.TextChoices):
     DEFINITIVE = "Definitive", "Definitive"
@@ -184,6 +188,7 @@ class ProbandRelationship(models.TextChoices):
     PATERNAL_FIRST_COUSIN = "Paternal 1st Cousin", _("PATERNAL_FIRST_COUSIN")
     OTHER = "Other", _("OTHER")
     UNKNOWN = "Unknown", _("UNKNOWN")
+
 
 class BiologicalSex(models.TextChoices):
     FEMALE = "Female", _("FEMALE")

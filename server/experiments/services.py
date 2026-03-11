@@ -385,7 +385,7 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedDNAShortReadSetSerializer
     """
-    aligned_dna_short_reads = serializers.SlugRelatedField(
+    aligned_dna_short_read_id = serializers.SlugRelatedField(
         many=True,
         slug_field="name",
         queryset=AlignedDNAShortRead.objects.all(),
@@ -398,20 +398,20 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new AlignedDNAShortReadSet instance using the validated data and set the many-to-many relationships"""
-        aligned_dna_short_reads_data = validated_data.pop("aligned_dna_short_reads", [])
-        aligned_dna_set_instance = AlignedDNAShortReadSet.objects.create(**validated_data)
-        aligned_dna_set_instance.aligned_dna_short_reads.set(aligned_dna_short_reads_data)
+        aligned_dna_short_read_id_data = validated_data.pop("aligned_dna_short_read_id", [])
+        aligned_dna_short_read_set_instance = AlignedDNAShortReadSet.objects.create(**validated_data)
+        aligned_dna_short_read_set_instance.aligned_dna_short_read_id.set(aligned_dna_short_read_id_data)
 
-        return aligned_dna_set_instance
+        return aligned_dna_short_read_set_instance
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
 
-        aligned_dna_short_reads_data = validated_data.pop("aligned_dna_short_reads", None)
+        aligned_dna_short_read_id_data = validated_data.pop("aligned_dna_short_read_id", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        if aligned_dna_short_reads_data is not None:
-            instance.aligned_dna_short_reads.set(aligned_dna_short_reads_data)
+        if aligned_dna_short_read_id_data is not None:
+            instance.aligned_dna_short_read_id.set(aligned_dna_short_read_id_data)
 
         instance.save()
         return instance
@@ -488,9 +488,36 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedPacBioSetSerializer
     """
+    aligned_pac_bio_id = serializers.SlugRelatedField(
+        many=True,
+        slug_field="name",
+        queryset=AlignedPacBio.objects.all(),
+        required=True,
+        allow_null=True,
+    )
     class Meta:
         model = AlignedPacBioSet
         fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new AlignedPacBioSet instance using the validated data and set the many-to-many relationships"""
+        aligned_pac_bio_id_data = validated_data.pop("aligned_pac_bio_id", [])
+        aligned_pac_bio_set_instance = AlignedPacBioSet.objects.create(**validated_data)
+        aligned_pac_bio_set_instance.aligned_pac_bio_id.set(aligned_pac_bio_id_data)
+
+        return aligned_pac_bio_set_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        aligned_pac_bio_id_data = validated_data.pop("aligned_pac_bio_id", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if aligned_pac_bio_id_data is not None:
+            instance.aligned_pac_bio_id.set(aligned_pac_bio_id_data)
+
+        instance.save()
+        return instance
 
 
 class CalledVariantsPacBioSerializer(serializers.ModelSerializer):
@@ -515,9 +542,36 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedNanoporeSetSerializer
     """
+    aligned_nanopore_id = serializers.SlugRelatedField(
+        many=True,
+        slug_field="name",
+        queryset=AlignedNanopore.objects.all(),
+        required=True,
+        allow_null=True,
+    )
     class Meta:
         model = AlignedNanoporeSet
         fields = "__all__"
+
+    def create(self, validated_data):
+        """Create a new AlignedNanoporeSet instance using the validated data and set the many-to-many relationships"""
+        aligned_nanopore_id_data = validated_data.pop("aligned_nanopore_id", [])
+        aligned_nanopore_set_instance = AlignedNanoporeSet.objects.create(**validated_data)
+        aligned_nanopore_set_instance.aligned_nanopore_id.set(aligned_nanopore_id_data)
+
+        return aligned_nanopore_set_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        aligned_nanopore_id_data = validated_data.pop("aligned_nanopore_id", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if aligned_nanopore_id_data is not None:
+            instance.aligned_nanopore_id.set(aligned_nanopore_id_data)
+
+        instance.save()
+        return instance
 
 
 class CalledVariantsNanoporeSerializer(serializers.ModelSerializer):
