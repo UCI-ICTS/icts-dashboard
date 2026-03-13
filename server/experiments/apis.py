@@ -34,15 +34,18 @@ from experiments.models import (
 from experiments.services import (
     AlignedDNAShortReadSerializer,
     AlignedDNAShortReadSetSerializer,
-    CalledVariantsDNAShortReadSerializer,
+    CalledVariantsDNAShortReadInputSerializer,
+    CalledVariantsDNAShortReadOutputSerializer,
     AlignedRNAShortReadInputSerializer,
     AlignedRNAShortReadOutputSerializer,
     AlignedNanoporeSerializer,
     AlignedNanoporeSetSerializer,
-    CalledVariantsNanoporeSerializer,
+    CalledVariantsNanoporeInputSerializer,
+    CalledVariantsNanoporeOutputSerializer,
     AlignedPacBioSerializer,
     AlignedPacBioSetSerializer,
-    CalledVariantsPacBioSerializer,
+    CalledVariantsPacBioInputSerializer,
+    CalledVariantsPacBioOutputSerializer,
     AlignedRNASerializer,
     AlignedSerializer,
     ExperimentSerializer,
@@ -1117,17 +1120,17 @@ class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all CalledVariantsDNAShortRead entries",
-        responses={200: CalledVariantsDNAShortReadSerializer(many=True), 400: "Bad request"},
+        responses={200: CalledVariantsDNAShortReadOutputSerializer(many=True), 400: "Bad request"},
         tags=["CalledVariantsDNAShortRead"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
         queryset = CalledVariantsDNAShortRead.objects.all()
-        serializer = CalledVariantsDNAShortReadSerializer(queryset, many=True)
+        serializer = CalledVariantsDNAShortReadOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        request_body=CalledVariantsDNAShortReadSerializer(many=True),
+        request_body=CalledVariantsDNAShortReadInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsDNAShortRead"],
     )
@@ -1202,7 +1205,7 @@ class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        request_body=CalledVariantsDNAShortReadSerializer(many=True),
+        request_body=CalledVariantsDNAShortReadInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsDNAShortRead"],
     )
@@ -1832,7 +1835,7 @@ class AlignedPacBioSetViewSet(viewsets.ViewSet):
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
-    
+
 
 
 class CalledVariantsPacBioViewSet(viewsets.ViewSet):
@@ -1842,17 +1845,17 @@ class CalledVariantsPacBioViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all CalledVariantsPacBio entries",
-        responses={200: CalledVariantsPacBioSerializer(many=True), 400: "Bad request"},
+        responses={200: CalledVariantsPacBioOutputSerializer(many=True), 400: "Bad request"},
         tags=["CalledVariantsPacBio"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
         queryset = CalledVariantsPacBio.objects.all()
-        serializer = CalledVariantsPacBioSerializer(queryset, many=True)
+        serializer = CalledVariantsPacBioOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        request_body=CalledVariantsPacBioSerializer(many=True),
+        request_body=CalledVariantsPacBioInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsPacBio"],
     )
@@ -1927,7 +1930,7 @@ class CalledVariantsPacBioViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        request_body=CalledVariantsPacBioSerializer(many=True),
+        request_body=CalledVariantsPacBioInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsPacBio"],
     )
@@ -2569,17 +2572,17 @@ class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all CalledVariantsNanopore entries",
-        responses={200: CalledVariantsNanoporeSerializer(many=True), 400: "Bad request"},
+        responses={200: CalledVariantsNanoporeOutputSerializer(many=True), 400: "Bad request"},
         tags=["CalledVariantsNanopore"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
         queryset = CalledVariantsNanopore.objects.all()
-        serializer = CalledVariantsNanoporeSerializer(queryset, many=True)
+        serializer = CalledVariantsNanoporeOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        request_body=CalledVariantsNanoporeSerializer(many=True),
+        request_body=CalledVariantsNanoporeInputSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsNanopore"],
     )
@@ -2654,7 +2657,7 @@ class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        request_body=CalledVariantsNanoporeSerializer(many=True),
+        request_body=CalledVariantsNanoporeInputSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["CalledVariantsNanopore"],
     )

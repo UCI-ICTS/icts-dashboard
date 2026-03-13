@@ -275,9 +275,12 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
     called_variants_dna_file = models.CharField(max_length=255)
     md5sum = models.CharField(max_length=32)
     caller_software = models.CharField(max_length=255)
-    variant_types = models.CharField(
-        max_length=255,
-        choices=VariantType.choices
+    variant_types = models.JSONField(
+        default=list,
+        choices=VariantType.choices,
+        help_text="can add more values as the need arises\nif there are two "
+        + "VCFs for SNV and Indels, there would be two different lines in this "
+        + "table; if combined in one VCF, a |-delimited entry"
     )
     analysis_details = models.TextField(
         blank=True,
@@ -827,7 +830,7 @@ class CalledVariantsNanopore(TimeStampedModel):
         primary_key=True,
         help_text="Unique key for table (anvil requirement).",
     )
-    aligned_nanopore_set = models.ForeignKey(
+    aligned_nanopore_set_id = models.ForeignKey(
         "AlignedNanoporeSet",
         on_delete=models.PROTECT,
         help_text="Identifier for experiment set. This refers to IDs from the "
@@ -847,10 +850,12 @@ class CalledVariantsNanopore(TimeStampedModel):
         max_length=255,
         help_text="Variant calling software used including version number.",
     )
-    variant_types = models.CharField(
-        max_length=255,
-        help_text="Types of variants called, separated by '|'. Can include "
-        + "types such as SNV, INDEL, SV, CNV, RE, and MEI.",
+    variant_types = models.JSONField(
+        default=list,
+        choices=VariantType.choices,
+        help_text="can add more values as the need arises\nif there are two "
+        + "VCFs for SNV and Indels, there would be two different lines in this "
+        + "table; if combined in one VCF, a |-delimited entry"
     )
     analysis_details = models.TextField(
         blank=True,
@@ -1174,7 +1179,7 @@ class CalledVariantsPacBio(TimeStampedModel):
         primary_key=True,
         help_text="Unique key for table (ANVIL requirement).",
     )
-    aligned_pac_bio_set = models.ForeignKey(
+    aligned_pac_bio_set_id = models.ForeignKey(
         "AlignedPacBioSet",
         on_delete=models.PROTECT,
         help_text="Identifier for experiment set.",
@@ -1193,11 +1198,12 @@ class CalledVariantsPacBio(TimeStampedModel):
         max_length=255,
         help_text="Variant calling software used including version number.",
     )
-    variant_types = models.CharField(
-        max_length=255,
-        help_text="Types of variants called. SNV, INDEL, SV, CNV, RE, MEI. If "
-        + "there are two VCFs for SNV and Indels, there would be two different "
-        + "lines in this table; if combined in one VCF, a |-delimited entry.",
+    variant_types = models.JSONField(
+        default=list,
+        choices=VariantType.choices,
+        help_text="can add more values as the need arises\nif there are two "
+        + "VCFs for SNV and Indels, there would be two different lines in this "
+        + "table; if combined in one VCF, a |-delimited entry"
     )
     analysis_details = models.TextField(
         blank=True,

@@ -10,7 +10,6 @@ from config.selectors import (
     compare_data,
     TableValidator,
 )
-
 from experiments.models import (
     Aligned,
     AlignedDNAShortRead,
@@ -31,6 +30,7 @@ from experiments.models import (
     LibraryPrepType,
     PrepTargetsDetail,
     ExperimentType,
+    VariantType,
 )
 from experiments.selectors import (
     parse_nanopore,
@@ -42,6 +42,8 @@ from experiments.selectors import (
     parse_pac_bio,
     parse_pac_bio_aligned,
     swap_experiment_aligned,
+    parse_aligned_sets,
+    parse_called_variants,
 )
 
 from metadata.selectors import get_analyte
@@ -417,13 +419,53 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsDNAShortReadSerializer(serializers.ModelSerializer):
+class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
     """
-    Docstring for CalledVariantsDNAShortReadSerializder
     """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
     class Meta:
         model = CalledVariantsDNAShortRead
         fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+
+        variant_types = set(data.get("variant_type") or [])
+
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        if not isinstance(data.get("variant_type"), list):
+            errors.setdefault("variant_type", []).append("variant_types must be a list")
+
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
     def create(self, validated_data):
         """Create a new CalledVariantsDNAShortRead instance using the validated data and set the many-to-many relationships"""
@@ -439,6 +481,20 @@ class CalledVariantsDNAShortReadSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class CalledVariantsDNAShortReadOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsDNAShortReadSerializder
+    """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
+    class Meta:
+        model = CalledVariantsDNAShortRead
+        fields = "__all__"
 
 
 class AlignedSerializer(serializers.ModelSerializer):
@@ -520,10 +576,80 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsPacBioSerializer(serializers.ModelSerializer):
+class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
     """
     Docstring for CalledVariantsPacBioSerializer
     """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
+    class Meta:
+        model = CalledVariantsPacBio
+        fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+
+        variant_types = set(data.get("variant_type") or [])
+
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        if not isinstance(data.get("variant_type"), list):
+            errors.setdefault("variant_type", []).append("variant_types must be a list")
+
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsPacBio instance using the validated data and set the many-to-many relationships"""
+        called_variants_pac_bio_instance = CalledVariantsPacBio.objects.create(**validated_data)
+
+        return called_variants_pac_bio_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsPacBioOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsPacBioSerializer
+    """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
     class Meta:
         model = CalledVariantsPacBio
         fields = "__all__"
@@ -574,10 +700,79 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsNanoporeSerializer(serializers.ModelSerializer):
+class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
+    """
+    """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
+    class Meta:
+        model = CalledVariantsNanopore
+        fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+
+        variant_types = set(data.get("variant_type") or [])
+
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        if not isinstance(data.get("variant_type"), list):
+            errors.setdefault("variant_type", []).append("variant_types must be a list")
+
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsNanopore instance using the validated data and set the many-to-many relationships"""
+        called_variants_nanopore_instance = CalledVariantsNanopore.objects.create(**validated_data)
+
+        return called_variants_nanopore_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsNanoporeOutputSerializer(serializers.ModelSerializer):
     """
     Docstring for CalledVariantsNanopore
     """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
     class Meta:
         model = CalledVariantsNanopore
         fields = "__all__"
@@ -803,33 +998,7 @@ def update_experiments_entry(
             "input_serializer": ExperimentRNAInputSerializer,
             "output_serializer": ExperimentRNAOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum),
-        },
-        "aligned_dna_short_read": {
-            "model": AlignedDNAShortRead,
-            "input_serializer": AlignedDNAShortReadSerializer,
-            "output_serializer": AlignedDNAShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read_aligned(
-                short_read_aligned=datum
-            ),
-        },
-        "aligned_nanopore": {
-            "model": AlignedNanopore,
-            "input_serializer": AlignedNanoporeSerializer,
-            "output_serializer": AlignedNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
-        },
-        "aligned_pac_bio": {
-            "model": AlignedPacBio,
-            "input_serializer": AlignedPacBioSerializer,
-            "output_serializer": AlignedPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
-        },
-        "aligned_rna_short_read": {
-            "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer,
-            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
-        },
+        }
     }
 
     serializers = table_serializers.get(table_name)
@@ -988,12 +1157,16 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
             ),
         },
         "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
             "input_serializer": AlignedDNAShortReadSetSerializer,
             "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_dna_short_read": {
-            "input_serializer": CalledVariantsDNAShortReadSerializer,
-            "output_serializer": CalledVariantsDNAShortReadSerializer,
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
@@ -1002,12 +1175,16 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
         "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
             "input_serializer": AlignedNanoporeSetSerializer,
             "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_nanopore": {
-            "input_serializer": CalledVariantsNanoporeSerializer,
-            "output_serializer": CalledVariantsNanoporeSerializer,
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
@@ -1016,12 +1193,16 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
         },
         "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
             "input_serializer": AlignedPacBioSetSerializer,
             "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_pac_bio": {
-            "intput_serializer": CalledVariantsPacBioSerializer,
-            "output_serializer": CalledVariantsPacBioSerializer,
+            "model": CalledVariantsPacBio,
+            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
@@ -1150,12 +1331,16 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
             ),
         },
         "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
             "input_serializer": AlignedDNAShortReadSetSerializer,
             "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_dna_short_read": {
-            "input_serializer": CalledVariantsDNAShortReadSerializer,
-            "output_serializer": CalledVariantsDNAShortReadSerializer,
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum),
         },
         "aligned_nanopore": {
             "model": AlignedNanopore,
@@ -1164,12 +1349,16 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
         "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
             "input_serializer": AlignedNanoporeSetSerializer,
             "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_nanopore": {
-            "input_serializer": CalledVariantsNanoporeSerializer,
-            "output_serializer": CalledVariantsNanoporeSerializer,
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
@@ -1178,12 +1367,16 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
         },
         "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
             "input_serializer": AlignedPacBioSetSerializer,
             "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
         },
         "called_variants_pac_bio": {
-            "intput_serializer": CalledVariantsPacBioSerializer,
-            "output_serializer": CalledVariantsPacBioSerializer,
+            "model": CalledVariantsPacBio,
+            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
