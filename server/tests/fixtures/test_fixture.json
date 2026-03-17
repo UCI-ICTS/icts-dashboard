@@ -6210,7 +6210,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6221,7 +6221,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6232,7 +6232,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6243,7 +6243,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6254,7 +6254,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6265,7 +6265,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6276,7 +6276,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6287,7 +6287,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6298,7 +6298,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6309,7 +6309,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6320,7 +6320,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6331,7 +6331,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6342,7 +6342,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6353,7 +6353,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6364,7 +6364,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6375,7 +6375,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6386,7 +6386,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6397,7 +6397,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6408,7 +6408,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6419,7 +6419,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6430,7 +6430,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6441,7 +6441,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6452,7 +6452,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6463,7 +6463,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
     }
   },
   {
@@ -6474,7 +6474,11 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1\nUCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1\nUCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1",
+        "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1",
+        "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6485,7 +6489,10 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1\nUCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1",
+        "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6499,8 +6506,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001_Fam_chr1_SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001.chr1.snv.vcf.gz",
       "md5sum": "121d0ef48e593df56845e019bc5679e4",
-      "caller_software": "DeepVariant_version=1.5.0|GLNexus_version=v1.4.1",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "1"
     }
@@ -6516,8 +6529,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.snv.vcf.gz",
       "md5sum": "312f44607cef922725f21f3c7861135c",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6533,8 +6552,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.snv.g.vcf.gz",
       "md5sum": "159487ae09bacb35c4f8acf322c3dd86",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6550,8 +6575,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "502fbc2af7225ddc37861ec85b867db5",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6567,8 +6595,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "a2d4f24cd7be3b4af1a8a05d68d71edf",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6584,8 +6617,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.snv.vcf.gz",
       "md5sum": "b49eed18ca0c364e4f710de6e67df2ac",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6601,8 +6640,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.snv.g.vcf.gz",
       "md5sum": "786b00fc412403b8cb5c413bc9bd7a7a",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6618,8 +6663,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "a0b10afcacf2b70e005ca0cd219b606c",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6635,8 +6683,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "0584fbca8020c241cb79751bd3cf5d06",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6652,8 +6705,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.snv.vcf.gz",
       "md5sum": "3862ac327ac4c5d47efb4c7e7ba097c4",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6669,8 +6728,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.snv.g.vcf.gz",
       "md5sum": "5d4e992dfae6ea4ca7ff03da5299220b",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6686,8 +6751,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "5d40fe81cd036de37bda879bb7cdaeaa",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6703,8 +6771,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "dd1239a4d5e6b7418ecd1acdc0c37285",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6720,8 +6793,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004_Fam_chr1_SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004.snv.vcf.gz",
       "md5sum": "b89f5dde079ef987f6ef86b1bcdcc275",
-      "caller_software": "DeepVariant_version=1.5.0|GLNexus_version=v1.4.1",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "1"
     }
@@ -6737,8 +6816,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.snv.vcf.gz",
       "md5sum": "b1cb0884fbab36a436108f92989042e8",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6754,8 +6839,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.snv.g.vcf.gz",
       "md5sum": "b78c4c1bc9ac75f8999babeb1cd32a5d",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6771,8 +6862,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "37f1880ce212c5a179ddb816d2e940d6",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6788,8 +6882,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "7e7892dcc6dd0477dbe1dafeb3ac4ef2",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6805,8 +6904,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.snv.vcf.gz",
       "md5sum": "98e9a305af734659d790580f496142d2",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6822,8 +6927,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.snv.g.vcf.gz",
       "md5sum": "56e9270559d5e524d7928378f2b0efe4",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6839,8 +6950,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "8679abc801e832681ded228babd7d936",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6856,8 +6970,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "b9e5fd96592e64eb05e38bda4bb19982",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6873,8 +6992,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.snv.vcf.gz",
       "md5sum": "0e3660b72e3e2d3862bd32bbfdda7838",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6890,8 +7015,14 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.snv.g.vcf.gz",
       "md5sum": "6021eff438e64e0e25c7fdf0067ac550",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
     }
@@ -6907,8 +7038,11 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.sv.endpoint-lenient.vcf.gz",
       "md5sum": "86572ce8eacb28a5cb8cae1462f1aa6c",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6924,8 +7058,13 @@
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.sv.endpoint-strict.vcf.gz",
       "md5sum": "6e95f68de3f47f5e6a458d257b06419a",
-      "caller_software": "SVDB_version=2.8.2|manta_version=1.6.0|delly_version=v1.3.3|lumpy_version=0.2.13",
-      "variant_types": "SV",
+      "caller_software": [
+        "SVDB_version=2.8.2",
+        "manta_version=1.6.0",
+        "delly_version=v1.3.3",
+        "lumpy_version=0.2.13"
+      ],
+      "variant_types": ["SV"],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -7322,7 +7461,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7333,7 +7472,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7344,7 +7483,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7355,7 +7494,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7366,7 +7505,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7377,7 +7516,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": ["UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"]
     }
   },
   {
@@ -7388,7 +7527,11 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1\nUCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1\nUCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1",
+        "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1",
+        "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7402,8 +7545,14 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-NANO-joint-chr1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-NANO-joint.chr1.phased.vcf.gz",
       "md5sum": "69f8957a4dd665c6ae2487e51b10ef61",
-      "caller_software": "DeepVariant_version=1.5.0|GLNexus_version=v1.4.1",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "",
       "chrom": "1"
     }
@@ -7419,8 +7568,11 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-001-001-0.phased.vcf.gz",
       "md5sum": "936d7bf2fcc9702d95eb8cb2ba45d594",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7436,8 +7588,8 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-001-001-0.sniffles.vcf.gz",
       "md5sum": "f17939e60aa8c92474dd55b898ea2870",
-      "caller_software": "Sniffles=v2.0.3",
-      "variant_types": "SV",
+      "caller_software": ["Sniffles=v2.0.3"],
+      "variant_types": ["SV"],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7453,8 +7605,11 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-004-004-0.phased.vcf.gz",
       "md5sum": "229e2bb0cc9935d9cf6eeeae3bd678a7",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7470,8 +7625,8 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-004-004-0.sniffles.vcf.gz",
       "md5sum": "b6c8a71c68e77a5f026a536fd49a6f5c",
-      "caller_software": "Sniffles=v2.0.3",
-      "variant_types": "SV",
+      "caller_software": ["Sniffles=v2.0.3"],
+      "variant_types": ["SV"],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7487,8 +7642,11 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-006-006-0.phased.vcf.gz",
       "md5sum": "de66ae668203ea1af28396bc8151865a",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7504,8 +7662,8 @@
       "aligned_nanopore_set_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-006-006-0.sniffles.vcf.gz",
       "md5sum": "0d212f2586bcd3a65d63a7c6d25cdb1c",
-      "caller_software": "Sniffles=v2.0.3",
-      "variant_types": "SV",
+      "caller_software": ["Sniffles=v2.0.3"],
+      "variant_types": ["SV"],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7713,13 +7871,13 @@
   },
   {
     "model": "experiments.alignedpacbioset",
-    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_vcf_1",
+    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {
@@ -7730,18 +7888,18 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {
     "model": "experiments.alignedpacbioset",
-    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-pbsv_1",
+    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-pbsv_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {
@@ -7752,7 +7910,7 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {
@@ -7763,29 +7921,117 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {
     "model": "experiments.alignedpacbioset",
-    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
     }
   },
   {
     "model": "experiments.alignedpacbioset",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-pbsv_phased_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-hificnv_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-trgt_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_phased_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-pbsv_phased_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-hificnv_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-trgt_1",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
     }
   },
   {
@@ -7796,7 +8042,11 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1\nUCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1\nUCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1",
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7810,25 +8060,34 @@
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-joint-deepvariant-chr1_vcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001.GRCh38.deepvariant.chr1.vcf.gz",
       "md5sum": "69f8957a4dd665c6ae2487e51b10ef61",
-      "caller_software": "DeepVariant_version=1.5.0|GLNexus_version=v1.4.1",
-      "variant_types": "SNV|Indel",
+      "caller_software": [
+        "DeepVariant_version=1.5.0",
+        "GLNexus_version=v1.4.1"
+      ],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "1"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_vcf_1",
+    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_vcf_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.deepvariant.phased.vcf.gz",
       "md5sum": "35129f0eb034efc0d5256a1d64c8cca7",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7844,8 +8103,11 @@
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.deepvariant.g.vcf.gz",
       "md5sum": "409c9d1b8536329d69f9420b7ce290fa",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7858,11 +8120,11 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-pbsv_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.pbsv.phased.vcf.gz",
       "md5sum": "1ae118cdedbaeba443d2dee6a91ab7ac",
-      "caller_software": "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)",
-      "variant_types": "SV",
+      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7879,8 +8141,8 @@
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-001-001-0-D-2.vcf.gz",
       "md5sum": "32a14e3bddaf67f106a55afa6d5b40ab",
-      "caller_software": "source=hificnv v0.1.7-70e9988",
-      "variant_types": "CNV",
+      "caller_software": ["source=hificnv v0.1.7-70e9988"],
+      "variant_types": ["CNV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7896,25 +8158,28 @@
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
       "md5sum": "8a0ff19e407070869c605f7c9b80b3db",
-      "caller_software": "trgtVersion=0.5.0-a70fa16",
-      "variant_types": "RE",
+      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
+      "variant_types": ["RE"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.deepvariant.phased.vcf.gz",
       "md5sum": "3ec89391f86668a8d3309fcb439a5581",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7927,45 +8192,48 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.deepvariant.g.vcf.gz",
       "md5sum": "34c6226e9245c2a4f994b7bf9bb1e3b9",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-Called_pbsv_phased_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-pbsv_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.pbsv.phased.vcf.gz",
       "md5sum": "5b4c838b11925af208d7285db2ead3f8",
-      "caller_software": "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)",
-      "variant_types": "SV",
+      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-Called_hificnv_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-hificnv_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-002-001-2-D-2.vcf.gz",
       "md5sum": "dfa282ec5d8f3225b4a52d585ac5a946",
-      "caller_software": "source=hificnv v0.1.7-70e9988",
-      "variant_types": "CNV",
+      "caller_software": ["source=hificnv v0.1.7-70e9988"],
+      "variant_types": ["CNV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -7973,85 +8241,91 @@
 
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-Called_trgt_1",
+    "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-trgt_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
       "md5sum": "3e5ed7ae2b72ca4f975d7caee5fe15b8",
-      "caller_software": "trgtVersion=0.5.0-a70fa16",
-      "variant_types": "RE",
+      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
+      "variant_types": ["RE"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-Called_deepvariant_phased_vcf_1",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.deepvariant.phased.vcf.gz",
       "md5sum": "ca9be587841b5c388dc0ec5853b5fe22",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-Called_deepvariant_gvcf_1",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.deepvariant.g.vcf.gz",
       "md5sum": "6bee2de0edbe3ad91066c1d6fb3ee5e4",
-      "caller_software": "DeepVariant_version=1.5.0",
-      "variant_types": "SNV|Indel",
+      "caller_software": ["DeepVariant_version=1.5.0"],
+      "variant_types": [
+        "SNV",
+        "Indel"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-Called_pbsv_phased_1",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-pbsv_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.pbsv.phased.vcf.gz",
       "md5sum": "7d194af7751b3fd24ab88fe06fd40ba5",
-      "caller_software": "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)",
-      "variant_types": "SV",
+      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-Called_hificnv_1",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-hificnv_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-003-001-1-D-2.vcf.gz",
       "md5sum": "e456cef3b2e96e1246a23c34322fb7f9",
-      "caller_software": "source=hificnv v0.1.7-70e9988",
-      "variant_types": "CNV",
+      "caller_software": ["source=hificnv v0.1.7-70e9988"],
+      "variant_types": ["CNV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8059,17 +8333,17 @@
 
   {
     "model": "experiments.calledvariantspacbio",
-    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-Called_trgt_1",
+    "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-trgt_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1",
+      "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
       "md5sum": "953335999118aca5234be7f33dec366b",
-      "caller_software": "trgtVersion=0.5.0-a70fa16",
-      "variant_types": "RE",
+      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
+      "variant_types": ["RE"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }

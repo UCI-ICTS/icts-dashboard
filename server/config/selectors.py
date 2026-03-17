@@ -151,16 +151,6 @@ def multi_value_split(datum: dict) -> dict:
                 except Exception as oops:
                     error = oops
                     print(error, k, v)
-            elif "\n" in v:  # Only for aligned sets with multiple aligned IDs
-                try:
-                    split_datum[k] = [item.strip() for item in v.split("\n")]
-                except TypeError:
-                    split_datum[k] = v
-                except AttributeError:
-                    pass
-                except Exception as oops:
-                    error = oops
-                    print(error, k, v)
             else:
                 split_datum[k] = v.strip()
         else:
