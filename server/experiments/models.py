@@ -243,7 +243,7 @@ class AlignedDNAShortReadSet(TimeStampedModel):
         + "callset, and use that same value in called_variants_short_read.",
     )
     aligned_dna_short_read_id = models.ManyToManyField(
-        AlignedDNAShortRead,
+        "AlignedDNAShortRead",
         help_text="the identifiers for single-sample aligned_dna_short_reads"
         + " included in the read_set",
     )
@@ -814,7 +814,7 @@ class AlignedNanoporeSet(TimeStampedModel):
         + "callset, and use that same value in called_variants_nanopore.",
     )
     aligned_nanopore_id = models.ManyToManyField(
-        AlignedNanopore,
+        "AlignedNanopore",
         help_text="The identifier for a single-sample aligned_nanopore "
         + "included in the read set (one per row). This refers to IDs from the "
         + "aligned_nanopore table.",
@@ -1163,7 +1163,7 @@ class AlignedPacBioSet(TimeStampedModel):
         + "callset, and use that same value in called_variants_short_read.",
     )
     aligned_pac_bio_id = models.ManyToManyField(
-        AlignedPacBio,
+        "AlignedPacBio",
         help_text="The identifier for a single-sample aligned_pac_bio included "
         + "in the read set (one per row).",
     )

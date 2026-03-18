@@ -389,14 +389,47 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
     """
     aligned_dna_short_read_id = serializers.SlugRelatedField(
         many=True,
-        slug_field="name",
+        slug_field="aligned_dna_short_read_id",
         queryset=AlignedDNAShortRead.objects.all(),
         required=True,
-        allow_null=True,
     )
     class Meta:
         model = AlignedDNAShortReadSet
         fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_dna_short_read_ids = set(data.get("aligned_dna_short_read_id" or []))
+
+        if not isinstance(data.get("aligned_dna_short_read_id"), list):
+            errors.setdefault("aligned_dna_short_read_id", []).append("aligned_dna_short_read_id must be a list")
+
+        missing_aligned_dna_short_read_ids = [e for e in aligned_dna_short_read_ids if not AlignedDNAShortRead.objects.filter(pk=e).exists()]
+        if missing_aligned_dna_short_read_ids:
+            errors.setdefault("aligned_dna_short_read_id", []).append(
+                f"aligned_dna_short_read_id not found: {', '.join(map(str, missing_aligned_dna_short_read_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
 
     def create(self, validated_data):
         """Create a new AlignedDNAShortReadSet instance using the validated data and set the many-to-many relationships"""
@@ -546,10 +579,9 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
     """
     aligned_pac_bio_id = serializers.SlugRelatedField(
         many=True,
-        slug_field="name",
+        slug_field="aligned_pac_bio_set",
         queryset=AlignedPacBio.objects.all(),
         required=True,
-        allow_null=True,
     )
     class Meta:
         model = AlignedPacBioSet
@@ -670,10 +702,9 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
     """
     aligned_nanopore_id = serializers.SlugRelatedField(
         many=True,
-        slug_field="name",
+        slug_field="aligned_nanopore_id",
         queryset=AlignedNanopore.objects.all(),
         required=True,
-        allow_null=True,
     )
     class Meta:
         model = AlignedNanoporeSet
@@ -1156,53 +1187,17 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
                 short_read_aligned=datum
             ),
         },
-        "aligned_dna_short_read_set": {
-            "model": AlignedDNAShortReadSet,
-            "input_serializer": AlignedDNAShortReadSetSerializer,
-            "output_serializer": AlignedDNAShortReadSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_dna_short_read": {
-            "model": CalledVariantsDNAShortRead,
-            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
-            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
-        },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
-        "aligned_nanopore_set": {
-            "model": AlignedNanoporeSet,
-            "input_serializer": AlignedNanoporeSetSerializer,
-            "output_serializer": AlignedNanoporeSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_nanopore": {
-            "model": CalledVariantsNanopore,
-            "input_serializer": CalledVariantsNanoporeInputSerializer,
-            "output_serializer": CalledVariantsNanoporeOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
-        },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
-        },
-        "aligned_pac_bio_set": {
-            "model": AlignedPacBioSet,
-            "input_serializer": AlignedPacBioSetSerializer,
-            "output_serializer": AlignedPacBioSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_pac_bio": {
-            "model": CalledVariantsPacBio,
-            "intput_serializer": CalledVariantsPacBioInputSerializer,
-            "output_serializer": CalledVariantsPacBioOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
@@ -1330,53 +1325,17 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
                 short_read_aligned=datum
             ),
         },
-        "aligned_dna_short_read_set": {
-            "model": AlignedDNAShortReadSet,
-            "input_serializer": AlignedDNAShortReadSetSerializer,
-            "output_serializer": AlignedDNAShortReadSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_dna_short_read": {
-            "model": CalledVariantsDNAShortRead,
-            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
-            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum),
-        },
         "aligned_nanopore": {
             "model": AlignedNanopore,
             "input_serializer": AlignedNanoporeSerializer,
             "output_serializer": AlignedNanoporeSerializer,
             "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
         },
-        "aligned_nanopore_set": {
-            "model": AlignedNanoporeSet,
-            "input_serializer": AlignedNanoporeSetSerializer,
-            "output_serializer": AlignedNanoporeSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_nanopore": {
-            "model": CalledVariantsNanopore,
-            "input_serializer": CalledVariantsNanoporeInputSerializer,
-            "output_serializer": CalledVariantsNanoporeOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
-        },
         "aligned_pac_bio": {
             "model": AlignedPacBio,
             "input_serializer": AlignedPacBioSerializer,
             "output_serializer": AlignedPacBioSerializer,
             "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
-        },
-        "aligned_pac_bio_set": {
-            "model": AlignedPacBioSet,
-            "input_serializer": AlignedPacBioSetSerializer,
-            "output_serializer": AlignedPacBioSetSerializer,
-            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
-        },
-        "called_variants_pac_bio": {
-            "model": CalledVariantsPacBio,
-            "intput_serializer": CalledVariantsPacBioInputSerializer,
-            "output_serializer": CalledVariantsPacBioOutputSerializer,
-            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
@@ -1478,6 +1437,278 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
                     request_status="DELETED",
                     code=200,
                     data=f"{table_name} {identifier} and associated alignment deleted successfully.",
+                ),
+                "accepted_request",
+            )
+        else:
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data=f"{table_name} {identifier} not found.",
+                ),
+                "rejected_request",
+            )
+
+    except Exception as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ),
+            "rejected_request",
+        )
+
+
+def create_called(table_name: str, identifier: str, datum: dict, current_user: User):
+    """
+    Create new aligned_sets or called_variants
+    """
+    table_serializers = {
+        "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "called_variants_dna_short_read": {
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_nanopore": {
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_pac_bio": {
+            "model": CalledVariantsPacBio,
+            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+    }
+    model_input_serializer = table_serializers[table_name]["input_serializer"]
+    model_output_serializer = table_serializers[table_name]["output_serializer"]
+
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
+    else:
+        datum = remove_na(datum=datum)
+
+    table_validator = TableValidator()
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+    if results["valid"]:
+        serializer = model_input_serializer(data=datum)
+        if serializer.is_valid():
+            new_instance = serializer.save(changed_by=current_user)
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="CREATED",
+                    code=201,
+                    message=f"{table_name} {identifier} created.",
+                    data={"instance": model_output_serializer(new_instance).data},
+                ),
+                "accepted_request",
+            )
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=results["errors"],
+            ),
+            "rejected_request",
+        )
+
+
+def update_called(
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
+    """
+    Update an existing model instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to update.
+        identifier (str): The unique identifier for the model instance.
+        model_instance: The existing model instance to update.
+        datum (dict): The data to update the model instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "called_variants_dna_short_read": {
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_nanopore": {
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_pac_bio": {
+            "model": CalledVariantsPacBio,
+            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+    }
+
+    serializers = table_serializers.get(table_name)
+    if not serializers:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Unsupported table: {table_name}",
+            ),
+            "rejected_request",
+        )
+
+    if "parsed_data" in table_serializers[table_name]:
+        datum = table_serializers[table_name]["parsed_data"](datum)
+
+    with transaction.atomic():
+        input_serializer = serializers["input_serializer"]
+        output_serializer = serializers["output_serializer"]
+        changes = compare_data(
+            old_data=output_serializer(model_instance).data,
+            new_data=datum,
+        )
+
+        serializer = input_serializer(model_instance, data=datum, partial=True)
+
+        if serializer.is_valid():
+            updated_instance = serializer.save(changed_by=current_user)
+            message = (
+                f"{table_name} {identifier} updated."
+                if changes
+                else f"{table_name} {identifier} had no changes."
+            )
+            status_label = "UPDATED" if changes else "NO CHANGE"
+            code = 200 if changes else 204
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status=status_label,
+                    code=code,
+                    message=message,
+                    data={
+                        "updates": changes or None,
+                        "instance": output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+
+
+def delete_called(table_name: str, identifier: str, id_field: str = "id"):
+    """
+    Delete an existing model instance based on the provided identifier.
+
+    Args:
+        table_name (str): The name of the table (model) to delete from.
+        identifier (str): The unique identifier of the model instance.
+        id_field (str): The field used as an identifier (default is "id").
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    model_mapping = {
+        "aligned_dna_short_read_set": AlignedDNAShortReadSet,
+        "aligned_nanopore_set": AlignedNanoporeSet,
+        "aligned_pac_bio_set": AlignedPacBioSet,
+        "called_variants_dna_short_read": CalledVariantsDNAShortRead,
+        "called_variants_nanopore": CalledVariantsNanopore,
+        "called_variants_pac_bio": CalledVariantsPacBio,
+    }
+
+    model_class = model_mapping.get(table_name)
+    if not model_class:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Invalid table name: {table_name}",
+            ),
+            "rejected_request",
+        )
+
+    try:
+        instance = model_class.objects.filter(**{id_field: identifier}).first()
+        if instance:
+            instance.delete()
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="DELETED",
+                    code=200,
+                    data=f"{table_name} {identifier} deleted successfully.",
                 ),
                 "accepted_request",
             )
