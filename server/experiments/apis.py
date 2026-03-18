@@ -1114,7 +1114,6 @@ class AlignedDNAShortReadSetViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-
 class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -1837,7 +1836,6 @@ class AlignedPacBioSetViewSet(viewsets.ViewSet):
                 rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))
-
 
 
 class CalledVariantsPacBioViewSet(viewsets.ViewSet):

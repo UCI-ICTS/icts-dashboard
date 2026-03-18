@@ -393,9 +393,12 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
         queryset=AlignedDNAShortRead.objects.all(),
         required=True,
     )
+
+
     class Meta:
         model = AlignedDNAShortReadSet
         fields = "__all__"
+
 
     def _partial_helper(self, attrs):
         """
@@ -419,6 +422,10 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
 
         if not isinstance(data.get("aligned_dna_short_read_id"), list):
             errors.setdefault("aligned_dna_short_read_id", []).append("aligned_dna_short_read_id must be a list")
+        elif not aligned_dna_short_read_ids:
+            errors.setdefault("aligned_dna_short_read_id", []). append(
+                f"aligned_dna_short_read_id cannot be empty"
+            )
 
         missing_aligned_dna_short_read_ids = [e for e in aligned_dna_short_read_ids if not AlignedDNAShortRead.objects.filter(pk=e).exists()]
         if missing_aligned_dna_short_read_ids:
@@ -438,6 +445,7 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
         aligned_dna_short_read_set_instance.aligned_dna_short_read_id.set(aligned_dna_short_read_id_data)
 
         return aligned_dna_short_read_set_instance
+
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
@@ -481,15 +489,23 @@ class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
         data = self._partial_helper(attrs)
         errors = {}
 
-        valid_variant_types = [choice[0] for choice in VariantType.choices]
-
+        caller_softwares = set(data.get("caller_software") or [])
         variant_types = set(data.get("variant_type") or [])
 
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
         if not isinstance(data.get("variant_type"), list):
             errors.setdefault("variant_type", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
+            )
 
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
@@ -579,13 +595,54 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
     """
     aligned_pac_bio_id = serializers.SlugRelatedField(
         many=True,
-        slug_field="aligned_pac_bio_set",
+        slug_field="aligned_pac_bio_id",
         queryset=AlignedPacBio.objects.all(),
         required=True,
     )
+
+
     class Meta:
         model = AlignedPacBioSet
         fields = "__all__"
+
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_pac_bio_ids = set(data.get("aligned_pac_bio_id" or []))
+
+        if not isinstance(data.get("aligned_pac_bio_id"), list):
+            errors.setdefault("aligned_pac_bio_id", []).append("aligned_pac_bio_id must be a list")
+        elif not aligned_pac_bio_ids:
+            errors.setdefault("aligned_pac_bio_id", []). append(
+                f"aligned_pac_bio_id cannot be empty"
+            )
+
+        missing_aligned_pac_bio_ids = [e for e in aligned_pac_bio_ids if not AlignedPacBio.objects.filter(pk=e).exists()]
+        if missing_aligned_pac_bio_ids:
+            errors.setdefault("aligned_pac_bio_id", []).append(
+                f"aligned_pac_bio_id not found: {', '.join(map(str, aligned_pac_bio_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
 
     def create(self, validated_data):
         """Create a new AlignedPacBioSet instance using the validated data and set the many-to-many relationships"""
@@ -594,6 +651,7 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
         aligned_pac_bio_set_instance.aligned_pac_bio_id.set(aligned_pac_bio_id_data)
 
         return aligned_pac_bio_set_instance
+
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
@@ -638,15 +696,23 @@ class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
         data = self._partial_helper(attrs)
         errors = {}
 
-        valid_variant_types = [choice[0] for choice in VariantType.choices]
-
+        caller_softwares = set(data.get("caller_software") or [])
         variant_types = set(data.get("variant_type") or [])
 
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
         if not isinstance(data.get("variant_type"), list):
             errors.setdefault("variant_type", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
+            )
 
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
@@ -706,9 +772,50 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
         queryset=AlignedNanopore.objects.all(),
         required=True,
     )
+
+
     class Meta:
         model = AlignedNanoporeSet
         fields = "__all__"
+
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_nanopore_ids = set(data.get("aligned_nanopore_id" or []))
+
+        if not isinstance(data.get("aligned_nanopore_id"), list):
+            errors.setdefault("aligned_nanopore_id", []).append("aligned_nanopore_id must be a list")
+        elif not aligned_nanopore_ids:
+            errors.setdefault("aligned_nanopore_id", []). append(
+                f"aligned_nanopore_id cannot be empty"
+            )
+
+        missing_aligned_nanopore_ids = [e for e in aligned_nanopore_ids if not AlignedNanopore.objects.filter(pk=e).exists()]
+        if missing_aligned_nanopore_ids:
+            errors.setdefault("aligned_nanopore_id", []).append(
+                f"aligned_nanopore_id not found: {', '.join(map(str, aligned_nanopore_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
 
     def create(self, validated_data):
         """Create a new AlignedNanoporeSet instance using the validated data and set the many-to-many relationships"""
@@ -717,6 +824,7 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
         aligned_nanopore_set_instance.aligned_nanopore_id.set(aligned_nanopore_id_data)
 
         return aligned_nanopore_set_instance
+
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
@@ -760,15 +868,23 @@ class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
         data = self._partial_helper(attrs)
         errors = {}
 
-        valid_variant_types = [choice[0] for choice in VariantType.choices]
-
+        caller_softwares = set(data.get("caller_software") or [])
         variant_types = set(data.get("variant_type") or [])
 
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
         if not isinstance(data.get("variant_type"), list):
             errors.setdefault("variant_type", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_type", []). append(
+                f"variant_type cannot be empty"
+            )
 
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
@@ -779,11 +895,13 @@ class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
         return attrs
 
+
     def create(self, validated_data):
         """Create a new CalledVariantsNanopore instance using the validated data and set the many-to-many relationships"""
         called_variants_nanopore_instance = CalledVariantsNanopore.objects.create(**validated_data)
 
         return called_variants_nanopore_instance
+
 
     def update(self, instance, validated_data):
         """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""

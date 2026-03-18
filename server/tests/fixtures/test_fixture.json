@@ -6204,6 +6204,17 @@
   },
   {
     "model": "experiments.aligneddnashortreadset",
+    "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1-delete",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.aligneddnashortreadset",
     "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -7455,6 +7466,17 @@
   },
   {
     "model": "experiments.alignednanoporeset",
+    "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1-delete",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
+    }
+  },
+  {
+    "model": "experiments.alignednanoporeset",
     "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -7867,6 +7889,17 @@
       "methylation_called": true,
       "quality_issues": null,
       "fiberseq_format": false
+    }
+  },
+  {
+    "model": "experiments.alignedpacbioset",
+    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1-delete",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
     }
   },
   {

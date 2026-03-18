@@ -449,7 +449,6 @@ def parse_aligned_sets(aligned_set_datum: dict) -> dict:
 
     multi_value = ["aligned_dna_short_read_id", "aligned_nanopore_id", "aligned_pac_bio_id"]
     split_aligned_set_datum = multi_value_split(aligned_set_datum)
-
     for key in multi_value:
         try:
             if key in split_aligned_set_datum and not isinstance(split_aligned_set_datum[key], list):
