@@ -428,6 +428,7 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
             )
 
         missing_aligned_dna_short_read_ids = [e for e in aligned_dna_short_read_ids if not AlignedDNAShortRead.objects.filter(pk=e).exists()]
+        import pdb; pdb.set_trace()
         if missing_aligned_dna_short_read_ids:
             errors.setdefault("aligned_dna_short_read_id", []).append(
                 f"aligned_dna_short_read_id not found: {', '.join(map(str, missing_aligned_dna_short_read_ids))}"
@@ -624,7 +625,7 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = self._partial_helper(attrs)
         errors = {}
-        aligned_pac_bio_ids = set(data.get("aligned_pac_bio_id" or []))
+        aligned_pac_bio_ids = data.get("aligned_pac_bio_id" or [])
 
         if not isinstance(data.get("aligned_pac_bio_id"), list):
             errors.setdefault("aligned_pac_bio_id", []).append("aligned_pac_bio_id must be a list")
@@ -633,7 +634,7 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
                 f"aligned_pac_bio_id cannot be empty"
             )
 
-        missing_aligned_pac_bio_ids = [e for e in aligned_pac_bio_ids if not AlignedPacBio.objects.filter(pk=e).exists()]
+        missing_aligned_pac_bio_ids = [e for e in aligned_pac_bio_ids if not AlignedPacBio.objects.filter(pk=e.pk).exists()]
         if missing_aligned_pac_bio_ids:
             errors.setdefault("aligned_pac_bio_id", []).append(
                 f"aligned_pac_bio_id not found: {', '.join(map(str, aligned_pac_bio_ids))}"

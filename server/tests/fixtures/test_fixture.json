@@ -6523,7 +6523,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "1"
@@ -6546,7 +6546,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6569,7 +6569,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6634,7 +6634,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6657,7 +6657,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6722,7 +6722,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6745,7 +6745,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6810,7 +6810,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "1"
@@ -6833,7 +6833,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6856,7 +6856,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6921,7 +6921,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -6944,7 +6944,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -7009,7 +7009,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -7032,7 +7032,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "Invitae wgs calling v1.0",
       "chrom": "ALL"
@@ -7573,7 +7573,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "",
       "chrom": "1"
@@ -7593,7 +7593,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "",
       "chrom": "ALL"
@@ -7630,7 +7630,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "",
       "chrom": "ALL"
@@ -7667,7 +7667,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "",
       "chrom": "ALL"
@@ -8099,7 +8099,7 @@
       ],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "1"
@@ -8119,7 +8119,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
@@ -8139,7 +8139,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
@@ -8211,7 +8211,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
@@ -8231,7 +8231,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
@@ -8303,7 +8303,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
@@ -8323,7 +8323,7 @@
       "caller_software": ["DeepVariant_version=1.5.0"],
       "variant_types": [
         "SNV",
-        "Indel"
+        "INDEL"
       ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
