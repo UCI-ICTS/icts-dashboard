@@ -1,5 +1,5 @@
 # #!/usr/bin/env python3
-# # tests/test_apps/test_metadata/test_apis/test_dna_short_read_apis.py
+# # tests/test_apps/test_metadata/test_apis/test_nanopore_apis.py
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -43,57 +43,53 @@ class APITestCaseWithAuth(APITestCase):
         self.client.force_authenticate(user=self.user)
 
 
-class CreateCalledVariantsDNAShortReadAPITest(APITestCaseWithAuth):
-    def test_create_called_variants_dna_short_read_api(self):
-        url = "/api/experiments/called_variants_dna_short_read/create/"
+class CreateCalledVariantsNanoporeAPITest(APITestCaseWithAuth):
+    def test_create_called_variants_nanopore_api(self):
+        url = "/api/experiments/called_variants_nanopore/create/"
 
         called_variants1 = {  # New entry to be entered twice. Is valid the first time but not the second time
-            "called_variants_dna_short_read_id": "UCI_GREGoR_test-001_Fam_chr1_SNV_2",
-            "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001_Fam_chr1_SNV_1",
-            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001.chr1.snv.vcf.gz",
-            "md5sum": "a8281e14d62b8a6223409d4b8aed0b95",
+            "called_variants_nanopore_id": "UCI_GREGoR_test-NANO-joint-chr1-SNV_2",
+            "aligned_nanopore_set_id": "UCI_GREGoR_test-NANO-joint-chr1-SNV_1",
+            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-NANO-joint.chr1.phased.vcf.gz",
+            "md5sum": "1a437f17cc113817e59fcd9bb64a50e2",
             "caller_software": [
                 "DeepVariant_version=1.5.0",
-                "GLNexus_version=v1.4.1",
+                "GLNexus_version=v1.4.1"
             ],
             "variant_types": [
                 "SNV",
-                "INDEL",
+                "INDEL"
             ],
-            "analysis_details": "Invitae wgs calling v1.0",
-            "chrom": "1",
+            "analysis_details": "UCSC Nanopore Pipeline 2023-03-03",
+            "chrom": "1"
         }
 
         called_variants2 = {  # New entry
-            "called_variants_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_2",
-            "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1",
-            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.snv.vcf.gz",
-            "md5sum": "efc3f3fb63399c90694cf0da9dd4c01f",
-            "caller_software": [
-                "DeepVariant_version=1.5.0",
-            ],
+            "called_variants_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_2",
+            "aligned_nanopore_set_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_1",
+            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-004-004-0.phased.vcf.gz",
+            "md5sum": "7147fbc6543730fbea97acebfb54e961",
+            "caller_software": ["DeepVariant_version=1.5.0"],
             "variant_types": [
                 "SNV",
-                "INDEL",
+                "INDEL"
             ],
-            "analysis_details": "Invitae wgs calling v1.0",
-            "chrom": "ALL",
+            "analysis_details": "UCSC Nanopore Pipeline 2023-03-03",
+            "chrom": "ALL"
         }
 
         called_variants3 = {  # New entry, invalid
-            "called_variants_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_2",
-            "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_1",
-            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.snv.vcf.gz",
-            "md5sum": "4418b27f440f2723a32a3a73c5568331",
-            "caller_software": [
-                "DeepVariant_version=1.5.0",
-            ],
+            "called_variants_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SNV_2",
+            "aligned_nanopore_set_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SNV_1",
+            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-006-006-0.phased.vcf.gz",
+            "md5sum": "f1665d870d56e4609fbbdff124547176",
+            "caller_software": [],  # Invalid, must have a value
             "variant_types": [
                 "SNV",
-                "INDEL",
+                "INDEL"
             ],
-            "analysis_details": "Invitae wgs calling v1.0",
-            "chrom": "",  # Invalid selection
+            "analysis_details": "UCSC Nanopore Pipeline 2023-03-03",
+            "chrom": "ALL"
         }
 
         response_200 = self.client.post(url, [called_variants2], format="json")
@@ -109,11 +105,11 @@ class CreateCalledVariantsDNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ReadCalledVariantsDNAShortReadAPITest(APITestCaseWithAuth):
-    def test_read_called_variants_dna_short_read(self):
-        url1 = "/api/experiments/called_variants_dna_short_read/?ids=UCI_GREGoR_test-001_Fam_chr1_SNV_1"
-        url2 = "/api/experiments/called_variants_dna_short_read/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1,DNE-01-1"
-        url3 = "/api/experiments/called_variants_dna_short_read/?ids=DNE-1,DNE2"
+class ReadCalledVariantsNanoporeAPITest(APITestCaseWithAuth):
+    def test_read_called_variants_nanopore(self):
+        url1 = "/api/experiments/called_variants_nanopore/?ids=UCI_GREGoR_test-NANO-joint-chr1-SNV_1"
+        url2 = "/api/experiments/called_variants_nanopore/?ids=UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_1,DNE-01-1"
+        url3 = "/api/experiments/called_variants_nanopore/?ids=DNE-1,DNE2"
 
         response_200 = self.client.get(url1, format="json")
         response_207 = self.client.get(url2, format="json")
@@ -123,24 +119,23 @@ class ReadCalledVariantsDNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
-    def test_update_called_variants_dna_short_read_api(self):
-        url = "/api/experiments/called_variants_dna_short_read/update/"
-
+class UpdateNanoporeAPITest(APITestCaseWithAuth):
+    def test_update_called_variants_nanopore_api(self):
+        url = "/api/experiments/called_variants_nanopore/update/"
         called_variants1 = {  # Valid, edited analysis_details
-            "called_variants_dna_short_read_id": "UCI_GREGoR_test-001_Fam_chr1_SNV_1",
-            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001.chr1.snv.anno.vcf.gz",  # new vcf file
-            "md5sum": "b1e5aff3080288fdbf2e4faabe98e4dc",  # new md5sum
+            "called_variants_nanopore_id": "UCI_GREGoR_test-NANO-joint-chr1-SNV_1",
+            "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-NANO-joint.chr1.phased.anno.vcf.gz",  # new vcf file
+            "md5sum": "4097b353167528799589bca1d3bdc3b9",  # new md5sum
             "caller_software": [
-                "SNV",
-                "INDEL",
-                "ANNOVAR=20250721",  # new annotation tool
+                "DeepVariant_version=1.5.0",
+                "GLNexus_version=v1.4.1",
+                "ANNOVAR=20250721",  # New tool added
             ],
-            "analysis_details": "Invitae wgs calling v1.0. Annotated with ANNOVAR.",
+            "analysis_details": "UCSC Nanopore Pipeline 2023-03-03. Annotated with ANNOVAR",  # new description
         }
 
         called_variants2 = {  # Invalid variant_types
-            "called_variants_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1",
+            "called_variants_nanopore_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1",
             "variant_types": [
                 "small variants",  # invalid
             ],
@@ -159,10 +154,10 @@ class UpdateDNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
 
-class DeleteCalledVariantsDNAShortReadAPITest(APITestCaseWithAuth):
-    def test_delete_dna_short_read_api(self):
-        url2 = "/api/experiments/called_variants_dna_short_read/delete/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1,DNE-01-1"
-        url3 = "/api/experiments/called_variants_dna_short_read/delete/?ids=DNE-1,DNE2"
+class DeleteCalledVariantsNanoporeAPITest(APITestCaseWithAuth):
+    def test_delete_nanopore_api(self):
+        url2 = "/api/experiments/called_variants_nanopore/delete/?ids=UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_1,DNE-01-1"
+        url3 = "/api/experiments/called_variants_nanopore/delete/?ids=DNE-1,DNE2"
 
         response_207 = self.client.delete(url2, format="json")
         response_400 = self.client.delete(url3, format="json")

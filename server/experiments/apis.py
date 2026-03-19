@@ -56,9 +56,10 @@ from experiments.services import (
     ExperimentDNAInputSerializer,
     ExperimentDNAOutputSerializer,
     create_experiment,
-    update_experiments_entry,
+    update_experiment,
     delete_experiment,
     create_aligned,
+    update_aligned,
     delete_aligned,
     create_called,
     update_called,
@@ -296,7 +297,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_rna_short_read",
                     experiment_rna_short_read_id,
                     experiment_rna_short_read[experiment_rna_short_read_id],
@@ -488,7 +489,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_rna_short_read",
                     aligned_rna_short_read_id,
                     aligned_rna_short_read[aligned_rna_short_read_id],
@@ -677,7 +678,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_dna_short_read",
                     experiment_dna_short_read_id,
                     experiment_dna_short_read[experiment_dna_short_read_id],
@@ -866,7 +867,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_dna_short_read",
                     aligned_dna_short_read_id,
                     aligned_dna_short_read[aligned_dna_short_read_id],
@@ -1412,7 +1413,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_pac_bio",
                     experiment_pac_bio_id,
                     experiment_pac_bio[experiment_pac_bio_id],
@@ -1594,7 +1595,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_pac_bio",
                     aligned_pac_bio_id,
                     aligned_pac_bio[aligned_pac_bio_id],
@@ -1879,7 +1880,7 @@ class CalledVariantsPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_aligned(
+                data, result = create_called(
                     "called_variants_pac_bio", called_variants_pac_bio_id, datum, self.request.user
                 )
                 response_data.append(data)
@@ -2136,7 +2137,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_nanopore",
                     experiment_nanopore_id,
                     experiment_nanopore[experiment_nanopore_id],
@@ -2320,7 +2321,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_nanopore",
                     aligned_nanopore_id,
                     aligned_nanopore[aligned_nanopore_id],
@@ -2606,7 +2607,7 @@ class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = create_aligned(
+                data, result = create_called(
                     "called_variants_nanopore", called_variants_nanopore_id, datum, self.request.user
                 )
                 response_data.append(data)

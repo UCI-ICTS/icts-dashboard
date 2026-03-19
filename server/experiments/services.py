@@ -428,7 +428,6 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
             )
 
         missing_aligned_dna_short_read_ids = [e for e in aligned_dna_short_read_ids if not AlignedDNAShortRead.objects.filter(pk=e).exists()]
-        import pdb; pdb.set_trace()
         if missing_aligned_dna_short_read_ids:
             errors.setdefault("aligned_dna_short_read_id", []).append(
                 f"aligned_dna_short_read_id not found: {', '.join(map(str, missing_aligned_dna_short_read_ids))}"
@@ -491,16 +490,15 @@ class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
         errors = {}
 
         caller_softwares = set(data.get("caller_software") or [])
-        variant_types = set(data.get("variant_type") or [])
-
+        variant_types = set(data.get("variant_types") or [])
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
         elif not caller_softwares:
             errors.setdefault("caller_software", []). append(
                 f"caller_software cannot be empty"
             )
-        if not isinstance(data.get("variant_type"), list):
-            errors.setdefault("variant_type", []).append("variant_types must be a list")
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
         elif not variant_types:
             errors.setdefault("variant_types", []). append(
                 f"variant_types cannot be empty"
@@ -510,7 +508,7 @@ class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
-                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
             )
 
         if errors:
@@ -698,7 +696,7 @@ class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
         errors = {}
 
         caller_softwares = set(data.get("caller_software") or [])
-        variant_types = set(data.get("variant_type") or [])
+        variant_types = set(data.get("variant_types") or [])
 
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
@@ -706,8 +704,8 @@ class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
             errors.setdefault("caller_software", []). append(
                 f"caller_software cannot be empty"
             )
-        if not isinstance(data.get("variant_type"), list):
-            errors.setdefault("variant_type", []).append("variant_types must be a list")
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
         elif not variant_types:
             errors.setdefault("variant_types", []). append(
                 f"variant_types cannot be empty"
@@ -717,7 +715,7 @@ class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
-                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
             )
 
         if errors:
@@ -870,7 +868,7 @@ class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
         errors = {}
 
         caller_softwares = set(data.get("caller_software") or [])
-        variant_types = set(data.get("variant_type") or [])
+        variant_types = set(data.get("variant_types") or [])
 
         if not isinstance(data.get("caller_software"), list):
             errors.setdefault("caller_software", []).append("caller_software must be a list")
@@ -878,18 +876,18 @@ class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
             errors.setdefault("caller_software", []). append(
                 f"caller_software cannot be empty"
             )
-        if not isinstance(data.get("variant_type"), list):
-            errors.setdefault("variant_type", []).append("variant_types must be a list")
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
         elif not variant_types:
-            errors.setdefault("variant_type", []). append(
-                f"variant_type cannot be empty"
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
             )
 
         valid_variant_types = [choice[0] for choice in VariantType.choices]
         bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
         if bad_variant_types:
             errors.setdefault("variant_types", []).append(
-                f" invalid variant_type {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
             )
 
         if errors:
@@ -1110,7 +1108,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict, current_use
         )
 
 
-def update_experiments_entry(
+def update_experiment(
     table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing experiment instance based on the provided data.
@@ -1463,42 +1461,64 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
         },
     }
-    serializer = table_serializers.get(table_name)
+    serializers = table_serializers.get(table_name)
 
-    if serializer.is_valid():
-        updated_instance = serializer.save(changed_by=current_user)
-        changes = compare_data(
-            old_data=table_serializers[table_name]["output_serializer"](
-                model_instance
-            ).data,
-            new_data=datum,
-        )
-        return (
-            response_constructor(
-                identifier=identifier,
-                request_status="UPDATED",
-                code=200,
-                message=f"{table_name} {identifier} updated.",
-                data={
-                    "updates": changes,
-                    "instance": table_serializers[table_name]["output_serializer"](
-                        updated_instance
-                    ).data,
-                },
-            ),
-            "accepted_request",
-        )
-    else:
-        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+    if not serializers:
         return (
             response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
+                data=f"Unsupported table: {table_name}",
             ),
             "rejected_request",
         )
+
+    with transaction.atomic():
+        input_serializer = serializers["input_serializer"]
+        output_serializer = serializers["output_serializer"]
+        changes = compare_data(
+            old_data=output_serializer(model_instance).data,
+            new_data=datum,
+        )
+
+        serializer = input_serializer(model_instance, data=datum, partial=True)
+
+        if serializer.is_valid():
+            updated_instance = serializer.save(changed_by=current_user)
+
+            message = (
+                f"{table_name} {identifier} updated."
+                if changes
+                else f"{table_name} {identifier} had no changes."
+            )
+            status_label = "UPDATED" if changes else "NO CHANGE"
+            code = 200 if changes else 204
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status=status_label,
+                    code=code,
+                    message=message,
+                    data={
+                        "updates": changes or None,
+                        "instance": output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
 
 
 def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
@@ -1619,7 +1639,7 @@ def create_called(table_name: str, identifier: str, datum: dict, current_user: U
         },
         "called_variants_pac_bio": {
             "model": CalledVariantsPacBio,
-            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "input_serializer": CalledVariantsPacBioInputSerializer,
             "output_serializer": CalledVariantsPacBioOutputSerializer,
             "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
@@ -1719,7 +1739,7 @@ def update_called(
         },
         "called_variants_pac_bio": {
             "model": CalledVariantsPacBio,
-            "intput_serializer": CalledVariantsPacBioInputSerializer,
+            "input_serializer": CalledVariantsPacBioInputSerializer,
             "output_serializer": CalledVariantsPacBioOutputSerializer,
             "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
         },
