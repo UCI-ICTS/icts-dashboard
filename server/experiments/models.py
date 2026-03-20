@@ -267,20 +267,29 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
     """
 
     called_variants_dna_short_read_id = models.CharField(
-        max_length=255, primary_key=True
+        max_length=255,
+        primary_key=True,
+        help_text="Unique key for table (anvil requirement).",
     )
     aligned_dna_short_read_set_id = models.ForeignKey(
-        AlignedDNAShortReadSet, on_delete=models.PROTECT
+        AlignedDNAShortReadSet,
+        on_delete=models.PROTECT,
+        help_text="Identifier for experiment set. This refers to IDs from the "
+        + "aligned_dna_short_read_set table.",
     )
     called_variants_dna_file = models.CharField(max_length=255)
     md5sum = models.CharField(max_length=32)
-    caller_software = models.CharField(max_length=255)
+    caller_software = models.JSONField(
+        default=list,
+        help_text="Name and path of the file with variant calls. Stored as a "
+        + "unique bucket path.",
+    )
     variant_types = models.JSONField(
         default=list,
         choices=VariantType.choices,
         help_text="can add more values as the need arises\nif there are two "
         + "VCFs for SNV and Indels, there would be two different lines in this "
-        + "table; if combined in one VCF, a |-delimited entry"
+        + "table; if combined in one VCF, a |-delimited entry",
     )
     analysis_details = models.TextField(
         blank=True,
@@ -292,7 +301,7 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
     chrom = models.CharField(
         max_length=10,
         choices=Chrom,
-        help_text="chromosome of the variants in the VCF file"
+        help_text="chromosome of the variants in the VCF file",
     )
 
     def __str__(self):
@@ -846,8 +855,8 @@ class CalledVariantsNanopore(TimeStampedModel):
         help_text="MD5 checksum for file, computed prior to upload to verify "
         + "file integrity.",
     )
-    caller_software = models.CharField(
-        max_length=255,
+    caller_software = models.JSONField(
+        default=list,
         help_text="Variant calling software used including version number.",
     )
     variant_types = models.JSONField(
@@ -1194,8 +1203,8 @@ class CalledVariantsPacBio(TimeStampedModel):
         help_text="MD5 checksum for file. md5sum computed prior to upload "
         + "(used to verify file integrity).",
     )
-    caller_software = models.CharField(
-        max_length=255,
+    caller_software = models.JSONField(
+        default=list,
         help_text="Variant calling software used including version number.",
     )
     variant_types = models.JSONField(

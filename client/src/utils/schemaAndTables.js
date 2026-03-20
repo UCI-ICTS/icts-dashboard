@@ -259,14 +259,14 @@ export const foreignKeyFields = {
     }
   },
   aligned_dna_short_read: {
-    experiment_dna_short_read_id:{
+    experiment_dna_short_read_id: {
       sourceTable: "experiment_dna_short_read",
       valueKey: "experiment_dna_short_read_id",
       apiKey: "experiment_dna_short_read",
     }
   },
   aligned_rna_short_read: {
-    experiment_rna_short_read_id:{
+    experiment_rna_short_read_id: {
       sourceTable: "experiment_rna_short_read",
       valueKey: "experiment_rna_short_read_id",
       apiKey: "experiment_rna_short_read",
@@ -280,10 +280,52 @@ export const foreignKeyFields = {
     }
   },
   aligned_nanopore: {
-    experiment_nanopore_id:{
+    experiment_nanopore_id: {
       sourceTable: "experiment_nanopore",
       valueKey: "experiment_nanopore_id",
       apiKey: "experiment_nanopore",
+    }
+  },
+  aligned_dna_short_read_set: {
+    aligned_dna_short_read_id: {
+      sourceTable: "aligned_dna_short_read",
+      valueKey: "aligned_dna_short_read_id",
+      apiKey: "aligned_dna_short_read",
+    }
+  },
+  aligned_nanopore_set: {
+    aligned_nanopore_id: {
+      sourceTable: "aligned_nanopore",
+      valueKey: "aligned_nanopore_id",
+      apiKey: "aligned_nanopore",
+    }
+  },
+  aligned_pac_bio_set: {
+    aligned_pac_bio_id: {
+      sourceTable: "aligned_pac_bio",
+      valueKey: "aligned_pac_bio_id",
+      apiKey: "aligned_pac_bio",
+    }
+  },
+  called_variants_dna_short_read: {
+    aligned_dna_short_read_set_id: {
+      sourceTable: "aligned_dna_short_read_set",
+      valueKey: "aligned_dna_short_read_set_id",
+      apiKey: "aligned_dna_short_read_set",
+    }
+  },
+  called_variants_nanopore: {
+    aligned_nanopore_set_id: {
+      sourceTable: "aligned_nanopore_set",
+      valueKey: "aligned_nanopore_set_id",
+      apiKey: "aligned_nanopore_set",
+    }
+  },
+  called_variants_pac_bio: {
+    aligned_pac_bio_set_id: {
+      sourceTable: "aligned_pac_bio_set",
+      valueKey: "aligned_pac_bio_set_id",
+      apiKey: "aligned_pac_bio_set",
     }
   },
 };
@@ -303,6 +345,12 @@ export const defaultVisibleColumns = {
   aligned_nanopore: ["aligned_nanopore_id"],
   aligned_pac_bio: ["aligned_pac_bio_id"],
   aligned_rna_short_read: ["aligned_rna_short_read_id"],
+  aligned_dna_short_read_set: ["aligned_dna_short_read_id"],
+  aligned_nanopore_set: ["aligned_nanopore_id"],
+  aligned_pac_bio_set: ["aligned_pac_bio_id"],
+  called_variants_dna_short_read: ["aligned_dna_short_read_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
+  called_variants_nanopore: ["aligned_nanopore_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
+  called_variants_pac_bio: ["aligned_pac_bio_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
 };
 
 export const onsetAgeRange = {
@@ -454,9 +502,15 @@ export const TABLE_MAPPING = [
   { name: "PacBio", schema: "experiment_pac_bio", identifier: "experiment_pac_bio_id" },
   { name: "NanoPore", schema: "experiment_nanopore", identifier: "experiment_nanopore_id" },
   { name: "Aligned DNA Short Read", schema: "aligned_dna_short_read", identifier: "aligned_dna_short_read_id" },
-  { name: "Aligned NanoPore", schema: "aligned_nanopore", identifier: "aligned_nanopore_id" },
-  { name: "Aligned Pac Bio", schema: "aligned_pac_bio", identifier: "aligned_pac_bio_id" },
+  { name: "Aligned Nanopore", schema: "aligned_nanopore", identifier: "aligned_nanopore_id" },
+  { name: "Aligned PacBio", schema: "aligned_pac_bio", identifier: "aligned_pac_bio_id" },
   { name: "Aligned RNA Short Read", schema: "aligned_rna_short_read", identifier: "aligned_rna_short_read_id" },
+  { name: "Aligned DNA Short Read Set", schema: "aligned_dna_short_read_set", identifier: "aligned_dna_short_read_set_id"},
+  { name: "Aligned Nanopore Set", schema: "aligned_nanopore_set", identifier: "aligned_nanopore_set_id" },
+  { name: "Aligned PacBio Set", schema: "aligned_pac_bio_set", identifier: "aligned_pac_bio_set_id" },
+  { name: "Called Variants DNA Short Read", schema: "called_variants_dna_short_read", identifier: "called_variants_dna_short_read_id"},
+  { name: "Called Variants Nanopore", schema: "called_variants_nanopore", identifier: "called_variants_nanopore_id"},
+  { name: "Called Variants PacBio", schema: "called_variants_pac_bio", identifier: "called_variants_pac_bio_id"},
 ];
 
 /**

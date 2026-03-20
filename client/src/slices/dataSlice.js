@@ -4,6 +4,7 @@ import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
 import { getTableName } from "../utils/schemaAndTables";
+import { calc } from "antd/es/theme/internal";
 
 const initialState = {
   tableView: "participants",
@@ -28,6 +29,12 @@ const initialState = {
   aligned_nanopore: [],
   aligned_pac_bio: [],
   aligned_rna_short_read: [],
+  aligned_dna_short_read_set: [],
+  aligned_nanopore_set: [],
+  aligned_pac_bio_set: [],
+  called_variants_dna_short_read: [],
+  called_variants_nanopore: [],
+  called_variants_pac_bio: [],
   rag_hpos: [],
   status: "idle"
 };
@@ -38,7 +45,7 @@ export const dataSlice = createSlice({
   reducers: {
     replaceRagHpoChoice: (state, action) => {
       const {id, choice} = action.payload;
-      const index = state.rag_hpos.findIndex(item => item.id === id) 
+      const index = state.rag_hpos.findIndex(item => item.id === id)
       if (index !== -1) {
         state.rag_hpos[index].choice = choice
       }
@@ -90,7 +97,13 @@ export const dataSlice = createSlice({
           aligned_dna_short_read,
           aligned_nanopore,
           aligned_pac_bio,
-          aligned_rna_short_read
+          aligned_rna_short_read,
+          aligned_dna_short_read_set,
+          aligned_nanopore_set,
+          aligned_pac_bio_set,
+          called_variants_dna_short_read,
+          called_variants_nanopore,
+          called_variants_pac_bio
         } = action.payload;
 
         Object.assign(state, {
@@ -110,6 +123,12 @@ export const dataSlice = createSlice({
           aligned_nanopore,
           aligned_pac_bio,
           aligned_rna_short_read,
+          aligned_dna_short_read_set,
+          aligned_nanopore_set,
+          aligned_pac_bio_set,
+          called_variants_dna_short_read,
+          called_variants_nanopore,
+          called_variants_pac_bio,
           status: "fulfilled"
         });
       })
@@ -186,7 +205,13 @@ export const dataSlice = createSlice({
                                  table === "aligned_dna_short_read" ? "aligned_dna_short_read" :
                                  table === "aligned_nanopore" ? "aligned_nanopore" :
                                  table === "aligned_pac_bio_id" ? "aligned_pac_bio" :
-                                 table === "aligned_rna_short_read" ? "aligned_rna_short_read" : null
+                                 table === "aligned_rna_short_read" ? "aligned_rna_short_read" :
+                                 table === "aligned_dna_short_read_set" ? "aligned_dna_short_read_set" :
+                                 table === "aligned_nanopore_set" ? "aligned_nanopore_set" :
+                                 table === "aligned_pac_bio_set" ? "aligned_pac_bio_set" :
+                                 table === "called_variants_dna_short_read" ? "called_variants_dna_short_read" :
+                                 table === "called_variants_nanopore" ? "called_variants_nanopore" :
+                                 table === "called_variants_pac_bio" ? "called_variants_pac_bio" : null
 
           if (collectionName && state[collectionName]) {
             // Find the object to add in the relevant collection

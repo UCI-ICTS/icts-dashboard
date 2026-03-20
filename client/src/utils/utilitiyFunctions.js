@@ -3,7 +3,7 @@
 import { message } from "antd";
 
 export const dataDownload = ({filename, displayData, visibleKeys, exportFormat, schema}) => {
-    
+
     // Safe checks — no crashes
     if (!displayData || (Array.isArray(displayData) && displayData.length === 0)) {
     message.warning("No data to export.");
@@ -61,7 +61,7 @@ export const dataDownload = ({filename, displayData, visibleKeys, exportFormat, 
 
       // Combine headers and rows
       fileContent = [headers, ...fileRows].join("\n");
-  
+
     } else if (exportFormat === "JSON") {
       fileExtension = "json";
       mimeType = "application/json;charset=utf-8";

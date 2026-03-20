@@ -9,10 +9,10 @@ export function useTableSettings({
   storagePrefix = "columns" // optional namespace
 }) {
   const keys = useMemo(() => Object.keys(schema?.properties || {}), [schema]);
-  const storage = persist ? localStorage : { 
-    getItem: () => null, 
-    setItem: () => {}, 
-    removeItem: () => {} 
+  const storage = persist ? localStorage : {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {}
   };
 
   const storageKey = `${storagePrefix}:${tableKey}`;
