@@ -364,6 +364,7 @@
         "properties": {
             "genetic_findings_id": {
                 "type": "string",
+                "pattern": "^[a-zA-Z0-9_\\.-]+$",
                 "description": "Unique ID of this variant in this participant (primary key)\n\nNotes: RC submitted unique variant ID\n- Useful for tracking in downstream functional studies (i.e. V2F clickup database). \n- RC submitted but encourage conventional naming (genomic coordinate + participant id)",
                 "examples": [
                     "4_25145092_Broad_RGP_1432"

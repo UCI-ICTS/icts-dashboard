@@ -20,9 +20,30 @@ from metadata.services import (
 class ServicesTests(TestCase):
     fixtures = ["tests/fixtures/test_fixture.json"]
 
+    def test_bad_genetic_findings_serializer_create(self):
+        data = {
+            "genetic_findings_id": "1:123456_GF001",  # Invalid chars in id
+            "participant_id": Participant.objects.first().participant_id,
+            "experiment_id": [
+                "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1",
+                "experiment_pac_bio.UCI_GREGoR_test-001-001-0-D-2_PB_1",
+            ],
+            "variant_type": ["SNV"],
+            "gene_of_interest": ["PQBP1"],
+            "variant_reference_assembly": "GRCh38",
+            "chrom": "1",
+            "pos": 123456,
+            "ref": "A",
+            "alt": "T",
+            "zygosity": "Homozygous",
+            "variant_inheritance": "biparental",
+        }
+        serializer = GeneticFindingsInputSerializer(data=data)
+        self.assertFalse(serializer.is_valid(), serializer.errors)
+
     def test_genetic_findings_serializer_create(self):
         data = {
-            "genetic_findings_id": "GF001",
+            "genetic_findings_id": "1_123456_GF001",  # valid findings id
             "participant_id": Participant.objects.first().participant_id,
             "experiment_id": [
                 "experiment_nanopore.UCI_GREGoR_test-004-004-0-D-3_NANO_1",
@@ -41,7 +62,7 @@ class ServicesTests(TestCase):
         serializer = GeneticFindingsInputSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         instance = serializer.save()
-        self.assertEqual(instance.genetic_findings_id, "GF001")
+        self.assertEqual(instance.genetic_findings_id, "1_123456_GF001")
 
     def test_analyte_serializer_create(self):
         data = {

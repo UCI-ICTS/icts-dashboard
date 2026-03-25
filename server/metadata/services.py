@@ -222,6 +222,14 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
             if bad_method_of_discovery:
                 f"invalid: {bad_method_of_discovery} (valid: {', '.join(sorted(valid_method_of_discovery))})"
 
+        # genetic_findings_id must match valid character list ^[a-zA-Z0-9_\.-]+$
+        genetic_findings_id = data.get("genetic_findings_id")
+        valid_chars = re.compile(r"^[a-zA-Z0-9_\.-]+$")
+        if not valid_chars.match(genetic_findings_id):
+            errors.setdefault("genetic_findings_id", []).append(
+                f"invalid character(s) in genetic_findings_id"
+            )
+
         if errors:
             raise serializers.ValidationError(errors)
         return attrs
