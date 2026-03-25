@@ -10,12 +10,17 @@ from config.selectors import (
     compare_data,
     TableValidator,
 )
-
 from experiments.models import (
     Aligned,
     AlignedDNAShortRead,
+    AlignedDNAShortReadSet,
+    CalledVariantsDNAShortRead,
     AlignedNanopore,
+    AlignedNanoporeSet,
+    CalledVariantsNanopore,
     AlignedPacBio,
+    AlignedPacBioSet,
+    CalledVariantsPacBio,
     AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
@@ -25,6 +30,7 @@ from experiments.models import (
     LibraryPrepType,
     PrepTargetsDetail,
     ExperimentType,
+    VariantType,
 )
 from experiments.selectors import (
     parse_nanopore,
@@ -36,6 +42,8 @@ from experiments.selectors import (
     parse_pac_bio,
     parse_pac_bio_aligned,
     swap_experiment_aligned,
+    parse_aligned_sets,
+    parse_called_variants,
 )
 
 from metadata.selectors import get_analyte
@@ -375,6 +383,168 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedDNAShortReadSetSerializer
+    """
+    aligned_dna_short_read_id = serializers.SlugRelatedField(
+        many=True,
+        slug_field="aligned_dna_short_read_id",
+        queryset=AlignedDNAShortRead.objects.all(),
+        required=True,
+    )
+
+
+    class Meta:
+        model = AlignedDNAShortReadSet
+        fields = "__all__"
+
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_dna_short_read_ids = set(data.get("aligned_dna_short_read_id" or []))
+
+        if not isinstance(data.get("aligned_dna_short_read_id"), list):
+            errors.setdefault("aligned_dna_short_read_id", []).append("aligned_dna_short_read_id must be a list")
+        elif not aligned_dna_short_read_ids:
+            errors.setdefault("aligned_dna_short_read_id", []). append(
+                f"aligned_dna_short_read_id cannot be empty"
+            )
+
+        missing_aligned_dna_short_read_ids = [e for e in aligned_dna_short_read_ids if not AlignedDNAShortRead.objects.filter(pk=e).exists()]
+        if missing_aligned_dna_short_read_ids:
+            errors.setdefault("aligned_dna_short_read_id", []).append(
+                f"aligned_dna_short_read_id not found: {', '.join(map(str, missing_aligned_dna_short_read_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+
+    def create(self, validated_data):
+        """Create a new AlignedDNAShortReadSet instance using the validated data and set the many-to-many relationships"""
+        aligned_dna_short_read_id_data = validated_data.pop("aligned_dna_short_read_id", [])
+        aligned_dna_short_read_set_instance = AlignedDNAShortReadSet.objects.create(**validated_data)
+        aligned_dna_short_read_set_instance.aligned_dna_short_read_id.set(aligned_dna_short_read_id_data)
+
+        return aligned_dna_short_read_set_instance
+
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        aligned_dna_short_read_id_data = validated_data.pop("aligned_dna_short_read_id", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if aligned_dna_short_read_id_data is not None:
+            instance.aligned_dna_short_read_id.set(aligned_dna_short_read_id_data)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
+    """
+    """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
+    class Meta:
+        model = CalledVariantsDNAShortRead
+        fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        caller_softwares = set(data.get("caller_software") or [])
+        variant_types = set(data.get("variant_types") or [])
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
+            )
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsDNAShortRead instance using the validated data and set the many-to-many relationships"""
+        called_variants_dna_short_read_instance = CalledVariantsDNAShortRead.objects.create(**validated_data)
+
+        return called_variants_dna_short_read_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsDNAShortReadOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsDNAShortReadSerializder
+    """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
+    class Meta:
+        model = CalledVariantsDNAShortRead
+        fields = "__all__"
+
+
 class AlignedSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedSerializer
@@ -418,12 +588,341 @@ class AlignedPacBioSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AlignedPacBioSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedPacBioSetSerializer
+    """
+    aligned_pac_bio_id = serializers.SlugRelatedField(
+        many=True,
+        slug_field="aligned_pac_bio_id",
+        queryset=AlignedPacBio.objects.all(),
+        required=True,
+    )
+
+
+    class Meta:
+        model = AlignedPacBioSet
+        fields = "__all__"
+
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_pac_bio_ids = data.get("aligned_pac_bio_id" or [])
+
+        if not isinstance(data.get("aligned_pac_bio_id"), list):
+            errors.setdefault("aligned_pac_bio_id", []).append("aligned_pac_bio_id must be a list")
+        elif not aligned_pac_bio_ids:
+            errors.setdefault("aligned_pac_bio_id", []). append(
+                f"aligned_pac_bio_id cannot be empty"
+            )
+
+        missing_aligned_pac_bio_ids = [e for e in aligned_pac_bio_ids if not AlignedPacBio.objects.filter(pk=e.pk).exists()]
+        if missing_aligned_pac_bio_ids:
+            errors.setdefault("aligned_pac_bio_id", []).append(
+                f"aligned_pac_bio_id not found: {', '.join(map(str, aligned_pac_bio_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+
+    def create(self, validated_data):
+        """Create a new AlignedPacBioSet instance using the validated data and set the many-to-many relationships"""
+        aligned_pac_bio_id_data = validated_data.pop("aligned_pac_bio_id", [])
+        aligned_pac_bio_set_instance = AlignedPacBioSet.objects.create(**validated_data)
+        aligned_pac_bio_set_instance.aligned_pac_bio_id.set(aligned_pac_bio_id_data)
+
+        return aligned_pac_bio_set_instance
+
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        aligned_pac_bio_id_data = validated_data.pop("aligned_pac_bio_id", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if aligned_pac_bio_id_data is not None:
+            instance.aligned_pac_bio_id.set(aligned_pac_bio_id_data)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsPacBioSerializer
+    """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
+    class Meta:
+        model = CalledVariantsPacBio
+        fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        caller_softwares = set(data.get("caller_software") or [])
+        variant_types = set(data.get("variant_types") or [])
+
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
+            )
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsPacBio instance using the validated data and set the many-to-many relationships"""
+        called_variants_pac_bio_instance = CalledVariantsPacBio.objects.create(**validated_data)
+
+        return called_variants_pac_bio_instance
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsPacBioOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsPacBioSerializer
+    """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
+    class Meta:
+        model = CalledVariantsPacBio
+        fields = "__all__"
+
+
 class AlignedNanoporeSerializer(serializers.ModelSerializer):
     """
     Docstring for AlignedNanoporeSerializer
     """
     class Meta:
         model = AlignedNanopore
+        fields = "__all__"
+
+
+class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
+    """
+    Docstring for AlignedNanoporeSetSerializer
+    """
+    aligned_nanopore_id = serializers.SlugRelatedField(
+        many=True,
+        slug_field="aligned_nanopore_id",
+        queryset=AlignedNanopore.objects.all(),
+        required=True,
+    )
+
+
+    class Meta:
+        model = AlignedNanoporeSet
+        fields = "__all__"
+
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+        aligned_nanopore_ids = set(data.get("aligned_nanopore_id" or []))
+
+        if not isinstance(data.get("aligned_nanopore_id"), list):
+            errors.setdefault("aligned_nanopore_id", []).append("aligned_nanopore_id must be a list")
+        elif not aligned_nanopore_ids:
+            errors.setdefault("aligned_nanopore_id", []). append(
+                f"aligned_nanopore_id cannot be empty"
+            )
+
+        missing_aligned_nanopore_ids = [e for e in aligned_nanopore_ids if not AlignedNanopore.objects.filter(pk=e).exists()]
+        if missing_aligned_nanopore_ids:
+            errors.setdefault("aligned_nanopore_id", []).append(
+                f"aligned_nanopore_id not found: {', '.join(map(str, aligned_nanopore_ids))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+
+    def create(self, validated_data):
+        """Create a new AlignedNanoporeSet instance using the validated data and set the many-to-many relationships"""
+        aligned_nanopore_id_data = validated_data.pop("aligned_nanopore_id", [])
+        aligned_nanopore_set_instance = AlignedNanoporeSet.objects.create(**validated_data)
+        aligned_nanopore_set_instance.aligned_nanopore_id.set(aligned_nanopore_id_data)
+
+        return aligned_nanopore_set_instance
+
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        aligned_nanopore_id_data = validated_data.pop("aligned_nanopore_id", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if aligned_nanopore_id_data is not None:
+            instance.aligned_nanopore_id.set(aligned_nanopore_id_data)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
+    """
+    """
+    caller_software = serializers.JSONField(required=True)
+    variant_types = serializers.JSONField(required=True)
+
+    class Meta:
+        model = CalledVariantsNanopore
+        fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        caller_softwares = set(data.get("caller_software") or [])
+        variant_types = set(data.get("variant_types") or [])
+
+        if not isinstance(data.get("caller_software"), list):
+            errors.setdefault("caller_software", []).append("caller_software must be a list")
+        elif not caller_softwares:
+            errors.setdefault("caller_software", []). append(
+                f"caller_software cannot be empty"
+            )
+        if not isinstance(data.get("variant_types"), list):
+            errors.setdefault("variant_types", []).append("variant_types must be a list")
+        elif not variant_types:
+            errors.setdefault("variant_types", []). append(
+                f"variant_types cannot be empty"
+            )
+
+        valid_variant_types = [choice[0] for choice in VariantType.choices]
+        bad_variant_types = [x for x in variant_types if x not in valid_variant_types]
+        if bad_variant_types:
+            errors.setdefault("variant_types", []).append(
+                f" invalid variant_types {bad_variant_types}. Must be one of {', '.join(sorted(valid_variant_types))}"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+
+    def create(self, validated_data):
+        """Create a new CalledVariantsNanopore instance using the validated data and set the many-to-many relationships"""
+        called_variants_nanopore_instance = CalledVariantsNanopore.objects.create(**validated_data)
+
+        return called_variants_nanopore_instance
+
+
+    def update(self, instance, validated_data):
+        """Update each attribute of the instance with validated data and update the many-to-many relationships if provided"""
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class CalledVariantsNanoporeOutputSerializer(serializers.ModelSerializer):
+    """
+    Docstring for CalledVariantsNanopore
+    """
+    variant_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=VariantType.choices),
+        default=list
+    )
+
+    class Meta:
+        model = CalledVariantsNanopore
         fields = "__all__"
 
 
@@ -609,7 +1108,7 @@ def create_experiment(table_name: str, identifier: str, datum: dict, current_use
         )
 
 
-def update_experiments_entry(
+def update_experiment(
     table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
     """
     Update an existing experiment instance based on the provided data.
@@ -647,33 +1146,7 @@ def update_experiments_entry(
             "input_serializer": ExperimentRNAInputSerializer,
             "output_serializer": ExperimentRNAOutputSerializer,
             "parsed_data": lambda datum: parse_rna(rna_datum=datum),
-        },
-        "aligned_dna_short_read": {
-            "model": AlignedDNAShortRead,
-            "input_serializer": AlignedDNAShortReadSerializer,
-            "output_serializer": AlignedDNAShortReadSerializer,
-            "parsed_data": lambda datum: parse_short_read_aligned(
-                short_read_aligned=datum
-            ),
-        },
-        "aligned_nanopore": {
-            "model": AlignedNanopore,
-            "input_serializer": AlignedNanoporeSerializer,
-            "output_serializer": AlignedNanoporeSerializer,
-            "parsed_data": lambda datum: parse_nanopore_aligned(nanopore_aligned=datum),
-        },
-        "aligned_pac_bio": {
-            "model": AlignedPacBio,
-            "input_serializer": AlignedPacBioSerializer,
-            "output_serializer": AlignedPacBioSerializer,
-            "parsed_data": lambda datum: parse_pac_bio_aligned(pac_bio_aligned=datum),
-        },
-        "aligned_rna_short_read": {
-            "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer,
-            "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
-        },
+        }
     }
 
     serializers = table_serializers.get(table_name)
@@ -988,42 +1461,64 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
         },
     }
-    serializer = table_serializers.get(table_name)
+    serializers = table_serializers.get(table_name)
 
-    if serializer.is_valid():
-        updated_instance = serializer.save(changed_by=current_user)
-        changes = compare_data(
-            old_data=table_serializers[table_name]["output_serializer"](
-                model_instance
-            ).data,
-            new_data=datum,
-        )
-        return (
-            response_constructor(
-                identifier=identifier,
-                request_status="UPDATED",
-                code=200,
-                message=f"{table_name} {identifier} updated.",
-                data={
-                    "updates": changes,
-                    "instance": table_serializers[table_name]["output_serializer"](
-                        updated_instance
-                    ).data,
-                },
-            ),
-            "accepted_request",
-        )
-    else:
-        error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+    if not serializers:
         return (
             response_constructor(
                 identifier=identifier,
                 request_status="BAD REQUEST",
                 code=400,
-                data=error_data,
+                data=f"Unsupported table: {table_name}",
             ),
             "rejected_request",
         )
+
+    with transaction.atomic():
+        input_serializer = serializers["input_serializer"]
+        output_serializer = serializers["output_serializer"]
+        changes = compare_data(
+            old_data=output_serializer(model_instance).data,
+            new_data=datum,
+        )
+
+        serializer = input_serializer(model_instance, data=datum, partial=True)
+
+        if serializer.is_valid():
+            updated_instance = serializer.save(changed_by=current_user)
+
+            message = (
+                f"{table_name} {identifier} updated."
+                if changes
+                else f"{table_name} {identifier} had no changes."
+            )
+            status_label = "UPDATED" if changes else "NO CHANGE"
+            code = 200 if changes else 204
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status=status_label,
+                    code=code,
+                    message=message,
+                    data={
+                        "updates": changes or None,
+                        "instance": output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
 
 
 def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
@@ -1041,8 +1536,14 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
     """
     model_mapping = {
         "aligned_dna_short_read": AlignedDNAShortRead,
+        "aligned_dna_short_read_set": AlignedDNAShortReadSet,
+        "called_variants_dna_short_read": CalledVariantsDNAShortRead,
         "aligned_nanopore": AlignedNanopore,
+        "aligned_nanopore_set": AlignedNanoporeSet,
+        "called_variants_nanopore": CalledVariantsNanopore,
         "aligned_pac_bio": AlignedPacBio,
+        "aligned_pac_bio_set": AlignedPacBioSet,
+        "called_variants_pac_bio": CalledVariantsPacBio,
         "aligned_rna_short_read": AlignedRNAShortRead,
     }
 
@@ -1075,6 +1576,278 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
                     request_status="DELETED",
                     code=200,
                     data=f"{table_name} {identifier} and associated alignment deleted successfully.",
+                ),
+                "accepted_request",
+            )
+        else:
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NOT FOUND",
+                    code=404,
+                    data=f"{table_name} {identifier} not found.",
+                ),
+                "rejected_request",
+            )
+
+    except Exception as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="SERVER ERROR",
+                code=500,
+                data=str(error),
+            ),
+            "rejected_request",
+        )
+
+
+def create_called(table_name: str, identifier: str, datum: dict, current_user: User):
+    """
+    Create new aligned_sets or called_variants
+    """
+    table_serializers = {
+        "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "called_variants_dna_short_read": {
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_nanopore": {
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_pac_bio": {
+            "model": CalledVariantsPacBio,
+            "input_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+    }
+    model_input_serializer = table_serializers[table_name]["input_serializer"]
+    model_output_serializer = table_serializers[table_name]["output_serializer"]
+
+    if "parsed_data" in table_serializers[table_name]:
+        datum = remove_na(table_serializers[table_name]["parsed_data"](datum))
+    else:
+        datum = remove_na(datum=datum)
+
+    table_validator = TableValidator()
+    table_validator.validate_json(json_object=datum, table_name=table_name)
+    results = table_validator.get_validation_results()
+    if results["valid"]:
+        serializer = model_input_serializer(data=datum)
+        if serializer.is_valid():
+            new_instance = serializer.save(changed_by=current_user)
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="CREATED",
+                    code=201,
+                    message=f"{table_name} {identifier} created.",
+                    data={"instance": model_output_serializer(new_instance).data},
+                ),
+                "accepted_request",
+            )
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+    else:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=results["errors"],
+            ),
+            "rejected_request",
+        )
+
+
+def update_called(
+    table_name: str, identifier: str, model_instance, datum: dict, current_user: User):
+    """
+    Update an existing model instance based on the provided data.
+
+    Args:
+        table_name (str): The name of the table (model) to update.
+        identifier (str): The unique identifier for the model instance.
+        model_instance: The existing model instance to update.
+        datum (dict): The data to update the model instance with.
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    table_serializers = {
+        "aligned_dna_short_read_set": {
+            "model": AlignedDNAShortReadSet,
+            "input_serializer": AlignedDNAShortReadSetSerializer,
+            "output_serializer": AlignedDNAShortReadSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_nanopore_set": {
+            "model": AlignedNanoporeSet,
+            "input_serializer": AlignedNanoporeSetSerializer,
+            "output_serializer": AlignedNanoporeSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "aligned_pac_bio_set": {
+            "model": AlignedPacBioSet,
+            "input_serializer": AlignedPacBioSetSerializer,
+            "output_serializer": AlignedPacBioSetSerializer,
+            "parsed_data": lambda datum: parse_aligned_sets(aligned_set_datum=datum),
+        },
+        "called_variants_dna_short_read": {
+            "model": CalledVariantsDNAShortRead,
+            "input_serializer": CalledVariantsDNAShortReadInputSerializer,
+            "output_serializer": CalledVariantsDNAShortReadOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_nanopore": {
+            "model": CalledVariantsNanopore,
+            "input_serializer": CalledVariantsNanoporeInputSerializer,
+            "output_serializer": CalledVariantsNanoporeOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+        "called_variants_pac_bio": {
+            "model": CalledVariantsPacBio,
+            "input_serializer": CalledVariantsPacBioInputSerializer,
+            "output_serializer": CalledVariantsPacBioOutputSerializer,
+            "parsed_data": lambda datum: parse_called_variants(variant_datum=datum)
+        },
+    }
+
+    serializers = table_serializers.get(table_name)
+    if not serializers:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Unsupported table: {table_name}",
+            ),
+            "rejected_request",
+        )
+
+    if "parsed_data" in table_serializers[table_name]:
+        datum = table_serializers[table_name]["parsed_data"](datum)
+
+    with transaction.atomic():
+        input_serializer = serializers["input_serializer"]
+        output_serializer = serializers["output_serializer"]
+        changes = compare_data(
+            old_data=output_serializer(model_instance).data,
+            new_data=datum,
+        )
+
+        serializer = input_serializer(model_instance, data=datum, partial=True)
+
+        if serializer.is_valid():
+            updated_instance = serializer.save(changed_by=current_user)
+            message = (
+                f"{table_name} {identifier} updated."
+                if changes
+                else f"{table_name} {identifier} had no changes."
+            )
+            status_label = "UPDATED" if changes else "NO CHANGE"
+            code = 200 if changes else 204
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status=status_label,
+                    code=code,
+                    message=message,
+                    data={
+                        "updates": changes or None,
+                        "instance": output_serializer(updated_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+        else:
+            error_data = [{item: serializer.errors[item]} for item in serializer.errors]
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="BAD REQUEST",
+                    code=400,
+                    data=error_data,
+                ),
+                "rejected_request",
+            )
+
+
+def delete_called(table_name: str, identifier: str, id_field: str = "id"):
+    """
+    Delete an existing model instance based on the provided identifier.
+
+    Args:
+        table_name (str): The name of the table (model) to delete from.
+        identifier (str): The unique identifier of the model instance.
+        id_field (str): The field used as an identifier (default is "id").
+
+    Returns:
+        dict: A response dictionary indicating the status of the operation.
+    """
+    model_mapping = {
+        "aligned_dna_short_read_set": AlignedDNAShortReadSet,
+        "aligned_nanopore_set": AlignedNanoporeSet,
+        "aligned_pac_bio_set": AlignedPacBioSet,
+        "called_variants_dna_short_read": CalledVariantsDNAShortRead,
+        "called_variants_nanopore": CalledVariantsNanopore,
+        "called_variants_pac_bio": CalledVariantsPacBio,
+    }
+
+    model_class = model_mapping.get(table_name)
+    if not model_class:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="BAD REQUEST",
+                code=400,
+                data=f"Invalid table name: {table_name}",
+            ),
+            "rejected_request",
+        )
+
+    try:
+        instance = model_class.objects.filter(**{id_field: identifier}).first()
+        if instance:
+            instance.delete()
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="DELETED",
+                    code=200,
+                    data=f"{table_name} {identifier} deleted successfully.",
                 ),
                 "accepted_request",
             )

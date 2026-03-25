@@ -136,7 +136,7 @@ def remove_na(datum: dict) -> dict:
 
 
 def multi_value_split(datum: dict) -> dict:
-    """Multi valu split"""
+    """Multi value split"""
     split_datum = {}
 
     for k, v in datum.items():

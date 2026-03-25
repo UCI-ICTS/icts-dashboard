@@ -17,8 +17,14 @@ from experiments.models import (
     Aligned,
     AlignedRNAShortRead,
     AlignedPacBio,
+    AlignedPacBioSet,
+    CalledVariantsPacBio,
     AlignedDNAShortRead,
+    AlignedDNAShortReadSet,
+    CalledVariantsDNAShortRead,
     AlignedNanopore,
+    AlignedNanoporeSet,
+    CalledVariantsNanopore,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
@@ -27,10 +33,19 @@ from experiments.models import (
 )
 from experiments.services import (
     AlignedDNAShortReadSerializer,
+    AlignedDNAShortReadSetSerializer,
+    CalledVariantsDNAShortReadInputSerializer,
+    CalledVariantsDNAShortReadOutputSerializer,
     AlignedRNAShortReadInputSerializer,
     AlignedRNAShortReadOutputSerializer,
     AlignedNanoporeSerializer,
+    AlignedNanoporeSetSerializer,
+    CalledVariantsNanoporeInputSerializer,
+    CalledVariantsNanoporeOutputSerializer,
     AlignedPacBioSerializer,
+    AlignedPacBioSetSerializer,
+    CalledVariantsPacBioInputSerializer,
+    CalledVariantsPacBioOutputSerializer,
     AlignedRNASerializer,
     AlignedSerializer,
     ExperimentSerializer,
@@ -41,10 +56,13 @@ from experiments.services import (
     ExperimentDNAInputSerializer,
     ExperimentDNAOutputSerializer,
     create_experiment,
-    update_experiments_entry,
+    update_experiment,
     delete_experiment,
     create_aligned,
+    update_aligned,
     delete_aligned,
+    create_called,
+    update_called,
 )
 from experiments.selectors import get_experiment
 
@@ -279,7 +297,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_rna_short_read",
                     experiment_rna_short_read_id,
                     experiment_rna_short_read[experiment_rna_short_read_id],
@@ -471,7 +489,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_rna_short_read",
                     aligned_rna_short_read_id,
                     aligned_rna_short_read[aligned_rna_short_read_id],
@@ -660,7 +678,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_dna_short_read",
                     experiment_dna_short_read_id,
                     experiment_dna_short_read[experiment_dna_short_read_id],
@@ -849,7 +867,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_dna_short_read",
                     aligned_dna_short_read_id,
                     aligned_dna_short_read[aligned_dna_short_read_id],
@@ -907,6 +925,366 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
                 response_data.append(
                     response_constructor(
                         identifier=aligned_dna_short_read_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class AlignedDNAShortReadSetViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedDNAShortReadSet entries",
+        responses={200: AlignedDNAShortReadSetSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedDNAShortReadSet"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedDNAShortReadSet.objects.all()
+        serializer = AlignedDNAShortReadSetSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=AlignedDNAShortReadSetSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedDNAShortReadSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_aligned_dna_short_read_set(self, request):
+        aligned_dna_short_read_set = bulk_model_retrieve(
+            request.data, AlignedDNAShortReadSet, "aligned_dna_short_read_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_dna_short_read_set_id = datum.get("aligned_dna_short_read_set_id")
+            if aligned_dna_short_read_set_id and aligned_dna_short_read_set_id in aligned_dna_short_read_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_dna_short_read_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="AlignedDNAShortReadSet entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "aligned_dna_short_read_set", aligned_dna_short_read_set_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedDNAShortReadSet"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        aligned_dna_short_read_set = bulk_retrieve(AlignedDNAShortReadSet, ids, "aligned_dna_short_read_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_dna_short_read_set_id in ids:
+            if aligned_dna_short_read_set_id in aligned_dna_short_read_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_dna_short_read_set_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=aligned_dna_short_read_set[aligned_dna_short_read_set_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_dna_short_read_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=AlignedDNAShortReadSetSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedDNAShortReadSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_aligned_dna_short_read_set(self, request):
+        aligned_dna_short_read_set = bulk_model_retrieve(
+            request.data, AlignedDNAShortReadSet, "aligned_dna_short_read_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_dna_short_read_set_id = datum.get("aligned_dna_short_read_set_id")
+            if aligned_dna_short_read_set_id not in aligned_dna_short_read_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_dna_short_read_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "aligned_dna_short_read_set",
+                    aligned_dna_short_read_set_id,
+                    aligned_dna_short_read_set[aligned_dna_short_read_set_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_aligned_dna_short_read_set_entries",
+        operation_description="Bulk delete AlignedDNAShortReadSet entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of AlignedDNAShortReadSet IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["AlignedDNAShortReadSet"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete AlignedDNAShortReadSet entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        aligned_dna_short_read_set = bulk_retrieve(AlignedDNAShortReadSet, ids, "aligned_dna_short_read_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_dna_short_read_set_id in ids:
+            if aligned_dna_short_read_set_id in aligned_dna_short_read_set:
+                data, result = delete_aligned(
+                    "aligned_dna_short_read_set", aligned_dna_short_read_set_id, "aligned_dna_short_read_set_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_dna_short_read_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all CalledVariantsDNAShortRead entries",
+        responses={200: CalledVariantsDNAShortReadOutputSerializer(many=True), 400: "Bad request"},
+        tags=["CalledVariantsDNAShortRead"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = CalledVariantsDNAShortRead.objects.all()
+        serializer = CalledVariantsDNAShortReadOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsDNAShortReadInputSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsDNAShortRead"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_called_variants_dna_short_read(self, request):
+        called_variants_dna_short_read = bulk_model_retrieve(
+            request.data, CalledVariantsDNAShortRead, "called_variants_dna_short_read_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_dna_short_read_id = datum.get("called_variants_dna_short_read_id")
+            if called_variants_dna_short_read_id and called_variants_dna_short_read_id in called_variants_dna_short_read:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_dna_short_read_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="CalledVariantsDNAShortRead entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "called_variants_dna_short_read", called_variants_dna_short_read_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsDNAShortRead"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_dna_short_read = bulk_retrieve(CalledVariantsDNAShortRead, ids, "called_variants_dna_short_read_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_dna_short_read_id in ids:
+            if called_variants_dna_short_read_id in called_variants_dna_short_read:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_dna_short_read_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=called_variants_dna_short_read[called_variants_dna_short_read_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_dna_short_read_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsDNAShortReadInputSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsDNAShortRead"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_called_variants_dna_short_read(self, request):
+        called_variants_dna_short_read = bulk_model_retrieve(
+            request.data, CalledVariantsDNAShortRead, "called_variants_dna_short_read_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_dna_short_read_id = datum.get("called_variants_dna_short_read_id")
+            if called_variants_dna_short_read_id not in called_variants_dna_short_read:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_dna_short_read_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "called_variants_dna_short_read",
+                    called_variants_dna_short_read_id,
+                    called_variants_dna_short_read[called_variants_dna_short_read_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_called_variants_dna_short_read_entries",
+        operation_description="Bulk delete CalledVariantsDNAShortRead entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of CalledVariantsDNAShortRead IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["CalledVariantsDNAShortRead"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete CalledVariantsDNAShortRead entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_dna_short_read = bulk_retrieve(CalledVariantsDNAShortRead, ids, "called_variants_dna_short_read_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_dna_short_read_id in ids:
+            if called_variants_dna_short_read_id in called_variants_dna_short_read:
+                data, result = delete_aligned(
+                    "called_variants_dna_short_read", called_variants_dna_short_read_id, "called_variants_dna_short_read_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_dna_short_read_id,
                         request_status="NOT FOUND",
                         code=404,
                         data="Not found",
@@ -1035,7 +1413,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_pac_bio",
                     experiment_pac_bio_id,
                     experiment_pac_bio[experiment_pac_bio_id],
@@ -1217,7 +1595,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_pac_bio",
                     aligned_pac_bio_id,
                     aligned_pac_bio[aligned_pac_bio_id],
@@ -1271,6 +1649,366 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
                 response_data.append(
                     response_constructor(
                         identifier=aligned_pac_bio_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class AlignedPacBioSetViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedPacBioSet entries",
+        responses={200: AlignedPacBioSetSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedPacBioSet"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedPacBioSet.objects.all()
+        serializer = AlignedPacBioSetSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=AlignedPacBioSetSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedPacBioSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_aligned_pac_bio_set(self, request):
+        aligned_pac_bio_set = bulk_model_retrieve(
+            request.data, AlignedPacBioSet, "aligned_pac_bio_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_pac_bio_set_id = datum.get("aligned_pac_bio_set_id")
+            if aligned_pac_bio_set_id and aligned_pac_bio_set_id in aligned_pac_bio_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_pac_bio_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="AlignedPacBioSet entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "aligned_pac_bio_set", aligned_pac_bio_set_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedPacBioSet"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        aligned_pac_bio_set = bulk_retrieve(AlignedPacBioSet, ids, "aligned_pac_bio_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_pac_bio_set_id in ids:
+            if aligned_pac_bio_set_id in aligned_pac_bio_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_pac_bio_set_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=aligned_pac_bio_set[aligned_pac_bio_set_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_pac_bio_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=AlignedPacBioSetSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedPacBioSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_aligned_pac_bio_set(self, request):
+        aligned_pac_bio_set = bulk_model_retrieve(
+            request.data, AlignedPacBioSet, "aligned_pac_bio_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_pac_bio_set_id = datum.get("aligned_pac_bio_set_id")
+            if aligned_pac_bio_set_id not in aligned_pac_bio_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_pac_bio_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "aligned_pac_bio_set",
+                    aligned_pac_bio_set_id,
+                    aligned_pac_bio_set[aligned_pac_bio_set_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_aligned_pac_bio_set_entries",
+        operation_description="Bulk delete AlignedPacBioSet entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of AlignedPacBioSet IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["AlignedPacBioSet"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete AlignedPacBioSet entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        aligned_pac_bio_set = bulk_retrieve(AlignedPacBioSet, ids, "aligned_pac_bio_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_pac_bio_set_id in ids:
+            if aligned_pac_bio_set_id in aligned_pac_bio_set:
+                data, result = delete_aligned(
+                    "aligned_pac_bio_set", aligned_pac_bio_set_id, "aligned_pac_bio_set_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_pac_bio_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class CalledVariantsPacBioViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all CalledVariantsPacBio entries",
+        responses={200: CalledVariantsPacBioOutputSerializer(many=True), 400: "Bad request"},
+        tags=["CalledVariantsPacBio"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = CalledVariantsPacBio.objects.all()
+        serializer = CalledVariantsPacBioOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsPacBioInputSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsPacBio"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_called_variants_pac_bio(self, request):
+        called_variants_pac_bio = bulk_model_retrieve(
+            request.data, CalledVariantsPacBio, "called_variants_pac_bio_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_pac_bio_id = datum.get("called_variants_pac_bio_id")
+            if called_variants_pac_bio_id and called_variants_pac_bio_id in called_variants_pac_bio:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_pac_bio_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="CalledVariantsPacBio entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "called_variants_pac_bio", called_variants_pac_bio_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsPacBio"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_pac_bio = bulk_retrieve(CalledVariantsPacBio, ids, "called_variants_pac_bio_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_pac_bio_id in ids:
+            if called_variants_pac_bio_id in called_variants_pac_bio:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_pac_bio_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=called_variants_pac_bio[called_variants_pac_bio_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_pac_bio_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsPacBioInputSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsPacBio"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_called_variants_pac_bio(self, request):
+        called_variants_pac_bio = bulk_model_retrieve(
+            request.data, CalledVariantsPacBio, "called_variants_pac_bio_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_pac_bio_id = datum.get("called_variants_pac_bio_id")
+            if called_variants_pac_bio_id not in called_variants_pac_bio:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_pac_bio_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "called_variants_pac_bio",
+                    called_variants_pac_bio_id,
+                    called_variants_pac_bio[called_variants_pac_bio_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_called_variants_pac_bio_entries",
+        operation_description="Bulk delete CalledVariantsPacBio entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of CalledVariantsPacBio IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["CalledVariantsPacBio"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete CalledVariantsPacBio entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_pac_bio = bulk_retrieve(CalledVariantsPacBio, ids, "called_variants_pac_bio_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_pac_bio_id in ids:
+            if called_variants_pac_bio_id in called_variants_pac_bio:
+                data, result = delete_aligned(
+                    "called_variants_pac_bio", called_variants_pac_bio_id, "called_variants_pac_bio_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_pac_bio_id,
                         request_status="NOT FOUND",
                         code=404,
                         data="Not found",
@@ -1399,7 +2137,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_experiment(
                     "experiment_nanopore",
                     experiment_nanopore_id,
                     experiment_nanopore[experiment_nanopore_id],
@@ -1583,7 +2321,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 )
                 rejected = True
             else:
-                data, result = update_experiments_entry(
+                data, result = update_aligned(
                     "aligned_nanopore",
                     aligned_nanopore_id,
                     aligned_nanopore[aligned_nanopore_id],
@@ -1637,6 +2375,367 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
                 response_data.append(
                     response_constructor(
                         identifier=aligned_nanopore_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class AlignedNanoporeSetViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all AlignedNanoporeSet entries",
+        responses={200: AlignedNanoporeSetSerializer(many=True), 400: "Bad request"},
+        tags=["AlignedNanoporeSet"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = AlignedNanoporeSet.objects.all()
+        serializer = AlignedNanoporeSetSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=AlignedNanoporeSetSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedNanoporeSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_aligned_nanopore_set(self, request):
+        aligned_nanopore_set = bulk_model_retrieve(
+            request.data, AlignedNanoporeSet, "aligned_nanopore_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_nanopore_set_id = datum.get("aligned_nanopore_set_id")
+            if aligned_nanopore_set_id and aligned_nanopore_set_id in aligned_nanopore_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_nanopore_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="AlignedNanoporeSet entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "aligned_nanopore_set", aligned_nanopore_set_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedNanoporeSet"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        aligned_nanopore_set = bulk_retrieve(AlignedNanoporeSet, ids, "aligned_nanopore_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_nanopore_set_id in ids:
+            if aligned_nanopore_set_id in aligned_nanopore_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_nanopore_set_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=aligned_nanopore_set[aligned_nanopore_set_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_nanopore_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=AlignedNanoporeSetSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["AlignedNanoporeSet"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_aligned_nanopore_set(self, request):
+        aligned_nanopore_set = bulk_model_retrieve(
+            request.data, AlignedNanoporeSet, "aligned_nanopore_set_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            aligned_nanopore_set_id = datum.get("aligned_nanopore_set_id")
+            if aligned_nanopore_set_id not in aligned_nanopore_set:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_nanopore_set_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "aligned_nanopore_set",
+                    aligned_nanopore_set_id,
+                    aligned_nanopore_set[aligned_nanopore_set_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_aligned_nanopore_set_entries",
+        operation_description="Bulk delete AlignedNanoporeSet entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of AlignedNanoporeSet IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["AlignedNanoporeSet"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete AlignedNanoporeSet entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        aligned_nanopore_set = bulk_retrieve(AlignedNanoporeSet, ids, "aligned_nanopore_set_id")
+        response_data, accepted, rejected = [], False, False
+
+        for aligned_nanopore_set_id in ids:
+            if aligned_nanopore_set_id in aligned_nanopore_set:
+                data, result = delete_aligned(
+                    "aligned_nanopore_set", aligned_nanopore_set_id, "aligned_nanopore_set_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=aligned_nanopore_set_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+
+class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all CalledVariantsNanopore entries",
+        responses={200: CalledVariantsNanoporeOutputSerializer(many=True), 400: "Bad request"},
+        tags=["CalledVariantsNanopore"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = CalledVariantsNanopore.objects.all()
+        serializer = CalledVariantsNanoporeOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsNanoporeInputSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsNanopore"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_called_variants_nanopore(self, request):
+        called_variants_nanopore = bulk_model_retrieve(
+            request.data, CalledVariantsNanopore, "called_variants_nanopore_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_nanopore_id = datum.get("called_variants_nanopore_id")
+            if called_variants_nanopore_id and called_variants_nanopore_id in called_variants_nanopore:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_nanopore_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="CalledVariantsNanopore entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_called(
+                    "called_variants_nanopore", called_variants_nanopore_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsNanopore"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_nanopore = bulk_retrieve(CalledVariantsNanopore, ids, "called_variants_nanopore_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_nanopore_id in ids:
+            if called_variants_nanopore_id in called_variants_nanopore:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_nanopore_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=called_variants_nanopore[called_variants_nanopore_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_nanopore_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=CalledVariantsNanoporeInputSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["CalledVariantsNanopore"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_called_variants_nanopore(self, request):
+        called_variants_nanopore = bulk_model_retrieve(
+            request.data, CalledVariantsNanopore, "called_variants_nanopore_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            called_variants_nanopore_id = datum.get("called_variants_nanopore_id")
+            if called_variants_nanopore_id not in called_variants_nanopore:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_nanopore_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_called(
+                    "called_variants_nanopore",
+                    called_variants_nanopore_id,
+                    called_variants_nanopore[called_variants_nanopore_id],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_called_variants_nanopore_entries",
+        operation_description="Bulk delete CalledVariantsNanopore entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of CalledVariantsNanopore IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["CalledVariantsNanopore"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete CalledVariantsNanopore entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        called_variants_nanopore = bulk_retrieve(CalledVariantsNanopore, ids, "called_variants_nanopore_id")
+        response_data, accepted, rejected = [], False, False
+
+        for called_variants_nanopore_id in ids:
+            if called_variants_nanopore_id in called_variants_nanopore:
+                data, result = delete_aligned(
+                    "called_variants_nanopore", called_variants_nanopore_id, "called_variants_nanopore_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=called_variants_nanopore_id,
                         request_status="NOT FOUND",
                         code=404,
                         data="Not found",

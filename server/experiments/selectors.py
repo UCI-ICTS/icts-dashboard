@@ -5,15 +5,21 @@
 """
 
 from experiments.models import (
-    AlignedDNAShortRead,
-    AlignedPacBio,
-    AlignedNanopore,
-    AlignedRNAShortRead,
     Experiment,
     ExperimentDNAShortRead,
     ExperimentNanopore,
     ExperimentPacBio,
     ExperimentRNAShortRead,
+    AlignedDNAShortRead,
+    AlignedDNAShortReadSet,
+    CalledVariantsDNAShortRead,
+    AlignedPacBio,
+    AlignedPacBioSet,
+    CalledVariantsPacBio,
+    AlignedNanopore,
+    AlignedNanoporeSet,
+    CalledVariantsNanopore,
+    AlignedRNAShortRead,
 )
 
 from metadata.models import Analyte, Participant
@@ -434,3 +440,50 @@ def get_aligned_rna(aligned_rna_short_read_id: str) -> AlignedNanopore:
         return aligned_rna_instance
     except AlignedRNAShortRead.DoesNotExist:
         return None
+
+
+def parse_aligned_sets(aligned_set_datum: dict) -> dict:
+    """
+    Parses and formats multi-value aligned IDs into lists
+    """
+
+    multi_value = ["aligned_dna_short_read_id", "aligned_nanopore_id", "aligned_pac_bio_id"]
+    split_aligned_set_datum = multi_value_split(aligned_set_datum)
+    for key in multi_value:
+        try:
+            if key in split_aligned_set_datum and not isinstance(split_aligned_set_datum[key], list):
+                split_aligned_set_datum[key] = [split_aligned_set_datum[key]]
+        except Exception as error:
+            oops = error
+            split_aligned_set_datum[key] = [oops]
+
+    return split_aligned_set_datum
+
+
+def parse_called_variants(variant_datum: dict) -> dict:
+    """
+    Parses and processes the called_variant record to format and clean specific fields.
+
+    The function handles specific fields that may contain delimiters.
+    It removes or transforms values based on their content to ensure consistent data handling downstream.
+
+    Parameters:
+    - variant_datum (dict): A dictionary containing called_variant data.
+
+    Returns:
+    - dict: A dictionary with the processed participant data. Fields with 'NA' values are excluded, and list
+      fields are properly formatted.
+    """
+
+    multi_value = ["caller_software", "variant_types"]
+    split_variant_datum = multi_value_split(variant_datum)
+
+    for key in multi_value:
+        try:
+            if key in split_variant_datum and not isinstance(split_variant_datum[key], list):
+                split_variant_datum[key] = [split_variant_datum[key]]
+        except Exception as error:
+            oops = error
+            split_variant_datum[key] = [oops]
+
+    return split_variant_datum
