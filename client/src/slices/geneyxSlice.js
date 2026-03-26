@@ -5,6 +5,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSli
 import { message } from "antd";
 import { getTableName } from "../utils/schemaAndTables";
 import { calc } from "antd/es/theme/internal";
+import geneyxService from "../services/geneyx.service";
 
 const initialState = {
   tableView: "participants",
@@ -272,6 +273,7 @@ export const dataSlice = createSlice({
         state.caseQueue = action.payload
         state.status = "fulfilled";
       })
+
       .addCase(extractPhenotypes.rejected, (state, action) => {
         state.status = "rejected";
       })
@@ -285,6 +287,18 @@ export const dataSlice = createSlice({
 
   }
 });
+
+export const getCases = createAsyncThunk(
+  "getCases",
+  async (objectKey, thunkAPI) => {
+    try {
+      const response = await dataService.getCases(objectKey);
+      return response.data
+    } catch(error) {
+      console.log("ERROR! ",error)
+    }
+  }
+);
 
 export const openReport = createAsyncThunk(
   "openReport",
