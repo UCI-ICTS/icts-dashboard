@@ -1,5 +1,5 @@
-// slices/dataSlice.js
-import dataService from "../services/data.service";
+// slices/geneyxSlice.js
+import { geneyxService } from "../services/geneyx.service";
 import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
@@ -8,61 +8,22 @@ import { calc } from "antd/es/theme/internal";
 import geneyxService from "../services/geneyx.service";
 
 const initialState = {
-  tableView: "participants",
-  tableID: "participant_id",
-  tableName: "Participants",
   jsonData: null,
-  familyDetail: null,
-  caseQueue: null,
-  participants: [],
-  families: [],
-  genetic_findings: [],
-  analytes: [],
-  biobank_entries: [],
-  phenotypes: [],
-  experiments: [],
-  experiment_dna_short_read: [],
-  experiment_rna_short_read: [],
-  experiment_pac_bio: [],
-  experiment_nanopore: [],
-  aligned: [],
-  aligned_dna_short_read: [],
-  aligned_nanopore: [],
-  aligned_pac_bio: [],
-  aligned_rna_short_read: [],
-  aligned_dna_short_read_set: [],
-  aligned_nanopore_set: [],
-  aligned_pac_bio_set: [],
-  called_variants_dna_short_read: [],
-  called_variants_nanopore: [],
-  called_variants_pac_bio: [],
-  rag_hpos: [],
+  samples: [],
+  cases: [],
+  caseNotes: [],
   status: "idle"
 };
 
-export const dataSlice = createSlice({
-  name: 'data',
+export const geneyxSlice = createSlice({
+  name: 'geneyx',
   initialState,
   reducers: {
-    replaceRagHpoChoice: (state, action) => {
-      const {id, choice} = action.payload;
-      const index = state.rag_hpos.findIndex(item => item.id === id)
-      if (index !== -1) {
-        state.rag_hpos[index].choice = choice
-      }
-    },
-    clearRagHpos: (state) => {
-      state.rag_hpos = [];
-      state.status = "idle";
-    },
     setJsonData: (state, action) => {
       state.jsonData = action.payload;
     },
     clearJsonData: (state, action) => {
       state.jsonData = null;
-    },
-    clearFamilyDetail: (state, action) => {
-      state.familyDetail = null;
     },
     clearCaseQueue: (state, action) => {
       state.caseQueue = null;
@@ -75,7 +36,7 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllTables.pending, (state, action) => {
+      .addCase(getSamples.pending, (state, action) => {
         state.status = "loading";
       })
       .addCase(getAllTables.rejected, (state, action) => {
