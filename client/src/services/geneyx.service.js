@@ -7,7 +7,7 @@ import api from "../utils/axiosConfig";
 
 const APIDB = process.env.GENEYX_APIDB;
 
-headers = {
+const headers = {
   "Content-Type": "application/json",
   "ApiUserId": process.env.GENEYX_USER_ID,
   "ApiUserKey": process.env.GENEYX_USER_KEY,
@@ -19,13 +19,13 @@ const getSamples = async () => {  // The samples API is used to retrieve the lis
   return response;
 }
 
-const getCases = async () => {  //The cases API is used to retrieve the list of cases in the account.
-  const response = api.get(`${APIDB}api/cases`, headers);
+const getSample = async (participant_id) => {  // Returns a description of the sample (e.g. its associated files and locations, setup configurations, when and by it was created etc.)
+  const response = api.get(`${APIDB}api/Sample`, {"SampleSN": participant_id}, headers);
   return response;
 }
 
-const getSample = async (participant_id) => {  // Returns a description of the sample (e.g. its associated files and locations, setup configurations, when and by it was created etc.)
-  const response = api.get(`${APIDB}api/Sample`, {"SampleSN": participant_id}, headers);
+const getCases = async () => {  //The cases API is used to retrieve the list of cases in the account.
+  const response = api.get(`${APIDB}api/cases`, headers);
   return response;
 }
 
@@ -41,8 +41,8 @@ const getCaseNotes = async (case_id) => {  // Get user notes from a given case_i
 
 const geneyxService = {
   getSamples,
-  getCases,
   getSample,
+  getCases,
   getCase,
   getCaseNotes,
 }
