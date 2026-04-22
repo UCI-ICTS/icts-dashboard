@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button, Table, Spin } from "antd";
 import { useSelector } from "react-redux";
 import { getIdentifier } from "../utils/schemaAndTables";
+import { getSamples } from "../slices/geneyxSlice";
 
 export default function CaseQueue({
   selectedRow,
@@ -33,7 +34,12 @@ export default function CaseQueue({
         size="small"
         className="action-btn"
         onClick={() => setSelectedRow(null)}
-      >Clear</Button>&nbsp;&nbsp;PacBio Case Queue for: {selectedRow.participant_id}
+      >Clear</Button>&nbsp;&nbsp;PacBio Case Queue for: {selectedRow.participant_id}&nbsp;&nbsp;
+      <Button
+        size="small"
+        className="action-btn"
+        onClick={() => {let response = getSamples(); console.log({response});}}
+      >Get Geneyx Samples</Button>
     </span>
     <Table
       className="table"

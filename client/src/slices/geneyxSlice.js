@@ -1,5 +1,7 @@
 // slices/geneyxSlice.js
 import geneyxService from "../services/geneyx.service";
+import errorService from "../services/error.service";
+import { message } from "antd";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 
 const initialState = {
@@ -45,10 +47,8 @@ export const geneyxSlice = createSlice({
       })
       .addCase(getSample.fulfilled, (state, action) => {
         state.status = "fulfilled"
-        const { gsample, response } = action.payload;
-        if (state[gsample]) {
-          state[gsample] = response
-        }
+        const { gsample } = action.payload;
+        const { response } = action.response;
       })
       .addCase(getCases.pending, (state, action) => {
         state.status = "loading";
@@ -96,12 +96,13 @@ export const geneyxSlice = createSlice({
 
 export const getSamples = createAsyncThunk(
   "getSamples",
-  async (objectKey, thunkAPI) => {
+  async (thunkAPI) => {
     try {
-      const response = await geneyxService.getSamples(objectKey);
-      return response.data
+      const response = await geneyxService.getSamples();
+      return response
     } catch(error) {
-      console.log("ERROR! ",error)
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 );
@@ -113,19 +114,21 @@ export const getSample = createAsyncThunk(
       const response = await geneyxService.getSample(objectKey);
       return response.data
     } catch(error) {
-      console.log("ERROR! ",error)
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 );
 
 export const getCases = createAsyncThunk(
   "getCases",
-  async (objectKey, thunkAPI) => {
+  async (thunkAPI) => {
     try {
-      const response = await geneyxService.getCases(objectKey);
+      const response = await geneyxService.getCases();
       return response.data
     } catch(error) {
-      console.log("ERROR! ",error)
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 );
@@ -137,7 +140,8 @@ export const getCase = createAsyncThunk(
       const response = await geneyxService.getCase(objectKey);
       return response.data
     } catch(error) {
-      console.log("ERROR! ",error)
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 );
@@ -149,7 +153,8 @@ export const getCaseNotes = createAsyncThunk(
       const response = await geneyxService.getCaseNotes(objectKey);
       return response.data
     } catch(error) {
-      console.log("ERROR! ",error)
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
     }
   }
 );
