@@ -2,8 +2,8 @@
 
 import "../App.css"
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Table, Spin } from "antd";
-import { useSelector } from "react-redux";
 import { getIdentifier } from "../utils/schemaAndTables";
 import { getSamples } from "../slices/geneyxSlice";
 
@@ -15,6 +15,7 @@ export default function CaseQueue({
   setQueueLoading,
   openModal
 }) {
+  const dispatch = useDispatch();
   const caseData =  useSelector((state) => state.data.caseQueue)
   const rows = Array.isArray(caseData) ? caseData[0] : []
   const handleOpen = (schemaKey, record) => {
@@ -38,7 +39,7 @@ export default function CaseQueue({
       <Button
         size="small"
         className="action-btn"
-        onClick={() => {let response = getSamples(); console.log({response});}}
+        onClick={() => {let response = dispatch(getSamples()); console.log({response});}}
       >Get Geneyx Samples</Button>
     </span>
     <Table

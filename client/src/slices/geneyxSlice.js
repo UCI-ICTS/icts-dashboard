@@ -34,10 +34,11 @@ export const geneyxSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(getSamples.fulfilled, (state, action) => {
-        //const { gsamples } = action.payload;
-
-        console.log(action.payload)
         state.status = "fullfiled";
+        const { gsamples, response } = action.payload;
+        if(state[gsamples]) {
+          state[gsamples] = response
+        }
       })
       .addCase(getSample.pending, (state, action) => {
         state.status = "loading"
@@ -47,8 +48,10 @@ export const geneyxSlice = createSlice({
       })
       .addCase(getSample.fulfilled, (state, action) => {
         state.status = "fulfilled"
-        const { gsample } = action.payload;
-        const { response } = action.response;
+        const { gsample, response } = action.payload;
+        if (state[gsample]) {
+          state[gsample] = response
+        }
       })
       .addCase(getCases.pending, (state, action) => {
         state.status = "loading";
@@ -57,13 +60,11 @@ export const geneyxSlice = createSlice({
         state.status = "rejected";
       })
       .addCase(getCases.fulfilled, (state, action) => {
-        const {
-          gcases
-        } = action.payload;
-
-        Object.assign(state, {
-          gcases
-        });
+        state.status = "fullfiled";
+        const { gcases, response } = action.payload;
+        if (state[gcases]) {
+          state[gcases] = response
+        }
       })
       .addCase(getCase.pending, (state, action) => {
         state.status = "loading"
