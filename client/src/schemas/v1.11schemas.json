@@ -3207,6 +3207,7 @@
                 "type": "string",
                 "enum": [
                     "5x5 cryobox",
+                    "7x7 cryobox",
                     "9x9 cryobox",
                     "10x10 cryobox",
                     "SBS plate",
