@@ -458,6 +458,35 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
         model = Participant
         fields = "__all__"
 
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        affected_status = data.get("affected_status")
+        solve_status = data.get("solve_status")
+        if "Unaffected" in [affected_status, solve_status] and affected_status != solve_status:
+            errors.setdefault("affected_status", []).append(
+                f"Invalid affected_status: {affected_status}. Must match solve_status if: Unaffected"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
     def create(self, validated_data):
         internal_project_id = validated_data.pop("internal_project_id", [])
         pmid_id = validated_data.pop("pmid_id", [])
