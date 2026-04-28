@@ -3,6 +3,8 @@
 
 import json
 import time
+import zipfile
+from io import BytesIO
 import requests
 import importlib
 from django.apps import apps
@@ -201,69 +203,45 @@ def serialize_table(name, queryset, serializer_class):
     }
 
 
-def get_anvil_tables():
-    files = {}
-    metadata_list = ['family', 'participant', 'phenotype', 'geneticfindings', 'analyte', 'biobankentry', 'experimentstage']
-    experiments_list = ['experiment', 'aligned', 'experimentdnashortread', 'aligneddnashortread', 'experimentrnashortread', 'alignedrnashortread', 'experimentnanopore', 'alignednanopore', 'experimentpacbio', 'alignedpacbio']
-    experiments_models = apps.all_models['experiments']
-    experiments_serializer_module = importlib.import_module('experiments.services')
-    metadata_serializer_module = importlib.import_module('metadata.services')
-    metadata_models = apps.all_models['metadata']
-    for key in experiments_models.keys():
-        if key in experiments_list:
-            try:
-                SerializerClass = getattr(experiments_serializer_module, serializer_mapping[key], None)
-                queryset = experiments_models[key].objects.all()
-                serializer = SerializerClass(queryset, many=True)
-                serialized_data = serializer.data
-                tsv_content = generate_tsv(serialized_data)
-                files[f"{key.lower()}.tsv"]  = tsv_content
-            except KeyError as error:
-                print(error)
-    for key in metadata_models.keys():
-        if key in metadata_list:
-            try:
-                SerializerClass = getattr(metadata_serializer_module, serializer_mapping[key], None)
-                queryset = metadata_models[key].objects.all()
-                serializer = SerializerClass(queryset, many=True)
-                serialized_data = serializer.data
-                tsv_content = generate_tsv(serialized_data)
-                files[f"{key.lower()}.tsv"]  = tsv_content
-            except KeyError as error:
-                print(error)
+def get_all_tables():
+    manifest = []
+    zip_buffer = BytesIO()
 
-    zip_buffer = generate_zip(files)
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for name, values in table_serializers.items():
+            try:
+                queryset_factory = values.get("queryset")
+
+                if queryset_factory:
+                    queryset = queryset_factory()
+                else:
+                    queryset = values["model"].objects.all()
+
+                result = serialize_table(
+                    name,
+                    queryset=queryset,
+                    serializer_class=values["output_serializer"]
+                )
+                data = result.pop("data")
+                manifest.append(result)
+                
+                payload = json.dumps(
+                    data,
+                    cls=DjangoJSONEncoder,
+                    indent=2
+                )
+                
+                zip_file.writestr(f"{name}.json", payload)
+
+            except Exception as error:
+                manifest.append({
+                    "name": name,
+                    "error": str(error)
+                })
+        zip_file.writestr("manifest.json", json.dumps(manifest, cls=DjangoJSONEncoder))
+    zip_buffer.seek(0)
 
     return zip_buffer
-
-
-def get_all_tables():
-    serialized_return_data = []
-
-    for name, values in table_serializers.items():
-        try:
-            queryset_factory = values.get("queryset")
-
-            if queryset_factory:
-                queryset = queryset_factory()
-            else:
-                queryset = values["model"].objects.all()
-
-            result = serialize_table(
-                name,
-                queryset=queryset,
-                serializer_class=values["output_serializer"]
-            )
-            # result.pop("data")
-            serialized_return_data.append(result)
-        
-        except Exception as error:
-            serialized_return_data.append({
-                "name": name,
-                "error": str(error)
-            })
-
-    return serialized_return_data
 
 
 def families_by_type(participants_sorted:Participant)-> dict:
