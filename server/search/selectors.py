@@ -2,9 +2,11 @@
 # search/selectors.py
 
 import json
+import time
 import requests
 import importlib
 from django.apps import apps
+from django.core.serializers.json import DjangoJSONEncoder
 
 from config.selectors import (
     generate_tsv,
@@ -86,45 +88,118 @@ serializer_mapping ={
 }
 
 table_serializers = {
-        "experiment_dna_short_read": {
-            "model": ExperimentDNAShortRead,
-            "output_serializer": ExperimentDNAOutputSerializer,
-        },
-        "experiment_nanopore": {
-            "model": ExperimentNanopore,
-            "input_serializer": ExperimentNanoporeSerializer,
-            "output_serializer": ExperimentNanoporeSerializer,
-        },
-        "experiment_pac_bio": {
-            "model": ExperimentPacBio,
-            "input_serializer": ExperimentPacBioSerializer,
-            "output_serializer": ExperimentPacBioSerializer,
-        },
-        "experiment_rna_short_read": {
-            "model": ExperimentRNAShortRead,
-            "output_serializer": ExperimentRNAOutputSerializer,
-        },
-        "aligned_dna_short_read": {
-            "model": AlignedDNAShortRead,
-            "input_serializer": AlignedDNAShortReadSerializer,
-            "output_serializer": AlignedDNAShortReadSerializer,
-        },
-        "aligned_nanopore": {
-            "model": AlignedNanopore,
-            "input_serializer": AlignedNanoporeSerializer,
-            "output_serializer": AlignedNanoporeSerializer,
-        },
-        "aligned_pac_bio": {
-            "model": AlignedPacBio,
-            "input_serializer": AlignedPacBioSerializer,
-            "output_serializer": AlignedPacBioSerializer,
-        },
-        "aligned_rna_short_read": {
-            "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer,
-        },
+    # Metadata Tables
+    "participant": {
+        "model": Participant,
+        "output_serializer": ParticipantOutputSerializer,
+        "queryset": lambda: Participant.objects.all()
+            .select_related("family_id")
+            .prefetch_related(
+                "internal_project_id",
+                "pmid_id",
+                "twin_id",
+                "reported_race",
+            ),
+    },
+    "family": {
+        "model": Family,
+        "input_serializer": FamilySerializer,
+        "output_serializer": FamilySerializer,
+    },
+    "genetic_findings": {
+        "model": GeneticFindings,
+        "input_serializer": GeneticFindingsInputSerializer,
+        "output_serializer": GeneticFindingsOutputSerializer,
+    },
+    "analyte": {
+        "model": Analyte,
+        "input_serializer": AnalyteSerializer,
+        "output_serializer": AnalyteSerializer,
+    },
+    "phenotype": {
+        "model": Phenotype,
+        "input_serializer": PhenotypeSerializer,
+        "output_serializer": PhenotypeSerializer,
+        "queryset": lambda: Phenotype.objects.all()
+            .select_related("participant_id")
+    },
+    "biobank": {
+        "model": Biobank,
+        "input_serializer": BiobankSerializer,
+        "output_serializer": BiobankSerializer,
+        "queryset": lambda: Biobank.objects.all()
+            .select_related("participant_id")
+            .prefetch_related("child_analytes", "experiments", "alignments"),
+    },
+    # Experiment Tables
+    "experiment": {
+        "model": Experiment,
+        "input_serializer": ExperimentSerializer,
+        "output_serializer": ExperimentSerializer,
+    },
+    "experiment_dna_short_read": {
+        "model": ExperimentDNAShortRead,
+        "output_serializer": ExperimentDNAOutputSerializer,
+    },
+    "experiment_nanopore": {
+        "model": ExperimentNanopore,
+        "input_serializer": ExperimentNanoporeSerializer,
+        "output_serializer": ExperimentNanoporeSerializer,
+    },
+    "experiment_pac_bio": {
+        "model": ExperimentPacBio,
+        "input_serializer": ExperimentPacBioSerializer,
+        "output_serializer": ExperimentPacBioSerializer,
+    },
+    "experiment_rna_short_read": {
+        "model": ExperimentRNAShortRead,
+        "output_serializer": ExperimentRNAOutputSerializer,
+    },
+    "aligned_dna_short_read": {
+        "model": AlignedDNAShortRead,
+        "input_serializer": AlignedDNAShortReadSerializer,
+        "output_serializer": AlignedDNAShortReadSerializer,
+    },
+    # Aligned tables
+    "aligned": {
+        "model": Aligned, 
+        "input_serializer": AlignedSerializer,
+        "output_serializer": AlignedSerializer,
+    },
+    "aligned_nanopore": {
+        "model": AlignedNanopore,
+        "input_serializer": AlignedNanoporeSerializer,
+        "output_serializer": AlignedNanoporeSerializer,
+    },
+    "aligned_pac_bio": {
+        "model": AlignedPacBio,
+        "input_serializer": AlignedPacBioSerializer,
+        "output_serializer": AlignedPacBioSerializer,
+    },
+    "aligned_rna_short_read": {
+        "model": AlignedRNAShortRead,
+        "input_serializer": AlignedRNASerializer,
+        "output_serializer": AlignedRNASerializer,
+    },
+}
+
+
+def serialize_table(name, queryset, serializer_class): 
+    start = time.perf_counter()
+    count = queryset.count()
+    serialized = serializer_class(queryset, many=True)
+    data = serialized.data
+
+    size_bytes = len(json.dumps(data, cls=DjangoJSONEncoder).encode("utf-8"))
+    elapsed = time.perf_counter() - start
+    return {
+        "name": name,
+        "count": count,
+        "size_mb": round(size_bytes / 1024 / 1024, 2),
+        "seconds": elapsed,
+        "data": data,
     }
+
 
 def get_anvil_tables():
     files = {}
@@ -163,76 +238,33 @@ def get_anvil_tables():
 
 
 def get_all_tables():
-    # Metadata Models
-    serialized_participants = ParticipantOutputSerializer(
-        Participant.objects.all(), many=True
-    )
-    serialized_families = FamilySerializer(Family.objects.all(), many=True)
-    serialized_analytes = AnalyteSerializer(Analyte.objects.all(), many=True)
-    serialized_phenotypes = PhenotypeSerializer(
-        Phenotype.objects.all(), many=True
-    )
-    serialized_genetic_findings = GeneticFindingsOutputSerializer(
-        GeneticFindings.objects.all(), many=True
-    )
-    serialized_biobank_entries = BiobankSerializer(
-        Biobank.objects.all(), many=True
-    )
+    serialized_return_data = []
 
-    # Experiment Models
-    serialized_aligned_experiments = AlignedSerializer(
-        Aligned.objects.all(), many=True
-    )
-    serialized_aligned_dna = AlignedDNAShortReadSerializer(
-        AlignedDNAShortRead.objects.all(), many=True
-    )
-    serialized_aligned_nanopore = AlignedNanoporeSerializer(
-        AlignedNanopore.objects.all(), many=True
-    )
-    serialized_aligned_pacbio = AlignedPacBioSerializer(
-        AlignedPacBio.objects.all(), many=True
-    )
-    serialized_aligned_rna = AlignedRNASerializer(
-        AlignedRNAShortRead.objects.all(), many=True
-    )
-    serialized_experiments = ExperimentSerializer(
-        Experiment.objects.all(), many=True
-    )
-    serialized_dna = ExperimentDNAOutputSerializer(
-        ExperimentDNAShortRead.objects.all(), many=True
-    )
-    serialized_nanopore = ExperimentNanoporeSerializer(
-        ExperimentNanopore.objects.all(), many=True
-    )
-    serialized_pacbio = ExperimentPacBioSerializer(
-        ExperimentPacBio.objects.all(), many=True
-    )
-    serialized_rna = ExperimentRNAOutputSerializer(
-        ExperimentRNAShortRead.objects.all(), many=True
-    )
+    for name, values in table_serializers.items():
+        try:
+            queryset_factory = values.get("queryset")
 
-    serilized_return_data = {
-        # Metadata Tables
-        "participant": serialized_participants.data,
-        "family": serialized_families.data,
-        "genetic_findings": serialized_genetic_findings.data,
-        "analyte": serialized_analytes.data,
-        "phenotype": serialized_phenotypes.data,
-        "biobank": serialized_biobank_entries.data,
-        # Experiment Tables
-        "experiment": serialized_experiments.data,
-        "experiment_dna_short_read": serialized_dna.data,
-        "experiment_nanopore": serialized_nanopore.data,
-        "experiment_pac_bio": serialized_pacbio.data,
-        "experiment_rna_short_read": serialized_rna.data,
-        # Aligned tables
-        "aligned": serialized_aligned_experiments.data,
-        "aligned_dna_short_read": serialized_aligned_dna.data,
-        "aligned_nanopore": serialized_aligned_nanopore.data,
-        "aligned_pac_bio": serialized_aligned_pacbio.data,
-        "aligned_rna_short_read": serialized_aligned_rna.data,
-    }
-    return serilized_return_data
+            if queryset_factory:
+                queryset = queryset_factory()
+            else:
+                queryset = values["model"].objects.all()
+
+            result = serialize_table(
+                name,
+                queryset=queryset,
+                serializer_class=values["output_serializer"]
+            )
+            # result.pop("data")
+            serialized_return_data.append(result)
+        
+        except Exception as error:
+            serialized_return_data.append({
+                "name": name,
+                "error": str(error)
+            })
+
+    return serialized_return_data
+
 
 def families_by_type(participants_sorted:Participant)-> dict:
     """Family relationship grouping"""
@@ -274,6 +306,7 @@ def families_by_type(participants_sorted:Participant)-> dict:
     families = families - len(family_ids_without_participants)
 
     return family_types, families
+
 
 def get_summary_stats():
     # Basic counts

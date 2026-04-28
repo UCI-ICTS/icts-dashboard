@@ -109,7 +109,7 @@ const HomePage = () => {
                 >
                   <img
                     src="/kauro192.png"
-                    alt="MIA logo"
+                    alt="Kauro logo"
                     className="card-icon"
                     style={{width: 60}}
                   />
