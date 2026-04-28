@@ -6,13 +6,15 @@ from rest_framework.routers import DefaultRouter
 from authentication.apis import (
     TokenViewSet,
     UserViewSet,
-    PasswordViewSet
+    PasswordViewSet,
+    EmailUsersViewSet
 )
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r"password", PasswordViewSet, basename="password")
 router.register(r"token", TokenViewSet, basename="token")
+router.register(r"email", EmailUsersViewSet, basename="email")
 
 
 

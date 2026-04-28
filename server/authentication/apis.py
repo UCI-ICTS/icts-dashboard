@@ -30,7 +30,10 @@ from authentication.services import (
     CustomTokenObtainPairSerializer,
     ActivateUserSerializer,
     IsSuperUser,
+    EmailActiveUsers
 )
+
+from authentication.selectors import get_active_user_emails
 
 import string  # For replacing the deprecated Django method BaseUserManager.make_random_password()
 import secrets # 
@@ -380,4 +383,41 @@ class PasswordViewSet(viewsets.ViewSet):
             serializer.update(request.user, serializer.validated_data)
             return Response({"detail": "Password changed successfully"}, status=200)
 
+        return Response(serializer.errors, status=400)
+
+
+class EmailUsersViewSet(viewsets.ViewSet):
+    """Handles system emails to users"""
+
+    permission_classes_by_action = {
+        "all_active": [permissions.IsAuthenticated]
+        # "request_reset": [permissions.AllowAny],
+        # "confirm_reset": [permissions.AllowAny],
+    }
+    
+    @swagger_auto_schema(
+        request_body=EmailActiveUsers,
+        responses={200: "Email sent successfully"},
+        operation_description="Email all active users.",
+        tags=["User Emails"],
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="all_active",
+        permission_classes=[permissions.AllowAny]
+    )
+    def email_all_users(self, request):
+        serializer = EmailActiveUsers(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            import pdb; pdb.set_trace()
+            message = EmailMultiAlternatives(
+                subject=serializer.data["subject"],
+                body="",
+                from_email="",
+                bcc=get_active_user_emails
+            )
+            return Response({"detail": "Email sent successfully"}, status=200)
         return Response(serializer.errors, status=400)

@@ -25,3 +25,8 @@ class CustomObtainPairSerializer(TokenObtainPairSerializer):
         # print(token)
 
         return token
+
+
+def get_active_user_emails():
+    email_list = [email['email'] for email in User.objects.filter(is_active=True).values('email')]
+    return email_list
