@@ -30,13 +30,6 @@ const openReport = async (objectKey) => {
   return response;
 };
 
-const getAllTables = async () => {
-  const response = api.get(`${APIDB}api/search/get_all_tables/`, {
-    headers: getAuthHeaders(),
-  });
-  return response;
-}
-
 const familyDetail = async (participant_id) => {
     const response = api.get(APIDB + `api/search/family_detail/?ids=${participant_id}`, {headers: getAuthHeaders()})
     return response
@@ -104,7 +97,6 @@ const dataService = {
   fetchTable,
   updateEntry,
   deleteEntry,
-  getAllTables,
   extractPhenotypes
 }
 

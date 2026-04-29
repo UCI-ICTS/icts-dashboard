@@ -4,10 +4,10 @@ Requires=gregor.socket
 After=network.target
 
 [Service]
-User=ec2-user
-Group=ec2-user
+User=nginx
+Group=developers
 WorkingDirectory=/var/www/github/GREGor_dashboard/server
-ExecStart=/var/www/github/GREGor_dashboard/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/api_stdout.log --log-level=debug --log-file /var/log/gunicorn/api_stderr.log --workers 3 --bind unix:/var/run/gregor.sock config.wsgi:application
+ExecStart=/var/www/github/GREGor_dashboard/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/api_stdout.log --log-level=debug --log-file /var/log/gunicorn/api_stderr.log --timeout 120 --workers 3 --bind unix:/var/run/gregor.sock config.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
