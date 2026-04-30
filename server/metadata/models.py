@@ -699,6 +699,7 @@ class Biobank(TimeStampedModel):
         max_length=50,
         choices=[
             ("5x5 cryobox", "5x5 cryobox"),
+            ("7x7 cryobox", "7x7 cryobox"),
             ("9x9 cryobox", "9x9 cryobox"),
             ("10x10 cryobox", "10x10 cryobox"),
             ("SBS plate", "SBS plate"),
