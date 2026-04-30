@@ -1,0 +1,1291 @@
+#!/usr/bin/env python
+# metadata/apis.py
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from config.selectors import (
+    response_constructor,
+    response_status,
+    bulk_retrieve,
+    bulk_model_retrieve,
+    get_visible_objects
+)
+
+from metadata.models import (
+    Participant,
+    Analyte,
+    Family,
+    GeneticFindings,
+    Phenotype,
+    Biobank,
+)
+
+from metadata.services import (
+    AnalyteSerializer,
+    GeneticFindingsInputSerializer,
+    GeneticFindingsOutputSerializer,
+    ParticipantInputSerializer,
+    ParticipantOutputSerializer,
+    FamilySerializer,
+    PhenotypeSerializer,
+    BiobankSerializer,
+    create_metadata,
+    update_metadata_entry,
+    delete_metadata,
+)
+
+
+class ParticipantViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Participant entries",
+        responses={200: ParticipantOutputSerializer(many=True), 400: "Bad request"},
+        tags=["Participant"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            model=Participant,
+            superuser=self.request.user.is_superuser
+        )
+        serializer = ParticipantOutputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=ParticipantInputSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Participant"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_participant(self, request):
+        participant = bulk_model_retrieve(request.data, Participant, "participant_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            participant_id = datum.get("participant_id")
+            if participant_id and participant_id in participant:
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Participant entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("participant", participant_id, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Participant"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        participants = bulk_retrieve(Participant, ids, "participant_id")
+            
+        response_data, accepted, rejected = [], False, False
+
+        for participant_id in ids:
+            if participant_id in participants:
+                if not superuser and participants[participant_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=participants[participant_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=ParticipantInputSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Participant"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_participant(self, request):
+        participants = bulk_model_retrieve(request.data, Participant, "participant_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            participant_id = datum.get("participant_id")
+            if participant_id not in participants:
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                    and participants[participant_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=participant_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "participant",
+                        participant_id,
+                        participants[participant_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_participant_entries",
+        operation_description="Bulk delete Participant entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Participant IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["Participant"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete Participant entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        participant = bulk_retrieve(Participant, ids, "participant_id")
+        response_data, accepted, rejected = [], False, False
+
+        for participant_id in ids:
+            if participant_id in participant:
+                data, result = delete_metadata(
+                    "participant", participant_id, "participant_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=participant_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class FamilyViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Family entries",
+        responses={200: FamilySerializer(many=True), 400: "Bad request"},
+        tags=["Family"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            superuser=self.request.user.is_superuser,
+            model=Family
+        )
+        serializer = FamilySerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=FamilySerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Family"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_family(self, request):
+        family = bulk_model_retrieve(request.data, Family, "family_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            family_id = datum.get("family_id")
+            if family_id and family_id in family:
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Family entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("family", family_id, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Family"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        family = bulk_retrieve(Family, ids, "family_id")
+        response_data, accepted, rejected = [], False, False
+
+        for family_id in ids:
+            if family_id in family:
+                if not superuser and family[family_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=family[family_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=FamilySerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Family"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_family(self, request):
+        family = bulk_model_retrieve(request.data, Family, "family_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            family_id = datum.get("family_id")
+            if family_id not in family:
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                    and family[family_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=family_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "family",
+                        family_id,
+                        family[family_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_family_entries",
+        operation_description="Bulk delete Family entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Family IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["Family"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete Family entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        family = bulk_retrieve(Family, ids, "family_id")
+        response_data, accepted, rejected = [], False, False
+
+        for family_id in ids:
+            if family_id in family:
+                data, result = delete_metadata("family", family_id, "family_id")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=family_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class AnalyteViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Analyte entries",
+        responses={200: AnalyteSerializer(many=True), 400: "Bad request"},
+        tags=["Analyte"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            model=Analyte,
+            superuser=self.request.user.is_superuser
+        )
+        serializer = AnalyteSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=AnalyteSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Analyte"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_analyte(self, request):
+        analyte = bulk_model_retrieve(request.data, Analyte, "analyte_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            analyte_id = datum.get("analyte_id")
+            if analyte_id and analyte_id in analyte:
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Analyte entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("analyte", analyte_id, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Analyte"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        analyte = bulk_retrieve(Analyte, ids, "analyte_id")
+        response_data, accepted, rejected = [], False, False
+
+        for analyte_id in ids:
+            if analyte_id in analyte:
+                if not superuser and analyte[analyte_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+                else:    
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=analyte[analyte_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=AnalyteSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Analyte"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_analyte(self, request):
+        analyte = bulk_model_retrieve(request.data, Analyte, "analyte_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            analyte_id = datum.get("analyte_id")
+            if analyte_id not in analyte:
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                    and analyte[analyte_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=analyte_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "analyte",
+                        analyte_id,
+                        analyte[analyte_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_analyte_entries",
+        operation_description="Bulk delete Analyte entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Analyte IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["Analyte"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete Analyte entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        analyte = bulk_retrieve(Analyte, ids, "analyte_id")
+        response_data, accepted, rejected = [], False, False
+
+        for analyte_id in ids:
+            if analyte_id in analyte:
+                data, result = delete_metadata("analyte", analyte_id, "analyte_id")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=analyte_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class PhenotypeViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Phenotype entries",
+        responses={200: PhenotypeSerializer(many=True), 400: "Bad request"},
+        tags=["Phenotype"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            model=Phenotype,
+            superuser=self.request.user.is_superuser
+        )
+        serializer = PhenotypeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=PhenotypeSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Phenotype"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_phenotype(self, request):
+        phenotype = bulk_model_retrieve(request.data, Phenotype, "phenotype_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            phenotype_id = datum.get("phenotype_id")
+            if phenotype_id and phenotype_id in phenotype:
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Phenotype entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("phenotype", phenotype_id, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Phenotype"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        phenotype = bulk_retrieve(Phenotype, ids, "phenotype_id")
+        response_data, accepted, rejected = [], False, False
+
+        for phenotype_id in ids:
+            if phenotype_id in phenotype:
+                if not superuser and phenotype[phenotype_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=phenotype[phenotype_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=PhenotypeSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Phenotype"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_phenotype(self, request):
+        phenotype = bulk_model_retrieve(request.data, Phenotype, "phenotype_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            phenotype_id = datum.get("phenotype_id")
+            if phenotype_id not in phenotype:
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                and phenotype[phenotype_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=phenotype_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "phenotype",
+                        phenotype_id,
+                        phenotype[phenotype_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_phenotype_entries",
+        operation_description="Bulk delete Phenotype entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Phenotype IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["Phenotype"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete Phenotype entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        phenotype = bulk_retrieve(Phenotype, ids, "phenotype_id")
+        response_data, accepted, rejected = [], False, False
+
+        for phenotype_id in ids:
+            if phenotype_id in phenotype:
+                data, result = delete_metadata(
+                    "phenotype", phenotype_id, "phenotype_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=phenotype_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class GeneticFindingsViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Genetic Findings entries",
+        responses={200: GeneticFindingsOutputSerializer(many=True), 400: "Bad request"},
+        tags=["GeneticFindings"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            model=GeneticFindings,
+            superuser=self.request.user.is_superuser
+        )
+        serializer = GeneticFindingsInputSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        request_body=GeneticFindingsOutputSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["GeneticFindings"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_genetic_findings(self, request):
+        genetic_findings = bulk_model_retrieve(
+            request.data, GeneticFindings, "genetic_findings_id"
+        )
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            genetic_findings_id = datum.get("genetic_findings_id")
+            if genetic_findings_id and genetic_findings_id in genetic_findings:
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="GeneticFindings entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+
+                data, result = create_metadata(
+                    "genetic_findings", genetic_findings_id, datum, self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["GeneticFindings"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        genetic_findings = bulk_retrieve(GeneticFindings, ids, "genetic_findings_id")
+        response_data, accepted, rejected = [], False, False
+
+        for genetic_findings_id in ids:
+            if genetic_findings_id in genetic_findings:
+                if not superuser and genetic_findings[genetic_findings_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=genetic_findings[genetic_findings_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=GeneticFindingsInputSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["GeneticFindings"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_genetic_findings(self, request):
+        genetic_findings = bulk_model_retrieve(
+            request.data, GeneticFindings, "genetic_findings_id"
+        )
+
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            genetic_findings_id = datum.get("genetic_findings_id")
+            if genetic_findings_id not in genetic_findings:
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                    and genetic_findings[genetic_findings_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=genetic_findings_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    
+                else:
+                    data, result = update_metadata_entry(
+                        "genetic_findings",
+                        genetic_findings_id,
+                        genetic_findings[genetic_findings_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_genetic_findings_entries",
+        operation_description="Bulk delete GeneticFindings entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of GeneticFindings IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["GeneticFindings"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete GeneticFindings entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        genetic_findings = bulk_retrieve(GeneticFindings, ids, "genetic_findings_id")
+        response_data, accepted, rejected = [], False, False
+
+        for genetic_findings_id in ids:
+            if genetic_findings_id in genetic_findings:
+                data, result = delete_metadata(
+                    "genetic_findings", genetic_findings_id, "genetic_findings_id"
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=genetic_findings_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class BiobankViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        method="get",
+        operation_description="Retrieve all Biobank entries",
+        responses={200: BiobankSerializer(many=True), 400: "Bad request"},
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = get_visible_objects(
+            model=Biobank,
+            superuser=self.request.user.is_superuser
+        )
+        serializer = BiobankSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "id",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"],
+    )
+    def list(self, request):
+        superuser = self.request.user.is_superuser
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        biobanks = bulk_retrieve(Biobank, ids, "bioank_id")
+
+        response_data, accepted, rejected = [], False, False
+
+        for biobank_id in ids:
+            if biobank_id in biobanks:
+                if not superuser and biobanks[biobank_id]["needs_review"]:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="FORBIDDEN",
+                            code=403
+                        )
+                    )
+                    rejected = True
+
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="SUCCESS",
+                            code=200,
+                            data=biobanks[biobank_id],
+                        )
+                    )
+                    accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=BiobankSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_biobank(self, request):
+        biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            biobank_id = datum.get("biobank_id")
+            if biobank_id and biobank_id in biobank:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Biobank entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_metadata("biobank", biobank_id, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"],
+    )
+    def list(self, request):
+        ids = request.GET.get("ids", "")
+        if not ids:
+            return Response(
+                {"detail": "Query parameter 'ids' is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        ids = ids.split(",")
+
+        biobank = bulk_retrieve(Biobank, ids, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for biobank_id in ids:
+            if biobank_id in biobank:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=biobank[biobank_id],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        request_body=BiobankSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_biobank(self, request):
+        biobank = bulk_model_retrieve(request.data, Biobank, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            biobank_id = datum.get("biobank_id")
+            if biobank_id not in biobank:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                if not self.request.user.is_superuser \
+                    and biobank[biobank_id].needs_review:
+                    response_data.append(
+                        response_constructor(
+                            identifier=biobank_id,
+                            request_status="FORBIDDEN",
+                            code=403,
+                        )
+                    )
+                    rejected = True
+                else:
+                    data, result = update_metadata_entry(
+                        "biobank",
+                        biobank_id,
+                        biobank[biobank_id],
+                        datum,
+                        self.request.user
+                    )
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="bulk_delete_biobank_entries",
+        operation_description="Bulk delete Biobank entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Biobank IDs (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["Biobank"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete Biobank entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        biobank = bulk_retrieve(Biobank, ids, "biobank_id")
+        response_data, accepted, rejected = [], False, False
+
+        for biobank_id in ids:
+            if biobank_id in biobank:
+                data, result = delete_metadata("biobank", biobank_id, "biobank_id")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=biobank_id,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
