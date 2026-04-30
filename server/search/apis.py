@@ -16,7 +16,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from search.selectors import (
-    get_anvil_tables,
     get_all_tables,
     get_summary_stats,
     get_family_detail,
@@ -26,41 +25,74 @@ from search.selectors import (
 from search.services import FamilyDetailInputSerializer
 
 
-class AllTablesAPI(APIView):
-    """"""
+class AllTablesZipAPI(APIView):
+    """
+    Download all registered GREGoR data tables as a ZIP archive.
+
+    The ZIP archive contains one JSON file per table and a manifest file
+    describing the exported files.
+    """
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_id="get_all_tables",
+        operation_id="download_all_tables_zip",
+        operation_summary="Download all tables as ZIP",
+        operation_description=(
+            "Builds and returns a ZIP archive containing one JSON file per "
+            "registered GREGoR data table, plus a manifest.json file."
+        ),
+        produces=["application/zip"],
         responses={
-            200: "Submission successful",
-            400: "Bad request",
+            200: openapi.Response(
+                description="ZIP archive containing exported table JSON files.",
+                schema=openapi.Schema(type=openapi.TYPE_FILE),
+            ),
+            400: openapi.Response(description="Failed to build ZIP archive."),
+            401: openapi.Response(description="Authentication required."),
         },
         tags=["Search"],
     )
     def get(self, request):
-        response_data = []
         try:
-            serilized_return_data = get_all_tables()
-            return Response(status=status.HTTP_200_OK, data=serilized_return_data)
+            zip_buffer = get_all_tables()
+
+            response = HttpResponse(
+                zip_buffer.getvalue(),
+                content_type="application/zip",
+            )
+            response["Content-Disposition"] = (
+                'attachment; filename="gregor_all_tables.zip"'
+            )
+            return response
+
         except Exception as error:
-            response_data.insert(0, str(error))
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+            return Response(
+                {"detail": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class SummaryAPI(APIView):
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id="summary",
+        operation_summary="Summary statistics",
+        operation_description=(
+            "Builds and returns aggregate summary statistics for the project. "
+            "The response includes high-level entity counts, solve status counts, "
+            "biobank and analyte summaries, sequencing versus alignment counts, "
+            "family type summaries, experiment category counts, pediatric proband "
+            "counts, long-read family summaries, reported race summaries, and "
+            "ontology term frequencies."
+        ),
         responses={
             200: "Submission successful",
             400: "Bad request",
         },
         tags=["Search"],
     )
-
 
     def get(self, request):
         try:
