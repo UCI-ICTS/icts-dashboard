@@ -55,6 +55,8 @@
 
 	ALTER USER postgres WITH PASSWORD 'a_new_and_secure_password';  # password is not initially set for the postgres user
 	CREATE DATABASE 'ictsdashboard_app';
+	ALTER DATABASE ictsdashboard_app OWNER TO postgres;
+
 	\q  # exit the psql shell
 
 	# Open port 5432 on your local postgresql instance's firewall, if the firewall is enabled.

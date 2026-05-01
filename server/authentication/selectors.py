@@ -3,7 +3,7 @@
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from rest_framework import serializers, permissions
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +25,15 @@ class CustomObtainPairSerializer(TokenObtainPairSerializer):
         # print(token)
 
         return token
+
+class IsSuperUser(permissions.BasePermission):
+    """
+    Allows access only to admin users.
+    """
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_superuser)
+    
+def get_active_user_emails():
+    email_list = [email['email'] for email in User.objects.filter(is_active=True).values('email')]
+    return email_list

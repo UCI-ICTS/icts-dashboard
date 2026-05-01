@@ -156,6 +156,16 @@ class UserOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class EmailActiveUsers(serializers.Serializer):
+    subject = serializers.CharField()
+    from_email = serializers.CharField(
+        default=settings.DEFAULT_FROM_EMAIL
+    )
+    to_email = serializers.CharField()
+    body = serializers.CharField()
+    html_template = serializers.CharField()
+
+
 class CustomAuthentication(BaseAuthentication):
     """
     Custom JSON Web Token Authentication class that supports different types
