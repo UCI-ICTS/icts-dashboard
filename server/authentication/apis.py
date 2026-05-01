@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # authentication/apis.py
 
+import string
+import secrets
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -33,11 +35,7 @@ from authentication.services import (
     EmailActiveUsers
 )
 
-from authentication.selectors import get_active_user_emails
-
-import string  # For replacing the deprecated Django method BaseUserManager.make_random_password()
-import secrets # 
-
+from authentication.selectors import IsSuperUser, get_active_user_emails
 
 User = get_user_model()
 
@@ -387,37 +385,48 @@ class PasswordViewSet(viewsets.ViewSet):
 
 
 class EmailUsersViewSet(viewsets.ViewSet):
-    """Handles system emails to users"""
-
+    """Handles system emails to users."""
     permission_classes_by_action = {
-        "all_active": [permissions.IsAuthenticated]
-        # "request_reset": [permissions.AllowAny],
-        # "confirm_reset": [permissions.AllowAny],
+        "email_all_users": [IsSuperUser],
     }
+
+    def get_permissions(self):
+        perms = self.permission_classes_by_action.get(
+            self.action, self.permission_classes
+        )
+        return [perm() for perm in perms]
     
     @swagger_auto_schema(
         request_body=EmailActiveUsers,
         responses={200: "Email sent successfully"},
-        operation_description="Email all active users.",
+        operation_description="Email all active users. Must be an admin user to use.",
         tags=["User Emails"],
     )
+
     @action(
         detail=False,
         methods=["post"],
-        url_path="all_active",
-        permission_classes=[permissions.AllowAny]
+        url_path="all_active"
     )
     def email_all_users(self, request):
-        serializer = EmailActiveUsers(
-            data=request.data, context={"request": request}
+        serializer = EmailActiveUsers(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        subject=serializer.validated_data.get("subject", "")
+        from_email=None,
+        body=serializer.validated_data.get("body", "")
+        html_template=serializer.validated_data.get("html_template", "string")
+        if html_template == "string":
+            html_template= "emails/email_users.html" 
+        bcc=get_active_user_emails()
+
+        html_content= render_to_string(html_template, serializer.validated_data)
+        message = EmailMultiAlternatives(from_email, subject, body, bcc,)
+        message.attach_alternative(html_content, "text/html")
+        message.send()
+
+        return Response(
+            {"detail": "Email sent successfully"},
+            status=200,
         )
-        if serializer.is_valid():
-            import pdb; pdb.set_trace()
-            message = EmailMultiAlternatives(
-                subject=serializer.data["subject"],
-                body="",
-                from_email="",
-                bcc=get_active_user_emails
-            )
-            return Response({"detail": "Email sent successfully"}, status=200)
+
         return Response(serializer.errors, status=400)

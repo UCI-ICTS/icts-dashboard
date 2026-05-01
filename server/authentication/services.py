@@ -162,7 +162,7 @@ class EmailActiveUsers(serializers.Serializer):
         default=settings.DEFAULT_FROM_EMAIL
     )
     to_email = serializers.CharField()
-    text_content = serializers.CharField()
+    body = serializers.CharField()
     html_template = serializers.CharField()
 
 
