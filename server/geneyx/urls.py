@@ -3,24 +3,20 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from metadata.apis import (
-
-    BiobankViewSet,
-    ParticipantViewSet,
-    FamilyViewSet,
-    AnalyteViewSet,
-    PhenotypeViewSet,
-    GeneticFindingsViewSet,
+from geneyx.apis import (
+    GeneyxGetAllSamplesViewSet,
+    GeneyxGetSampleViewSet,
+    GeneyxGetAllCasesViewSet,
+    GeneyxGetCaseViewSet,
+    GeneyxGetCaseNotesViewSet,
 )
 
 router = DefaultRouter()
-router.register(r'participant', ParticipantViewSet, basename='participant')
-router.register(r'family', FamilyViewSet, basename='family')
-router.register(r'analyte', AnalyteViewSet, basename='analyte')
-router.register(r'phenotype', PhenotypeViewSet, basename='phenotype')
-router.register(r'genetic_findings', GeneticFindingsViewSet, basename='genetic_findings')
-router.register(r'biobank', BiobankViewSet, basename='biobank')
-
+router.register(r'get_samples', GeneyxGetAllSamplesViewSet, basename='get_all_samples')
+router.register(r'get_sample', GeneyxGetSampleViewSet, basename='get_sample')
+router.register(r'get_cases', GeneyxGetAllCasesViewSet, basename='get_all_cases')
+router.register(r'get_case', GeneyxGetCaseViewSet, basename='get_case')
+router.register(r'get_case_notes', GeneyxGetCaseNotesViewSet, basename='get_case_notes')
 urlpatterns = [
     path('', include(router.urls)),
 ]
