@@ -555,8 +555,6 @@ export const getIdentifier = (schema) => {
 // Normalize forms for GREGoR-specific format requirements
 export const normalizeArrays = (obj, schemaProps) => {
   const result = { ...obj };
-  console.log("Pre-normalized result")
-  console.log(result)
   Object.entries(schemaProps).forEach(([key, def]) => {
     if (def.type === "array" && result[key] === null) {
       result[key] = [];
@@ -578,7 +576,5 @@ export const normalizeArrays = (obj, schemaProps) => {
   if (result["shipment_date"] instanceof dayjs) {  // Convert dayjs objects to ISO 8601 date strings, else ignore if already a string
     result["shipment_date"] = result["shipment_date"].toISOString().split('T')[0]
   }
-  console.log("Post-normalized result")
-  console.log(result)
   return result;
 };
