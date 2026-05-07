@@ -563,7 +563,7 @@ export const normalizeArrays = (obj, schemaProps) => {
     }
   });
   // Phenotype normalization
-  if (result["phenotype_id"] === null && result["participant_id"] && result["term_id"]) {
+  if (result["phenotype_id"] == null && result["participant_id"] && result["term_id"]) {
     result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
   }
   // Biobank normalization
