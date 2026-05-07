@@ -18,57 +18,33 @@ from geneyx.selectors import (
 class GeneyxViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         method="post",
-        operation_description="Retrieve all VCF sample entries",
+        operation_description="Geneyx APIs",
         responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxGetSamples"],
+        tags=["GeneyxAPIs"],
     )
-    @action(detail=False, methods=["post"], url_path="Samples")
-    def get_all_samples(self):
+    @action(detail=False, methods=["post"], url_path="get_samples")
+    def get_all_samples(self, request):
         serializer = get_all_samples()
         return Response(serializer.data, status=200)
 
-    @swagger_auto_schema(
-        method="post",
-        operation_description="Retrieve a VCF sample given its Geneyx sample ID",
-        responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxGetSample"],
-    )
-    @action(detail=False, methods=["post"], url_path="Sample")
+    @action(detail=False, methods=["post"], url_path="get_sample")
     def get_sample(self, request):
         sample_id = request.data
         sample = get_sample(sample_id)
         return Response(sample, status=200)
 
-    @swagger_auto_schema(
-        method="post",
-        operation_description="Retrieve all cases",
-        responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxGetCases"],
-    )
-    @action(detail=False, methods=["post"], url_path="Cases")
-    def get_all_cases(self):
+    @action(detail=False, methods=["post"], url_path="get_all_cases")
+    def get_all_cases(self, request):
         serializer = get_all_cases()
         return Response(serializer.data, status=200)
 
-    @swagger_auto_schema(
-        method="post",
-        operation_description="Retrieve a case given a Geneyx case ID",
-        responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxGetCase"],
-    )
-    @action(detail=False, methods=["post"], url_path="Case")
+    @action(detail=False, methods=["post"], url_path="get_case")
     def get_case(self, request):
         case_id = request.data
         case = get_case(case_id)
         return Response(case, status=200)
 
-    @swagger_auto_schema(
-        method="post",
-        operation_description="Retrieve a case's notes given a Geneyx case ID",
-        responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxGetCaseNotes"],
-    )
-    @action(detail=False, methods=["post"], url_path="Case")
+    @action(detail=False, methods=["post"], url_path="get_case_notes")
     def get_sample(self, request):
         case_id = request.data
         case_notes = get_case_notes(case_id)

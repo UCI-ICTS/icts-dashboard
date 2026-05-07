@@ -237,3 +237,10 @@ SWAGGER_SETTINGS = {
 #    'snippets': None,
 #    'scaffold_templates': None,
 #}
+
+# Geneyx variables
+GENEYX_APIDB = secrets.get("GENEYX", "GENEYX_APIDB", fallback="locahttps://analysis.geneyx.com/api")
+GENEYX_CONTENT_TYPE = secrets.get("GENEYX", "GENEYX_CONTENT_TYPE", fallback="application/json")
+GENEYX_PAGE_SIZE = secrets.getint("GENEYX", "GENEYX_PAGE_SIZE", fallback=2000)
+GENEYX_USER_ID = secrets.get("GENEYX", "GENEYX_USER_ID", fallback="OOPS")
+GENEYX_USER_KEY = secrets.get("GENEYX", "GENEYX_USER_KEY", fallback="OOPS")

@@ -2,7 +2,7 @@
 # geneyx/selectors.py
 
 import requests
-from settings import GENEYX_APIDB, GENEYX_CONTENT_TYPE, GENEYX_APIDB, GENEYX_PAGE_SIZE, GENEYX_USER_ID, GENEYX_USER_KEY
+from config.settings import GENEYX_APIDB, GENEYX_CONTENT_TYPE, GENEYX_APIDB, GENEYX_PAGE_SIZE, GENEYX_USER_ID, GENEYX_USER_KEY
 
 """Geneyx Selectors"""
 

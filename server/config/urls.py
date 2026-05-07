@@ -2,7 +2,7 @@
 # config/urls.py
 
 """
-Main URL configuration for GREGoRDB Dashboard. 
+Main URL configuration for GREGoRDB Dashboard.
 """
 
 from django.conf import settings
@@ -50,6 +50,7 @@ urlpatterns = [
     path("api/search/", include("search.urls")),
     path("api/hpo/", include("hpo.urls")),
     path("api/s3/", include("s3.urls")),
+    path("api/geneyx/", include("geneyx.urls")),
     path(
         "api/swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
@@ -59,5 +60,5 @@ urlpatterns = [
         "api/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
     path("api/admin/", admin.site.urls),
-    
+
 ]
