@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping, normalizeArrays } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 import dayjs from 'dayjs';
 
@@ -444,36 +444,6 @@ const SchemaForm = ({
         onClose?.();
       })
       .catch((err) => message.error(errorService.printErrorMessages(err)));
-  };
-
-  const normalizeArrays = (obj, schemaProps) => {
-    const result = { ...obj };
-    console.log("Pre-normalized result")
-    console.log(result)
-    Object.entries(schemaProps).forEach(([key, def]) => {
-      if (def.type === "array" && result[key] === null) {
-        result[key] = [];
-      }
-    });
-    // Phenotype normalization
-    if (result["phenotype_id"] === null && result["participant_id"] && result["term_id"]) {
-      result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
-    }
-    // Biobank normalization
-    if (result["current_location"] && !result["current_location"].includes("UCI")) {  // Clear freezer information if not in UCI Vilain Lab
-      result["freezer_id"] = null
-      result["shelf_id"] = null
-      result["rack_id"] = null
-    }
-    if (result["received_date"] instanceof dayjs) {  // Convert dayjs objects to ISO 8601 date strings, else ignore if already a string
-      result["received_date"] = result["received_date"].toISOString().split('T')[0]
-    }
-    if (result["shipment_date"] instanceof dayjs) {  // Convert dayjs objects to ISO 8601 date strings, else ignore if already a string
-      result["shipment_date"] = result["shipment_date"].toISOString().split('T')[0]
-    }
-    console.log("Post-normalized result")
-    console.log(result)
-    return result;
   };
 
   const handleSubmit = async (values) => {
