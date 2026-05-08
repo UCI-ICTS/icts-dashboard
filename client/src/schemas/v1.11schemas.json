@@ -3171,8 +3171,8 @@
                 "description": "Name of institution who collected the biosample"
             },
             "received_date": {
-                "type": "string",
-                "description": "8-digit date as MM/DD/YYYY, printed on tube"
+                "type": "date",
+                "description": "8-digit date as YYYY-MM-DD, printed on tube"
             },
             "specimen_type": {
                 "type": "string",
@@ -3250,7 +3250,7 @@
             },
             "shipment_date": {
                 "type": "date",
-                "description": "8-digit date MM/DD/YYYY"
+                "description": "8-digit date YYYY-MM-DD"
             },
             "tracking_number": {
                 "type": "string",
