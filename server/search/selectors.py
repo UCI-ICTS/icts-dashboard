@@ -501,18 +501,18 @@ def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict
             for report in s3_manifest:
                 if report["source_analysis_file"]["table_identifier"] == aln.aligned_id:
                     serialized_reports.append(report)
-            
-            
+
+
             serialized_alignments.append(alignment)
             print(serialized_reports)
 
-        
+
         # for aln in serialized_alignments:
         #     for report in TEST_MANIFEST:
         #         if report["source_analysis_file"]["table_identifier"] == aln.aligned_id:
         #             print(report)
         #     # if aln["alignment_id"]
-    
+
         family_detail.append({
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
@@ -534,14 +534,48 @@ def get_case_queue(participant_id:str) -> dict:
     """
     case_queue = []
     analysis_ready = {}
-    participants = Participant.objects.filter(family_id=Participant.objects.get(pk=participant_id).family_id)  # Get related participants
+    family_id = Participant.objects.get(pk=participant_id).family_id.pk
+    participants = Participant.objects.filter(family_id=family_id)  # Get related participants
+    family_type = {
+        "gregor_family_structure" : {
+            "proband": False,
+            "father": False,
+            "mother": False,
+            "sibling": False,
+            "other_relative": False
+        },
+        "analysis_family_structure" : {
+            "proband": False,
+            "father": False,
+            "mother": False,
+            "sibling": False,
+            "other_relative": False
+        }
+    }
+
+    def get_family_type(ft):
+        if participant.proband_relationship == "Self":
+            family_type[ft]["proband"] = True
+        elif participant.proband_relationship == "Father":
+            family_type[ft]["father"] = True
+        elif participant.proband_relationship == "Mother":
+            family_type[ft]["mother"] = True
+        elif participant.proband_relationship == "Sibling":
+            family_type[ft]["sibling"] = True
+        else:
+            family_type[ft]["other_relative"] = True
+        return family_type
 
     for participant in participants:
         serialized_participant = ParticipantOutputSerializer(participant)
         analytes = Analyte.objects.filter(participant_id=participant)
+        genetic_findings = GeneticFindings.objects.filter(participant_id=participant)
         dna_analytes = []
+        findings = []
         pac_bio_sequencing = []
         pac_bio_alignments = []
+
+        get_family_type("gregor_family_structure")
 
         for analyte in analytes:
             if analyte.analyte_type != "DNA":
@@ -556,9 +590,14 @@ def get_case_queue(participant_id:str) -> dict:
                 continue
             pac_bio_alignments.append(pac_bio_alignment[0].aligned_pac_bio_id)
             analysis_ready[participant.participant_id] = True  # avoid adding duplicates
+            get_family_type("analysis_family_structure")
+
+        for genetic_finding in genetic_findings:
+            findings.append(genetic_finding.genetic_findings_id)
 
         serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=dna_analytes), many=True)
         serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=dna_analytes), many=True)
+        serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(pk__in=findings), many=True)
         serialized_sequencing = ExperimentPacBioSerializer(ExperimentPacBio.objects.filter(pk__in=pac_bio_sequencing), many=True)
         serialized_alignments = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
 
@@ -566,18 +605,75 @@ def get_case_queue(participant_id:str) -> dict:
             "participant": serialized_participant.data,
             "proband_relationship": participant.proband_relationship,
             "family_id": participant.family_id_id,
-            "family_size": len(participants),
             "biobank": serialized_biobanks.data,
             "analytes": serialized_analytes.data,
+            "genetic_findings": serialized_genetic_findings.data,
             "sequencing": serialized_sequencing.data,
             "alignments": serialized_alignments.data,
             }
         case_queue.append(items)
 
-    for p in case_queue:
-        if len(analysis_ready) == p["family_size"]:
-            p["cohort_analysis"] = "ready"
+    def get_family_shorthand(ft):
+        if family_type[ft]["proband"] and \
+            not family_type[ft]["father"] and \
+            not family_type[ft]["mother"] and \
+            not (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Proband only"
+        elif family_type[ft]["proband"] and \
+            not family_type[ft]["father"] and \
+            not family_type[ft]["mother"] and \
+            family_type[ft]["sibling"]:
+            return "Proband + sibling"
+        elif family_type[ft]["proband"] and \
+            family_type[ft]["father"] and \
+            not family_type[ft]["mother"] and \
+            not (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Duo (Father)"
+        elif family_type[ft]["proband"] and \
+            not family_type[ft]["father"] and \
+            family_type[ft]["mother"] and \
+            not (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Duo (Mother)"
+        elif family_type[ft]["proband"] and \
+            family_type[ft]["father"] and \
+            not family_type[ft]["mother"] and \
+            (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Duo (Father)+"
+        elif family_type[ft]["proband"] and \
+            not family_type[ft]["father"] and \
+            family_type[ft]["mother"] and \
+            (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Duo (Mother)+"
+        elif family_type[ft]["proband"] and \
+            family_type[ft]["father"] and \
+            family_type[ft]["mother"] and \
+            not (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Trio"
+        elif family_type[ft]["proband"] and \
+            family_type[ft]["father"] and \
+            family_type[ft]["mother"] and \
+            (family_type[ft]["sibling"] or \
+            family_type[ft]["other_relative"]):
+            return "Trio+"
         else:
-            p["cohort_analysis"] = "incomplete"
+            return "Undetermined family structure"
+
+    for p in case_queue:
+        for ft in family_type:
+            p[ft] = get_family_shorthand(ft)
+        p["family_size"] = len(participants),
+
+        if len(participants) == 1:
+            p["cohort_analysis"] = "N/A"
+        elif len(analysis_ready) == len(participants):
+            p["cohort_analysis"] = "Ready"
+        else:
+            p["cohort_analysis"] = "Not ready"
 
     return case_queue
