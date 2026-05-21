@@ -539,7 +539,7 @@ def get_case_queue(participant_id:str) -> dict:
     Only collect families with completed PacBio alignments
     """
     case_queue = []
-    analysis_ready = {}
+    lr_analysis_ready = {}
     family_id = Participant.objects.get(pk=participant_id).family_id.pk
     participants = Participant.objects.filter(family_id=family_id)  # Get related participants
     family_type = {
@@ -586,35 +586,52 @@ def get_case_queue(participant_id:str) -> dict:
         if isinstance(geneyx_case_notes, str):
            geneyx_case_notes = []
         dna_analytes = []
+        rna_analytes = []
         findings = []
-        pac_bio_sequencing = []
         pac_bio_alignments = []
+        nanopore_alignments = []
+        dna_sr_alignments = []
+        rna_sr_alignments = []
 
         get_family_type("gregor_family_structure")
 
         for analyte in analytes:
-            if analyte.analyte_type != "DNA":
-                continue
-            dna_analytes.append(analyte.analyte_id)
-            pac_bio_experiment = ExperimentPacBio.objects.filter(analyte_id=analyte)  # each analyte should have one experiment
-            if not pac_bio_experiment:
-                continue
-            pac_bio_sequencing.append(pac_bio_experiment[0].experiment_pac_bio_id)
-            pac_bio_alignment = AlignedPacBio.objects.filter(experiment_pac_bio_id=pac_bio_experiment[0])
-            if not pac_bio_alignment:
-                continue
-            pac_bio_alignments.append(pac_bio_alignment[0].aligned_pac_bio_id)
-            analysis_ready[participant.participant_id] = True  # avoid adding duplicates
-            get_family_type("analysis_family_structure")
+            if analyte.analyte_type == "RNA":
+                rna_sr_experiment = ExperimentRNAShortRead.objects.filter(analyte_id=analyte)
+                if rna_sr_experiment:
+                    rna_sr_alignment = AlignedRNAShortRead.objects.filter(experiment_rna_short_read_id=rna_sr_experiment[0])
+                    if rna_sr_alignment:  # only track completed experiments
+                        rna_sr_alignments.append(rna_sr_alignment[0].aligned_rna_short_read_id)
+            elif analyte.analyte_type == "DNA":
+                pac_bio_experiment = ExperimentPacBio.objects.filter(analyte_id=analyte)  # each analyte should have one experiment
+                nanopore_experiment = ExperimentNanopore.objects.filter(analyte_id=analyte)
+                dna_sr_experiment = ExperimentDNAShortRead.objects.filter(analyte_id=analyte)
+                if pac_bio_experiment:
+                    pac_bio_alignment = AlignedPacBio.objects.filter(experiment_pac_bio_id=pac_bio_experiment[0])
+                    if pac_bio_alignment:
+                        pac_bio_alignments.append(pac_bio_alignment[0].aligned_pac_bio_id)
+                        lr_analysis_ready[participant.participant_id] = True  # avoid adding duplicates
+                elif nanopore_experiment:
+                    nanopore_alignment = AlignedNanopore.objects.filter(experiment_nanopore_id=nanopore_experiment[0])
+                    if nanopore_alignment:
+                        nanopore_alignments.append(nanopore_alignment[0].aligned_nanopore_id)
+                        lr_analysis_ready[participant.participant_id] = True
+                elif dna_sr_experiment:
+                    dna_sr_alignment = AlignedDNAShortRead.objects.filter(experiment_dna_short_read_id=dna_sr_experiment[0])
+                    if dna_sr_alignment:
+                        dna_sr_alignments.append(dna_sr_alignment[0].aligned_dna_short_read_id)
+                get_family_type("analysis_family_structure")
 
-        for genetic_finding in genetic_findings:
-            findings.append(genetic_finding.genetic_findings_id)
+            for genetic_finding in genetic_findings:
+                findings.append(genetic_finding.genetic_findings_id)
 
         serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=dna_analytes), many=True)
-        serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=dna_analytes), many=True)
+        serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=analytes), many=True)
         serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(pk__in=findings), many=True)
-        serialized_sequencing = ExperimentPacBioSerializer(ExperimentPacBio.objects.filter(pk__in=pac_bio_sequencing), many=True)
-        serialized_alignments = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
+        serialized_aligned_pac_bio = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
+        serialized_aligned_nanopore = AlignedNanoporeSerializer(AlignedNanopore.objects.filter(pk__in=nanopore_alignments), many=True)
+        serialized_aligned_dna_sr = AlignedDNAShortReadSerializer(AlignedDNAShortRead.objects.filter(pk__in=dna_sr_alignments), many=True)
+        serialized_aligned_rna_sr = AlignedRNASerializer(AlignedRNAShortRead.objects.filter(pk__in=rna_sr_alignments), many=True)
 
         items = {
             "participant": serialized_participant.data,
@@ -623,8 +640,10 @@ def get_case_queue(participant_id:str) -> dict:
             "biobank": serialized_biobanks.data,
             "analytes": serialized_analytes.data,
             "genetic_findings": serialized_genetic_findings.data,
-            "sequencing": serialized_sequencing.data,
-            "alignments": serialized_alignments.data,
+            "aligned_pac_bio": serialized_aligned_pac_bio.data,
+            "aligned_nanopore": serialized_aligned_nanopore.data,
+            "aligned_dna_short_read": serialized_aligned_dna_sr.data,
+            "aligned_rna_short_read": serialized_aligned_rna_sr.data,
             #"geneyx_vcf": geneyx_vcf,
             "geneyx_case": geneyx_case,
             "geneyx_case_notes": geneyx_case_notes,
@@ -689,7 +708,7 @@ def get_case_queue(participant_id:str) -> dict:
 
         if len(participants) == 1:
             p["cohort_analysis"] = "N/A"
-        elif len(analysis_ready) == len(participants):
+        elif len(lr_analysis_ready) == len(participants):
             p["cohort_analysis"] = "Ready"
         else:
             p["cohort_analysis"] = "Not ready"

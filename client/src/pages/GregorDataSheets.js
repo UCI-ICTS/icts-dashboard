@@ -263,7 +263,6 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
   };
 
   const handleQueue = (record) => {
-    console.log(record);
     setSelectedRow(record);
     dispatch(caseQueue(record.participant_id))
   };

@@ -22,6 +22,51 @@ export default function CaseQueue({
       openModal("edit", { schemaKey, record });
     }
   };
+
+  const igv_host = "http://localhost:60151";  // IGV Desktop App must be open to use this
+  const merge_flag = "false";
+  const genome_build = "hg38";
+  const lrs_aligned_ids = [];
+  const lrs_bam_uris = [];
+  const lrs_bai_uris = [];
+  const sr_dna_aligned_ids = [];
+  const sr_dna_bam_uris = [];
+  const sr_dna_bai_uris = [];
+  const sr_rna_aligned_ids = [];
+  const sr_rna_bam_uris = [];
+  const sr_rna_bai_uris = [];
+
+  for (const row of rows) {
+    for (const idx in row.aligned_pac_bio) {
+      const pb = row.aligned_pac_bio[idx]
+      lrs_aligned_ids.push(pb.aligned_pac_bio_id)
+      lrs_bam_uris.push(pb.aligned_pac_bio_file)
+      lrs_bai_uris.push(pb.aligned_pac_bio_index_file)
+    }
+    for (const idx in row.aligned_nanopore) {
+      const np = row.aligned_nanopore[idx]
+      lrs_aligned_ids.push(np.aligned_nanopore_id)
+      lrs_bam_uris.push(np.aligned_nanopore_file)
+      lrs_bai_uris.push(np.aligned_nanopore_index_file)
+    }
+    for (const idx in row.aligned_dna_short_read) {
+      const sr_dna = row.aligned_dna_short_read[idx]
+      sr_dna_aligned_ids.push(sr_dna.aligned_dna_short_read_id)
+      sr_dna_bam_uris.push(sr_dna.aligned_dna_short_read_file)
+      sr_dna_bai_uris.push(sr_dna.aligned_dna_short_read_index_file)
+    }
+    for (const idx in row.aligned_rna_short_read) {
+      const sr_rna = row.aligned_rna_short_read[idx]
+      sr_rna_aligned_ids.push(sr_rna.aligned_rna_short_read_id)
+      sr_rna_bam_uris.push(sr_rna.aligned_rna_short_read_file)
+      sr_rna_bai_uris.push(sr_rna.aligned_rna_short_read_index_file)
+    }
+  }
+
+  const lrs_igv_link = `${igv_host}/load?file=${lrs_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${lrs_aligned_ids}`;
+  const sr_dna_igv_link = `${igv_host}/load?file=${sr_dna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_dna_aligned_ids}`;
+  const sr_rna_igv_link = `${igv_host}/load?file=${sr_rna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_rna_aligned_ids}`;
+
   {queueLoading ? (
       <Spin tip="Loading related case data..." style={{ display: "block", textAlign: "center", marginTop: 20 }}>
         <div style={{ minHeight: 100 }} />
@@ -35,6 +80,27 @@ export default function CaseQueue({
         className="action-btn"
         onClick={() => setSelectedRow(null)}
       >Clear</Button>&nbsp;&nbsp;PacBio Case Queue for: {selectedRow.participant_id}&nbsp;&nbsp;
+    </span>
+    <span className="sider">
+      <Button
+        size="small"
+        className="action-btn"
+        onClick={()=> window.open(lrs_igv_link, "_blank")}
+      >LR-GS IGV Session</Button>
+    </span>
+    <span className="sider">
+      <Button
+        size="small"
+        className="action-btn"
+        onClick={()=> window.open(sr_dna_igv_link, "_blank")}
+      >SR-GS IGV Session</Button>
+    </span>
+    <span className="sider">
+      <Button
+        size="small"
+        className="action-btn"
+        onClick={()=> window.open(sr_rna_igv_link, "_blank")}
+      >SR-RNA IGV Session</Button>
     </span>
     <Table
       className="table"

@@ -138,7 +138,6 @@ class CaseQueue(APIView):
         response = []
         try:
             participant_ids = request.GET.get("ids", "").split(",")
-            print(participant_ids)
             for participant_id in participant_ids:
                 response.append(get_case_queue(participant_id))
 
