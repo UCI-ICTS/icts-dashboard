@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Table, Spin } from "antd";
 import { getIdentifier } from "../utils/schemaAndTables";
-import { getSamples } from "../slices/geneyxSlice";
 
 export default function CaseQueue({
   selectedRow,
@@ -36,11 +35,6 @@ export default function CaseQueue({
         className="action-btn"
         onClick={() => setSelectedRow(null)}
       >Clear</Button>&nbsp;&nbsp;PacBio Case Queue for: {selectedRow.participant_id}&nbsp;&nbsp;
-      <Button
-        size="small"
-        className="action-btn"
-        onClick={() => {let response = dispatch(getSamples()); console.log({response});}}
-      >Get Geneyx Samples</Button>
     </span>
     <Table
       className="table"
@@ -64,19 +58,22 @@ export default function CaseQueue({
             )
           }
         },
-        { title: "Analysis status", key: "family size",
+        { title: "Analysis status", key: "geneyx_status",
           render: (_, record) => {
-            return record.family_size
+            if (!record.geneyx_case.length) return "-";
+            return record.geneyx_case["StatusName"]
           }
         },
-        { title: "Analyst", key: "family size",
+        { title: "Analyst", key: "created_by",
           render: (_, record) => {
-            return record.family_size
+            if (!record.geneyx_case.length) return "-";
+            return record.geneyx_case["CreatedByUser"]
           }
         },
-        { title: "Second Pass Analyst", key: "family size",
+        { title: "Second Pass Analyst", key: "modified_by",
           render: (_, record) => {
-            return record.family_size
+            if (!record.geneyx_case.length) return "-";
+            return record.geneyx_case["ModifiedByUser"]
           }
         },
         { title: "GREGoR Family Size", key: "family size",
@@ -84,19 +81,21 @@ export default function CaseQueue({
             return record.family_size
           }
         },
-        { title: "LR Case type", key: "family size",
+        { title: "LR Case type", key: "lrs_case_type",
           render: (_, record) => {
             return record.gregor_family_structure
           }
         },
-        { title: "Date result added", key: "family size",
+        { title: "Date result added", key: "date_created",
           render: (_, record) => {
-            return record.family_size
+            if (!record.geneyx_case.length) return "-";
+            return record.geneyx_case["CreateDate"]
           }
         },
-        { title: "Analysis result from LRS", key: "family size",
+        { title: "Analysis result from LRS", key: "analysis_result",
           render: (_, record) => {
-            return record.family_size
+            if (!record.geneyx_case.length) return "-";
+            return record.geneyx_case["SubStatusName"]
           }
         },
         { title: "Relation", dataIndex: "proband_relationship", key: "proband_relationship" },
@@ -153,9 +152,21 @@ export default function CaseQueue({
             );
           }
         },
-        { title: "Notes/other notable findings", key: "family size",
+        { title: "Notes/other notable findings", key: "case_notes",
           render: (_, record) => {
-            return record.family_size
+            const items = Array.isArray(record.geneyx_case_notes) ? record.geneyx_case_notes : [];
+            if (!items.length) return "-";
+
+            return (
+              <div>
+                {items.map((entry, index) => {
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(entry["Note"]);
+                  const note = doc.body.textContent;
+                  return note
+                })}
+              </div>
+            );
           }
         },
         { title: "Sex", key: "sex",
@@ -220,6 +231,7 @@ export default function CaseQueue({
         },
         { title: "Phenotype", key: "phenotype_description",
           render: (_, record) => {
+            const pheno = record.participant.phenotype_description.toString();
             return (
               <div className="action-btn">
                 <Button
@@ -227,7 +239,23 @@ export default function CaseQueue({
                     style={{ padding: 0 }}
                     onClick={() => handleOpen("participants", record.participant)}
                   >
-                    { record.participant.phenotype_description || "NA"}
+                    { pheno || "NA" }
+                  </Button>
+              </div>
+            )
+          }
+        },
+        { title: "Prior Testing", key: "prior_testing",
+          render: (_, record) => {
+            const prior_testing = record.participant.prior_testing.toString();
+            return (
+              <div className="action-btn">
+                <Button
+                    type="link"
+                    style={{ padding: 0 }}
+                    onClick={() => handleOpen("participants", record.participant)}
+                  >
+                    { prior_testing || "NA" }
                   </Button>
               </div>
             )
@@ -242,30 +270,6 @@ export default function CaseQueue({
                 {items.map((entry, index) => {
                   const schemaKey = "biobank_entries";
                   const idField = getIdentifier(schemaKey);
-                  const label = entry[idField] ||  "✓";
-                  return (
-                    <div className="action-btn">
-                      <Button
-                        key={index}
-                        type="link"
-                        style={{ padding: 0 }}
-                        onClick={() => {handleOpen(schemaKey, entry)}}
-                      >{label}</Button>
-                    </div>)
-                })}
-              </div>
-            );
-          }
-        },
-        { title: "Analytes", key: "analytes",
-          render: (_, record) => {
-            const items = Array.isArray(record.sequencing) ? record.analytes : [];
-            if (!items.length) return "-";
-            return (
-              <div>
-                {items.map((entry, index) => {
-                  const schemaKey = "analytes";
-                  const idField = getIdentifier(schemaKey);
                   const label = entry[idField] ||  "NA";
                   return (
                     <div className="action-btn">
@@ -279,54 +283,6 @@ export default function CaseQueue({
                 })}
               </div>
             );
-          }
-        },
-        { title: "Sequencing", key: "sequencing",
-          render: (_, record) => {
-            const items = Array.isArray(record.sequencing) ? record.sequencing : [];
-            if (!items.length) return "-";
-            return (
-              <div>
-                {items.map((entry, index) => {
-                  const schemaKey = "experiment_pac_bio";
-                  const idField = getIdentifier(schemaKey);
-                  const label = entry[idField] ||  "NA";
-                  return (
-                    <div className="action-btn">
-                      <Button
-                        key={index}
-                        type="link"
-                        style={{ padding: 0 }}
-                        onClick={() => {handleOpen(schemaKey, entry)}}
-                      >{label}</Button>
-                    </div>)
-                })}
-              </div>
-            );
-          }
-        },
-        { title: "Alignments", key: "alignments",
-          render: (_, record) => {
-            const items = Array.isArray(record.alignments) ? record.alignments : [];
-            if (!items.length) return "-";
-            return (
-              <div>
-                {items.map((entry, index) => {
-                  const schemaKey = "aligned_pac_bio";
-                  const idField = getIdentifier(schemaKey);
-                  const label = entry[idField] ||  "NA";
-                  return (
-                    <div className="action-btn">
-                    <Button
-                      key={index}
-                      type="link"
-                      style={{ padding: 0 }}
-                      onClick={() => {handleOpen(schemaKey, entry)}}
-                    >{label}</Button>
-                    </div>)
-                })}
-              </div>
-            )
           }
         }
       ]}

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # geneyx/services.py
 
-import json
 import requests
 from django.conf import settings
 
@@ -20,7 +19,10 @@ def fetch_vcf_samples() -> dict:
     """
 
     response = requests.post(f"{settings.GENEYX_APIDB}/Samples", data=header)
-    return response.json()["Data"]
+    if "Data" in response.json():
+        return response.json()["Data"]
+    elif "Info" in response.json():
+        return response.json()["Info"]
 
 
 def fetch_vcf_sample(participant_id) -> dict:
@@ -29,7 +31,10 @@ def fetch_vcf_sample(participant_id) -> dict:
     """
     header["SampleSn"] = participant_id
     response = requests.post(f"{settings.GENEYX_APIDB}/Sample", data=header)
-    return response.json()["Data"]
+    if "Data" in response.json():
+        return response.json()["Data"]
+    elif "Info" in response.json():
+        return response.json()["Info"]
 
 
 def fetch_cases() -> dict:
@@ -38,7 +43,10 @@ def fetch_cases() -> dict:
     """
 
     response = requests.post(f"{settings.GENEYX_APIDB}/Cases", data=header)
-    return response.json()["Data"]
+    if "Data" in response.json():
+        return response.json()["Data"]
+    elif "Info" in response.json():
+        return response.json()["Info"]
 
 
 def fetch_case(participant_id) -> dict:
@@ -47,7 +55,10 @@ def fetch_case(participant_id) -> dict:
     """
     header["CaseSn"] = participant_id
     response = requests.post(f"{settings.GENEYX_APIDB}/Case", data=header)
-    return response.json()["Data"]
+    if "Data" in response.json():
+        return response.json()["Data"]
+    elif "Info" in response.json():
+        return response.json()["Info"]
 
 
 def fetch_case_notes(participant_id) -> dict:
@@ -56,4 +67,7 @@ def fetch_case_notes(participant_id) -> dict:
     """
     header["CaseSn"] = participant_id
     response = requests.post(f"{settings.GENEYX_APIDB}/CaseNotes", data=header)
-    return response.json()["Data"]
+    if "Data" in response.json():
+        return response.json()["Data"]
+    elif "Info" in response.json():
+        return response.json()["Info"]

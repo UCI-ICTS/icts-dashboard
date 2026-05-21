@@ -63,6 +63,12 @@ from experiments.services import (
     ExperimentRNAOutputSerializer,
 )
 
+from geneyx.services import(
+    fetch_vcf_sample,
+    fetch_case,
+    fetch_case_notes,
+)
+
 from s3.services import fetch_manifest
 
 serializer_mapping ={
@@ -570,6 +576,15 @@ def get_case_queue(participant_id:str) -> dict:
         serialized_participant = ParticipantOutputSerializer(participant)
         analytes = Analyte.objects.filter(participant_id=participant)
         genetic_findings = GeneticFindings.objects.filter(participant_id=participant)
+        #geneyx_vcf = fetch_vcf_sample(participant.pk)
+        #if isinstance(geneyx_vcf, str):
+        #   geneyx_vcf = []
+        geneyx_case = fetch_case(participant.pk)
+        if isinstance(geneyx_case, str):
+           geneyx_case = []
+        geneyx_case_notes = fetch_case_notes(participant.pk)
+        if isinstance(geneyx_case_notes, str):
+           geneyx_case_notes = []
         dna_analytes = []
         findings = []
         pac_bio_sequencing = []
@@ -610,6 +625,9 @@ def get_case_queue(participant_id:str) -> dict:
             "genetic_findings": serialized_genetic_findings.data,
             "sequencing": serialized_sequencing.data,
             "alignments": serialized_alignments.data,
+            #"geneyx_vcf": geneyx_vcf,
+            "geneyx_case": geneyx_case,
+            "geneyx_case_notes": geneyx_case_notes,
             }
         case_queue.append(items)
 
