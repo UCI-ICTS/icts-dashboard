@@ -3,49 +3,147 @@
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
-from geneyx.selectors import (
-    get_all_samples,
-    get_sample,
-    get_all_cases,
-    get_case,
-    get_case_notes,
+from rest_framework import status
+from geneyx.services import (
+    fetch_vcf_samples,
+    fetch_vcf_sample,
+    fetch_cases,
+    fetch_case,
+    fetch_case_notes,
 )
 
 
-class GeneyxViewSet(viewsets.ViewSet):
+class GetAllVCFSamples(APIView):
+    """"""
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(
-        method="post",
-        operation_description="Geneyx APIs",
-        responses={200: "Ok", 400: "Bad request"},
-        tags=["GeneyxAPIs"],
+        operation_id="get_all_vcf_samples",
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Geneyx"]
     )
-    @action(detail=False, methods=["post"], url_path="get_samples")
-    def get_all_samples(self, request):
-        serializer = get_all_samples()
-        return Response(serializer.data, status=200)
 
-    @action(detail=False, methods=["post"], url_path="get_sample")
-    def get_sample(self, request):
-        sample_id = request.data
-        sample = get_sample(sample_id)
-        return Response(sample, status=200)
+    def get(self, request):
+        try:
+            vcf_samples = fetch_vcf_samples()
+            return Response(status=status.HTTP_200_OK, data=vcf_samples)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=["post"], url_path="get_all_cases")
-    def get_all_cases(self, request):
-        serializer = get_all_cases()
-        return Response(serializer.data, status=200)
 
-    @action(detail=False, methods=["post"], url_path="get_case")
-    def get_case(self, request):
-        case_id = request.data
-        case = get_case(case_id)
-        return Response(case, status=200)
+class GetVCFSample(APIView):
+    """"""
+    permission_classes = [AllowAny]
 
-    @action(detail=False, methods=["post"], url_path="get_case_notes")
-    def get_sample(self, request):
-        case_id = request.data
-        case_notes = get_case_notes(case_id)
-        return Response(case_notes, status=200)
+    participant_id = openapi.Parameter(
+        "participant_id",
+        openapi.IN_QUERY,
+        description="participant_id",
+        type=openapi.TYPE_STRING,
+    )
+
+    @swagger_auto_schema(
+        operation_id="get_vcf_sample",
+        manual_parameters=[participant_id],
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Geneyx"]
+    )
+
+    def get(self, request):
+        try:
+            participant_id = request.query_params["participant_id"]
+            vcf_sample = fetch_vcf_sample(participant_id)
+            return Response(status=status.HTTP_200_OK, data=vcf_sample)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetAllCases(APIView):
+    """"""
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_id="get_all_cases",
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Geneyx"]
+    )
+
+    def get(self, request):
+        try:
+            cases = fetch_cases()
+            return Response(status=status.HTTP_200_OK, data=cases)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetCase(APIView):
+    """"""
+    permission_classes = [AllowAny]
+
+    participant_id = openapi.Parameter(
+        "participant_id",
+        openapi.IN_QUERY,
+        description="participant_id",
+        type=openapi.TYPE_STRING,
+    )
+
+    @swagger_auto_schema(
+        operation_id="get_case",
+        manual_parameters=[participant_id],
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Geneyx"]
+    )
+
+    def get(self, request):
+        try:
+            participant_id = request.query_params["participant_id"]
+            case = fetch_case(participant_id)
+            return Response(status=status.HTTP_200_OK, data=case)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetCaseNotes(APIView):
+    """"""
+    permission_classes = [AllowAny]
+
+    participant_id = openapi.Parameter(
+        "participant_id",
+        openapi.IN_QUERY,
+        description="participant_id",
+        type=openapi.TYPE_STRING,
+    )
+
+    @swagger_auto_schema(
+        operation_id="get_case",
+        manual_parameters=[participant_id],
+        responses={
+            200: "Submission successful",
+            400: "Bad request",
+        },
+        tags=["Geneyx"]
+    )
+
+    def get(self, request):
+        try:
+            participant_id = request.query_params["participant_id"]
+            case_notes = fetch_case_notes(participant_id)
+            return Response(status=status.HTTP_200_OK, data=case_notes)
+        except Exception as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

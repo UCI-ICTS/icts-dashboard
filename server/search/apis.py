@@ -127,7 +127,7 @@ class CaseQueue(APIView):
                 type=openapi.TYPE_STRING,
             )
         ],
-        operation_id="case-queue",
+        operation_id="case_queue",
         responses={
             200: "Submission successful",
             400: "Bad request",
