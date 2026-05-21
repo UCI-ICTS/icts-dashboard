@@ -227,7 +227,7 @@ export default function CaseQueue({
               <div>
                 {items.map((entry, index) => {
                   const parser = new DOMParser();
-                  const doc = parser.parseFromString(entry["Note"]);
+                  const doc = parser.parseFromString(entry["Note"], "text/html");
                   const note = doc.body.textContent;
                   return note
                 })}
