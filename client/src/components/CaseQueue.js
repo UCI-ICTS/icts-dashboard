@@ -35,37 +35,55 @@ export default function CaseQueue({
   const sr_rna_aligned_ids = [];
   const sr_rna_bam_uris = [];
   const sr_rna_bai_uris = [];
+  let lrs_igv_link = ""
+  let sr_dna_igv_link = ""
+  let sr_rna_igv_link = ""
 
   for (const row of rows) {
     for (const idx in row.aligned_pac_bio) {
       const pb = row.aligned_pac_bio[idx]
-      lrs_aligned_ids.push(pb.aligned_pac_bio_id)
+      lrs_aligned_ids.push("aligned_pac_bio." + pb.aligned_pac_bio_id)
       lrs_bam_uris.push(pb.aligned_pac_bio_file)
       lrs_bai_uris.push(pb.aligned_pac_bio_index_file)
     }
     for (const idx in row.aligned_nanopore) {
       const np = row.aligned_nanopore[idx]
-      lrs_aligned_ids.push(np.aligned_nanopore_id)
+      lrs_aligned_ids.push("aligned_nanopore." + np.aligned_nanopore_id)
       lrs_bam_uris.push(np.aligned_nanopore_file)
       lrs_bai_uris.push(np.aligned_nanopore_index_file)
     }
+    if (!lrs_aligned_ids.length) {
+      lrs_igv_link = "No LRS alignments available";
+    }
+    else {
+      lrs_igv_link = `${igv_host}/load?file=${lrs_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${lrs_aligned_ids}`;
+    }
     for (const idx in row.aligned_dna_short_read) {
       const sr_dna = row.aligned_dna_short_read[idx]
-      sr_dna_aligned_ids.push(sr_dna.aligned_dna_short_read_id)
+      sr_dna_aligned_ids.push("aligned_dna_short_read." + sr_dna.aligned_dna_short_read_id)
       sr_dna_bam_uris.push(sr_dna.aligned_dna_short_read_file)
       sr_dna_bai_uris.push(sr_dna.aligned_dna_short_read_index_file)
     }
+    if (!sr_dna_aligned_ids.length) {
+      sr_dna_igv_link = "No SR-GS alignments available";
+    }
+    else {
+      sr_dna_igv_link = `${igv_host}/load?file=${sr_dna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_dna_aligned_ids}`;
+    }
     for (const idx in row.aligned_rna_short_read) {
       const sr_rna = row.aligned_rna_short_read[idx]
-      sr_rna_aligned_ids.push(sr_rna.aligned_rna_short_read_id)
+      sr_rna_aligned_ids.push("aligned_rna_short_read." + sr_rna.aligned_rna_short_read_id)
       sr_rna_bam_uris.push(sr_rna.aligned_rna_short_read_file)
       sr_rna_bai_uris.push(sr_rna.aligned_rna_short_read_index_file)
     }
+    if (!sr_rna_aligned_ids.length) {
+      sr_rna_igv_link = "No SR-RNA alignments available";
+    }
+    else {
+      sr_rna_igv_link = `${igv_host}/load?file=${sr_rna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_rna_aligned_ids}`;
+    }
   }
 
-  const lrs_igv_link = `${igv_host}/load?file=${lrs_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${lrs_aligned_ids}`;
-  const sr_dna_igv_link = `${igv_host}/load?file=${sr_dna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_dna_aligned_ids}`;
-  const sr_rna_igv_link = `${igv_host}/load?file=${sr_rna_bam_uris}&merge=${merge_flag}&genome=${genome_build}&name=${sr_rna_aligned_ids}`;
 
   {queueLoading ? (
       <Spin tip="Loading related case data..." style={{ display: "block", textAlign: "center", marginTop: 20 }}>
@@ -297,7 +315,7 @@ export default function CaseQueue({
         },
         { title: "Phenotype", key: "phenotype_description",
           render: (_, record) => {
-            const pheno = record.participant.phenotype_description.toString();
+            const pheno = record.participant.phenotype_description;
             return (
               <div className="action-btn">
                 <Button
@@ -313,7 +331,7 @@ export default function CaseQueue({
         },
         { title: "Prior Testing", key: "prior_testing",
           render: (_, record) => {
-            const prior_testing = record.participant.prior_testing.toString();
+            const prior_testing = record.participant.prior_testing;
             return (
               <div className="action-btn">
                 <Button
@@ -327,10 +345,106 @@ export default function CaseQueue({
             )
           }
         },
+        { title: "PacBio Alignments", key: "pac_bio_alignments",
+          render: (_, record) => {
+            const items = Array.isArray(record.aligned_pac_bio) ? record.aligned_pac_bio : [];
+            if (!items.length) return "✕";
+            return (
+              <div>
+                {items.map((entry, index) => {
+                  const schemaKey = "aligned_pac_bio";
+                  const idField = getIdentifier(schemaKey);
+                  const label = entry[idField] ||  "NA";
+                  return (
+                    <div className="action-btn">
+                      <Button
+                        key={index}
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => {handleOpen(schemaKey, entry)}}
+                      >{label}</Button>
+                    </div>)
+                })}
+              </div>
+            );
+          }
+        },
+        { title: "Nanopore Alignments", key: "nanopore_alignments",
+          render: (_, record) => {
+            const items = Array.isArray(record.aligned_nanopore) ? record.aligned_nanopore : [];
+            if (!items.length) return "✕";
+            return (
+              <div>
+                {items.map((entry, index) => {
+                  const schemaKey = "aligned_nanopore";
+                  const idField = getIdentifier(schemaKey);
+                  const label = entry[idField] ||  "NA";
+                  return (
+                    <div className="action-btn">
+                      <Button
+                        key={index}
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => {handleOpen(schemaKey, entry)}}
+                      >{label}</Button>
+                    </div>)
+                })}
+              </div>
+            );
+          }
+        },
+        { title: "SR-GS Alignments", key: "sr_gs_alignments",
+          render: (_, record) => {
+            const items = Array.isArray(record.aligned_dna_short_read) ? record.aligned_dna_short_read : [];
+            if (!items.length) return "✕";
+            return (
+              <div>
+                {items.map((entry, index) => {
+                  const schemaKey = "aligned_dna_short_read";
+                  const idField = getIdentifier(schemaKey);
+                  const label = entry[idField] ||  "NA";
+                  return (
+                    <div className="action-btn">
+                      <Button
+                        key={index}
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => {handleOpen(schemaKey, entry)}}
+                      >{label}</Button>
+                    </div>)
+                })}
+              </div>
+            );
+          }
+        },
+        { title: "SR-RNA Alignments", key: "sr_rna_alignments",
+          render: (_, record) => {
+            const items = Array.isArray(record.aligned_rna_short_read) ? record.aligned_rna_short_read : [];
+            if (!items.length) return "✕";
+            return (
+              <div>
+                {items.map((entry, index) => {
+                  const schemaKey = "aligned_rna_short_read";
+                  const idField = getIdentifier(schemaKey);
+                  const label = entry[idField] ||  "NA";
+                  return (
+                    <div className="action-btn">
+                      <Button
+                        key={index}
+                        type="link"
+                        style={{ padding: 0 }}
+                        onClick={() => {handleOpen(schemaKey, entry)}}
+                      >{label}</Button>
+                    </div>)
+                })}
+              </div>
+            );
+          }
+        },
         { title: "Biobank", key: "biobank",
           render: (_, record) => {
             const items = Array.isArray(record.biobank) ? record.biobank : [];
-            if (!items.length) return "-";
+            if (!items.length) return "✕";
             return (
               <div>
                 {items.map((entry, index) => {

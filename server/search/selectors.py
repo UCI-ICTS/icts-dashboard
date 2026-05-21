@@ -585,8 +585,6 @@ def get_case_queue(participant_id:str) -> dict:
         geneyx_case_notes = fetch_case_notes(participant.pk)
         if isinstance(geneyx_case_notes, str):
            geneyx_case_notes = []
-        dna_analytes = []
-        rna_analytes = []
         findings = []
         pac_bio_alignments = []
         nanopore_alignments = []
@@ -625,7 +623,7 @@ def get_case_queue(participant_id:str) -> dict:
             for genetic_finding in genetic_findings:
                 findings.append(genetic_finding.genetic_findings_id)
 
-        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=dna_analytes), many=True)
+        serialized_biobanks = BiobankSerializer(Biobank.objects.filter(child_analytes__in=analytes), many=True)
         serialized_analytes = AnalyteSerializer(Analyte.objects.filter(pk__in=analytes), many=True)
         serialized_genetic_findings = GeneticFindingsOutputSerializer(GeneticFindings.objects.filter(pk__in=findings), many=True)
         serialized_aligned_pac_bio = AlignedPacBioSerializer(AlignedPacBio.objects.filter(pk__in=pac_bio_alignments), many=True)
