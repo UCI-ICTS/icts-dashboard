@@ -126,19 +126,19 @@ export default function CaseQueue({
         },
         { title: "Analysis status", key: "geneyx_status",
           render: (_, record) => {
-            if (!record.geneyx_case.length) return "-";
+            if (!Object.keys(record.geneyx_case).length) return "-";
             return record.geneyx_case["StatusName"]
           }
         },
         { title: "Analyst", key: "created_by",
           render: (_, record) => {
-            if (!record.geneyx_case.length) return "-";
+            if (!Object.keys(record.geneyx_case).length) return "-";
             return record.geneyx_case["CreatedByUser"]
           }
         },
         { title: "Second Pass Analyst", key: "modified_by",
           render: (_, record) => {
-            if (!record.geneyx_case.length) return "-";
+            if (!Object.keys(record.geneyx_case).length) return "-";
             return record.geneyx_case["ModifiedByUser"]
           }
         },
@@ -154,13 +154,13 @@ export default function CaseQueue({
         },
         { title: "Date result added", key: "date_created",
           render: (_, record) => {
-            if (!record.geneyx_case.length) return "-";
-            return record.geneyx_case["CreateDate"]
+            if (!Object.keys(record.geneyx_case).length) return "-";
+            return record.geneyx_case["CreateDate"].toString().split("T")[0]
           }
         },
         { title: "Analysis result from LRS", key: "analysis_result",
           render: (_, record) => {
-            if (!record.geneyx_case.length) return "-";
+            if (!Object.keys(record.geneyx_case).length) return "-";
             return record.geneyx_case["SubStatusName"]
           }
         },
