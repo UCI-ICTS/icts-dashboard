@@ -208,6 +208,10 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         # partial_contribution_explained terms must be valid HPO in phenotype table
         partial_contribution_explained = data.get("partial_contribution_explained") or []
         if partial_contribution_explained and isinstance(partial_contribution_explained, list):
+            if phenotype_contribution is not "Partial":
+                errors.setdefault("partial_contribution_explained", []).append(
+                    f"Phenotype contribution must be 'Partial' to include phenotype contribution HPO terms"
+                )
             missing = [p for p in partial_contribution_explained if not Phenotype.objects.filter(term_id=p).exists()]
             if missing:
                 errors.setdefault("partial_contribution_explained", []).append(
