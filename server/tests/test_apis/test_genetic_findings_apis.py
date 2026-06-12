@@ -130,49 +130,138 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
             "notes": "",
             "additional_family_members_with_variant": [],
         }
-        part3 = {  # Invalid submission; missing variant_inheritance
-            "genetic_findings_id": "2_6849938_GREGoR_test-001-001-0",
+        part3 = {  # Invalid submission; missing variant inheritance
+            "genetic_findings_id": "1_100200640_GREGoR_test-001-001-0",
             "participant_id": "GREGoR_test-001-001-0",
-            "experiment_id": ["WGS"],
+            "experiment_id": [
+                "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+                "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            ],
             "variant_type": ["SNV"],
             "sv_type": "",
             "variant_reference_assembly": "GRCh38",
-            "chrom": "2",
+            "chrom": "10",
             "chrom_end": "",
-            "pos": 6849938,
+            "pos": 100200640,
             "pos_end": "",
             "ref": "C",
             "alt": "T",
             "copy_number": "",
             "ClinGen_allele_ID": "",
-            "gene_of_interest": ["CMPK2"],
-            "transcript": "ENST00000256722.10",
-            "hgvsc": "c.1262G>A",
-            "hgvsp": "",
-            "hgvs": "",
-            "zygosity": "Heterozygous",
+            "gene_of_interest": ["DBT"],
+            "transcript": "NM_001918.5",
+            "hgvsc": "c.1282-4218G>A",
+            "hgvsp": "p.?",
+            "hgvs": "g.100200640C>T",
+            "zygosity": "Homozygous",
             "allele_balance_or_heteroplasmy_percentage": "",
             "variant_inheritance": "",  # changed
-            "linked_variant": "2_6865407_GREGoR_test-001-001-0",
-            "linked_variant_phase": "in trans",
-            "gene_known_for_phenotype": "Candidate",
-            "known_condition_name": "",
-            "condition_id": "",
-            "condition_inheritance": ["Unknown"],
-            "GREGoR_variant_classification": "Curation in progress",
+            "linked_variant": "",
+            "linked_variant_phase": "",
+            "gene_known_for_phenotype": "Known",
+            "known_condition_name": "Maple syrup urine disease, type II",
+            "condition_id": "OMIM:248600",
+            "condition_inheritance": ["Autosomal recessive"],
+            "GREGoR_variant_classification": "Likely pathogenic",
             "GREGoR_ClinVar_SCV": "",
             "gene_disease_validity": "Curation in progress",
             "public_database_other": "",
             "public_database_ID_other": "",
-            "phenotype_contribution": "",
-            "partial_contribution_explained": [],
-            "method_of_discovery": ["SR-GS"],
+            "phenotype_contribution": "Partial",
+            "partial_contribution_explained": ["GREGoR_test-001-001-0_HP:0002194"],
+            "method_of_discovery": ["SR-GS", "SR RNA-seq"],
+            "notes": "",
+            "additional_family_members_with_variant": [],
+        }
+        part4 = {  # Invalid submission; partial contribution is missing associated phenotype
+            "genetic_findings_id": "1_100200640_GREGoR_test-001-001-0",
+            "participant_id": "GREGoR_test-001-001-0",
+            "experiment_id": [
+                "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+                "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            ],
+            "variant_type": ["SNV"],
+            "sv_type": "",
+            "variant_reference_assembly": "GRCh38",
+            "chrom": "10",
+            "chrom_end": "",
+            "pos": 100200640,
+            "pos_end": "",
+            "ref": "C",
+            "alt": "T",
+            "copy_number": "",
+            "ClinGen_allele_ID": "",
+            "gene_of_interest": ["DBT"],
+            "transcript": "NM_001918.5",
+            "hgvsc": "c.1282-4218G>A",
+            "hgvsp": "p.?",
+            "hgvs": "g.100200640C>T",
+            "zygosity": "Homozygous",
+            "allele_balance_or_heteroplasmy_percentage": "",
+            "variant_inheritance": "biparental",
+            "linked_variant": "",
+            "linked_variant_phase": "",
+            "gene_known_for_phenotype": "Known",
+            "known_condition_name": "Maple syrup urine disease, type II",
+            "condition_id": "OMIM:248600",
+            "condition_inheritance": ["Autosomal recessive"],
+            "GREGoR_variant_classification": "Likely pathogenic",
+            "GREGoR_ClinVar_SCV": "",
+            "gene_disease_validity": "Curation in progress",
+            "public_database_other": "",
+            "public_database_ID_other": "",
+            "phenotype_contribution": "Partial",
+            "partial_contribution_explained": [],  # changed
+            "method_of_discovery": ["SR-GS", "SR RNA-seq"],
+            "notes": "",
+            "additional_family_members_with_variant": [],
+        }
+        part5 = {  # Valid submission; partial contribution has associated phenotype
+            "genetic_findings_id": "1_100200640_GREGoR_test-001-001-0",
+            "participant_id": "GREGoR_test-001-001-0",
+            "experiment_id": [
+                "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1",
+                "experiment_rna_short_read.UCI_GREGoR_test-001-001-0-R-1_RNA_1"
+            ],
+            "variant_type": ["SNV"],
+            "sv_type": "",
+            "variant_reference_assembly": "GRCh38",
+            "chrom": "10",
+            "chrom_end": "",
+            "pos": 100200640,
+            "pos_end": "",
+            "ref": "C",
+            "alt": "T",
+            "copy_number": "",
+            "ClinGen_allele_ID": "",
+            "gene_of_interest": ["DBT"],
+            "transcript": "NM_001918.5",
+            "hgvsc": "c.1282-4218G>A",
+            "hgvsp": "p.?",
+            "hgvs": "g.100200640C>T",
+            "zygosity": "Homozygous",
+            "allele_balance_or_heteroplasmy_percentage": "",
+            "variant_inheritance": "biparental",
+            "linked_variant": "",
+            "linked_variant_phase": "",
+            "gene_known_for_phenotype": "Known",
+            "known_condition_name": "Maple syrup urine disease, type II",
+            "condition_id": "OMIM:248600",
+            "condition_inheritance": ["Autosomal recessive"],
+            "GREGoR_variant_classification": "Likely pathogenic",
+            "GREGoR_ClinVar_SCV": "",
+            "gene_disease_validity": "Curation in progress",
+            "public_database_other": "",
+            "public_database_ID_other": "",
+            "phenotype_contribution": "Partial",
+            "partial_contribution_explained": ["HP:0002194"],
+            "method_of_discovery": ["SR-GS", "SR RNA-seq"],
             "notes": "",
             "additional_family_members_with_variant": [],
         }
         response_200 = self.client.post(url, [part1], format="json")
-        response_207 = self.client.post(url, [part2, part3], format="json")
-        response_400 = self.client.post(url, [part3], format="json")
+        response_207 = self.client.post(url, [part2, part3, part5], format="json")
+        response_400 = self.client.post(url, [part3, part4], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         changed_by(self, response_200.data[0], testuser)
@@ -180,7 +269,9 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
         changed_by(self, response_207.data[0], testuser)
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
-        self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_207.data[2]["request_status"], "CREATED")
+        self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_400.data[1]["request_status"], "BAD REQUEST")
 
 
 class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
