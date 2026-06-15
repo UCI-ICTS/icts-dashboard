@@ -3514,13 +3514,13 @@
       "known_condition_name": "",
       "condition_id": "",
       "condition_inheritance": [
-        "De novo"
+        "Unknown"
       ],
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "Partial",
       "partial_contribution_explained": [
         "HP:0001260",
@@ -3579,8 +3579,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": null,
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3636,8 +3636,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3693,8 +3693,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3743,15 +3743,15 @@
       "linked_variant_phase": "",
       "gene_known_for_phenotype": "Known",
       "known_condition_name": "Pilarowski-Bjornsson syndrome",
-      "condition_id": "617682",
+      "condition_id": "OMIM:617682",
       "condition_inheritance": [
         "Autosomal dominant"
       ],
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
