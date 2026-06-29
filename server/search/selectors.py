@@ -449,7 +449,10 @@ def get_family_detail(participant_id: str, superuser: bool = False) -> list[dict
     Return full family detail for a participant's family.
     """
     family_detail = []
-    s3_manifest = fetch_manifest("icts-dashboard-analysis-files")
+    try:
+        s3_manifest = fetch_manifest("icts-dashboard-analysis-files")
+    except:
+        s3_manifest = {}
     root_participant = Participant.objects.get(pk=participant_id)
 
     participants = get_visible_objects(
