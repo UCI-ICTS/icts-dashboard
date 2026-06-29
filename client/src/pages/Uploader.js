@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Table, Input, Select, Form, Spin, Typography, Layout, Row, Col, Button, Tooltip } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { setJsonData, clearJsonData, fetchTable, createEntry, setTableView } from '../slices/dataSlice';
-import schemas from '../schemas/v1.11schemas.json';
+import schemas from '../schemas/v1.12schemas.json';
 import { getValidationRules, getCollectionName, TABLE_MAPPING } from "../utils/schemaAndTables";
 
 const { Option } = Select;
@@ -25,15 +25,15 @@ export const Uploader = () => {
   const defaultHeaders = Object.keys(schema.properties || {});
   const [form] = Form.useForm();
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (value) => {
     const selectedTable = TABLE_MAPPING.find((table) => table.schema === value);
     if (selectedTable) {
       dispatch(setTableView(selectedTable));
     }
   };
-  
+
   // Type coercion of cells based on schema
   const coerceValue = (rawValue, schemapProp) => {
     // Empty string as null
@@ -95,7 +95,7 @@ export const Uploader = () => {
       setIsLoading(false);
       return;
     }
-    
+
     // Coerce sheet before dispatch and add key for AntD
     const coercedSheet = sheet.map((row, index) => {
       const coerced = coerceRowToSchema(row, schema)
@@ -228,7 +228,7 @@ export const Uploader = () => {
           </Tooltip>
         </Col>
         <Col xs={24} md={8}>
-          
+
           <input
             ref={fileInputRef}
             type="file"
@@ -257,7 +257,7 @@ export const Uploader = () => {
           />
         </Col>
         <Col xs={24} md={8}>
-          <Button 
+          <Button
             className="header-button"
             onClick={handleClear}
           >Clear Data</Button>
