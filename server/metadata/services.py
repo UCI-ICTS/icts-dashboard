@@ -207,7 +207,11 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
 
         # partial_contribution_explained terms must be valid HPO in phenotype table
         partial_contribution_explained = data.get("partial_contribution_explained") or []
-        if partial_contribution_explained and isinstance(partial_contribution_explained, list):
+        if isinstance(partial_contribution_explained, list):
+            if not partial_contribution_explained and phenotype_contribution == "Partial":
+                errors.setdefault("partial_contribution_explained", []).append(
+                    f"Partial phenotype contribution must include at least one contributory HPO term"
+                )
             missing = [p for p in partial_contribution_explained if not Phenotype.objects.filter(term_id=p).exists()]
             if missing:
                 errors.setdefault("partial_contribution_explained", []).append(
@@ -457,6 +461,35 @@ class ParticipantInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Participant
         fields = "__all__"
+
+    def _partial_helper(self, attrs):
+        """
+        For partial updates, combine existing instance values with incoming attrs.
+        For creates, this just returns attrs.
+        """
+        if not self.instance:
+            return dict(attrs)
+
+        combined = { }
+        for name in self.fields.keys():
+            combined[name] = getattr(self.instance, name, None)
+        combined.update(attrs)
+        return combined
+
+    def validate(self, attrs):
+        data = self._partial_helper(attrs)
+        errors = {}
+
+        affected_status = data.get("affected_status")
+        solve_status = data.get("solve_status")
+        if "Unaffected" in [affected_status, solve_status] and affected_status != solve_status:
+            errors.setdefault("affected_status", []).append(
+                f"Invalid affected_status: {affected_status}. Must match solve_status if: Unaffected"
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
     def create(self, validated_data):
         internal_project_id = validated_data.pop("internal_project_id", [])

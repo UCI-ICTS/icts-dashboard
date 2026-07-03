@@ -58,7 +58,7 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
             # "reported_race": "More than one",
             # "reported_ethnicity": "Unknown",
             "age_at_last_observation": 20,
-            "affected_status": "Unaffected",
+            "affected_status": "Affected",
             "age_at_enrollment": 20,
             "solve_status": "Unsolved",
             "missing_variant_case": "No",
@@ -102,8 +102,28 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
             "solve_status": "Unaffected",
             "missing_variant_case": "Unknown",
         }
+        part4 = {  # Invalid submission
+            "participant_id": "P-004-101-2",
+            "gregor_center": "UCI",
+            "consent_code": "GRU",
+            "family_id": "GREGoR_test-001",
+            "paternal_id": "0",
+            "maternal_id": "0",
+            "proband_relationship": "Mother",
+            "proband_relationship_detail": "",
+            "sex": "Female",
+            "sex_detail": "",
+            "reported_race": [],
+            "reported_ethnicity": "Hispanic or Latino",
+            "ancestry_detail": "",
+            "age_at_last_observation": 45.1,
+            "affected_status": "Unaffected",
+            "age_at_enrollment": 45.1,
+            "solve_status": "Unsolved",  # invalid
+            "missing_variant_case": "Unknown",
+        }
         response_200 = self.client.post(url, [part3], format="json")
-        response_207 = self.client.post(url, [part1, part3], format="json")
+        response_207 = self.client.post(url, [part1, part3, part4], format="json")
         response_400 = self.client.post(url, [part2], format="json")
         changed_by(self, response_200.data[0], testuser)
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
@@ -112,6 +132,7 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
         changed_by(self, response_207.data[0], testuser)
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
+        self.assertEqual(response_207.data[2]["request_status"], "BAD REQUEST")
 
 
 class ReadParticipantAPITest(APITestCaseWithAuth):
@@ -215,7 +236,7 @@ class DeleteParticipantAPITest(APITestCaseWithAuth):
             "age_at_last_observation": 20,
             "affected_status": "Unaffected",
             "age_at_enrollment": 20,
-            "solve_status": "Unsolved",
+            "solve_status": "Unaffected",
             "missing_variant_case": "No",
         }
         create_response = self.client.post(create_url, [part1], format="json")

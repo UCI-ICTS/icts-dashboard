@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping, normalizeArrays } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 import dayjs from 'dayjs';
 
@@ -42,7 +42,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           }}
         >{schema.title || keyName}</Button>
       </Tooltip>
-      
+
       {schema.description && (
         <Tooltip title={schema.description}>
           <InfoCircleOutlined style={{ marginLeft: 4 }} />
@@ -56,9 +56,9 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   const rawData = useSelector(state =>
     sourceTable ? state.data[sourceTable] : undefined
   );
-  
+
   const dependantValue = foreignMap?.dependsOn ? form.getFieldValue(foreignMap.dependsOn) : null;
-  
+
   const foreignData = useMemo(() => {
     if (foreignMap?.filterBy && dependantValue) {
       console.log(dependantValue, foreignMap.filterBy);
@@ -66,7 +66,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
     }
     return rawData || [];
   }, [rawData, foreignMap, dependantValue]);
-  
+
   useEffect(() => {
     if (foreignMap?.sourceTable && !foreignData.length) {
       dispatch(fetchTable(foreignMap.apiKey));
@@ -76,11 +76,11 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
   if (foreignMap) {
     // support labelKey for display; fallback to apiKey for backward-compat
     const { valueKey, apiKey, labelKey = apiKey } = foreignMap;
-    
+
     // Check if foreignMap defines a default value (e.g., 0)
     const extendedOptions = [...foreignData];
     if (
-      foreignMap.default !== undefined && 
+      foreignMap.default !== undefined &&
       !foreignData.some(item => String(item[valueKey]) === String(foreignMap.default))
     ) {
       extendedOptions.unshift({
@@ -127,7 +127,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
         dependencies={deps}
         rules={rules.map(({ _conditionalDependencies, ...r }) => r)}
       >
-        <Select 
+        <Select
           showSearch
           allowClear
           optionFilterProp="value"
@@ -315,8 +315,8 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
           getValueProps={(i) => ({ value: dayjs(i) })}
         >
           <DatePicker
-            format='DD/MM/YYYY'
-            placeholder='DD/MM/YYYY'
+            format='YYYY-MM-DD'
+            placeholder='YYYY-MM-DD'
             disabled={readOnly}
             defaultValue={null}
           />
@@ -446,19 +446,6 @@ const SchemaForm = ({
       .catch((err) => message.error(errorService.printErrorMessages(err)));
   };
 
-  const normalizeArrays = (obj, schemaProps) => {
-    const result = { ...obj };
-    Object.entries(schemaProps).forEach(([key, def]) => {
-      if (def.type === "array" && result[key] === null) {
-        result[key] = [];
-      }
-    });
-    if (result["phenotype_id"] === null && result["participant_id"] && result["term_id"]) {
-      result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
-    }
-    return result;
-  };
-
   const handleSubmit = async (values) => {
     try {
       const normalized = normalizeArrays(values, schema.properties);
@@ -500,13 +487,13 @@ const SchemaForm = ({
           </div>
 
           <div className="review-actions">
-            
+
             <Tooltip title="Enable 'Edit Mode' to DELETE entry (not reversible)">
               <Button onClick={handleDelete} disabled={!editMode} danger>
                 DELETE
               </Button>
             </Tooltip>
-            
+
           </div>
         </div>
       )}

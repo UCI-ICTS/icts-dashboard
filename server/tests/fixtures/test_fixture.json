@@ -3079,7 +3079,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.2",
+    "pk": "GREGoR_test-001-001-0_HP:0002194",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3097,7 +3097,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.3",
+    "pk": "GREGoR_test-002-001-2_HP:0002076",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3115,7 +3115,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.4",
+    "pk": "GREGoR_test-001-001-0_HP:0000733",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3133,7 +3133,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.5",
+    "pk": "GREGoR_test-001-001-0_HP:0001260",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3151,7 +3151,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.6",
+    "pk": "GREGoR_test-_HP:0032322",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3169,7 +3169,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.7",
+    "pk": "GREGoR_test-001-001-0_HP:0001324",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3187,7 +3187,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.8",
+    "pk": "GREGoR_test-001-001-0_HP:0008936",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3205,7 +3205,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "1.9",
+    "pk": "GREGoR_test-001-001-0_HP:0000729",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3223,7 +3223,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.1",
+    "pk": "GREGoR_test-004-004-0_HP:0008936",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3241,7 +3241,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.10",
+    "pk": "GREGoR_test-005-004-2_HP:0032322",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3259,7 +3259,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.11",
+    "pk": "GREGoR_test-004-004-0_HP:0000486",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3277,7 +3277,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.2",
+    "pk": "GREGoR_test-004-004-0_HP:0001257",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3295,7 +3295,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.3",
+    "pk": "GREGoR_test-004-004-0_HP:0000565",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3313,7 +3313,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.4",
+    "pk": "GREGoR_test-004-004-0_HP:0001269",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3331,7 +3331,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.5",
+    "pk": "GREGoR_test-004-004-0_HP:0002126",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3349,7 +3349,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.6",
+    "pk": "GREGoR_test-004-004-0_HP:0030724",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3367,7 +3367,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.7",
+    "pk": "GREGoR_test-004-004-0_HP:0002282",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3385,7 +3385,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.8",
+    "pk": "GREGoR_test-004-004-0_HP:0001263",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3403,7 +3403,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "2.9",
+    "pk": "GREGoR_test-005-004-2_HP:0032322",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3421,7 +3421,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "3.10",
+    "pk": "GREGoR_test-006-006-0_HP:0001631",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3439,7 +3439,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "3.11",
+    "pk": "GREGoR_test-006-006-0_HP:0025666",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3457,7 +3457,7 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "3.12",
+    "pk": "GREGoR_test-006-006-0_HP:0000207",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
@@ -3483,7 +3483,7 @@
       "changed_by": "wheel",
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
-        "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+        "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
         "SNV"
@@ -3514,13 +3514,13 @@
       "known_condition_name": "",
       "condition_id": "",
       "condition_inheritance": [
-        "De novo"
+        "Unknown"
       ],
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "Partial",
       "partial_contribution_explained": [
         "HP:0001260",
@@ -3545,7 +3545,7 @@
       "changed_by": "wheel",
       "participant_id": "GREGoR_test-004-004-0",
       "experiment_id": [
-        "experiment.experiment_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1"
+        "experiment_dna_short_read.UCI_GREGoR_test-004-004-0-D-1_DNA_1"
       ],
       "variant_type": [
         "SNV"
@@ -3579,8 +3579,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": null,
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3600,7 +3600,7 @@
       "changed_by": "wheel",
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
-        "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+        "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
         "SNV"
@@ -3636,8 +3636,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3657,7 +3657,7 @@
       "changed_by": "wheel",
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
-        "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+        "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
         "SNV"
@@ -3693,8 +3693,8 @@
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [
@@ -3714,7 +3714,7 @@
       "changed_by": "wheel",
       "participant_id": "GREGoR_test-001-001-0",
       "experiment_id": [
-        "experiment.experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
+        "experiment_dna_short_read.UCI_GREGoR_test-001-001-0-D-1_DNA_1"
       ],
       "variant_type": [
         "SNV"
@@ -3743,15 +3743,15 @@
       "linked_variant_phase": "",
       "gene_known_for_phenotype": "Known",
       "known_condition_name": "Pilarowski-Bjornsson syndrome",
-      "condition_id": "617682",
+      "condition_id": "OMIM:617682",
       "condition_inheritance": [
         "Autosomal dominant"
       ],
       "GREGoR_variant_classification": "Curation in progress",
       "GREGoR_ClinVar_SCV": "",
       "gene_disease_validity": "Curation in progress",
-      "public_database_other": "",
-      "public_database_ID_other": "",
+      "public_database_other": [],
+      "public_database_ID_other": [],
       "phenotype_contribution": "",
       "partial_contribution_explained": [],
       "method_of_discovery": [

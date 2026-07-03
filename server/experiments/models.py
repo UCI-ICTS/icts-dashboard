@@ -751,7 +751,7 @@ class AlignedNanopore(TimeStampedModel):
         blank=True, null=True, help_text="Total reads before ignoring "
         + "alignment."
     )
-    num_bases = models.IntegerField(
+    num_bases = models.BigIntegerField(
         blank=True, null=True, help_text="Number of bases before ignoring "
         + "alignment."
     )
@@ -1103,7 +1103,7 @@ class AlignedPacBio(TimeStampedModel):
         blank=True, null=True, help_text="Total reads (before/ignoring "
         + "alignment)"
     )
-    num_bases = models.IntegerField(
+    num_bases = models.BigIntegerField(
         blank=True, null=True, help_text="Number of bases (before/ignoring "
         + "alignment)"
     )

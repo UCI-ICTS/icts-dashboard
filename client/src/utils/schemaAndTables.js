@@ -1,5 +1,7 @@
 // src/utils/schemaAndTables.js
 
+import dayjs from 'dayjs';
+
 /**
  * Parse values like:
  *  "CONDITIONAL (gene_known_for_phenotype = Known)"
@@ -160,19 +162,19 @@ export const foreignKeyFields = {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                         // add a default of `0`
     },
     paternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                         // add a default of `0`
     },
     maternal_id: {
       sourceTable: "participants",
       valueKey: "participant_id",
       apiKey: "participant",
-      default: 0                         // add a default of `0`
+      default: "0"                         // add a default of `0`
     }
   },
   phenotype: {
@@ -548,4 +550,31 @@ export const getTableName = (collectionName) => {
  */
 export const getIdentifier = (schema) => {
   return TABLE_MAPPING.find(item => item.schema === schema)?.identifier || null;
+};
+
+// Normalize forms for GREGoR-specific format requirements
+export const normalizeArrays = (obj, schemaProps) => {
+  const result = { ...obj };
+  Object.entries(schemaProps).forEach(([key, def]) => {
+    if (def.type === "array" && result[key] === null) {
+      result[key] = [];
+    }
+  });
+  // Phenotype normalization
+  if (result["phenotype_id"] == null && result["participant_id"] && result["term_id"]) {
+    result["phenotype_id"] = `${result["participant_id"]}_${result["term_id"]}`;
+  }
+  // Biobank normalization
+  if (result["current_location"] && !result["current_location"].includes("UCI")) {  // Clear freezer information if not in UCI Vilain Lab
+    result["freezer_id"] = null
+    result["shelf_id"] = null
+    result["rack_id"] = null
+  }
+  if (result["received_date"] instanceof dayjs) {  // Convert dayjs objects to ISO 8601 date strings, else ignore if already a string
+    result["received_date"] = result["received_date"].toISOString().split('T')[0]
+  }
+  if (result["shipment_date"] instanceof dayjs) {  // Convert dayjs objects to ISO 8601 date strings, else ignore if already a string
+    result["shipment_date"] = result["shipment_date"].toISOString().split('T')[0]
+  }
+  return result;
 };

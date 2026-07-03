@@ -44,44 +44,46 @@ class APITestCaseWithAuth(APITestCase):
 
 
 class CreatePhenotypeAPITest(APITestCaseWithAuth):
-    def test_create_analyte_api(self):
+    def test_create_phenotype_api(self):
         url = "/api/metadata/phenotype/create/"
         part1 = {  # Valid submission
-            "phenotype_id": "1.10",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0005285",
             "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002194",
+            "term_id": "HP:0005285",
             "presence": "Present",
             "ontology": "HPO",
-            "additional_details": "gross motor delay",
-            "onset_age_range": "HP:0011463",
+            "additional_details": "Absent Nasal bridge",
+            "onset_age_range": "HP:0003577",
             "additional_modifiers": [],
             "syndromic": "non-syndromic",
         }
         part2 = {  # Valid submission 2
-            "phenotype_id": "1.11",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0000457",
             "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002195",
+            "term_id": "HP:0000457",
             "presence": "Present",
             "ontology": "HPO",
-            "additional_details": "Dysgenesis of the cerebellar vermis",
-            "onset_age_range": "HP:0011463",
+            "additional_details": "flatten nose",
+            "onset_age_range": "",
             "additional_modifiers": [],
             "syndromic": "non-syndromic",
         }
         part3 = {  # Invalid submission; missing ontology
-            "phenotype_id": "1.12",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0001263",
             "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002196",
+            "term_id": "HP:0001263",
             "presence": "Present",
-            "ontology": "",
-            "additional_details": "Myelopathy",
-            "onset_age_range": "HP:0011463",
-            "additional_modifiers": [],
+            "ontology": "",  # missing
+            "additional_details": "Developmental delay",
+            "onset_age_range": "",
+            "additional_modifiers": ["HP:0003676"],
             "syndromic": "non-syndromic",
         }
+
         response_200 = self.client.post(url, [part1], format="json")
         response_207 = self.client.post(url, [part2, part3], format="json")
         response_400 = self.client.post(url, [part3], format="json")
+
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         changed_by(self, response_200.data[0], testuser)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
@@ -93,8 +95,8 @@ class CreatePhenotypeAPITest(APITestCaseWithAuth):
 
 class ReadPhenotypeAPITest(APITestCaseWithAuth):
     def test_read_phenotype_success(self):
-        url1 = "/api/metadata/phenotype/?ids=1.2,1.7"
-        url2 = "/api/metadata/phenotype/?ids=1.2,1.7,1.99"
+        url1 = "/api/metadata/phenotype/?ids=GREGoR_test-001-001-0_HP:0002194,GREGoR_test-001-001-0_HP:0001260"
+        url2 = "/api/metadata/phenotype/?ids=GREGoR_test-001-001-0_HP:0002194,GREGoR_test-001-001-0_HP:0001260,1.99"
         url3 = "/api/metadata/phenotype/?ids=1.99,1.100"
 
         response_200 = self.client.get(url1, format="json")
@@ -112,13 +114,13 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
     def test_update_phenotype_api(self):
         url = "/api/metadata/phenotype/update/"
         part1 = {  # Valid submission
-            "phenotype_id": "1.2",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0002194",
             "additional_modifiers": ["HP:0025292"],
             "syndromic": "non-syndromic",
         }
 
         part2 = {  # Invalid submission; invalid syndromic
-            "phenotype_id": "1.4",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0000733",
             "term_id": "HP:0000733",
             "presence": "Present",
             "ontology": "HPO",
@@ -145,29 +147,29 @@ class UpdatePhenotypeAPITest(APITestCaseWithAuth):
 
 class DeletePhenotypeAPITest(APITestCaseWithAuth):
     def test_delete_phenotype(self):
-        url = "/api/metadata/phenotype/delete/?ids=1.2"
+        url = "/api/metadata/phenotype/delete/?ids=GREGoR_test-001-001-0_HP:0002194"
         response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["data"], "phenotype 1.2 deleted successfully.")
+        self.assertEqual(response.data[0]["data"], "phenotype GREGoR_test-001-001-0_HP:0002194 deleted successfully.")
 
 
-    def test_create_and_delete_analyte_api(self):
+    def test_create_and_delete_phenotype_api(self):
         create_url = "/api/metadata/phenotype/create/"
         pheno1 = {  # Valid submission
-            "phenotype_id": "1.10",
+            "phenotype_id": "GREGoR_test-001-001-0_HP:0007018",
             "participant_id": "GREGoR_test-001-001-0",
-            "term_id": "HP:0002194",
+            "term_id": "HP:0007018",
             "presence": "Present",
             "ontology": "HPO",
-            "additional_details": "gross motor delay",
-            "onset_age_range": "HP:0011463",
+            "additional_details": "ADHD",
+            "onset_age_range": "HP:0410280",
             "additional_modifiers": [],
             "syndromic": "non-syndromic",
         }
         create_response = self.client.post(create_url, [pheno1], format="json")
         self.assertEqual(create_response.status_code, status.HTTP_200_OK)
 
-        delete_url = "/api/metadata/phenotype/delete/?ids=1.10"
+        delete_url = "/api/metadata/phenotype/delete/?ids=GREGoR_test-001-001-0_HP:0002194"
         delete_response = self.client.delete(delete_url, format="json")
         self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
         self.assertEqual(delete_response.data[0]["request_status"], "DELETED")

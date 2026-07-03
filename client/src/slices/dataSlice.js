@@ -74,64 +74,6 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllTables.pending, (state, action) => {
-        state.status = "loading";
-      })
-      .addCase(getAllTables.rejected, (state, action) => {
-        state.status = "rejected";
-      })
-      .addCase(getAllTables.fulfilled, (state, action) => {
-        const {
-          participants,
-          families,
-          genetic_findings,
-          analytes,
-          biobank_entries,
-          phenotypes,
-          experiments,
-          experiment_dna_short_read,
-          experiment_rna_short_read,
-          experiment_pac_bio,
-          experiment_nanopore,
-          aligned,
-          aligned_dna_short_read,
-          aligned_nanopore,
-          aligned_pac_bio,
-          aligned_rna_short_read,
-          aligned_dna_short_read_set,
-          aligned_nanopore_set,
-          aligned_pac_bio_set,
-          called_variants_dna_short_read,
-          called_variants_nanopore,
-          called_variants_pac_bio
-        } = action.payload;
-
-        Object.assign(state, {
-          participants,
-          families,
-          genetic_findings,
-          analytes,
-          biobank_entries,
-          phenotypes,
-          experiments,
-          experiment_dna_short_read,
-          experiment_rna_short_read,
-          experiment_pac_bio,
-          experiment_nanopore,
-          aligned,
-          aligned_dna_short_read,
-          aligned_nanopore,
-          aligned_pac_bio,
-          aligned_rna_short_read,
-          aligned_dna_short_read_set,
-          aligned_nanopore_set,
-          aligned_pac_bio_set,
-          called_variants_dna_short_read,
-          called_variants_nanopore,
-          called_variants_pac_bio,
-          status: "fulfilled"
-        });
-      })
       .addCase(fetchTable.pending, (state, action) => {
         state.status = "loading"
       })
@@ -297,18 +239,6 @@ export const openReport = createAsyncThunk(
     }
   }
 );
-
-export const getAllTables = createAsyncThunk(
-  "getAllTables",
-  async (_, thunkAPI) => {
-    try {
-      const response = await dataService.getAllTables();
-      return response.data
-    } catch(error) {
-      console.log("ERROR! ",error)
-    }
-  }
-)
 
 export const familyDetail = createAsyncThunk(
   "familyDetail",

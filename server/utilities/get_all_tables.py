@@ -4,7 +4,7 @@ from datetime import date
 import json
 import requests
 
-
+# TODO: Modify this to match new endpoint
 def get_all_tables(token):
     """Get tables and return if valid"""
     url = "https://genomics.icts.uci.edu/api/search/get_all_tables/"

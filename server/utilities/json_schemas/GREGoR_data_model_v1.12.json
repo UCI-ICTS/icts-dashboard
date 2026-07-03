@@ -1,7 +1,7 @@
 {
   "name": "GREGoR Data Model",
   "description": "Data model for the GREGoR consortium",
-  "version": "1.11",
+  "version": "1.12",
   "tables": [
     {
       "table": "participant",
@@ -348,7 +348,7 @@
           "column": "variant_type",
           "required": true,
           "data_type": "enumeration",
-          "enumerations": ["SNV", "INDEL", "SV", "RE", "CNV", "MEI", "STR"],
+          "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
           "examples": "SNV|CNV",
           "notes": "SNV: single nucelotide variants\nINDEL: short insertion/deletions (<50bp)\nSV: structural variants\nRE: repeat elements\nCNV: copy number variants\nMEI: mobile element insertions\nSTR: short tandem repeats"
@@ -1062,9 +1062,9 @@
           "required": true,
           "description": "types of variants called",
           "data_type": "enumeration",
-          "enumerations": ["SNV", "INDEL", "SV", "CNV", "RE", "MEI", "STR"],
+          "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
-          "examples": ["RE = Repeat Expansion", "MEI = Mobile Element Insertion"],
+          "examples": "SNV|INDEL",
           "notes": "can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry"
         },
         {
@@ -1833,7 +1833,7 @@
           "required": true,
           "description": "types of variants called",
           "data_type": "string",
-          "enumerations": ["SNV", "INDEL", "SV", "CNV", "RE", "MEI", "STR"],
+          "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
           "examples": "SNV|INDEL",
           "notes": "can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry"
@@ -2275,7 +2275,7 @@
           "required": true,
           "description": "types of variants called",
           "data_type": "string",
-          "enumerations": ["SNV", "INDEL", "SV", "CNV", "RE", "MEI", "STR"],
+          "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
           "examples": "SNV|INDEL",
           "notes": "can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry"
@@ -3398,9 +3398,9 @@
           "required": true,
           "description": "types of variants called",
           "data_type": "enumeration",
-          "enumerations": ["SNV", "INDEL", "SV", "CNV", "RE", "MEI", "STR"],
+          "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
-          "examples": ["RE = Repeat Expansion", "MEI = Mobile Element Insertion"],
+          "examples": "SNV|INDEL",
           "notes": "can add more values as the need arises\nif there are two VCFs for SNV and Indels, there would be two different lines in this table; if combined in one VCF, a |-delimited entry"
         },
         {

@@ -466,7 +466,7 @@ def build_vectors_from_csv(
         embed_model = local_model  # record for artifact
 
     np.savez(npz_path, ids=np.array(ids, dtype=object), labels=np.array(labels, dtype=object), vecs=X)
-    faiss.write_index(index, faiss_path)
+    faiss.write_index(index, str(faiss_path))
     return faiss_path, npz_path, embed_model
 
 def attach_vectors_to_release(release: str, faiss_path: Path, npz_path: Path, embed_model: str, set_active: bool = True):
@@ -513,7 +513,6 @@ def _load_faiss_once() -> Tuple[faiss.Index, np.ndarray, np.ndarray, np.ndarray]
 
     art = get_active_artifact()
     if not art or not art.faiss_path or not art.npz_path:
-        import pdb; pdb.set_trace()
         raise RuntimeError("No active HPOArtifact with FAISS/NPZ found.")
 
     index = faiss.read_index(str(art.faiss_path))
@@ -927,7 +926,7 @@ def phenotype_extraction(note: str) -> list:
     hpo_candidates = search_hpo([p["phrase"] for p in validated_phrases])
     for phrase, candidate in zip(validated_phrases, hpo_candidates):
         phrase["candidates"] = candidate
-    
+
     choices = best_match(
         validated_phrases=validated_phrases,
         prompt=None,
