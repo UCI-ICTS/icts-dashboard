@@ -95,7 +95,7 @@ EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="https://api.op
 EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
 EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="text-embedding-3-large")
 
-# AWS S3 
+# AWS S3
 AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="OOPS")
 AWS_SECRET_ACCESS_KEY=secrets.get("AWS", "AWS_SECRET_ACCESS_KEY", fallback="OOPS")
 AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.sites",
     "django.contrib.staticfiles",
     "django_extensions",
     "drf_yasg",
@@ -121,8 +122,14 @@ INSTALLED_APPS = [
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels",
-    "hpo.apps.HpoConfig"
+    "hpo.apps.HpoConfig",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -134,6 +141,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -225,6 +233,27 @@ SWAGGER_SETTINGS = {
     },
     "DEEP_LINKING": True,
 }
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# Google OAuth config
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True,
+        'APP': {
+            'client_id': secrets.get("GOOGLE", "GOOGLE_CLIENT_ID", fallback=""),
+            'secret': secrets.get("GOOGLE", "GOOGLE_CLIENT_SECRET", fallback=""),
+            'key': ''
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL = '/api/swagger'
 
 #MIGRATION_MODULES = {
 #    'auth': None,
