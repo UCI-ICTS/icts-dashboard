@@ -121,7 +121,8 @@ INSTALLED_APPS = [
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels",
-    "hpo.apps.HpoConfig"
+    "hpo.apps.HpoConfig",
+    "anvil.apps.AnvilConfig",
 ]
 
 MIDDLEWARE = [
