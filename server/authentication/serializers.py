@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# authentication/services.py
+# authentication/serializers.py
 
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User, update_last_login
@@ -211,3 +211,7 @@ class CustomAuthentication(BaseAuthentication):
 
         # Return the user and the token
         return user, token
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    token = serializers.CharField(help_text="Google ID token from the frontend")

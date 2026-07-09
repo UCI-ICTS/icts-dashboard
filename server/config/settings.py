@@ -52,8 +52,6 @@ DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
 CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "CORS_ALLOWED_ORIGINS", fallback="http://localhost:3000").split(",")
 
 backup = [
-    "https://example.com",
-    "https://sub.example.com",
     "http://localhost:3000",
     "http://127.0.0.1:9000",
     "https://icts8001.hs.uci.edu",
@@ -99,6 +97,10 @@ EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="text-embedding-3-lar
 AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="OOPS")
 AWS_SECRET_ACCESS_KEY=secrets.get("AWS", "AWS_SECRET_ACCESS_KEY", fallback="OOPS")
 AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
+
+# GOOGLE OAUTH
+GOOGLE_CLIENT_ID=secrets.get("GOOGLE", "GOOGLE_CLIENT_ID", fallback="")
+GOOGLE_CLIENT_SECRET=secrets.get("GOOGLE", "GOOGLE_CLIENT_SECRET", fallback="")
 
 # Application definition
 
@@ -210,7 +212,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "authentication.services.CustomAuthentication",
+        "authentication.serializers.CustomAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
@@ -246,8 +248,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
         'OAUTH_PKCE_ENABLED': True,
         'APP': {
-            'client_id': secrets.get("GOOGLE", "GOOGLE_CLIENT_ID", fallback=""),
-            'secret': secrets.get("GOOGLE", "GOOGLE_CLIENT_SECRET", fallback=""),
+            'client_id': GOOGLE_CLIENT_ID,
+            'secret': GOOGLE_CLIENT_SECRET,
             'key': ''
         }
     }

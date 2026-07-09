@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Form, Input, Button, Checkbox, message, Modal, Layout } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login, resetPassword } from '../slices/accountSlice';
 import SiteFooter from '../components/SiteFooter';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { setCredentials } from "../slices/accountSlice";
 
 
 const Login = () => {
@@ -14,6 +17,8 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [passwordResetModal, setPasswordResetModal] = useState(false);
   const { isLoggedIn, loading, error } = useSelector((state) => state.account);
+
+  //const { setUser } = useContext(AuthContext);
 
   const onFinish = async (values) => {
     dispatch(login({...values, rememberMe}))
@@ -40,6 +45,20 @@ const Login = () => {
   const handleCancel = () => {
     form.resetFields();
     setPasswordResetModal(false);
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const res = await axios.post(
+      "http://localhost:8000/api/auth/oauth/google/", {
+      token: credentialResponse.credential
+    }, {
+      headers: { Authorization: undefined }
+    });
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
+
+    //setUser(res.data.user);
+    navigate("/dashboard");
   };
 
   // Redirect after login
@@ -94,6 +113,10 @@ const Login = () => {
             </Form.Item>
           </Form>
           {error && <p style={{ color: 'red' }}>{error}</p>}
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.log("Login Failed")}
+          />
         </div>
         <Modal
           className="uci-modal"
@@ -127,4 +150,5 @@ const Login = () => {
   );
 };
 
+axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("access")}`;
 export default Login;

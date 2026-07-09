@@ -13,9 +13,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 from rest_framework import status, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import (
     TokenRefreshSerializer,
@@ -23,19 +26,17 @@ from rest_framework_simplejwt.serializers import (
     TokenBlacklistSerializer,
 )
 
-from authentication.services import (
-    UserInputSerializer,
+from authentication.selectors import IsSuperUser, get_active_user_emails
+from authentication.serializers import (    UserInputSerializer,
     UserOutputSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     ChangePasswordSerializer,
     CustomTokenObtainPairSerializer,
     ActivateUserSerializer,
-    IsSuperUser,
-    EmailActiveUsers
+    GoogleAuthSerializer,
+    EmailActiveUsers,
 )
-
-from authentication.selectors import IsSuperUser, get_active_user_emails
 
 User = get_user_model()
 
@@ -395,7 +396,7 @@ class EmailUsersViewSet(viewsets.ViewSet):
             self.action, self.permission_classes
         )
         return [perm() for perm in perms]
-    
+
     @swagger_auto_schema(
         request_body=EmailActiveUsers,
         responses={200: "Email sent successfully"},
@@ -416,7 +417,7 @@ class EmailUsersViewSet(viewsets.ViewSet):
         body=serializer.validated_data.get("body", "")
         html_template=serializer.validated_data.get("html_template", "string")
         if html_template == "string":
-            html_template= "emails/email_users.html" 
+            html_template= "emails/email_users.html"
         bcc=get_active_user_emails()
 
         html_content= render_to_string(html_template, serializer.validated_data)
@@ -430,3 +431,49 @@ class EmailUsersViewSet(viewsets.ViewSet):
         )
 
         return Response(serializer.errors, status=400)
+
+
+class GoogleAuthViewSet(viewsets.ViewSet):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        request_body=GoogleAuthSerializer,
+        responses={200: "Authenticated with Google OAuth"},
+        operation_description="Authenticate with Google OAuth",
+        tags=["Google OAuth"],
+    )
+    @action(detail=False, methods=["post"], url_path="google")
+    def google(self, request):
+        token = request.data.get("token")
+        if not token:
+            return Response({"error": "No token provided"}, status=400)
+
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            return Response({"error": "Invalid token"}, status=401)
+
+        email = idinfo["email"]
+        name = idinfo.get("name", "")
+
+        user, _ = User.objects.get_or_create(
+            email=email,
+            defaults={"username": email, "first_name": name},
+        )
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": {"email": user.email, "name": user.first_name},
+        }, status=status.HTTP_200_OK)
+
+    def me(self, request):
+        user = request.user
+        return Response({
+            "email": user.email,
+            "name": user.first_name,
+        }, status=status.HTTP_200_OK)
