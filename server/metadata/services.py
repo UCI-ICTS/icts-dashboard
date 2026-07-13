@@ -754,6 +754,21 @@ def update_metadata_entry(
             new_data=datum,
         )
 
+        if not changes:
+            return (
+                response_constructor(
+                    identifier=identifier,
+                    request_status="NO CHANGE",
+                    code=204,
+                    message=f"{table_name} {identifier} had no changes.",
+                    data={
+                        "updates": None,
+                        "instance": output_serializer(model_instance).data,
+                    },
+                ),
+                "accepted_request",
+            )
+
         serializer = input_serializer(model_instance, data=datum, partial=True)
 
         if serializer.is_valid():
