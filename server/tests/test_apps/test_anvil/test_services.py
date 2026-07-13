@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# tests/test_apps/test_anvil/services.py
+# tests/test_apps/test_anvil/test_services.py
 
 from django.contrib.auth.models import User
 from django.test import TestCase
