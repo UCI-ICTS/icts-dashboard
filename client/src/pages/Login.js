@@ -7,7 +7,6 @@ import { login, resetPassword } from '../slices/accountSlice';
 import SiteFooter from '../components/SiteFooter';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import { setCredentials } from "../slices/accountSlice";
 
 
 const Login = () => {
@@ -54,8 +53,14 @@ const Login = () => {
     }, {
       headers: { Authorization: undefined }
     });
-    localStorage.setItem("access", res.data.access);
-    localStorage.setItem("refresh", res.data.refresh);
+    dispatch(login({...credentialResponse, rememberMe}))
+    .unwrap()
+    .then(() => {
+      message.success("Login successful");
+    })
+    .catch((err) => {
+      message.error(err || "Login failed. Please check your credentials.");
+    });
 
     //setUser(res.data.user);
     navigate("/dashboard");
