@@ -29,6 +29,7 @@ export default function TableToolBar({
   const [open, setOpen] = useState(false);
   const keys = useMemo(() => Object.keys(schema?.properties || {}), [schema]);
   const allSelected = keys.length > 0 && keys.every((k) => !!visibleColumns[k]);
+  const restrictedView = renderDetail || renderQueue;
 
   const items = [
     {
@@ -128,51 +129,39 @@ export default function TableToolBar({
 
   return (
     <>
-    {!renderDetail ?(
-      <Space wrap>
-        <Tooltip title="Add new row">&nbsp;
-          <Button
-            className="action-btn"
-            icon={<PlusOutlined />}
-            onClick={() => onOpenModal("add")}
-          >Add Row</Button>
-        </Tooltip>&nbsp;
-        <TableSelector />&nbsp;
-        <Tooltip title="Refresh Data">
-          <Button
-            className="action-btn"
-            icon={<ReloadOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRefresh?.(); // trigger the parent fetch
-            }}
-          >Refresh data</Button>&nbsp;
-        </Tooltip>
-      </Space>
-    ) : !renderQueue ?(
-      <Space wrap>
-        <Tooltip title="Add new row">&nbsp;
-          <Button
-            className="action-btn"
-            icon={<PlusOutlined />}
-            onClick={() => onOpenModal("add")}
-          >Add Row</Button>
-        </Tooltip>&nbsp;
-        <TableSelector />&nbsp;
-        <Tooltip title="Refresh Data">
-          <Button
-            className="action-btn"
-            icon={<ReloadOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRefresh?.(); // trigger the parent fetch
-            }}
-          >Refresh data</Button>&nbsp;
-        </Tooltip>
-      </Space>
-    ) : (
-      <></>
-    )}
+{!restrictedView && (
+  <Space wrap>
+    <Tooltip title="Add new row">
+      &nbsp;
+      <Button
+        className="action-btn"
+        icon={<PlusOutlined />}
+        onClick={() => onOpenModal("add")}
+      >
+        Add Row
+      </Button>
+    </Tooltip>
+
+    &nbsp;
+    <TableSelector />
+    &nbsp;
+
+    <Tooltip title="Refresh Data">
+      <Button
+        className="action-btn"
+        icon={<ReloadOutlined />}
+        onClick={(event) => {
+          event.stopPropagation();
+          onRefresh?.();
+        }}
+      >
+        Refresh data
+      </Button>
+    </Tooltip>
+
+    &nbsp;
+  </Space>
+)}
       <Space >
       <Collapse
         // className="site-header"

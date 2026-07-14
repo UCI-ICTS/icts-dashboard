@@ -19,6 +19,7 @@ import AccountService from "./services/account.service";
 import HomePage from './pages/Home';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { Uploader } from "./pages/Uploader";
+import PhenotypeCohort from './pages/PhenotypeCohort';
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000;
@@ -84,6 +85,7 @@ const AppRoutes = () => {
         <Route path="uploader" element={<Uploader />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="cohort" element={<PhenotypeCohort />} />
         <Route path="rag-hpo" element={<RAGHPO />} />
       </Route>
 
