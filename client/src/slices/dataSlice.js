@@ -36,6 +36,8 @@ const initialState = {
   called_variants_nanopore: [],
   called_variants_pac_bio: [],
   rag_hpos: [],
+  phenotype_cohort: null,
+  phenotype_cohort_error: null,
   status: "idle"
 };
 
@@ -43,6 +45,10 @@ export const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
+    clearPhenotypeCohort(state) {
+      state.phenotype_cohort = null;
+      state.phenotype_cohort_error = null;
+    },
     replaceRagHpoChoice: (state, action) => {
       const {id, choice} = action.payload;
       const index = state.rag_hpos.findIndex(item => item.id === id)
@@ -215,7 +221,18 @@ export const dataSlice = createSlice({
         state.rag_hpos = action.payload
         state.status = "fulfilled";
       })
-
+      .addCase(createPhenotypeCohort.pending, (state) => {
+        state.status = "loading";
+        state.phenotype_cohort_error = null;
+      })
+      .addCase(createPhenotypeCohort.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        state.phenotype_cohort = action.payload;
+      })
+      .addCase(createPhenotypeCohort.rejected, (state, action) => {
+        state.status = "rejected";
+        state.phenotype_cohort_error = action.payload;
+      })
   }
 });
 
@@ -318,14 +335,13 @@ export const deleteEntry = createAsyncThunk(
     try {
       const response = await dataService.deleteEntry(table, idList)
       const payload = {response: response.data, table}
-      console.log("slice", response)
       message.success(`${payload.table} ${response.data[0].identifier} deleted successfuly`);
     } catch(error) {
       message.error(errorService.printErrorMessages(error));
       return thunkAPI.rejectWithValue()
     }
   }
-)
+);
 
 export const extractPhenotypes = createAsyncThunk(
   "extractPhenotypes",
@@ -338,9 +354,26 @@ export const extractPhenotypes = createAsyncThunk(
       return thunkAPI.rejectWithValue()
     }
   }
-)
+);
+
+export const createPhenotypeCohort = createAsyncThunk(
+  "data/createPhenotypeCohort",
+  async (values, thunkAPI) => {
+    try {
+      console.log(values)
+      const response = await dataService.createPhenotypeCohort(values);
+      return response.data;
+    } catch (error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Unable to build phenotype cohort."
+      );
+    }
+  }
+);
 
 export const {
+  clearPhenotypeCohort,
   replaceRagHpoChoice,
   clearRagHpos,
   setJsonData,
