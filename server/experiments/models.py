@@ -763,7 +763,7 @@ class AlignedNanopore(TimeStampedModel):
     num_aligned_reads = models.IntegerField(
         blank=True, null=True, help_text="Total aligned reads."
     )
-    num_aligned_bases = models.IntegerField(
+    num_aligned_bases = models.BigIntegerField(
         blank=True, null=True, help_text="Number of bases in aligned reads."
     )
     aligned_read_length_mean = models.IntegerField(
@@ -1115,7 +1115,7 @@ class AlignedPacBio(TimeStampedModel):
     num_aligned_reads = models.IntegerField(
         blank=True, null=True, help_text="Total aligned reads"
     )
-    num_aligned_bases = models.IntegerField(
+    num_aligned_bases = models.BigIntegerField(
         blank=True, null=True, help_text="Number of bases in aligned reads"
     )
     aligned_read_length_mean = models.IntegerField(
