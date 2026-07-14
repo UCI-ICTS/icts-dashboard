@@ -294,7 +294,7 @@ class PhenotypeCohortViewSet(viewsets.ViewSet):
     """
     Build participant cohorts from submitted HPO identifiers or terms.
     """
-    permission_classes = [AllowAny]
+
     @swagger_auto_schema(
         request_body=PhenotypeCohortSummaryInputSerializer,
         tags=["HPO"],
