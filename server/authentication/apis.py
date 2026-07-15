@@ -456,24 +456,30 @@ class GoogleAuthViewSet(viewsets.ViewSet):
         except ValueError:
             return Response({"error": "Invalid token"}, status=401)
 
+        username = idinfo.get("username", "")
         email = idinfo["email"]
-        name = idinfo.get("name", "")
 
         user, _ = User.objects.get_or_create(
             email=email,
-            defaults={"username": email, "first_name": name},
+            defaults={
+                "username": username,
+                "email": email,
+            },
         )
 
         refresh = RefreshToken.for_user(user)
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
-            "user": {"email": user.email, "name": user.first_name},
+            "user": {
+                "username": user.username,
+                "email": user.email,
+            },
         }, status=status.HTTP_200_OK)
 
     def me(self, request):
         user = request.user
         return Response({
+            "username": user.username,
             "email": user.email,
-            "name": user.first_name,
         }, status=status.HTTP_200_OK)
