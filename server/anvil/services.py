@@ -1,42 +1,25 @@
 #!/usr/bin/env python
 # anvil/services.py
 
+import csv
+import hashlib
+import json
+from pathlib import Path
 from django.apps import apps
 from django.db import transaction
 
+from anvil.constants import (
+    ANVIL_UPLOAD_TABLES,
+    ANVIL_UPLOAD_TABLE_MODEL_MAP,
+    TSV_CONTENT_TYPE,   
+)
 from anvil.models import (
-    AnvilUploadTable,
-    AnvilUploadArtifact,
     AnvilUpload,
+    AnvilUploadArtifact,
+    AnvilUploadTable,
     AnvilUploadValidationRun,
 )
 
-
-ANVIL_UPLOAD_TABLES = [
-    "family",
-    "participant",
-    "phenotype",
-    "analyte",
-    "genetic_findings",
-    "experiment",
-    "experiment_dna_short_read",
-    "experiment_rna_short_read",
-    "experiment_nanopore",
-    "experiment_pac_bio",
-    "aligned",
-    "aligned_dna_short_read",
-    "aligned_rna_short_read",
-    "aligned_nanopore",
-    "aligned_pac_bio",
-    "aligned_dna_short_read_set",
-    "aligned_nanopore_set",
-    "aligned_pac_bio_set",
-    "called_variants_dna_short_read",
-    "called_variants_nanopore",
-    "called_variants_pac_bio",
-]
-
-TSV_CONTENT_TYPE = "text/tab-separated-values"
 
 @transaction.atomic
 def initialize_upload_tables(*, upload, changed_by=None):
@@ -44,8 +27,7 @@ def initialize_upload_tables(*, upload, changed_by=None):
     Ensure that the upload has one AnvilUploadTable row for every GREGoR table
     expected in the Dashboard-generated AnVIL package.
 
-    This is idempotent: calling it multiple times for the same upload will not
-    create duplicate table rows.
+    This is idempotent.
     """
 
     upload_tables = []
@@ -62,20 +44,22 @@ def initialize_upload_tables(*, upload, changed_by=None):
 
     return upload_tables
 
+
 @transaction.atomic
-def initialize_upload_tsv_artifacts(*, upload, changed_by=None):
+def initialize_upload_tsv_artifacts(*, upload, upload_tables=None, changed_by=None):
     """
     Ensure that the upload has one planned TSV artifact for every expected
     GREGoR upload table.
 
-    #TODO: This does not write files yet. It creates the durable artifact package that the
-    exporter will later fill with byte_size, sha256, storage_uri, and generated
-    status.
+    This does not write files. It creates artifact records that the TSV generator
+    will later fill with byte_size, sha256, storage_uri, and generated status.
     """
-    upload_tables =initialize_upload_tables(
-        upload=upload,
-        changed_by=changed_by
-    )
+
+    if upload_tables is None:
+        upload_tables = initialize_upload_tables(
+            upload=upload,
+            changed_by=changed_by,
+        )
 
     artifacts = []
 
@@ -92,23 +76,25 @@ def initialize_upload_tsv_artifacts(*, upload, changed_by=None):
                 "generation_status": AnvilUploadArtifact.GenerationStatus.PENDING,
                 "file_name": file_name,
                 "content_type": TSV_CONTENT_TYPE,
-                "changed_by": changed_by
-            }
+                "changed_by": changed_by,
+            },
         )
+
         artifacts.append(artifact)
 
     return artifacts
 
+
 @transaction.atomic
-def build_upload_tsv_package(*, upload, changed_by=None):
+def initialize_upload_package(*, upload, changed_by=None):
     """
-    Build the first deterministic AnVIL upload package.
+    Initialize the database records for a deterministic AnVIL upload package.
 
-    For now, this only creates:
+    This creates:
     - 21 AnvilUploadTable rows
-    - 21 planned table TSV artifacts
+    - 21 planned table TSV artifact rows
 
-    #TODO: Make this function can call the real TSV row serializers.
+    It does not write TSV files yet.
     """
 
     upload_tables = initialize_upload_tables(
@@ -117,6 +103,7 @@ def build_upload_tsv_package(*, upload, changed_by=None):
     )
     tsv_artifacts = initialize_upload_tsv_artifacts(
         upload=upload,
+        upload_tables=upload_tables,
         changed_by=changed_by,
     )
 
@@ -126,6 +113,82 @@ def build_upload_tsv_package(*, upload, changed_by=None):
         "tsv_artifacts": tsv_artifacts,
     }
 
+
+DASHBOARD_ONLY_EXPORT_FIELDS = {
+    "created_at",
+    "updated_at",
+    "needs_review",
+    "changed_by",
+}
+
+
+def _get_generation_status(enum_class, name, fallback):
+    """
+    Small compatibility helper so this service does not break if the model
+    enum names are slightly different during early development.
+    """
+
+    return getattr(enum_class, name, fallback)
+
+
+def _get_upload_table_model(*, table_name):
+    app_label, model_name = ANVIL_UPLOAD_TABLE_MODEL_MAP[table_name]
+    return apps.get_model(app_label, model_name)
+
+
+def _get_export_fields(model_class):
+    """
+    First-pass export field selection.
+
+    This intentionally uses concrete Django model fields and excludes Dashboard
+    audit/review fields. Later, this can be replaced with schema-defined column
+    order from the GREGoR data model.
+    """
+
+    fields = []
+
+    for field in model_class._meta.fields:
+        if field.name in DASHBOARD_ONLY_EXPORT_FIELDS:
+            continue
+
+        fields.append(field)
+
+    return fields
+
+
+def _serialize_tsv_value(value):
+    if value is None:
+        return ""
+
+    if isinstance(value, (list, dict)):
+        return json.dumps(value, sort_keys=True)
+
+    return str(value)
+
+
+def _row_from_object(*, obj, fields):
+    row = {}
+
+    for field in fields:
+        column_name = field.column
+
+        # field.value_from_object handles ForeignKey fields correctly by using
+        # the underlying attname value rather than the related object instance.
+        value = field.value_from_object(obj)
+
+        row[column_name] = _serialize_tsv_value(value)
+
+    return row
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+
+    with path.open("rb") as file_handle:
+        for chunk in iter(lambda: file_handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    return digest.hexdigest()
 
 def _get_model(app_label, model_name):
     return apps.get_model(app_label, model_name)
@@ -154,12 +217,6 @@ def _error(
 
 
 def _validate_participant_solve_status():
-    """
-
-    This catches the known invalid participant fixture issue without attempting
-    to fully reimplement JSON Schema validation yet.
-    """
-
     Participant = _get_model("metadata", "participant")
 
     errors = []
@@ -184,13 +241,6 @@ def _validate_participant_solve_status():
 
 
 def _validate_phenotype_onset_age_range():
-    """
-    GREGoR v1.12 does not allow onset_age_range='unknown'.
-
-    Blank is acceptable for the Dashboard fixture, but the literal value
-    'unknown' should be blocked.
-    """
-
     Phenotype = _get_model("metadata", "phenotype")
 
     errors = []
@@ -216,12 +266,10 @@ def _validate_phenotype_onset_age_range():
 
 def _validate_delete_marked_alignment_sets():
     """
-    The upload-source fixture should not include delete-marked alignment set
-    rows for the generated GREGoR upload tables.
+    Delete-marked alignment set rows should not be exported into generated
+    GREGoR upload tables.
 
-    This intentionally checks the alignment set tables only. The current valid
-    fixture may still contain a delete-marked metadata.family row, which is a
-    separate policy question and not part of this first validator.
+    This check is intentionally narrow and only applies to alignment set tables.
     """
 
     checks = [
@@ -261,7 +309,7 @@ def _validate_delete_marked_alignment_sets():
                     value=str(obj.pk),
                     message=(
                         "Delete-marked alignment set records should not be "
-                        "included in an AnVIL upload source fixture."
+                        "included in an AnVIL upload."
                     ),
                 )
             )
@@ -305,7 +353,6 @@ def validate_upload_source_data(*, upload, changed_by=None):
     validation_run.save()
 
     errors = collect_upload_source_validation_errors()
-
     passed = len(errors) == 0
 
     summary = {
@@ -341,3 +388,122 @@ def validate_upload_source_data(*, upload, changed_by=None):
     upload.save()
 
     return validation_run
+
+
+@transaction.atomic
+def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
+    """
+    Generate TSV files for the initialized AnVIL upload package.
+
+    This is the first real file-writing slice. It does not yet attempt to be a
+    complete GREGoR schema exporter. It writes deterministic TSVs from current
+    Django model fields and updates AnvilUploadTable / AnvilUploadArtifact
+    metadata.
+
+    Later slices can replace _get_export_fields() with schema-defined GREGoR
+    column ordering.
+    """
+
+    package = initialize_upload_package(
+        upload=upload,
+        changed_by=changed_by,
+    )
+
+    upload_tables_by_name = {
+        upload_table.table_name: upload_table
+        for upload_table in package["upload_tables"]
+    }
+
+    artifacts_by_table_name = {
+        artifact.upload_table.table_name: artifact
+        for artifact in package["tsv_artifacts"]
+    }
+
+    package_dir = Path(output_dir) / str(upload.upload_id)
+    tables_dir = package_dir / "tables"
+    tables_dir.mkdir(parents=True, exist_ok=True)
+
+    generated = []
+
+    for table_name in ANVIL_UPLOAD_TABLES:
+        model_class = _get_upload_table_model(table_name=table_name)
+        fields = _get_export_fields(model_class)
+
+        column_names = [field.column for field in fields]
+
+        queryset = model_class.objects.all().order_by(model_class._meta.pk.name)
+
+        upload_table = upload_tables_by_name[table_name]
+        artifact = artifacts_by_table_name[table_name]
+
+        file_path = tables_dir / f"{table_name}.tsv"
+
+        row_count = 0
+
+        with file_path.open("w", newline="", encoding="utf-8") as file_handle:
+            writer = csv.DictWriter(
+                file_handle,
+                fieldnames=column_names,
+                delimiter="\t",
+                lineterminator="\n",
+                extrasaction="ignore",
+            )
+            writer.writeheader()
+
+            for obj in queryset:
+                writer.writerow(
+                    _row_from_object(
+                        obj=obj,
+                        fields=fields,
+                    )
+                )
+                row_count += 1
+
+        upload_table.row_count = row_count
+        upload_table.column_names = column_names
+        upload_table.generation_status = _get_generation_status(
+            AnvilUploadTable.GenerationStatus,
+            "GENERATED",
+            "generated",
+        )
+
+        if changed_by is not None:
+            upload_table.changed_by = changed_by
+
+        upload_table.save()
+
+        artifact.file_name = f"{table_name}.tsv"
+        artifact.relative_path = f"tables/{table_name}.tsv"
+        artifact.content_type = TSV_CONTENT_TYPE
+        artifact.byte_size = file_path.stat().st_size
+        artifact.sha256 = _sha256_file(file_path)
+        artifact.storage_uri = str(file_path)
+        artifact.generation_status = _get_generation_status(
+            AnvilUploadArtifact.GenerationStatus,
+            "GENERATED",
+            "generated",
+        )
+
+        if changed_by is not None:
+            artifact.changed_by = changed_by
+
+        artifact.save()
+
+        generated.append(
+            {
+                "table_name": table_name,
+                "relative_path": artifact.relative_path,
+                "file_path": str(file_path),
+                "row_count": row_count,
+                "column_names": column_names,
+                "sha256": artifact.sha256,
+                "byte_size": artifact.byte_size,
+            }
+        )
+
+    return {
+        "upload": upload,
+        "package_dir": str(package_dir),
+        "tables_dir": str(tables_dir),
+        "generated": generated,
+    }

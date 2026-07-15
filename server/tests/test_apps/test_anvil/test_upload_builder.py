@@ -34,7 +34,7 @@ from django.test import TestCase
 
 from anvil.services import ANVIL_UPLOAD_TABLES
 from anvil.models import AnvilUpload, AnvilUploadArtifact, AnvilUploadTable
-from anvil.services import build_upload_tsv_package
+from anvil.services import initialize_upload_package
 
 
 class AnvilUploadBuilderTests(TestCase):
@@ -47,8 +47,8 @@ class AnvilUploadBuilderTests(TestCase):
             changed_by=self.user,
         )
 
-    def test_build_upload_tsv_package_creates_21_upload_tables(self):
-        result = build_upload_tsv_package(
+    def test_initialize_upload_package_creates_21_upload_tables(self):
+        result = initialize_upload_package(
             upload=self.upload,
             changed_by=self.user,
         )
@@ -62,8 +62,8 @@ class AnvilUploadBuilderTests(TestCase):
 
         self.assertEqual(actual_table_names, set(ANVIL_UPLOAD_TABLES))
 
-    def test_build_upload_tsv_package_creates_21_tsv_artifacts(self):
-        result = build_upload_tsv_package(
+    def test_initialize_upload_package_creates_21_tsv_artifacts(self):
+        result = initialize_upload_package(
             upload=self.upload,
             changed_by=self.user,
         )
@@ -87,8 +87,8 @@ class AnvilUploadBuilderTests(TestCase):
 
         self.assertEqual(actual_paths, expected_paths)
 
-    def test_build_upload_tsv_package_links_each_artifact_to_upload_table(self):
-        build_upload_tsv_package(
+    def test_initialize_upload_package_links_each_artifact_to_upload_table(self):
+        initialize_upload_package(
             upload=self.upload,
             changed_by=self.user,
         )
@@ -112,12 +112,12 @@ class AnvilUploadBuilderTests(TestCase):
                 AnvilUploadArtifact.GenerationStatus.PENDING,
             )
 
-    def test_build_upload_tsv_package_is_idempotent(self):
-        build_upload_tsv_package(
+    def test_initialize_upload_package_is_idempotent(self):
+        initialize_upload_package(
             upload=self.upload,
             changed_by=self.user,
         )
-        build_upload_tsv_package(
+        initialize_upload_package(
             upload=self.upload,
             changed_by=self.user,
         )
