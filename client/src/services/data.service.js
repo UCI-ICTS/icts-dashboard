@@ -40,6 +40,12 @@ const caseQueue = async (participant_id) => {
     return response
 }
 
+const createPhenotypeCohort = async (values) => {
+    console.log("SERVICE", values)
+    const response = api.post(APIDB + `api/hpo/cohorts/summary/`, values, {headers: getAuthHeaders()})
+    return response
+}
+
 const fetchTable = async (table) => {
   if (metadata.includes(table)) {
     const response = api.get(APIDB + `api/metadata/${table}/all/`, {headers: getAuthHeaders()})
@@ -93,6 +99,7 @@ const dataService = {
   openReport,
   createEntry,
   familyDetail,
+  createPhenotypeCohort,
   caseQueue,
   fetchTable,
   updateEntry,

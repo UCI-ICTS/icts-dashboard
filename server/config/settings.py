@@ -123,6 +123,7 @@ INSTALLED_APPS = [
     "submodels",
     "hpo.apps.HpoConfig",
     "anvil.apps.AnvilConfig",
+    "utilities"
 ]
 
 MIDDLEWARE = [

@@ -76,6 +76,15 @@ from rest_framework import serializers
 from typing import Iterable, List, Optional, Tuple, Dict
 from psycopg2.extras import Json, execute_values
 from hpo.models import HPOTerm, HPOEdge, HPOArtifact
+from metadata.services import ParticipantOutputSerializer
+
+from hpo.selectors import (
+    get_hpo_descendant_ids,
+    get_participants_by_hpo_terms,
+    phenotype_cohort_summary,
+    resolve_hpo_inputs,
+)
+
 
 # ---------- Serializers ----------
 class HPOTermLiteSerializer(serializers.Serializer):
@@ -85,11 +94,13 @@ class HPOTermLiteSerializer(serializers.Serializer):
     deprecated = serializers.BooleanField()
     score      = serializers.FloatField()
 
+
 class PhenotypeExtractRequestSerializer(serializers.Serializer):
     userText = serializers.CharField(
         help_text="Text to decode for HPO terms",
         default="gait instability with ataxia and seizures since childhood."
     )
+
 
 class PhenotypeChoiceSerializer(serializers.Serializer):
     id     = serializers.CharField()
@@ -100,6 +111,7 @@ class PhenotypeChoiceSerializer(serializers.Serializer):
     source = serializers.CharField(required=False, allow_null=True)
     reason = serializers.CharField(required=False, allow_blank=True)
 
+
 class PhenotypePhraseSerializer(serializers.Serializer):
     id         = serializers.CharField()
     phrase     = serializers.CharField()
@@ -109,10 +121,12 @@ class PhenotypePhraseSerializer(serializers.Serializer):
     candidates = serializers.ListField(child=serializers.DictField(), required=False)
     choice     = PhenotypeChoiceSerializer(required=False)
 
+
 class PhenotypeExtractResponseSerializer(serializers.Serializer):
     phrases = PhenotypePhraseSerializer(many=True)
     matches = PhenotypeChoiceSerializer(many=True, required=False)
     meta    = serializers.DictField()
+
 
 class HPOLookupIDSerializer(serializers.Serializer):
     hpo_id     = serializers.CharField()
@@ -123,8 +137,37 @@ class HPOLookupIDSerializer(serializers.Serializer):
     deprecated = serializers.BooleanField(required=False)
     error      = serializers.CharField(required=False)  # present only if not found
 
+
 class HPOLookupIDResponseSerializer(serializers.Serializer):
     results = HPOLookupIDSerializer(many=True)
+
+
+class PhenotypeCohortSummaryInputSerializer(serializers.Serializer):
+    terms = serializers.ListField(
+        child=serializers.CharField(
+            trim_whitespace=True,
+            allow_blank=False,
+        ),
+        allow_empty=False,
+        help_text=(
+            "HPO identifiers, labels, or synonyms used to define the cohort."
+        ),
+    )
+
+    include_descendants = serializers.BooleanField(
+        default=True,
+        help_text=(
+            "Include all descendant HPO terms beneath each resolved root."
+        ),
+    )
+
+    present_only = serializers.BooleanField(
+        default=True,
+        help_text=(
+            "Include only phenotype records marked Present."
+        ),
+    )
+
 
 # ---------- Config helpers ----------
 _FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE | re.DOTALL)
@@ -939,3 +982,44 @@ def phenotype_extraction(note: str) -> list:
         it["choice"] = choice_by_id.get(it["id"])
 
     return validated_phrases
+
+
+def build_phenotype_cohort_summary(
+    terms: list[str],
+    *,
+    include_descendants: bool = True,
+    present_only: bool = True,
+) -> dict:
+    """
+    Resolve submitted HPO terms, construct a participant cohort, and return
+    summary counts.
+    """
+    root_ids, resolutions = resolve_hpo_inputs(terms)
+
+    if not root_ids:
+        raise ValueError("None of the submitted HPO terms could be resolved.")
+
+    cohort_term_ids = (
+        get_hpo_descendant_ids(
+            list(root_ids),
+            include_roots=True,
+        )
+        if include_descendants
+        else root_ids
+    )
+
+    participants = get_participants_by_hpo_terms(
+        cohort_term_ids,
+        present_only=present_only,
+    )
+
+    return {
+        "submitted_terms": terms,
+        "resolved_terms": resolutions,
+        "root_hpo_ids": sorted(root_ids),
+        "cohort_hpo_term_count": len(cohort_term_ids),
+        "include_descendants": include_descendants,
+        "present_only": present_only,
+        "summary": phenotype_cohort_summary(participants),
+        "participants": ParticipantOutputSerializer(participants, many=True).data
+    }
