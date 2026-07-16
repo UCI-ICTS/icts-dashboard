@@ -31,6 +31,9 @@ const postWithCSRF = async (url, data) => {
 };
 
 // Auth services (return only res.data)
+const googleLogin = (token) =>
+  postWithCSRF("auth/oauth/google/", { token }).then(res => res.data);
+
 const login = (username, password) =>
   postWithCSRF("auth/token/login/", { username, password }).then(res => res.data);
 
@@ -70,6 +73,7 @@ const deleteUser = (userId) =>
 
 const accountService = {
   getCSRFToken,
+  googleLogin,
   login,
   logout,
   changePassword,

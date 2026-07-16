@@ -3,7 +3,7 @@ import { Form, Input, Button, Checkbox, message, Modal, Layout } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login, resetPassword } from '../slices/accountSlice';
+import { googleLogin, login, resetPassword } from '../slices/accountSlice';
 import SiteFooter from '../components/SiteFooter';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
@@ -47,23 +47,17 @@ const Login = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
-    const res = await axios.post(
-      "http://localhost:8000/api/auth/oauth/google/", {
-      token: credentialResponse.credential
-    }, {
-      headers: { Authorization: undefined }
-    });
-    dispatch(login({...credentialResponse, rememberMe}))
+    dispatch(googleLogin({
+      token: credentialResponse.credential,
+      rememberMe: rememberMe,
+    }))
     .unwrap()
     .then(() => {
-      message.success("Login successful");
+      message.success("OAuth Login successful");
     })
     .catch((err) => {
-      message.error(err || "Login failed. Please check your credentials.");
+      message.error(err || "OAuth Login failed. Please check your credentials.");
     });
-
-    //setUser(res.data.user);
-    navigate("/dashboard");
   };
 
   // Redirect after login
@@ -120,7 +114,7 @@ const Login = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => console.log("Login Failed")}
+            onError={() => console.log("OAuth Login Failed")}
           />
         </div>
         <Modal

@@ -21,6 +21,7 @@ const initialState = user
         .addCase(login.pending, (state) => {
           state.loading = true; // Set loading to true when login is pending
         })
+
         .addCase(login.fulfilled, (state, action) => {
           state.loading = false; // Set loading to false when login is fulfilled
           state.isLoggedIn = true;
@@ -35,6 +36,28 @@ const initialState = user
           }
         })
         .addCase(login.rejected, (state) => {
+          state.loading = false; // Set loading to false when login is rejected
+          state.isLoggedIn = false;
+          state.user = null;
+        })
+
+        .addCase(googleLogin.pending, (state) => {
+          state.loading = true; // Set loading to true when login is pending
+        })
+        .addCase(googleLogin.fulfilled, (state, action) => {
+          state.loading = false; // Set loading to false when login is fulfilled
+          state.isLoggedIn = true;
+          const payload = action.payload.data
+          const user = jwtDecode(action.payload.data.access)
+          user["refresh_token"] = payload.refresh
+          user["access_token"] = payload.access
+          delete user.token_type
+          state.user = user;
+          if (action.payload.rememberMe === true) {
+            localStorage.setItem("user", JSON.stringify(user));
+          }
+        })
+        .addCase(googleLogin.rejected, (state) => {
           state.loading = false; // Set loading to false when login is rejected
           state.isLoggedIn = false;
           state.user = null;
@@ -142,7 +165,7 @@ const initialState = user
           state.loading = false;
           state.error = action.payload;
         })
-        
+
         .addCase(updateProfile.fulfilled, (state, action) => {
           const updated = action
           console.log(updated)
@@ -172,6 +195,31 @@ const initialState = user
 })
 
 // --- Authentication and Passwords ---
+export const googleLogin = createAsyncThunk(
+  async ({ token, rememberMe }, thunkAPI) => {
+    try {
+      const data = await AccountService.googleLogin(token);
+      return { data, rememberMe };
+    } catch (error) {
+      console.error("Login Error:", error);
+
+      // Extract error message safely
+      let errorMessage = "Login failed. Please try again."; // Default message
+      if (error.response?.data) {
+        // Handle Django DRF-style errors (e.g., { detail: "Invalid credentials" })
+        if (typeof error.response.data === "object") {
+          errorMessage = error.response.data.detail || JSON.stringify(error.response.data);
+        } else {
+          errorMessage = error.response.data;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const login = createAsyncThunk(
   "auth/login",
   async ({ username, password, rememberMe }, thunkAPI) => {
