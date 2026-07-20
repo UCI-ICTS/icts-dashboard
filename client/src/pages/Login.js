@@ -56,7 +56,8 @@ const Login = () => {
       message.success("OAuth Login successful");
     })
     .catch((err) => {
-      message.error(err || "OAuth Login failed. Please check your credentials.");
+      const msg = typeof err === "string" ? err: err?.message || "OAuth Login failed. Please check your credentials.";
+      message.error(msg)
     });
   };
 

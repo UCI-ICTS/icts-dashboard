@@ -196,6 +196,7 @@ const initialState = user
 
 // --- Authentication and Passwords ---
 export const googleLogin = createAsyncThunk(
+  "auth/googleLogin",
   async ({ token, rememberMe }, thunkAPI) => {
     try {
       const data = await AccountService.googleLogin(token);
