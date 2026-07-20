@@ -9,7 +9,8 @@ from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.contrib.postgres.search import TrigramSimilarity
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,7 +20,9 @@ from hpo.selectors import get_hpo_term_by_id
 from hpo.services import (
     phenotype_extraction,
     PhenotypeExtractRequestSerializer,
-    PhenotypeExtractResponseSerializer
+    PhenotypeExtractResponseSerializer,
+    PhenotypeCohortSummaryInputSerializer,
+    build_phenotype_cohort_summary,
 )
 
 
@@ -285,6 +288,47 @@ class HPOExtractPhenotypesView(APIView):
             return Response(result, status=200)
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
+
+
+class PhenotypeCohortViewSet(viewsets.ViewSet):
+    """
+    Build participant cohorts from submitted HPO identifiers or terms.
+    """
+
+    @swagger_auto_schema(
+        request_body=PhenotypeCohortSummaryInputSerializer,
+        tags=["HPO"],
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="summary",
+    )
+    def summary(self, request):
+        serializer = PhenotypeCohortSummaryInputSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            result = build_phenotype_cohort_summary(
+                terms=serializer.validated_data["terms"],
+                include_descendants=serializer.validated_data[
+                    "include_descendants"
+                ],
+                present_only=serializer.validated_data["present_only"],
+            )
+        except ValueError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            result,
+            status=status.HTTP_200_OK,
+        )
+    
 
 TEST_RETURN = [
   {

@@ -125,10 +125,7 @@ INSTALLED_APPS = [
     "experiments.apps.Experiment",
     "submodels",
     "hpo.apps.HpoConfig",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
+    "utilities"
 ]
 
 SITE_ID = 1

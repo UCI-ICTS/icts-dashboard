@@ -12,7 +12,8 @@ import {
   ScheduleOutlined,
   SettingOutlined,
   UploadOutlined,
-  UserOutlined
+  UserOutlined,
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../slices/accountSlice';
@@ -46,6 +47,7 @@ const Dashboard = () => {
     { key: 'uploader', icon: <UploadOutlined />, label: <Link to="uploader">Uploader</Link> },
     { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
     { key: 'raghpo', icon: <OpenAIOutlined />, label: <Link to="rag-hpo">RAG-HPO</Link> },
+    { key: 'cohort', icon: <UsergroupAddOutlined />, label: <Link to="cohort">PhenoCohort</Link> },
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
   ];
 
