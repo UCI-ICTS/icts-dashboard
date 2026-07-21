@@ -55,3 +55,5 @@ ANVIL_UPLOAD_TABLE_MODEL_MAP = {
     "called_variants_nanopore": ("experiments", "calledvariantsnanopore"),
     "called_variants_pac_bio": ("experiments", "calledvariantspacbio"),
 }
+
+MANIFEST_CONTENT_TYPE = "application/json"
