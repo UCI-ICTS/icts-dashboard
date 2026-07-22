@@ -1,5 +1,5 @@
 # #!/usr/bin/env python3
-# # tests/test_apps/test_metadata/test_apis/test_biobankn_apis.py
+# # tests/test_apps/test_metadata/test_apis/test_biobank_apis.py
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -207,3 +207,34 @@ class DeleteBiobankAPITest(APITestCaseWithAuth):
         response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")
+
+
+class ListAllBiobankAPITest(APITestCaseWithAuth):
+    def test_list_all_biobank_entries(self):
+        url = "/api/metadata/biobank/all/"
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response.data), 0)
+        self.assertIn("biobank_id", response.data[0])
+
+    def test_list_all_biobank_entries_suppresses_requested_fields(self):
+        base_url = "/api/metadata/biobank/all/"
+        baseline_response = self.client.get(base_url, format="json")
+        suppressed_response = self.client.get(
+            f"{base_url}?suppress=participant_id,status",
+            format="json",
+        )
+
+        self.assertEqual(baseline_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(suppressed_response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(baseline_response.data), 0)
+        self.assertEqual(len(suppressed_response.data), len(baseline_response.data))
+        self.assertIn("participant_id", baseline_response.data[0])
+        self.assertIn("status", baseline_response.data[0])
+
+        for biobank_entry in suppressed_response.data:
+            self.assertIn("biobank_id", biobank_entry)
+            self.assertNotIn("participant_id", biobank_entry)
+            self.assertNotIn("status", biobank_entry)
+
