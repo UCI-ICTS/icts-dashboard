@@ -115,12 +115,12 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.staticfiles",
     "django_extensions",
+    "authentication",
     "drf_yasg",
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "authentication",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels",
@@ -230,6 +230,7 @@ SWAGGER_SETTINGS = {
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
     },
     "DEEP_LINKING": True,
+    "PERSIST_AUTH": True,
 }
 
 AUTHENTICATION_BACKENDS = [

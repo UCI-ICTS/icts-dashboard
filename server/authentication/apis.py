@@ -11,11 +11,19 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from drf_spectacular.utils import extend_schema
+from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+
+import firecloud.api
+
 from rest_framework import status, permissions, viewsets
+from rest_framework.permissions import IsAdminUser
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -355,6 +363,7 @@ class PasswordViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response({"error": "Invalid user."}, status=404)
 
+        import pdb; pdb.set_trace()
         if not default_token_generator.check_token(user, token):
             return Response({"error": "Invalid or expired token."}, status=400)
 
@@ -435,7 +444,21 @@ class EmailUsersViewSet(viewsets.ViewSet):
 
 class GoogleAuthViewSet(viewsets.ViewSet):
     authentication_classes = []
-    permission_classes = [AllowAny]
+    permission_classes_by_action = {
+        "swagger_helper": [permissions.AllowAny],  # change to IsSuperUser before prod
+        "google": [permissions.AllowAny],
+    }
+
+    def get_permissions(self):
+        perms = self.permission_classes_by_action.get(
+            self.action, self.permission_classes
+        )
+        return [perm() for perm in perms]
+
+    @swagger_auto_schema(auto_schema=None)
+    @action(detail=False, methods=["get"], url_path="helper", authentication_classes=[SessionAuthentication])
+    def swagger_helper(self, request):
+        return render(request, "swagger_auth_helper.html")
 
     @swagger_auto_schema(
         request_body=GoogleAuthSerializer,
@@ -443,6 +466,7 @@ class GoogleAuthViewSet(viewsets.ViewSet):
         operation_description="Authenticate with Google OAuth",
         tags=["Google OAuth"],
     )
+
     @action(detail=False, methods=["post"], url_path="google")
     def google(self, request):
         token = request.data.get("token")
