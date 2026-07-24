@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from drf_spectacular.utils import extend_schema
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -49,6 +49,8 @@ from authentication.serializers import (    UserInputSerializer,
 )
 
 User = get_user_model()
+from authentication.models import GoogleCredential
+from datetime import timezone, timedelta
 
 
 class TokenViewSet(viewsets.ViewSet):
@@ -449,6 +451,7 @@ class GoogleAuthViewSet(viewsets.ViewSet):
     permission_classes_by_action = {
         "swagger_helper": [permissions.AllowAny],  # change to IsSuperUser before prod
         "google": [permissions.AllowAny],
+        "oauth_callback": [permissions.IsAuthenticated],
     }
 
     def get_permissions(self):
@@ -460,7 +463,10 @@ class GoogleAuthViewSet(viewsets.ViewSet):
     @swagger_auto_schema(auto_schema=None)
     @action(detail=False, methods=["get"], url_path="helper", authentication_classes=[SessionAuthentication])
     def swagger_helper(self, request):
-        return render(request, "swagger_auth_helper.html")
+        return render(request, "swagger_auth_helper.html", {
+            "google_client_id": settings.GOOGLE_CLIENT_ID,
+            "google_redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        })
 
     @swagger_auto_schema(
         request_body=GoogleAuthSerializer,
@@ -527,9 +533,12 @@ class GoogleAuthViewSet(viewsets.ViewSet):
         operation_description="OAuth callback",
         tags=["Google OAuth"],
         )
-    @action(detail=False, methods=["get"], url_path="callback", permission_classes=[AllowAny], authentication_classes=[])
+    @action(detail=False, methods=["get"], url_path="callback", authentication_classes=[CustomAuthentication, SessionAuthentication])
     def oauth_callback(self, request):
         code = request.GET.get("code")
+        if not code:
+            return Response({"error": "No code provided"}, status=400)
+
         token_response = http_requests.post("https://oauth2.googleapis.com/token", data={
             "code": code,
             "client_id": settings.GOOGLE_CLIENT_ID,
@@ -538,3 +547,34 @@ class GoogleAuthViewSet(viewsets.ViewSet):
             "grant_type": "authorization_code",
         })
         tokens = token_response.json()
+
+        if "error" in tokens:
+            return Response({"error": tokens.get("error_description", tokens["error"])}, status=400)
+
+        access_token = tokens.get("access_token")
+        refresh_token = tokens.get("refresh_token")
+        expires_in = tokens.get("expires_in", 3600)
+
+        if not refresh_token:
+            # Google only sends a refresh_token on first consent. If this user
+            # already has one on file, keep it rather than overwriting with nothing.
+            existing = GoogleCredential.objects.filter(user=request.user).first()
+            if existing:
+                refresh_token = existing.refresh_token
+            else:
+                return Response(
+                    {"error": "No refresh token returned. Revoke prior access at "
+                              "https://myaccount.google.com/permissions and try again."},
+                    status=400,
+                )
+
+        GoogleCredential.objects.update_or_create(
+            user=request.user,
+            defaults={
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "expires_at": timezone.now() + timedelta(seconds=expires_in),
+            },
+        )
+
+        return redirect(f"{settings.PUBLIC_HOSTNAME.rstrip('/')}/api/swagger/")

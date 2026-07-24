@@ -1,5 +1,5 @@
 <div id="g_id_onload"
-     data-client_id="707343581069-oe3rocjvd5cjvb1jaajjtict9pofeql7.apps.googleusercontent.com"
+     data-client_id={{ google_client_id }}
      data-callback="handleCredentialResponse">
 </div>
 <div class="g_id_signin" data-type="standard"></div>
@@ -43,6 +43,10 @@
       });
   }
 </script>
+
+<a href="https://accounts.google.com/o/oauth2/v2/auth?client_id={{ google_client_id }}&redirect_uri={{ google_redirect_uri }}&response_type=code&scope=...&access_type=offline&prompt=consent">
+  Connect Google for Firecloud
+</a>
 
 <form id="login-form">
   <input type="text" id="username" placeholder="Username" required>
