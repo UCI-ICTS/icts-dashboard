@@ -20,6 +20,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 import firecloud.api
+import requests as http_requests
 
 from rest_framework import status, permissions, viewsets
 from rest_framework.permissions import IsAdminUser
@@ -40,6 +41,7 @@ from authentication.serializers import (    UserInputSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     ChangePasswordSerializer,
+    CustomAuthentication,
     CustomTokenObtainPairSerializer,
     ActivateUserSerializer,
     GoogleAuthSerializer,
@@ -506,9 +508,33 @@ class GoogleAuthViewSet(viewsets.ViewSet):
             },
         }, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        responses={200: "User credentials"},
+        operation_description="OAuth user information",
+        tags=["Google OAuth"],
+    )
+    @action(detail=False, methods=["get"], url_path="me", authentication_classes=[CustomAuthentication, SessionAuthentication])
     def me(self, request):
         user = request.user
         return Response({
+            "user_id": user.pk,
             "username": user.username,
             "email": user.email,
         }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={200: "OAuth token"},
+        operation_description="OAuth callback",
+        tags=["Google OAuth"],
+        )
+    @action(detail=False, methods=["get"], url_path="callback", permission_classes=[AllowAny], authentication_classes=[])
+    def oauth_callback(self, request):
+        code = request.GET.get("code")
+        token_response = http_requests.post("https://oauth2.googleapis.com/token", data={
+            "code": code,
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+            "grant_type": "authorization_code",
+        })
+        tokens = token_response.json()

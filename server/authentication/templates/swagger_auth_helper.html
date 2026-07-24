@@ -8,19 +8,42 @@
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
+  function slugify(text) {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  function storeAuthAndRedirect(accessToken) {
+    const swaggerPath = '/api/swagger';
+    const key = slugify(swaggerPath) + '-drf-yasg-auth';
+    const authObj = {
+      Bearer: {
+        name: "Bearer",
+        schema: { type: "apiKey", in: "header", name: "Authorization" },
+        value: "Bearer " + accessToken
+      }
+    };
+    localStorage.setItem(key, JSON.stringify(authObj));
+    window.location.href = swaggerPath; // wherever your Swagger UI is served
+  }
+
   function handleCredentialResponse(response) {
     fetch('/api/auth/oauth/google/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: response.credential })
-  })
-    .then(res => res.json())
-    .then(data => {
-      sessionStorage.setItem('swagger_access_token', data.access);
-      window.location.href = '/api/swagger/'; // wherever your Swagger UI is served
-    });
-}
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: response.credential })
+    })
+      .then(res => res.json())
+      .then(data => {
+        storeAuthAndRedirect(data.access);
+      });
+  }
 </script>
+
 <form id="login-form">
   <input type="text" id="username" placeholder="Username" required>
   <input type="password" id="password" placeholder="Password" required>
@@ -40,8 +63,7 @@
     })
       .then(res => res.json())
       .then(data => {
-        sessionStorage.setItem('swagger_access_token', data.access);
-        window.location.href = '/api/swagger';
+        storeAuthAndRedirect(data.access);
       });
   });
 </script>

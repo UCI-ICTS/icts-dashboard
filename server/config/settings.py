@@ -101,6 +101,7 @@ AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
 # GOOGLE OAUTH
 GOOGLE_CLIENT_ID=secrets.get("GOOGLE", "GOOGLE_CLIENT_ID", fallback="")
 GOOGLE_CLIENT_SECRET=secrets.get("GOOGLE", "GOOGLE_CLIENT_SECRET", fallback="")
+GOOGLE_REDIRECT_URI=secrets.get("GOOGLE", "GOOGLE_REDIRECT_URI", fallback="")
 
 # Application definition
 
