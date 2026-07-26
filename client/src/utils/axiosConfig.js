@@ -37,3 +37,17 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const getAuthHeaders = () => {
+  const state = store.getState(); // Get Redux state
+  const token = state.account.user.access_token; // Retrieve the latest token from Redux
+
+  if (!token) {
+    throw new Error("No authentication token found.");
+  }
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+};

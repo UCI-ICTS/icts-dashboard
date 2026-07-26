@@ -3,11 +3,13 @@
 **.DS_Store**
 **__pycache__**
 maintenance/maintenance.flag
+.vscode/**
 
 #Server Items
 server/.env*
 server/.python-version
 server/.secrets
+server/anvil_uploads/**
 server/config/fixtures/local_data.json
 server/config/fixtures/full_local_data.json
 server/config/fixtures/dump.json
@@ -32,9 +34,6 @@ server/utilities/anvil**
 server/utilities/geneyx**
 server/utilities/db_reset.sh
 server/utilities/hpo_artifacts**
-
-server/tests/.coverage
-server/tests/fixtures/U09_flattened_sampled_dump.json
 server/utilities/anvil**
 server/utilities/db_reset.sh
 server/utilities/hpo_artifacts**
