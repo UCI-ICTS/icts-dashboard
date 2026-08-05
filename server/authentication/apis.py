@@ -20,7 +20,6 @@ from drf_yasg.utils import swagger_auto_schema
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-import firecloud.api
 import requests as http_requests
 
 from rest_framework import status, permissions, viewsets
@@ -536,7 +535,7 @@ class GoogleAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"], url_path="me", authentication_classes=[CustomAuthentication, SessionAuthentication])
     def me(self, request):
         user = request.user
-        creds = GoogleAuthSerializer.get_google_credentials(user)
+        creds = get_google_credentials(user)
         return Response({
             "user_id": user.pk,
             "username": user.username,
@@ -620,15 +619,16 @@ class GoogleAuthViewSet(viewsets.ViewSet):
                 status=400,
             )
 
-        namespace = serializer.validated_data["namespace"]
-        workspace = serializer.validated_data["workspace"]
+        #namespace = serializer.validated_data["namespace"]
+        #workspace = serializer.validated_data["workspace"]
+        bucket_name = serializer.validated_data["bucket_name"]
         destination_path = serializer.validated_data["destination_path"]
         file_obj = serializer.validated_data["file"]
 
         try:
-            bucket_name = get_workspace_bucket(creds, namespace, workspace)
+            #bucket_name = get_workspace_bucket(creds, namespace, workspace)
             gs_path = upload_to_workspace(creds, bucket_name, destination_path, file_obj)
-        except requests.HTTPError as e:
+        except http_requests.HTTPError as e:
             return Response({"error": f"Failed to resolve workspace bucket: {e}"}, status=502)
 
         return Response({"gs_path": gs_path}, status=status.HTTP_200_OK)

@@ -4,7 +4,6 @@
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User, update_last_login
 from django.conf import settings
-from django.utils import timezone
 from django.urls import reverse
 from django.core.mail import send_mail
 from rest_framework import serializers
@@ -13,12 +12,6 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import BasePermission
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request as GoogleAuthRequest
-from authentication.models import GoogleCredential
-from datetime import timedelta
-import requests
 
 
 class IsSuperUser(BasePermission):
@@ -223,42 +216,10 @@ class CustomAuthentication(BaseAuthentication):
 class GoogleAuthSerializer(serializers.Serializer):
     token = serializers.CharField(help_text="Google ID token from the frontend")
 
-    def get_google_credentials(user):
-        try:
-            stored = GoogleCredential.objects.get(user=user)
-        except GoogleCredential.DoesNotExist:
-            return None
-
-        creds = Credentials(
-            token=stored.access_token,
-            refresh_token=stored.refresh_token,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=settings.GOOGLE_CLIENT_ID,
-            client_secret=settings.GOOGLE_CLIENT_SECRET,
-        )
-
-        # Refresh if the stored access_token is expired/near-expired
-        if timezone.now() >= stored.expires_at:
-            creds.refresh(GoogleAuthRequest())
-            stored.access_token = creds.token
-            stored.expires_at = timezone.now() + timedelta(seconds=3600)  # google-auth doesn't expose expiry directly here
-            stored.save(update_fields=["access_token", "expires_at"])
-
-        return creds
-
-    def get_workspace_bucket(creds, namespace, workspace_name):
-        creds.refresh(GoogleAuthRequest()) if not creds.valid else None
-        resp = requests.get(
-            f"https://api.firecloud.org/api/workspaces/{namespace}/{workspace_name}",
-            headers={"Authorization": f"Bearer {creds.token}"},
-            params={"fields": "workspace.bucketName"},
-        )
-        resp.raise_for_status()
-        return resp.json()["workspace"]["bucketName"]
-
 
 class FirecloudUploadSerializer(serializers.Serializer):
     namespace = serializers.CharField(help_text="Firecloud/Terra billing project (workspace namespace)")
     workspace = serializers.CharField(help_text="Workspace name")
+    bucket_name = serializers.CharField(help_text="GCS bucket name for the workspace, e.g. 'fc-secure-abc123-...")
     destination_path = serializers.CharField(help_text="Path within the workspace bucket, e.g. 'uploads/data.csv'")
     file = serializers.FileField()
