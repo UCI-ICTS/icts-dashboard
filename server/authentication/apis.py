@@ -121,7 +121,7 @@ class TokenViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         request_body=TokenBlacklistSerializer,
-        responses={200: openapi.Response("Token blacklisted successfully")},
+        responses={200: openapi.Response("Token successfully blacklisted.")},
         tags=["JWT Auth"],
     )
     @action(
@@ -133,7 +133,7 @@ class TokenViewSet(viewsets.ViewSet):
     )
     def logout(self, request):
         django_logout(request)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Token successfully blacklisted."}, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ViewSet):
