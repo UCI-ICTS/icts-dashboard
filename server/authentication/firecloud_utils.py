@@ -36,18 +36,9 @@ def get_google_credentials(user):
     return creds
 
 
-def get_workspace_bucket(creds, namespace, workspace_name):
-    resp = requests.get(
-        f"https://api.firecloud.org/api/workspaces/{namespace}/{workspace_name}",
-        headers={"Authorization": f"Bearer {creds.token}"},
-        params={"fields": "workspace.bucketName"},
-    )
-    resp.raise_for_status()
-    return resp.json()["workspace"]["bucketName"]
-
-
-def upload_to_workspace(creds, bucket_name, destination_path, file_obj):
+def upload_to_workspace(creds, bucket_name, google_project_id, destination_path, file_obj):
     client = storage.Client(credentials=creds, project=None)
-    blob = client.bucket(bucket_name).blob(destination_path)
+    bucket = client.bucket(bucket_name, user_project=google_project_id)
+    blob = bucket.blob(destination_path)
     blob.upload_from_file(file_obj)
     return f"gs://{bucket_name}/{destination_path}"

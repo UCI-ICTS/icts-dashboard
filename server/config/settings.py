@@ -145,6 +145,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -232,6 +234,7 @@ SWAGGER_SETTINGS = {
     },
     "DEEP_LINKING": True,
     "PERSIST_AUTH": True,
+    "USE_SESSION_AUTH": False,
 }
 
 AUTHENTICATION_BACKENDS = [

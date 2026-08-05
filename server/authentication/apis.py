@@ -4,10 +4,11 @@
 import string
 import secrets
 from django.conf import settings
-from django.contrib.auth import get_user_model, login as django_login
+from django.contrib.auth import get_user_model, login as django_login, logout as django_logout
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -55,7 +56,7 @@ from datetime import timedelta
 
 from rest_framework.parsers import MultiPartParser
 from authentication.serializers import FirecloudUploadSerializer
-from authentication.firecloud_utils import get_google_credentials, get_workspace_bucket, upload_to_workspace
+from authentication.firecloud_utils import get_google_credentials, upload_to_workspace
 
 class TokenViewSet(viewsets.ViewSet):
     """
@@ -123,22 +124,16 @@ class TokenViewSet(viewsets.ViewSet):
         responses={200: openapi.Response("Token blacklisted successfully")},
         tags=["JWT Auth"],
     )
-    @action(detail=False, methods=["post"], url_path="logout")
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="logout",
+        permission_classes=[permissions.IsAuthenticated],
+        authentication_classes=[CustomAuthentication, SessionAuthentication],
+    )
     def logout(self, request):
-        try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response(
-                    {"error": "Refresh token required."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"message": "Token successfully blacklisted."}, status=200)
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        django_logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -470,6 +465,7 @@ class GoogleAuthViewSet(viewsets.ViewSet):
     @swagger_auto_schema(auto_schema=None)
     @action(detail=False, methods=["get"], url_path="helper", authentication_classes=[SessionAuthentication])
     def swagger_helper(self, request):
+        get_token(request)  # ensures the csrftoken cookie is set for this page's fetch() calls
         return render(request, "swagger_auth_helper.html", {
             "google_client_id": settings.GOOGLE_CLIENT_ID,
             "google_redirect_uri": settings.GOOGLE_REDIRECT_URI,
@@ -532,8 +528,8 @@ class GoogleAuthViewSet(viewsets.ViewSet):
         operation_description="OAuth user information",
         tags=["Google OAuth"],
     )
-    @action(detail=False, methods=["get"], url_path="me", authentication_classes=[CustomAuthentication, SessionAuthentication])
-    def me(self, request):
+    @action(detail=False, methods=["get"], url_path="whoami", authentication_classes=[CustomAuthentication, SessionAuthentication])
+    def whoami(self, request):
         user = request.user
         creds = get_google_credentials(user)
         return Response({
@@ -619,16 +615,14 @@ class GoogleAuthViewSet(viewsets.ViewSet):
                 status=400,
             )
 
-        #namespace = serializer.validated_data["namespace"]
-        #workspace = serializer.validated_data["workspace"]
         bucket_name = serializer.validated_data["bucket_name"]
+        google_project_id = serializer.validated_data["google_project_id"]
         destination_path = serializer.validated_data["destination_path"]
         file_obj = serializer.validated_data["file"]
 
         try:
-            #bucket_name = get_workspace_bucket(creds, namespace, workspace)
-            gs_path = upload_to_workspace(creds, bucket_name, destination_path, file_obj)
-        except http_requests.HTTPError as e:
-            return Response({"error": f"Failed to resolve workspace bucket: {e}"}, status=502)
+            gs_path = upload_to_workspace(creds, bucket_name, google_project_id, destination_path, file_obj)
+        except Exception as e:
+            return Response({"error": f"Upload failed: {e}"}, status=502)
 
         return Response({"gs_path": gs_path}, status=status.HTTP_200_OK)

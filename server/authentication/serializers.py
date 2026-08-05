@@ -218,8 +218,7 @@ class GoogleAuthSerializer(serializers.Serializer):
 
 
 class FirecloudUploadSerializer(serializers.Serializer):
-    namespace = serializers.CharField(help_text="Firecloud/Terra billing project (workspace namespace)")
-    workspace = serializers.CharField(help_text="Workspace name")
     bucket_name = serializers.CharField(help_text="GCS bucket name for the workspace, e.g. 'fc-secure-abc123-...")
+    google_project_id = serializers.CharField(help_text="Terra billing project / Google project ID for the workspace (for requester-pays billing)")
     destination_path = serializers.CharField(help_text="Path within the workspace bucket, e.g. 'uploads/data.csv'")
     file = serializers.FileField()
