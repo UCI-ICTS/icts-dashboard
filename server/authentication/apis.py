@@ -4,11 +4,12 @@
 import string
 import secrets
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login as django_login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from drf_spectacular.utils import extend_schema
@@ -36,7 +37,8 @@ from rest_framework_simplejwt.serializers import (
 )
 
 from authentication.selectors import IsSuperUser, get_active_user_emails
-from authentication.serializers import (    UserInputSerializer,
+from authentication.serializers import (
+    UserInputSerializer,
     UserOutputSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
@@ -50,8 +52,11 @@ from authentication.serializers import (    UserInputSerializer,
 
 User = get_user_model()
 from authentication.models import GoogleCredential
-from datetime import timezone, timedelta
+from datetime import timedelta
 
+from rest_framework.parsers import MultiPartParser
+from authentication.serializers import FirecloudUploadSerializer
+from authentication.firecloud_utils import get_google_credentials, get_workspace_bucket, upload_to_workspace
 
 class TokenViewSet(viewsets.ViewSet):
     """
@@ -87,6 +92,9 @@ class TokenViewSet(viewsets.ViewSet):
     def login(self, request):
         serializer = CustomTokenObtainPairSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        django_login(request, user)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -499,6 +507,12 @@ class GoogleAuthViewSet(viewsets.ViewSet):
             },
         )
 
+        # Establish a real Django session so browser-redirect flows (like the
+        # Google OAuth callback, which can't carry a JWT Authorization header)
+        # can still identify the authenticated user.
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        django_login(request, user)
+
         refresh = RefreshToken.for_user(user)
         return Response({
             "refresh": str(refresh),
@@ -522,10 +536,12 @@ class GoogleAuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"], url_path="me", authentication_classes=[CustomAuthentication, SessionAuthentication])
     def me(self, request):
         user = request.user
+        creds = GoogleAuthSerializer.get_google_credentials(user)
         return Response({
             "user_id": user.pk,
             "username": user.username,
             "email": user.email,
+            "google_connected": creds is not None,
         }, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -577,4 +593,42 @@ class GoogleAuthViewSet(viewsets.ViewSet):
             },
         )
 
-        return redirect(f"{settings.PUBLIC_HOSTNAME.rstrip('/')}/api/swagger/")
+        return redirect(f"http://localhost:8000/api/swagger/")
+
+    @swagger_auto_schema(
+        request_body=FirecloudUploadSerializer,
+        responses={200: "File uploaded to workspace bucket"},
+        operation_description="Upload a file to a Firecloud/Terra workspace bucket using the caller's stored Google credentials",
+        tags=["Google OAuth"],
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="upload",
+        parser_classes=[MultiPartParser],
+        permission_classes=[permissions.IsAuthenticated],
+        authentication_classes=[CustomAuthentication, SessionAuthentication],
+    )
+    def upload(self, request):
+        serializer = FirecloudUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        creds = get_google_credentials(request.user)
+        if creds is None:
+            return Response(
+                {"error": "No Google credentials on file. Visit /api/auth/oauth/helper/ to connect."},
+                status=400,
+            )
+
+        namespace = serializer.validated_data["namespace"]
+        workspace = serializer.validated_data["workspace"]
+        destination_path = serializer.validated_data["destination_path"]
+        file_obj = serializer.validated_data["file"]
+
+        try:
+            bucket_name = get_workspace_bucket(creds, namespace, workspace)
+            gs_path = upload_to_workspace(creds, bucket_name, destination_path, file_obj)
+        except requests.HTTPError as e:
+            return Response({"error": f"Failed to resolve workspace bucket: {e}"}, status=502)
+
+        return Response({"gs_path": gs_path}, status=status.HTTP_200_OK)
