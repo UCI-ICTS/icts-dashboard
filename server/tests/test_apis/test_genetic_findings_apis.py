@@ -1,5 +1,5 @@
 # #!/usr/bin/env python3
-# # tests/test_apps/test_metadata/test_apis/test_participant_apis.py
+# # tests/test_apps/test_metadata/test_apis/test_genetic_findings_apis.py
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -275,7 +275,7 @@ class CreateGeneticFindingsAPITest(APITestCaseWithAuth):
 
 
 class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
-    def test_read_analyte_success(self):
+    def test_read_genetic_findings_success(self):
         url1 = "/api/metadata/genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-004-004-0"
         url2 = "/api/metadata/genetic_findings/?ids=10_73792184_GREGoR_test-001-001-0,11_64660831_GREGoR_test-004-004-0,DNE-01"
         url3 = "/api/metadata/genetic_findings/?ids=DNE-01,DNE-2"
@@ -292,7 +292,7 @@ class ReadGeneticFindingsAPITest(APITestCaseWithAuth):
 
 
 class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
-    def test_update_analyte_api(self):
+    def test_update_genetic_findings_api(self):
         url = "/api/metadata/genetic_findings/update/"
         part1 = {  # Valid submission, changing experiment_id
             "genetic_findings_id": "10_73792184_GREGoR_test-001-001-0",
@@ -329,7 +329,7 @@ class UpdateGeneticFindingsAPITest(APITestCaseWithAuth):
 
 
 class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
-    def test_delete_analyte(self):
+    def test_delete_genetic_findings(self):
         url = (
             "/api/metadata/genetic_findings/delete/?ids=2_6849938_GREGoR_test-001-001-0"
         )
@@ -339,7 +339,7 @@ class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
                          "genetic_findings 2_6849938_GREGoR_test-001-001-0 deleted successfully.")
 
 
-    def test_create_and_delete_analyte_api(self):
+    def test_create_and_delete_genetic_findings_api(self):
         create_url = "/api/metadata/genetic_findings/create/"
         gf1 = {  # Valid submission
             "genetic_findings_id": "10_73792185_GREGoR_test-001-001-0",
@@ -392,3 +392,34 @@ class DeleteGeneticFindingsAPITest(APITestCaseWithAuth):
         delete_response = self.client.delete(delete_url, format="json")
         self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
         self.assertEqual(delete_response.data[0]["request_status"], "DELETED")
+
+
+class ListAllGeneticFindingsAPITest(APITestCaseWithAuth):
+    def test_list_all_genetic_findings(self):
+        url = "/api/metadata/genetic_findings/all/"
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response.data), 0)
+        self.assertIn("genetic_findings_id", response.data[0])
+
+    def test_list_all_genetic_findings_suppresses_requested_fields(self):
+        base_url = "/api/metadata/genetic_findings/all/"
+        baseline_response = self.client.get(base_url, format="json")
+        suppressed_response = self.client.get(
+            f"{base_url}?suppress=participant_id,notes",
+            format="json",
+        )
+
+        self.assertEqual(baseline_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(suppressed_response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(baseline_response.data), 0)
+        self.assertEqual(len(suppressed_response.data), len(baseline_response.data))
+        self.assertIn("participant_id", baseline_response.data[0])
+        self.assertIn("notes", baseline_response.data[0])
+
+        for genetic_finding in suppressed_response.data:
+            self.assertIn("genetic_findings_id", genetic_finding)
+            self.assertNotIn("participant_id", genetic_finding)
+            self.assertNotIn("notes", genetic_finding)
+

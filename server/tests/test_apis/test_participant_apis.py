@@ -248,9 +248,31 @@ class DeleteParticipantAPITest(APITestCaseWithAuth):
         self.assertEqual(delete_response.data[0]["request_status"], "DELETED")
 
 
-class ListAllParticipants(APITestCaseWithAuth):
+class ListAllParticipantAPITest(APITestCaseWithAuth):
     def test_list_all_participants(self):
         url = "/api/metadata/participant/all/"
         response = self.client.get(url, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response.data), 0)
+        self.assertIn("participant_id", response.data[0])
+
+    def test_list_all_participants_suppresses_requested_fields(self):
+        base_url = "/api/metadata/participant/all/"
+        baseline_response = self.client.get(base_url, format="json")
+        suppressed_response = self.client.get(
+            f"{base_url}?suppress=family_id,solve_status",
+            format="json",
+        )
+
+        self.assertEqual(baseline_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(suppressed_response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(baseline_response.data), 0)
+        self.assertEqual(len(suppressed_response.data), len(baseline_response.data))
+        self.assertIn("family_id", baseline_response.data[0])
+        self.assertIn("solve_status", baseline_response.data[0])
+
+        for participant in suppressed_response.data:
+            self.assertIn("participant_id", participant)
+            self.assertNotIn("family_id", participant)
+            self.assertNotIn("solve_status", participant)

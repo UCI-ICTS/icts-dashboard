@@ -160,3 +160,34 @@ class DeleteFamilyAPITest(APITestCaseWithAuth):
         response = self.client.delete(delete_url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["request_status"], "DELETED")
+
+
+class ListAllFamilyAPITest(APITestCaseWithAuth):
+    def test_list_all_families(self):
+        url = "/api/metadata/family/all/"
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response.data), 0)
+        self.assertIn("family_id", response.data[0])
+
+    def test_list_all_families_suppresses_requested_fields(self):
+        base_url = "/api/metadata/family/all/"
+        baseline_response = self.client.get(base_url, format="json")
+        suppressed_response = self.client.get(
+            f"{base_url}?suppress=consanguinity,pedigree_file_detail",
+            format="json",
+        )
+
+        self.assertEqual(baseline_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(suppressed_response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(baseline_response.data), 0)
+        self.assertEqual(len(suppressed_response.data), len(baseline_response.data))
+        self.assertIn("consanguinity", baseline_response.data[0])
+        self.assertIn("pedigree_file_detail", baseline_response.data[0])
+
+        for family in suppressed_response.data:
+            self.assertIn("family_id", family)
+            self.assertNotIn("consanguinity", family)
+            self.assertNotIn("pedigree_file_detail", family)
+

@@ -3,12 +3,17 @@
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from config.api_mixins import (
+    SuppressSerializerFieldsMixin,
+    SUPPRESS_FIELDS_PARAMETER,
+)
 from config.selectors import (
     response_constructor,
     response_status,
@@ -25,7 +30,6 @@ from metadata.models import (
     Phenotype,
     Biobank,
 )
-
 from metadata.services import (
     AnalyteSerializer,
     GeneticFindingsInputSerializer,
@@ -41,13 +45,18 @@ from metadata.services import (
 )
 
 
-class ParticipantViewSet(viewsets.ViewSet):
+class ParticipantViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = ParticipantOutputSerializer
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Participant entries",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: ParticipantOutputSerializer(many=True), 400: "Bad request"},
         tags=["Participant"],
     )
@@ -57,7 +66,7 @@ class ParticipantViewSet(viewsets.ViewSet):
             model=Participant,
             superuser=self.request.user.is_superuser
         )
-        serializer = ParticipantOutputSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -97,7 +106,8 @@ class ParticipantViewSet(viewsets.ViewSet):
                 openapi.IN_QUERY,
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Participant"],
@@ -122,12 +132,16 @@ class ParticipantViewSet(viewsets.ViewSet):
                     rejected = True
 
                 else:
+                    participant_data = self.suppress_mapping_fields(
+                        participants[participant_id]
+                    )
+
                     response_data.append(
                         response_constructor(
                             identifier=participant_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=participants[participant_id],
+                            data=participant_data,
                         )
                     )
                     accepted = True
@@ -242,13 +256,18 @@ class ParticipantViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class FamilyViewSet(viewsets.ViewSet):
+class FamilyViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = FamilySerializer
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Family entries",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: FamilySerializer(many=True), 400: "Bad request"},
         tags=["Family"],
     )
@@ -258,7 +277,7 @@ class FamilyViewSet(viewsets.ViewSet):
             superuser=self.request.user.is_superuser,
             model=Family
         )
-        serializer = FamilySerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -298,7 +317,8 @@ class FamilyViewSet(viewsets.ViewSet):
                 openapi.IN_QUERY,
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Family"],
@@ -322,12 +342,16 @@ class FamilyViewSet(viewsets.ViewSet):
                     rejected = True
 
                 else:
+                    family_data = self.suppress_mapping_fields(
+                        family[family_id]
+                    )
+
                     response_data.append(
                         response_constructor(
                             identifier=family_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=family[family_id],
+                            data=family_data,
                         )
                     )
                     accepted = True
@@ -440,13 +464,18 @@ class FamilyViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AnalyteViewSet(viewsets.ViewSet):
+class AnalyteViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = AnalyteSerializer
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Analyte entries",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: AnalyteSerializer(many=True), 400: "Bad request"},
         tags=["Analyte"],
     )
@@ -456,7 +485,7 @@ class AnalyteViewSet(viewsets.ViewSet):
             model=Analyte,
             superuser=self.request.user.is_superuser
         )
-        serializer = AnalyteSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -496,7 +525,8 @@ class AnalyteViewSet(viewsets.ViewSet):
                 openapi.IN_QUERY,
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Analyte"],
@@ -518,13 +548,17 @@ class AnalyteViewSet(viewsets.ViewSet):
                         )
                     )
                     rejected = True
-                else:    
+                else:
+                    analyte_data = self.suppress_mapping_fields(
+                        analyte[analyte_id]
+                    )
+
                     response_data.append(
                         response_constructor(
                             identifier=analyte_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=analyte[analyte_id],
+                            data=analyte_data,
                         )
                     )
                     accepted = True
@@ -637,12 +671,17 @@ class AnalyteViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class PhenotypeViewSet(viewsets.ViewSet):
+class PhenotypeViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = PhenotypeSerializer
 
     @swagger_auto_schema(
         method="get",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         operation_description="Retrieve all Phenotype entries",
         responses={200: PhenotypeSerializer(many=True), 400: "Bad request"},
         tags=["Phenotype"],
@@ -653,7 +692,7 @@ class PhenotypeViewSet(viewsets.ViewSet):
             model=Phenotype,
             superuser=self.request.user.is_superuser
         )
-        serializer = PhenotypeSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -693,7 +732,8 @@ class PhenotypeViewSet(viewsets.ViewSet):
                 openapi.IN_QUERY,
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Phenotype"],
@@ -717,12 +757,15 @@ class PhenotypeViewSet(viewsets.ViewSet):
                     rejected = True
 
                 else:
+                    phenotype_data = self.suppress_mapping_fields(
+                        phenotype[phenotype_id]
+                    )
                     response_data.append(
                         response_constructor(
                             identifier=phenotype_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=phenotype[phenotype_id],
+                            data=phenotype_data,
                         )
                     )
                     accepted = True
@@ -837,13 +880,18 @@ class PhenotypeViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class GeneticFindingsViewSet(viewsets.ViewSet):
+class GeneticFindingsViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = GeneticFindingsOutputSerializer
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Genetic Findings entries",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: GeneticFindingsOutputSerializer(many=True), 400: "Bad request"},
         tags=["GeneticFindings"],
     )
@@ -853,7 +901,7 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
             model=GeneticFindings,
             superuser=self.request.user.is_superuser
         )
-        serializer = GeneticFindingsInputSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -898,7 +946,8 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                 openapi.IN_QUERY,
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["GeneticFindings"],
@@ -920,12 +969,15 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
                         )
                     )
                 else:
+                    genetic_findings_data = self.suppress_mapping_fields(
+                        genetic_findings[genetic_findings_id]
+                    )
                     response_data.append(
                         response_constructor(
                             identifier=genetic_findings_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=genetic_findings[genetic_findings_id],
+                            data=genetic_findings_data,
                         )
                     )
                     accepted = True
@@ -1043,13 +1095,18 @@ class GeneticFindingsViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class BiobankViewSet(viewsets.ViewSet):
+class BiobankViewSet(
+    SuppressSerializerFieldsMixin,
+    viewsets.GenericViewSet,
+):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = BiobankSerializer
 
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Biobank entries",
+        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: BiobankSerializer(many=True), 400: "Bad request"},
         tags=["Biobank"],
     )
@@ -1059,7 +1116,7 @@ class BiobankViewSet(viewsets.ViewSet):
             model=Biobank,
             superuser=self.request.user.is_superuser
         )
-        serializer = BiobankSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
@@ -1070,7 +1127,8 @@ class BiobankViewSet(viewsets.ViewSet):
                 description="Comma-separated list of IDs",
                 type=openapi.TYPE_STRING,
                 required=True
-            )
+            ),
+            SUPPRESS_FIELDS_PARAMETER,
         ],
         responses={200: "All success", 207: "Partial success", 400: "Bad request"},
         tags=["Biobank"],
@@ -1095,12 +1153,15 @@ class BiobankViewSet(viewsets.ViewSet):
                     rejected = True
 
                 else:
+                    biobank_data = self.suppress_mapping_fields(
+                        biobanks[biobank_id]
+                     )
                     response_data.append(
                         response_constructor(
                             identifier=biobank_id,
                             request_status="SUCCESS",
                             code=200,
-                            data=biobanks[biobank_id],
+                            data=biobank_data,
                         )
                     )
                     accepted = True

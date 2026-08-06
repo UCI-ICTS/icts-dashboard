@@ -1,5 +1,5 @@
 # #!/usr/bin/env python3
-# # tests/test_apps/test_metadata/test_apis/test_participant_apis.py
+# # tests/test_apps/test_metadata/test_apis/test_analyte_apis.py
 
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
@@ -147,3 +147,34 @@ class DeleteAnalyteAPITest(APITestCaseWithAuth):
         delete_response = self.client.delete(delete_url, format="json")
         self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
         self.assertEqual(delete_response.data[0]["request_status"], "DELETED")
+
+
+class ListAllAnalyteAPITest(APITestCaseWithAuth):
+    def test_list_all_analytes(self):
+        url = "/api/metadata/analyte/all/"
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(response.data), 0)
+        self.assertIn("analyte_id", response.data[0])
+
+    def test_list_all_analytes_suppresses_requested_fields(self):
+        base_url = "/api/metadata/analyte/all/"
+        baseline_response = self.client.get(base_url, format="json")
+        suppressed_response = self.client.get(
+            f"{base_url}?suppress=participant_id,analyte_type",
+            format="json",
+        )
+
+        self.assertEqual(baseline_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(suppressed_response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(baseline_response.data), 0)
+        self.assertEqual(len(suppressed_response.data), len(baseline_response.data))
+        self.assertIn("participant_id", baseline_response.data[0])
+        self.assertIn("analyte_type", baseline_response.data[0])
+
+        for analyte in suppressed_response.data:
+            self.assertIn("analyte_id", analyte)
+            self.assertNotIn("participant_id", analyte)
+            self.assertNotIn("analyte_type", analyte)
+
