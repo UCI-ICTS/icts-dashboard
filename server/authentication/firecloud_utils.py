@@ -3,7 +3,6 @@
 
 from datetime import timedelta
 
-import requests
 from django.conf import settings
 from django.utils import timezone
 from google.auth.transport.requests import Request as GoogleAuthRequest

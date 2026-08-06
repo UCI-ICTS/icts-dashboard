@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # authentication/apis.py
 
-import string
+
+from datetime import timedelta
 import secrets
+import string
 from django.conf import settings
 from django.contrib.auth import get_user_model, login as django_login, logout as django_logout
 from django.contrib.auth.tokens import default_token_generator
@@ -13,7 +15,6 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from drf_spectacular.utils import extend_schema
 from django.shortcuts import render, redirect
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -28,6 +29,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import (
@@ -36,6 +38,7 @@ from rest_framework_simplejwt.serializers import (
     TokenBlacklistSerializer,
 )
 
+from authentication.models import GoogleCredential
 from authentication.selectors import IsSuperUser, get_active_user_emails
 from authentication.serializers import (
     UserInputSerializer,
@@ -48,15 +51,12 @@ from authentication.serializers import (
     ActivateUserSerializer,
     GoogleAuthSerializer,
     EmailActiveUsers,
+    FirecloudUploadSerializer,
 )
+from authentication.firecloud_utils import get_google_credentials, upload_to_workspace
+
 
 User = get_user_model()
-from authentication.models import GoogleCredential
-from datetime import timedelta
-
-from rest_framework.parsers import MultiPartParser
-from authentication.serializers import FirecloudUploadSerializer
-from authentication.firecloud_utils import get_google_credentials, upload_to_workspace
 
 class TokenViewSet(viewsets.ViewSet):
     """
@@ -369,7 +369,6 @@ class PasswordViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response({"error": "Invalid user."}, status=404)
 
-        import pdb; pdb.set_trace()
         if not default_token_generator.check_token(user, token):
             return Response({"error": "Invalid or expired token."}, status=400)
 
