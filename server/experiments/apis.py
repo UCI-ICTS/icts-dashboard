@@ -436,7 +436,8 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
         aligned_rna_short_read = bulk_retrieve(
-            AlignedRNAShortRead, ids, "aligned_rna_short_read_id"
+            AlignedRNAShortRead, ids, "aligned_rna_short_read_id",
+            rename_map={"five_prime_three_prime_bias": "5prime3prime_bias"},
         )
         response_data, accepted, rejected = [], False, False
 

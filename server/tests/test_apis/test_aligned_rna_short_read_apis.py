@@ -44,7 +44,7 @@ class APITestCaseWithAuth(APITestCase):
         self.client.force_authenticate(user=self.user)
 
 
-class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
+class CreateAlignedRNAShortReadAPITest(APITestCaseWithAuth):
     def test_create_aligned_rna_short_read_api(self):
         url = "/api/experiments/aligned_rna_short_read/create/"
 
@@ -56,26 +56,26 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "reference_assembly_details": None,
+            "reference_assembly_details": "primary, chrY-masked",
             "gene_annotation": "GENCODEv41",
             "gene_annotation_details": "gencode_comprehensive_chr",
             "alignment_software": "STARv2.7.10a",
-            "alignment_log_file": None,
-            "alignment_postprocessing": None,
-            "mean_coverage": None,
-            "percent_uniquely_aligned": None,
-            "percent_multimapped": None,
-            "percent_unaligned": None,
-            "quality_issues": None,
-            "alignment_QC_output_file": None,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
 
         aligned2 = {  # New entry
@@ -86,26 +86,26 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "md5sum": "08b2942a5d0e572e856b55ce97cfdfd4",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "reference_assembly_details": None,
+            "reference_assembly_details": "primary, chrY-masked",
             "gene_annotation": "GENCODEv41",
             "gene_annotation_details": "gencode_comprehensive_chr",
             "alignment_software": "STARv2.7.10a",
-            "alignment_log_file": None,
-            "alignment_postprocessing": None,
-            "mean_coverage": None,
-            "percent_uniquely_aligned": None,
-            "percent_multimapped": None,
-            "percent_unaligned": None,
-            "quality_issues": None,
-            "alignment_QC_output_file": None,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
 
         aligned3 = {  # New entry
@@ -116,26 +116,26 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
             "md5sum": "2afb51f69a032eaeecd5f2f3ed3b5bbb",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "reference_assembly_details": None,
+            "reference_assembly_details": "primary, chrY-masked",
             "gene_annotation": "GENCODEv41",
             "gene_annotation_details": "gencode_comprehensive_chr",
             "alignment_software": "STARv2.7.10a",
-            "alignment_log_file": None,
-            "alignment_postprocessing": None,
-            "mean_coverage": None,
-            "percent_uniquely_aligned": None,
-            "percent_multimapped": None,
-            "percent_unaligned": None,
-            "quality_issues": None,
-            "alignment_QC_output_file": None,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
 
         # Checks for the Aligned table before creation
@@ -174,7 +174,7 @@ class CreateAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
+class ReadAlignedRNAShortReadAPITest(APITestCaseWithAuth):
     def test_read_aligned_rna_short_read(self):
         url1 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1"
         url2 = "/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1, DNE-01-1"
@@ -188,14 +188,34 @@ class ReadAlignedRnaShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
+class UpdateAlignedRNAShortReadAPITest(APITestCaseWithAuth):
     def test_update_aligned_rna_short_read_api(self):
         url = "/api/experiments/aligned_rna_short_read/update/"
 
-        aligned1 = {  # New CRAM and CRAI URIs but same md5sum
+        aligned1 = {  # New CRAM and CRAI URIs but same md5sum, new notes
             "aligned_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1",
             "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram",
             "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned.cram.crai",
+            "reference_assembly_details": "primary, chrY-masked",
+            "gene_annotation": "GENCODEv41",
+            "gene_annotation_details": "gencode_comprehensive_chr",
+            "alignment_software": "STARv2.7.10a",
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
 
         aligned2 = {  # Non-existent aligned_rna_short_read_id
@@ -206,26 +226,26 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "md5sum": "08b2942a5d0e572e856b55ce97cfdfd4",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "reference_assembly_details": None,
+            "reference_assembly_details": "primary, chrY-masked",
             "gene_annotation": "GENCODEv41",
             "gene_annotation_details": "gencode_comprehensive_chr",
             "alignment_software": "STARv2.7.10a",
-            "alignment_log_file": None,
-            "alignment_postprocessing": None,
-            "mean_coverage": None,
-            "percent_uniquely_aligned": None,
-            "percent_multimapped": None,
-            "percent_unaligned": None,
-            "quality_issues": None,
-            "alignment_QC_output_file": None,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_2/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
 
         aligned3 = {  # Non-existent aligned_rna_short_read_id
@@ -236,33 +256,34 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
             "md5sum": "25129ce37d1d28d765074f50e7a49660",
             "reference_assembly": "GRCh38",
             "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
-            "reference_assembly_details": None,
+            "reference_assembly_details": "primary, chrY-masked",
             "gene_annotation": "GENCODEv41",
             "gene_annotation_details": "gencode_comprehensive_chr",
             "alignment_software": "STARv2.7.10a",
-            "alignment_log_file": None,
-            "alignment_postprocessing": None,
-            "mean_coverage": None,
-            "percent_uniquely_aligned": None,
-            "percent_multimapped": None,
-            "percent_unaligned": None,
-            "quality_issues": None,
-            "alignment_QC_output_file": None,
-            "percent_rRNA": None,
-            "percent_mRNA": None,
-            "percent_mtRNA": None,
-            "percent_Globin": None,
-            "percent_UMI": None,
-            "five_prime_three_prime_bias": None,
-            "percent_GC": None,
-            "percent_chrX_Y": None,
+            "alignment_log_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3/STAR.log",
+            "alignment_postprocessing": "multimapped reads removed, reads trimmed",
+            "mean_coverage": 100,
+            "percent_uniquely_aligned": 81,
+            "percent_multimapped": 10,
+            "percent_unaligned": 9,
+            "quality_issues": "Note quality issues here...",
+            "alignment_QC_output_file": "gs://uci-gregor/aligned-rna-short-read/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_3/QC.log",
+            "percent_rRNA": 20,
+            "percent_mRNA": 75,
+            "percent_mtRNA": 4,
+            "percent_Globin": 1,
+            "percent_UMI": 0,
+            "5prime3prime_bias": 1.09,
+            "percent_GC": 66,
+            "percent_chrX_Y": 12,
         }
+
+        response_200 = self.client.post(url, [aligned1], format="json")
         aligned4 = aligned1
         aligned4["gene_annotation"] = "hadley"
-
         response_207 = self.client.post(url, [aligned4, aligned2], format="json")
-        response_200 = self.client.post(url, [aligned1], format="json")
         response_400 = self.client.post(url, [aligned2, aligned3], format="json")
+
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         changed_by(self, response_200.data[0], testuser)
         timestamps(self, response_200.data[0])
@@ -275,8 +296,45 @@ class UpdateRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
+        aligned_rna_attributes = [
+            "created_at",
+            "updated_at",
+            "needs_review",
+            "changed_by_id",
+            "aligned_rna_short_read_id",
+            "experiment_rna_short_read_id_id",
+            "aligned_rna_short_read_file",
+            "aligned_rna_short_read_index_file",
+            "md5sum",
+            "reference_assembly",
+            "reference_assembly_uri",
+            "reference_assembly_details",
+            "gene_annotation",
+            "gene_annotation_details",
+            "alignment_software",
+            "alignment_log_file",
+            "alignment_postprocessing",
+            "mean_coverage",
+            "percent_uniquely_aligned",
+            "percent_multimapped",
+            "percent_unaligned",
+            "quality_issues",
+            "alignment_QC_output_file",
+            "percent_rRNA",
+            "percent_mRNA",
+            "percent_mtRNA",
+            "percent_Globin",
+            "percent_UMI",
+            "5prime3prime_bias",
+            "percent_GC",
+            "percent_chrX_Y",
+        ]
+        aligned1_read = self.client.get("/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1", format="json")
+        for attr in aligned_rna_attributes:
+            assert attr in aligned1_read.data[0]["data"]  # ensure all updated attributes are not null
 
-class DeleteAlignedRnaShortReadAPITest(APITestCaseWithAuth):
+
+class DeleteAlignedRNAShortReadAPITest(APITestCaseWithAuth):
     def test_delete_rna_short_read_api(self):
 
         # Checks for the Alignment table before deletion

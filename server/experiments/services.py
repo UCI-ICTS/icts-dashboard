@@ -301,18 +301,6 @@ class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlignedRNAShortRead
         fields = "__all__"
-        extra_kwargs = {
-            "five_prime_three_prime_bias": {
-                "read_only": True
-            }  # Prevents duplication issues
-        }
-        rename_fields = {  # Custom rename logic
-            "five_prime_three_prime_bias": "5prime3prime_bias"
-        }
-        # This renames the field in API input/output while keeping it correct in Django ORM
-        five_prime_three_prime_bias = serializers.FloatField(
-            required=False, allow_null=True
-        )
 
     def to_representation(self, instance):
         """Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response"""
@@ -1333,8 +1321,8 @@ def create_aligned(table_name: str, identifier: str, datum: dict, current_user: 
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer,
+            "input_serializer": AlignedRNAShortReadInputSerializer,
+            "output_serializer": AlignedRNAShortReadOutputSerializer,
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
         },
     }
@@ -1471,8 +1459,8 @@ def update_aligned(table_name: str, identifier: str, model_instance, datum: dict
         },
         "aligned_rna_short_read": {
             "model": AlignedRNAShortRead,
-            "input_serializer": AlignedRNASerializer,
-            "output_serializer": AlignedRNASerializer,
+            "input_serializer": AlignedRNAShortReadInputSerializer,
+            "output_serializer": AlignedRNAShortReadOutputSerializer,
             "parsed_data": lambda datum: parse_rna_aligned(rna_aligned=datum),
         },
     }

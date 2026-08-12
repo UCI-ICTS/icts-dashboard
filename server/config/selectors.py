@@ -375,7 +375,7 @@ def bulk_model_retrieve(request_data: list, model_class, id: str) -> dict:
     return model_dict
 
 
-def bulk_retrieve(model_class, id_list: list, id_field: str = "id") -> dict:
+def bulk_retrieve(model_class, id_list: list, id_field: str = "id", rename_map: dict = None) -> dict:
     """
     Retrieve multiple instances of a Django model class based on a list of IDs.
 
@@ -403,6 +403,10 @@ def bulk_retrieve(model_class, id_list: list, id_field: str = "id") -> dict:
         # Remove internal Django fields (_state) from the response
         for obj in serialized_data.values():
             obj.pop("_state", None)
+            if rename_map:
+                for internal_key, remap_key in rename_map.items():
+                    if internal_key in obj:
+                        obj[remap_key] = obj.pop(internal_key)
 
         return serialized_data
 
