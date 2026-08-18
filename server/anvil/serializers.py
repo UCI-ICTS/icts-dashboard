@@ -3,6 +3,7 @@
 
 from rest_framework import serializers
 
+from anvil.constants import ANVIL_UPLOAD_TABLES
 from anvil.models import (
     AnvilUpload,
     AnvilUploadArtifact,
@@ -113,3 +114,16 @@ class AnvilUploadDetailSerializer(serializers.ModelSerializer):
             "artifacts",
             "validation_runs",
         ]
+
+class AnvilUploadInitializeSerializer(serializers.Serializer):
+    tables = serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=[(table_name, table_name) for table_name in ANVIL_UPLOAD_TABLES]
+        ),
+        required=False,
+        allow_empty=False,
+        help_text=(
+            "Optional list of GREGoR tables to include in this upload. "
+            "If omitted, all standard AnVIL upload tables are included."
+        ),
+    )

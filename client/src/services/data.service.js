@@ -2,8 +2,7 @@
 
 import axios from "axios";
 import { store } from "../store";
-import api from "../utils/axiosConfig";
-import { getAuthHeaders } from "../utils/axiosConfig";
+import api, {getAuthHeaders} from "../utils/axiosConfig";
 
 
 const APIDB = process.env.REACT_APP_APIDB;

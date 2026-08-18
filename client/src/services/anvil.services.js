@@ -40,12 +40,12 @@ const generateAnvilTsvsService = async ({ uploadId, outputDir }) => {
   return response;
 };
 
-// const generateAnvilManifestService = async ({ uploadId, outputDir }) => {
-//   const response = api.post(`${BASE_URL}${uploadId}/generate-manifest/`, {
-//     output_dir: outputDir,
-//   });
-//   return response;
-// };
+const generateAnvilManifestService = async ({ uploadId, outputDir }) => {
+  const response = api.post(`${BASE_URL}${uploadId}/generate-manifest/`, {
+    output_dir: outputDir,
+  });
+  return response;
+};
 
 const validateAnvilPackageService = async (uploadId) => {
   const response = api.post(`${BASE_URL}${uploadId}/validate-package/`, {});
@@ -60,7 +60,7 @@ const anvilService = {
     validateAnvilPackageService,
     validateAnvilSourceService,
     generateAnvilTsvsService,
-    // generateAnvilManifestService,
+    generateAnvilManifestService,
 };
 
 export default anvilService;

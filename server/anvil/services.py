@@ -9,6 +9,8 @@ from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
 
+from config.selectors import TableValidator, remove_na
+
 from anvil.constants import (
     ANVIL_UPLOAD_TABLES,
     ANVIL_UPLOAD_TABLE_MODEL_MAP,
@@ -24,7 +26,7 @@ from anvil.models import (
 
 
 @transaction.atomic
-def initialize_upload_tables(*, upload, changed_by=None):
+def initialize_upload_tables(*, upload:dict, tables:list, changed_by=None):
     """
     Ensure that the upload has one AnvilUploadTable row for every GREGoR table
     expected in the Dashboard-generated AnVIL package.
@@ -32,9 +34,10 @@ def initialize_upload_tables(*, upload, changed_by=None):
     This is idempotent.
     """
 
+    selected_tables = _get_selected_upload_tables(tables=tables)
     upload_tables = []
 
-    for table_name in ANVIL_UPLOAD_TABLES:
+    for table_name in selected_tables:
         upload_table, _created = AnvilUploadTable.objects.get_or_create(
             upload=upload,
             table_name=table_name,
@@ -88,20 +91,24 @@ def initialize_upload_tsv_artifacts(*, upload, upload_tables=None, changed_by=No
 
 
 @transaction.atomic
-def initialize_upload_package(*, upload, changed_by=None):
+def initialize_upload_package(*, upload:dict, tables:list=None, changed_by=None):
     """
     Initialize the database records for a deterministic AnVIL upload package.
 
     This creates:
-    - 21 AnvilUploadTable rows
-    - 21 planned table TSV artifact rows
+    - AnvilUploadTable rows
+    - planned table TSV artifact rows
+    - upload_manifest.json
 
-    It does not write TSV files yet.
+    It does not write TSV files.
     """
+
+    selected_tables = _get_selected_upload_tables(tables=tables)
 
     upload_tables = initialize_upload_tables(
         upload=upload,
-        changed_by=changed_by,
+        tables=selected_tables,
+        changed_by=changed_by, 
     )
     tsv_artifacts = initialize_upload_tsv_artifacts(
         upload=upload,
@@ -109,10 +116,17 @@ def initialize_upload_package(*, upload, changed_by=None):
         changed_by=changed_by,
     )
 
+    upload_manifest = initialize_upload_manifest_artifact(
+        upload=upload,
+        selected_tables=selected_tables,
+        changed_by=changed_by,
+    )
+
     return {
         "upload": upload,
         "upload_tables": upload_tables,
         "tsv_artifacts": tsv_artifacts,
+        "upload_manifest": upload_manifest,
     }
 
 
@@ -168,17 +182,18 @@ def _serialize_tsv_value(value):
     return str(value)
 
 
-def _row_from_object(*, obj, fields):
+def _row_from_object(*, obj, fields, serialize_for_tsv=False):
     row = {}
 
     for field in fields:
         column_name = field.column
 
-        # field.value_from_object handles ForeignKey fields correctly by using
-        # the underlying attname value rather than the related object instance.
         value = field.value_from_object(obj)
 
-        row[column_name] = _serialize_tsv_value(value)
+        if serialize_for_tsv:
+            value = _serialize_tsv_value(value=value)
+
+        row[column_name] = value
 
     return row
 
@@ -667,77 +682,17 @@ def _validate_manifest_payload(*, upload):
     return errors
 
 
-def collect_upload_package_validation_errors(*, upload):
-    """
-    Validate generated upload package files and recorded package metadata.
+def _get_selected_upload_tables(*, tables=None):
+    if tables is None:
+        return list(ANVIL_UPLOAD_TABLES)
 
-    This checks local package integrity only. It does not perform full GREGoR
-    schema validation, cross-table foreign-key validation, WDL validation, GCS
-    checks, or AnVIL submission checks.
-    """
+    selected_tables = list(dict.fromkeys(tables))
+    invalid_tables = sorted(set(selected_tables) - set(ANVIL_UPLOAD_TABLES))
 
-    errors = []
-    errors.extend(_validate_table_tsv_artifacts(upload=upload))
-    errors.extend(_validate_manifest_payload(upload=upload))
+    if invalid_tables:
+        raise ValueError(f"Invalid AnVIL upload tables: {invalid_tables}")
 
-    return errors
-
-
-@transaction.atomic
-def validate_upload_package(*, upload, changed_by=None):
-    """
-    Validate generated package files and metadata for one upload.
-
-    This is the Dashboard package-integrity validator. It assumes TSV generation
-    and manifest generation have already run.
-    """
-
-    validation_run = AnvilUploadValidationRun.objects.create(
-        upload=upload,
-        validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
-        validator_version="dashboard-package-v0.1",
-        changed_by=changed_by,
-    )
-
-    validation_run.mark_running()
-    validation_run.save()
-
-    errors = collect_upload_package_validation_errors(upload=upload)
-    passed = len(errors) == 0
-
-    summary = {
-        "validator": "dashboard-package-v0.1",
-        "passed": passed,
-        "error_count": len(errors),
-        "warning_count": 0,
-        "errors": errors,
-    }
-
-    validation_run.error_count = len(errors)
-    validation_run.warning_count = 0
-    validation_run.mark_complete(
-        passed=passed,
-        message=(
-            "Dashboard package validation passed."
-            if passed
-            else "Dashboard package validation failed."
-        ),
-        summary=summary,
-    )
-    validation_run.save()
-
-    upload.status = (
-        AnvilUpload.Status.READY_FOR_REVIEW
-        if passed
-        else AnvilUpload.Status.VALIDATION_FAILED
-    )
-
-    if changed_by is not None:
-        upload.changed_by = changed_by
-
-    upload.save()
-
-    return validation_run
+    return selected_tables
 
 
 def _json_safe_datetime(value):
@@ -874,173 +829,81 @@ def _build_upload_manifest_dict(*, upload):
     }
 
 
-def _get_model(app_label, model_name):
-    return apps.get_model(app_label, model_name)
+def _build_initialized_manifest(*, upload, selected_tables):
+    excluded_tables = [
+        {
+            "table_name": table_name,
+            "reason": "not selected at initialization",
+        }
+        for table_name in ANVIL_UPLOAD_TABLES
+        if table_name not in selected_tables
+    ]
 
-
-def _error(
-    *,
-    code,
-    table,
-    model,
-    pk,
-    field=None,
-    value=None,
-    message,
-):
     return {
-        "severity": "error",
-        "code": code,
-        "table": table,
-        "model": model,
-        "pk": str(pk),
-        "field": field,
-        "value": value,
-        "message": message,
+        "manifest_version": "dashboard-anvil-upload-manifest-v0.1",
+        "manifest_state": "initialized",
+        "upload": {
+            "upload_id": str(upload.upload_id),
+            "status": upload.status,
+            "gregor_model_version": upload.gregor_model_version,
+            "created_at": _json_safe_datetime(upload.created_at),
+            "updated_at": _json_safe_datetime(upload.updated_at),
+        },
+        "tables": {
+            "included": selected_tables,
+            "excluded": excluded_tables,
+        },
+        "validation": {
+            "source": None,
+            "package": None,
+        },
+        "artifacts": {
+            "table_tsvs": [],
+            "manifest": None,
+        },
     }
 
 
-def _validate_participant_solve_status():
-    Participant = _get_model("metadata", "participant")
-
-    errors = []
-
-    for participant in Participant.objects.filter(solve_status="Affected"):
-        errors.append(
-            _error(
-                code="invalid_solve_status",
-                table="participant",
-                model="metadata.Participant",
-                pk=participant.pk,
-                field="solve_status",
-                value=participant.solve_status,
-                message=(
-                    "Participant solve_status cannot be 'Affected'. "
-                    "Use a GREGoR solve status such as 'Unsolved' instead."
-                ),
-            )
-        )
-
-    return errors
-
-
-def _validate_phenotype_onset_age_range():
-    Phenotype = _get_model("metadata", "phenotype")
-
-    errors = []
-
-    for phenotype in Phenotype.objects.filter(onset_age_range__iexact="unknown"):
-        errors.append(
-            _error(
-                code="invalid_onset_age_range",
-                table="phenotype",
-                model="metadata.Phenotype",
-                pk=phenotype.pk,
-                field="onset_age_range",
-                value=phenotype.onset_age_range,
-                message=(
-                    "Phenotype onset_age_range cannot be 'unknown'. "
-                    "Use a valid HPO onset term or leave the field blank."
-                ),
-            )
-        )
-
-    return errors
-
-
-def _validate_delete_marked_alignment_sets():
+def collect_upload_package_validation_errors(*, upload):
     """
-    Delete-marked alignment set rows should not be exported into generated
-    GREGoR upload tables.
+    Validate generated upload package files and recorded package metadata.
 
-    This check is intentionally narrow and only applies to alignment set tables.
-    """
-
-    checks = [
-        (
-            "aligned_dna_short_read_set",
-            "experiments",
-            "aligneddnashortreadset",
-            "experiments.AlignedDnaShortReadSet",
-        ),
-        (
-            "aligned_nanopore_set",
-            "experiments",
-            "alignednanoporeset",
-            "experiments.AlignedNanoporeSet",
-        ),
-        (
-            "aligned_pac_bio_set",
-            "experiments",
-            "alignedpacbioset",
-            "experiments.AlignedPacBioSet",
-        ),
-    ]
-
-    errors = []
-
-    for table_name, app_label, model_name, display_model in checks:
-        model_class = _get_model(app_label, model_name)
-
-        for obj in model_class.objects.filter(pk__contains="-delete"):
-            errors.append(
-                _error(
-                    code="delete_marked_alignment_set",
-                    table=table_name,
-                    model=display_model,
-                    pk=obj.pk,
-                    field="pk",
-                    value=str(obj.pk),
-                    message=(
-                        "Delete-marked alignment set records should not be "
-                        "included in an AnVIL upload."
-                    ),
-                )
-            )
-
-    return errors
-
-
-def collect_upload_source_validation_errors():
-    """
-    Collect known source-data errors that should block AnVIL upload generation.
-
-    This is intentionally narrow. It is the first Dashboard-side validator, not
-    a full replacement for GREGoR JSON Schema validation or the DCC validator.
+    This checks local package integrity only. It does not perform full GREGoR
+    schema validation, cross-table foreign-key validation, WDL validation, GCS
+    checks, or AnVIL submission checks.
     """
 
     errors = []
-    errors.extend(_validate_participant_solve_status())
-    errors.extend(_validate_phenotype_onset_age_range())
-    errors.extend(_validate_delete_marked_alignment_sets())
+    errors.extend(_validate_table_tsv_artifacts(upload=upload))
+    errors.extend(_validate_manifest_payload(upload=upload))
 
     return errors
 
 
 @transaction.atomic
-def validate_upload_source_data(*, upload, changed_by=None):
+def validate_upload_package(*, upload, changed_by=None):
     """
-    Validate currently loaded Dashboard source data for an AnVIL upload.
+    Validate generated package files and metadata for one upload.
 
-    Creates an AnvilUploadValidationRun and marks the upload as either failed
-    validation or ready for review.
+    This is the Dashboard package-integrity validator. It assumes TSV generation
+    and manifest generation have already run.
     """
 
     validation_run = AnvilUploadValidationRun.objects.create(
         upload=upload,
         validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
-        validator_version="dashboard-source-data-v0.1",
+        validator_version="dashboard-package-v0.1",
         changed_by=changed_by,
     )
 
     validation_run.mark_running()
     validation_run.save()
 
-    errors = collect_upload_source_validation_errors()
+    errors = collect_upload_package_validation_errors(upload=upload)
     passed = len(errors) == 0
 
     summary = {
-        "validator": "dashboard-source-data-v0.1",
+        "validator": "dashboard-package-v0.1",
         "passed": passed,
         "error_count": len(errors),
         "warning_count": 0,
@@ -1052,12 +915,170 @@ def validate_upload_source_data(*, upload, changed_by=None):
     validation_run.mark_complete(
         passed=passed,
         message=(
+            "Dashboard package validation passed."
+            if passed
+            else "Dashboard package validation failed."
+        ),
+        summary=summary,
+    )
+    validation_run.save()
+
+    upload.status = (
+        AnvilUpload.Status.READY_FOR_REVIEW
+        if passed
+        else AnvilUpload.Status.VALIDATION_FAILED
+    )
+
+    if changed_by is not None:
+        upload.changed_by = changed_by
+
+    upload.save()
+
+    return validation_run
+
+
+@transaction.atomic
+def validate_upload_source_data(*, upload, changed_by=None):
+    """
+    Validate currently loaded Dashboard source data for an AnVIL upload.
+
+    Creates an AnvilUploadValidationRun and marks the upload as either failed
+    validation or ready for review.
+    """
+
+    manifest_artifact = get_upload_manifest_artifact(upload=upload)
+
+    if manifest_artifact is None:
+        raise ValueError("Upload manifest does not exist. Run initialize first.")
+
+    manifest = manifest_artifact.metadata or {}
+    selected_tables = manifest.get("tables", {}).get("included", [])
+
+    validation_run = AnvilUploadValidationRun.objects.create(
+        upload=upload,
+        validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
+        validator_version="dashboard-source-data-v0.2",
+        changed_by=changed_by,
+    )
+
+    validation_run.mark_running()
+    validation_run.save()
+
+    table_results = {}
+    table_summaries = {}
+    error_count = 0
+    warning_count = 0
+
+    for table_name in selected_tables:
+        model_class = _get_upload_table_model(table_name=table_name)
+        fields = _get_export_fields(model_class=model_class)
+        queryset = model_class.objects.all().order_by(model_class._meta.pk.name)
+
+        source_row_count = queryset.count()
+        excluded_rows = []
+
+        for obj in queryset:
+            row = _row_from_object(obj=obj, fields=fields)
+
+            validator = TableValidator()
+            validator.validate_json(remove_na(row), table_name)
+            validation_results = validator.get_validation_results()
+
+            if not validation_results["valid"]:
+                import pdb; pdb.set_trace()
+                excluded_rows.append(
+                    {
+                        "pk": str(obj.pk),
+                        "reason": "schema validation failed",
+                        "errors": validation_results["errors"],
+                    }
+                )
+
+        excluded_row_count = len(excluded_rows)
+        included_row_count = source_row_count - excluded_row_count
+        table_error_count = excluded_row_count
+
+        source_status = "passed" if table_error_count == 0 else "failed"
+
+        table_summary = {
+            "source_status": source_status,
+            "source_row_count": source_row_count,
+            "included_row_count": included_row_count,
+            "excluded_row_count": excluded_row_count,
+            "error_count": table_error_count,
+        }
+
+        table_results[table_name] = {
+            "selected": True,
+            **table_summary,
+            "excluded_rows": excluded_rows,
+        }
+
+        table_summaries[table_name] = table_summary
+
+        upload_table = upload.upload_tables.filter(table_name=table_name).first()
+
+        if upload_table is not None:
+            upload_table.source_summary = table_summary
+
+            if changed_by is not None:
+                upload_table.changed_by = changed_by
+
+            upload_table.save()
+
+        error_count += table_error_count
+
+    passed = error_count == 0
+
+    summary = {
+        "validator": "dashboard-source-data-v0.2",
+        "passed": passed,
+        "error_count": error_count,
+        "warning_count": warning_count,
+        "tables": table_summaries,
+    }
+
+    manifest.setdefault("tables", {})
+    manifest["tables"]["by_name"] = table_results
+
+    manifest.setdefault("validation", {})
+    manifest["validation"]["source"] = {
+        "status": "passed" if passed else "failed",
+        "validator": "dashboard-source-data-v0.2",
+        "error_count": error_count,
+        "warning_count": warning_count,
+        "run_id": validation_run.id,
+    }
+
+    manifest["manifest_state"] = (
+        "source_validated" if passed else "source_validation_failed"
+    )
+
+    manifest_artifact.metadata = manifest
+    manifest_artifact.generation_status = (
+        AnvilUploadArtifact.GenerationStatus.GENERATED
+        if passed
+        else AnvilUploadArtifact.GenerationStatus.FAILED
+    )
+
+    if changed_by is not None:
+        manifest_artifact.changed_by = changed_by
+
+    manifest_artifact.save()
+
+    validation_run.error_count = error_count
+    validation_run.warning_count = warning_count
+    validation_run.summary = summary
+    validation_run.mark_complete(
+        passed=passed,
+        message=(
             "Dashboard source-data validation passed."
             if passed
             else "Dashboard source-data validation failed."
         ),
         summary=summary,
     )
+    validation_run.summary = summary
     validation_run.save()
 
     upload.status = (
@@ -1088,19 +1109,22 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
     column ordering.
     """
 
-    package = initialize_upload_package(
-        upload=upload,
-        changed_by=changed_by,
-    )
+    manifest_artifact = get_upload_manifest_artifact(upload=upload)
+
+    manifest = manifest_artifact.metadata or {}
+    selected_tables = manifest.get("tables", {}).get("include", [])
 
     upload_tables_by_name = {
         upload_table.table_name: upload_table
-        for upload_table in package["upload_tables"]
+        for upload_table in upload.upload_tables.filter(table_name__in=selected_tables)
     }
 
     artifacts_by_table_name = {
         artifact.upload_table.table_name: artifact
-        for artifact in package["tsv_artifacts"]
+        for artifact in upload.artifacts.filter(
+            artifact_type=AnvilUploadArtifact.ArtifactType.TABLE_TSV,
+            upload_table__table_name__in=selected_tables,
+        ).select_related("upload_table")
     }
 
     package_dir = Path(output_dir) / str(upload.upload_id)
@@ -1109,7 +1133,7 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
 
     generated = []
 
-    for table_name in ANVIL_UPLOAD_TABLES:
+    for table_name in selected_tables:
         model_class = _get_upload_table_model(table_name=table_name)
         fields = _get_export_fields(model_class)
 
@@ -1139,17 +1163,14 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
                     _row_from_object(
                         obj=obj,
                         fields=fields,
+                        serialize_for_tsv=True,
                     )
                 )
                 row_count += 1
 
         upload_table.row_count = row_count
         upload_table.column_names = column_names
-        upload_table.generation_status = _get_generation_status(
-            AnvilUploadTable.GenerationStatus,
-            "GENERATED",
-            "generated",
-        )
+        upload_table.generation_status = AnvilUploadTable.GenerationStatus.GENERATED
 
         if changed_by is not None:
             upload_table.changed_by = changed_by
@@ -1198,8 +1219,6 @@ def generate_upload_manifest(*, upload, output_dir, changed_by=None):
     """
     Generate manifest.json for a Dashboard-generated AnVIL upload package.
 
-    This assumes generate_upload_tsvs has already run. It writes one manifest
-    file and records one UPLOAD_MANIFEST artifact.
     """
 
     package_dir = Path(output_dir) / str(upload.upload_id)
@@ -1258,3 +1277,47 @@ def generate_upload_manifest(*, upload, output_dir, changed_by=None):
         "manifest_path": str(manifest_path),
         "artifact": artifact,
     }
+
+
+def initialize_upload_manifest_artifact(*, upload, selected_tables, changed_by=None):
+    manifest = _build_initialized_manifest(
+        upload=upload,
+        selected_tables=selected_tables,
+    )
+
+    artifact, _created = AnvilUploadArtifact.objects.get_or_create(
+        upload=upload,
+        relative_path="manifest.json",
+        defaults={
+            "artifact_type": AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST,
+            "generation_status": AnvilUploadArtifact.GenerationStatus.PENDING,
+            "file_name": "manifest.json",
+            "content_type": MANIFEST_CONTENT_TYPE,
+            "metadata": manifest,
+            "changed_by": changed_by,
+        },
+    )
+
+    artifact.artifact_type = AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST
+    artifact.generation_status = AnvilUploadArtifact.GenerationStatus.PENDING
+    artifact.file_name = "manifest.json"
+    artifact.content_type = MANIFEST_CONTENT_TYPE
+    artifact.metadata = manifest
+
+    if changed_by is not None:
+        artifact.changed_by = changed_by
+
+    artifact.save()
+
+    return artifact
+
+
+def get_upload_manifest_artifact(upload):
+    return (
+        upload.artifacts.filter(
+            artifact_type=AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST,
+            relative_path="manifest.json",
+        )
+        .order_by("-updated_at", "-created_at")
+        .first()
+    )
