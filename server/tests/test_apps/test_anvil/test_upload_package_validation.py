@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from anvil.models import (
     AnvilUpload,
@@ -42,12 +42,10 @@ class AnvilUploadPackageValidationTests(TestCase):
         validate_upload_source_data(upload=upload, changed_by=self.user)
         generate_upload_tsvs(
             upload=upload,
-            output_dir=temp_dir,
             changed_by=self.user,
         )
         generate_upload_manifest(
             upload=upload,
-            output_dir=temp_dir,
             changed_by=self.user,
         )
 
@@ -55,7 +53,9 @@ class AnvilUploadPackageValidationTests(TestCase):
         return {error["code"] for error in validation_run.summary["errors"]}
 
     def test_validate_upload_package_passes_for_generated_package(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             validation_run = validate_upload_package(
@@ -83,7 +83,9 @@ class AnvilUploadPackageValidationTests(TestCase):
             changed_by=self.user,
         )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(
                 temp_dir,
                 upload=upload,
@@ -118,7 +120,9 @@ class AnvilUploadPackageValidationTests(TestCase):
         )
 
     def test_validate_upload_package_detects_missing_tsv_file(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             artifact = self.upload.artifacts.get(
@@ -141,7 +145,9 @@ class AnvilUploadPackageValidationTests(TestCase):
             )
 
     def test_validate_upload_package_detects_tsv_row_count_mismatch(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             upload_table = self.upload.upload_tables.get(table_name="participant")
@@ -163,7 +169,9 @@ class AnvilUploadPackageValidationTests(TestCase):
             self.assertIn("manifest_table_row_count_mismatch", error_codes)
 
     def test_validate_upload_package_detects_artifact_hash_mismatch(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             artifact = self.upload.artifacts.get(
@@ -190,7 +198,9 @@ class AnvilUploadPackageValidationTests(TestCase):
             )
 
     def test_validate_upload_package_detects_duplicate_tsv_primary_keys(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             artifact = self.upload.artifacts.get(
@@ -230,7 +240,9 @@ class AnvilUploadPackageValidationTests(TestCase):
             )
 
     def test_validate_upload_package_creates_second_dashboard_validation_run(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._build_package(temp_dir)
 
             validate_upload_package(

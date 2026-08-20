@@ -122,11 +122,8 @@ class AnvilUploadViewSet(
     def generate_tsvs(self, request, upload_id=None):
         upload = self.get_object()
 
-        output_dir = request.data.get("output_dir", "/tmp/anvil_uploads")
-
         result = generate_upload_tsvs(
             upload=upload,
-            output_dir=output_dir,
             changed_by=self._changed_by(),
         )
 
@@ -147,11 +144,8 @@ class AnvilUploadViewSet(
     def generate_manifest(self, request, upload_id=None):
         upload = self.get_object()
 
-        output_dir = request.data.get("output_dir", "/tmp/anvil_uploads")
-
         result = generate_upload_manifest(
             upload=upload,
-            output_dir=output_dir,
             changed_by=self._changed_by(),
         )
 

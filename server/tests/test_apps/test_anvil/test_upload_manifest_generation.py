@@ -4,7 +4,7 @@
 import json
 import tempfile
 from pathlib import Path
-
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -34,17 +34,17 @@ class AnvilUploadManifestGenerationTests(TestCase):
         validate_upload_source_data(upload=self.upload, changed_by=self.user)
         generate_upload_tsvs(
             upload=self.upload,
-            output_dir=temp_dir,
             changed_by=self.user,
         )
         return generate_upload_manifest(
             upload=self.upload,
-            output_dir=temp_dir,
             changed_by=self.user,
         )
 
     def test_generate_upload_manifest_writes_manifest_json(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = self._generate_package(temp_dir)
 
             manifest_path = Path(result["manifest_path"])
@@ -53,7 +53,9 @@ class AnvilUploadManifestGenerationTests(TestCase):
             self.assertEqual(manifest_path.name, "manifest.json")
 
     def test_generate_upload_manifest_records_manifest_artifact(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = self._generate_package(temp_dir)
 
             artifact = result["artifact"]
@@ -74,7 +76,9 @@ class AnvilUploadManifestGenerationTests(TestCase):
             )
 
     def test_manifest_file_describes_all_selected_tables(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = self._generate_package(temp_dir)
 
             manifest_path = Path(result["manifest_path"])
@@ -105,7 +109,9 @@ class AnvilUploadManifestGenerationTests(TestCase):
         """The manifest is the living upload plan: generating the package
         manifest must enrich it, never replace source-validation state."""
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             self._generate_package(temp_dir)
 
             manifest = get_upload_manifest_artifact(upload=self.upload).metadata
@@ -123,11 +129,12 @@ class AnvilUploadManifestGenerationTests(TestCase):
             self.assertEqual(manifest["manifest_state"], "package_generated")
 
     def test_generate_upload_manifest_is_idempotent(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             first_result = self._generate_package(temp_dir)
             second_result = generate_upload_manifest(
                 upload=self.upload,
-                output_dir=temp_dir,
                 changed_by=self.user,
             )
 
@@ -150,19 +157,21 @@ class AnvilUploadManifestGenerationTests(TestCase):
             changed_by=self.user,
         )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             with self.assertRaisesMessage(ValueError, "Run initialize first"):
                 generate_upload_manifest(
                     upload=upload,
-                    output_dir=temp_dir,
                     changed_by=self.user,
                 )
 
     def test_generate_upload_manifest_requires_generated_tsvs(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             with self.assertRaisesMessage(ValueError, "generate_upload_tsvs"):
                 generate_upload_manifest(
                     upload=self.upload,
-                    output_dir=temp_dir,
                     changed_by=self.user,
                 )

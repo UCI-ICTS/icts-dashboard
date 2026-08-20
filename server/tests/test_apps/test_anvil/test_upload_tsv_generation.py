@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from anvil.constants import ANVIL_UPLOAD_TABLES
 from anvil.models import AnvilUpload, AnvilUploadArtifact
@@ -35,19 +35,23 @@ class AnvilUploadTsvGenerationTests(TestCase):
             changed_by=self.user,
         )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             with self.assertRaisesMessage(ValueError, "Run initialize first"):
                 generate_upload_tsvs(
                     upload=upload,
-                    output_dir=temp_dir,
+                    
                     changed_by=self.user,
                 )
 
     def test_generate_upload_tsvs_writes_21_tsv_files(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -71,10 +75,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
             changed_by=self.user,
         )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = generate_upload_tsvs(
                 upload=upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -84,10 +90,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
             self.assertEqual(written, ["family.tsv", "participant.tsv"])
 
     def test_generate_upload_tsvs_updates_artifacts_as_generated(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -109,10 +117,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
                 )
 
     def test_generate_upload_tsvs_updates_table_row_counts(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -132,10 +142,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
             self.assertEqual(table_row_counts["genetic_findings"], 5)
 
     def test_generated_participant_tsv_uses_gregor_schema_columns(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -154,10 +166,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
             self.assertNotIn("family_id_id", reader.fieldnames)
 
     def test_generated_set_tsv_serializes_m2m_as_pipe_delimited(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -199,10 +213,12 @@ class AnvilUploadTsvGenerationTests(TestCase):
         manifest_artifact.metadata = manifest
         manifest_artifact.save()
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 
@@ -219,15 +235,17 @@ class AnvilUploadTsvGenerationTests(TestCase):
         self.assertEqual(participant_table.row_count, 5)
 
     def test_generate_upload_tsvs_is_repeatable(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             first_result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
             second_result = generate_upload_tsvs(
                 upload=self.upload,
-                output_dir=temp_dir,
+                
                 changed_by=self.user,
             )
 

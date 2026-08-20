@@ -45,8 +45,6 @@ import {
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
-const DEFAULT_OUTPUT_DIR = "/tmp/anvil_uploads";
-
 const getStatusColor = (status) => {
   if (!status) return "default";
 
@@ -76,7 +74,6 @@ const AnvilUploads = () => {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [outputDir, setOutputDir] = useState(DEFAULT_OUTPUT_DIR);
   const dispatch = useDispatch();
 
   const fetchUploads = () => {
@@ -364,15 +361,13 @@ const AnvilUploads = () => {
                         icon={<FileTextOutlined />}
                         disabled={
                         !selectedUpload?.upload_id ||
-                        actionStatus === "loading" ||
-                        !outputDir?.trim()
+                        actionStatus === "loading"
                         }
                         loading={activeAction === "generateAnvilTsvs"}
                         onClick={() =>
                         runUploadAction({
                             actionThunk: generateAnvilTsvs({
                             uploadId: selectedUpload.upload_id,
-                            outputDir,
                             }),
                             label: "Generate TSVs",
                         })
@@ -385,15 +380,13 @@ const AnvilUploads = () => {
                         icon={<FileDoneOutlined />}
                         disabled={
                         !selectedUpload?.upload_id ||
-                        actionStatus === "loading" ||
-                        !outputDir?.trim()
+                        actionStatus === "loading"
                         }
                         loading={activeAction === "generateAnvilManifest"}
                         onClick={() =>
                         runUploadAction({
                             actionThunk: generateAnvilManifest({
                             uploadId: selectedUpload.upload_id,
-                            outputDir,
                             }),
                             label: "Generate manifest",
                         })
@@ -417,13 +410,6 @@ const AnvilUploads = () => {
                         Validate Package
                     </Button>
                     </Space>
-
-                    <Input
-                      style={{ marginTop: 12, maxWidth: 420 }}
-                      addonBefore="Output dir"
-                      value={outputDir}
-                      onChange={(event) => setOutputDir(event.target.value)}
-                    />
                   </Card>
 
                   {latestValidationErrors.length > 0 && (

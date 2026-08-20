@@ -4,6 +4,7 @@
 import tempfile
 
 from django.contrib.auth import get_user_model
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -27,7 +28,9 @@ class AnvilUploadApiTests(APITestCase):
         return f"{self.base_url}{self.upload_id}/{action}/"
 
     def test_upload_api_full_workflow(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory() as temp_dir, override_settings(
+            ANVIL_PACKAGE_ROOT=temp_dir,
+        ):
             create_response = self.client.post(
                 self.base_url,
                 data={

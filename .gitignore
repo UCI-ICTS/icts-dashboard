@@ -37,7 +37,7 @@ server/utilities/hpo_artifacts**
 server/utilities/anvil**
 server/utilities/db_reset.sh
 server/utilities/hpo_artifacts**
-server/anvil_uploads/**
+server/anvil_packages/**
 
 #Client Items
 #Client dependencies

@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
@@ -107,7 +108,7 @@ def initialize_upload_package(*,
     upload: AnvilUpload,
     tables: list[str] | None = None,
     changed_by: User| None = None
-) -> list[AnvilUploadTable]:
+) -> dict:
     """
     Initialize the database records for a deterministic AnVIL upload package.
 
@@ -238,6 +239,19 @@ def _sha256_file(path: Path) -> str:
             digest.update(chunk)
 
     return digest.hexdigest()
+
+
+def _get_package_dir(*, upload: AnvilUpload) -> Path:
+    """
+    Resolve the durable package directory for one upload.
+
+    Packages live under settings.ANVIL_PACKAGE_ROOT, one directory per
+    upload_id. They are permanent upload snapshots and are never auto-deleted.
+    This helper is the single path-resolution seam; a future cloud storage
+    backend replaces this function, not its callers.
+    """
+
+    return Path(settings.ANVIL_PACKAGE_ROOT) / str(upload.upload_id)
 
 
 def _package_error(
@@ -1040,7 +1054,6 @@ def validate_upload_source_data(
 def generate_upload_tsvs(
     *,
     upload: AnvilUpload,
-    output_dir: str,
     changed_by: User | None = None
 ) -> dict:
     """
@@ -1076,7 +1089,7 @@ def generate_upload_tsvs(
         ).select_related("upload_table")
     }
 
-    package_dir = Path(output_dir) / str(upload.upload_id)
+    package_dir = _get_package_dir(upload=upload)
     tables_dir = package_dir / "tables"
     tables_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1173,7 +1186,6 @@ def generate_upload_tsvs(
 def generate_upload_manifest(
     *,
     upload: AnvilUpload,
-    output_dir: str,
     changed_by: User | None = None
 )-> dict:
     """
@@ -1217,7 +1229,7 @@ def generate_upload_manifest(
     manifest["generated_at"] = timezone.now().isoformat()
     manifest["manifest_state"] = "package_generated"
 
-    package_dir = Path(output_dir) / str(upload.upload_id)
+    package_dir = _get_package_dir(upload=upload)
     package_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = package_dir / "manifest.json"
 

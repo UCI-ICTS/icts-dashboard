@@ -33,17 +33,13 @@ const validateAnvilSourceService = async (uploadId) => {
   return response;
 };
 
-const generateAnvilTsvsService = async ({ uploadId, outputDir }) => {
-  const response = api.post(`${BASE_URL}${uploadId}/generate-tsvs/`, {
-    output_dir: outputDir,
-  });
+const generateAnvilTsvsService = async ({ uploadId }) => {
+  const response = api.post(`${BASE_URL}${uploadId}/generate-tsvs/`, {});
   return response;
 };
 
-const generateAnvilManifestService = async ({ uploadId, outputDir }) => {
-  const response = api.post(`${BASE_URL}${uploadId}/generate-manifest/`, {
-    output_dir: outputDir,
-  });
+const generateAnvilManifestService = async ({ uploadId }) => {
+  const response = api.post(`${BASE_URL}${uploadId}/generate-manifest/`, {});
   return response;
 };
 
