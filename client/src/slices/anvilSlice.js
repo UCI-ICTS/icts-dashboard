@@ -114,13 +114,9 @@ export const validateAnvilSource = createAsyncThunk(
 
 export const generateAnvilTsvs = createAsyncThunk(
   "anvil/generateTsvs",
-  async ({ uploadId, outputDir }, thunkAPI) => {
+  async ({ uploadId }, thunkAPI) => {
     try {
-      const response = await anvilService.generateAnvilTsvsService({
-        uploadId,
-        outputDir,
-      });
-
+      const response = await anvilService.generateAnvilTsvsService({uploadId});
       message.success("AnVIL TSVs generated.");
       return response.data;
     } catch (error) {
@@ -134,13 +130,9 @@ export const generateAnvilTsvs = createAsyncThunk(
 
 export const generateAnvilManifest = createAsyncThunk(
   "anvil/generateManifest",
-  async ({ uploadId, outputDir }, thunkAPI) => {
+  async ({ uploadId }, thunkAPI) => {
     try {
-      const response = await anvilService.generateAnvilManifestService({
-        uploadId,
-        outputDir,
-      });
-
+      const response = await anvilService.generateAnvilManifestService({uploadId});
       message.success("AnVIL upload manifest generated.");
       return response.data;
     } catch (error) {
