@@ -2,10 +2,12 @@
 # anvil/services.py
 
 import csv
+import datetime
 import hashlib
 import json
 from pathlib import Path
 from django.apps import apps
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
 
@@ -26,7 +28,12 @@ from anvil.models import (
 
 
 @transaction.atomic
-def initialize_upload_tables(*, upload:dict, tables:list, changed_by=None):
+def initialize_upload_tables(
+    *,
+    upload: AnvilUpload,
+    tables: list[str] | None = None,
+    changed_by: User | None = None,
+) -> list[AnvilUploadTable]:
     """
     Ensure that the upload has one AnvilUploadTable row for every GREGoR table
     expected in the Dashboard-generated AnVIL package.
@@ -51,7 +58,12 @@ def initialize_upload_tables(*, upload:dict, tables:list, changed_by=None):
 
 
 @transaction.atomic
-def initialize_upload_tsv_artifacts(*, upload, upload_tables=None, changed_by=None):
+def initialize_upload_tsv_artifacts(
+    *,
+    upload: AnvilUpload,
+    upload_tables: list[AnvilUploadTable] | None = None,
+    changed_by: User | None = None,
+) -> list[AnvilUploadArtifact]:
     """
     Ensure that the upload has one planned TSV artifact for every expected
     GREGoR upload table.
@@ -91,7 +103,11 @@ def initialize_upload_tsv_artifacts(*, upload, upload_tables=None, changed_by=No
 
 
 @transaction.atomic
-def initialize_upload_package(*, upload:dict, tables:list=None, changed_by=None):
+def initialize_upload_package(*,
+    upload: AnvilUpload,
+    tables: list[str] | None = None,
+    changed_by: User| None = None
+) -> list[AnvilUploadTable]:
     """
     Initialize the database records for a deterministic AnVIL upload package.
 
@@ -138,32 +154,24 @@ DASHBOARD_ONLY_EXPORT_FIELDS = {
 }
 
 
-def _get_generation_status(enum_class, name, fallback):
-    """
-    Small compatibility helper so this service does not break if the model
-    enum names are slightly different during early development.
-    """
-
-    return getattr(enum_class, name, fallback)
-
-
-def _get_upload_table_model(*, table_name):
+def _get_upload_table_model(*, table_name: str) -> type:
     app_label, model_name = ANVIL_UPLOAD_TABLE_MODEL_MAP[table_name]
     return apps.get_model(app_label, model_name)
 
 
-def _get_export_fields(model_class):
+def _get_export_fields(model_class: type) -> list:
     """
     First-pass export field selection.
 
-    This intentionally uses concrete Django model fields and excludes Dashboard
-    audit/review fields. Later, this can be replaced with schema-defined column
-    order from the GREGoR data model.
+    Uses concrete fields plus many-to-many fields (GREGoR set tables and
+    multi-valued columns are M2M on the Django models but schema arrays),
+    excluding Dashboard audit/review fields. Later, this can be replaced with
+    schema-defined column order from the GREGoR data model.
     """
 
     fields = []
 
-    for field in model_class._meta.fields:
+    for field in list(model_class._meta.fields) + list(model_class._meta.many_to_many):
         if field.name in DASHBOARD_ONLY_EXPORT_FIELDS:
             continue
 
@@ -172,23 +180,47 @@ def _get_export_fields(model_class):
     return fields
 
 
-def _serialize_tsv_value(value):
+def _serialize_tsv_value(value) -> str:
     if value is None:
         return ""
 
-    if isinstance(value, (list, dict)):
+    if isinstance(value, list):
+        # GREGoR TSV convention: multi-valued fields are pipe-delimited.
+        return "|".join(str(item) for item in value)
+
+    if isinstance(value, dict):
         return json.dumps(value, sort_keys=True)
 
     return str(value)
 
 
-def _row_from_object(*, obj, fields, serialize_for_tsv=False):
+def _row_from_object(*, obj, fields: list, serialize_for_tsv: bool = False) -> dict:
+    """
+    Build a {column_name: value} dict for one Django object.
+
+    Uses field.name (not field.column) so ForeignKey fields export as the
+    GREGoR schema key ('family_id'), not the database column ('family_id_id').
+    """
+
     row = {}
 
     for field in fields:
-        column_name = field.column
+        column_name = field.name
 
         value = field.value_from_object(obj)
+
+        if field.many_to_many:
+            # M2M values arrive as model instances; schema expects string arrays.
+            # Related models with natural-key PKs (set tables) export the pk;
+            # lookup models with surrogate auto-PKs export their 'name' value.
+            related_pk_is_auto = field.related_model._meta.pk.auto_created
+            value = [
+                str(getattr(item, "name", item.pk)) if related_pk_is_auto else str(item.pk)
+                for item in value
+            ]
+        elif isinstance(value, (datetime.date, datetime.datetime)):
+            # Schema expects ISO date strings, not Python date objects.
+            value = value.isoformat()
 
         if serialize_for_tsv:
             value = _serialize_tsv_value(value=value)
@@ -198,7 +230,7 @@ def _row_from_object(*, obj, fields, serialize_for_tsv=False):
     return row
 
 
-def _sha256_file(path):
+def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
 
     with path.open("rb") as file_handle:
@@ -378,17 +410,34 @@ def _read_tsv_header_and_validate_rows(*, artifact):
     return errors
 
 
+def _get_manifest_selected_tables(*, upload:AnvilUpload)->list[str]:
+    """
+    Selected tables from the plan manifest; falls back to all upload tables
+    if no manifest exists (missing manifest is reported separately).
+    """
+
+    manifest_artifact = get_upload_manifest_artifact(upload=upload)
+
+    if manifest_artifact is None or not manifest_artifact.metadata:
+        return list(ANVIL_UPLOAD_TABLES)
+
+    return manifest_artifact.metadata.get("tables", {}).get("included", [])
+
+
 def _validate_table_tsv_artifacts(*, upload):
     errors = []
 
+    selected_tables = _get_manifest_selected_tables(upload=upload)
+
     expected_relative_paths = {
         f"tables/{table_name}.tsv"
-        for table_name in ANVIL_UPLOAD_TABLES
+        for table_name in selected_tables
     }
 
     artifacts = list(
         upload.artifacts.filter(
             artifact_type=AnvilUploadArtifact.ArtifactType.TABLE_TSV,
+            upload_table__table_name__in=selected_tables,
         )
         .select_related("upload_table")
         .order_by("relative_path")
@@ -532,37 +581,10 @@ def _validate_manifest_payload(*, upload):
     if manifest is None:
         return errors
 
-    summary = manifest.get("summary", {})
+    selected_tables = _get_manifest_selected_tables(upload=upload)
 
-    if summary.get("table_count") != len(ANVIL_UPLOAD_TABLES):
-        errors.append(
-            _package_error(
-                code="manifest_table_count_mismatch",
-                expected=len(ANVIL_UPLOAD_TABLES),
-                observed=summary.get("table_count"),
-                message="Manifest table_count does not match expected table count.",
-            )
-        )
-
-    if summary.get("table_tsv_artifact_count") != len(ANVIL_UPLOAD_TABLES):
-        errors.append(
-            _package_error(
-                code="manifest_table_tsv_artifact_count_mismatch",
-                expected=len(ANVIL_UPLOAD_TABLES),
-                observed=summary.get("table_tsv_artifact_count"),
-                message=(
-                    "Manifest table_tsv_artifact_count does not match expected "
-                    "TSV artifact count."
-                ),
-            )
-        )
-
-    manifest_table_names = {
-        table_entry.get("table_name")
-        for table_entry in manifest.get("tables", [])
-    }
-
-    expected_table_names = set(ANVIL_UPLOAD_TABLES)
+    manifest_table_names = set(manifest.get("tables", {}).get("included", []))
+    expected_table_names = set(selected_tables)
 
     if manifest_table_names != expected_table_names:
         errors.append(
@@ -570,29 +592,35 @@ def _validate_manifest_payload(*, upload):
                 code="manifest_table_names_mismatch",
                 expected=sorted(expected_table_names),
                 observed=sorted(manifest_table_names),
-                message="Manifest table names do not match expected upload tables.",
+                message="Manifest table names do not match selected upload tables.",
             )
         )
 
     db_tables_by_name = {
         upload_table.table_name: upload_table
-        for upload_table in upload.upload_tables.all()
+        for upload_table in upload.upload_tables.filter(
+            table_name__in=selected_tables,
+        )
     }
 
-    for table_entry in manifest.get("tables", []):
-        table_name = table_entry.get("table_name")
+    manifest_artifacts_by_path = {}
+
+    for artifact_entry in manifest.get("artifacts", {}).get("table_tsvs", []):
+        manifest_artifacts_by_path[artifact_entry.get("relative_path")] = artifact_entry
+
+        table_name = artifact_entry.get("table_name")
         upload_table = db_tables_by_name.get(table_name)
 
         if upload_table is None:
             continue
 
-        if table_entry.get("row_count") != upload_table.row_count:
+        if artifact_entry.get("row_count") != upload_table.row_count:
             errors.append(
                 _package_error(
                     code="manifest_table_row_count_mismatch",
                     table=table_name,
                     expected=upload_table.row_count,
-                    observed=table_entry.get("row_count"),
+                    observed=artifact_entry.get("row_count"),
                     message=(
                         "Manifest table row_count does not match "
                         "AnvilUploadTable.row_count."
@@ -600,13 +628,13 @@ def _validate_manifest_payload(*, upload):
                 )
             )
 
-        if table_entry.get("column_names") != upload_table.column_names:
+        if artifact_entry.get("column_names") != upload_table.column_names:
             errors.append(
                 _package_error(
                     code="manifest_table_column_names_mismatch",
                     table=table_name,
                     expected=upload_table.column_names,
-                    observed=table_entry.get("column_names"),
+                    observed=artifact_entry.get("column_names"),
                     message=(
                         "Manifest table column_names do not match "
                         "AnvilUploadTable.column_names."
@@ -614,13 +642,9 @@ def _validate_manifest_payload(*, upload):
                 )
             )
 
-    manifest_artifacts_by_path = {
-        artifact_entry.get("relative_path"): artifact_entry
-        for artifact_entry in manifest.get("table_tsv_artifacts", [])
-    }
-
     db_tsv_artifacts = upload.artifacts.filter(
         artifact_type=AnvilUploadArtifact.ArtifactType.TABLE_TSV,
+        upload_table__table_name__in=selected_tables,
     ).order_by("relative_path")
 
     expected_artifact_paths = {
@@ -682,7 +706,7 @@ def _validate_manifest_payload(*, upload):
     return errors
 
 
-def _get_selected_upload_tables(*, tables=None):
+def _get_selected_upload_tables(*, tables:list[str]|None=None)->list[str]:
     if tables is None:
         return list(ANVIL_UPLOAD_TABLES)
 
@@ -695,33 +719,33 @@ def _get_selected_upload_tables(*, tables=None):
     return selected_tables
 
 
-def _json_safe_datetime(value):
+def _json_safe_datetime(value)->str|None:
     if value is None:
         return None
 
     return value.isoformat()
 
 
-def _get_generated_table_tsv_artifacts(*, upload):
-    return (
+def _get_selected_tsv_artifacts(
+    *,
+    upload: AnvilUpload,
+    selected_tables: list[str],
+) -> list[AnvilUploadArtifact]:
+    """
+    Return generated TABLE_TSV artifacts for the selected tables, raising if
+    any are missing or lack generated file metadata.
+    """
+
+    artifacts = list(
         upload.artifacts.filter(
             artifact_type=AnvilUploadArtifact.ArtifactType.TABLE_TSV,
+            upload_table__table_name__in=selected_tables,
         )
         .select_related("upload_table")
         .order_by("relative_path")
     )
 
-
-def _ensure_tsv_artifacts_are_generated(*, upload):
-    artifacts = list(_get_generated_table_tsv_artifacts(upload=upload))
-
-    if len(artifacts) != len(ANVIL_UPLOAD_TABLES):
-        raise ValueError(
-            f"Expected {len(ANVIL_UPLOAD_TABLES)} TSV artifacts, "
-            f"found {len(artifacts)}. Run generate_upload_tsvs first."
-        )
-
-    missing_metadata = [
+    not_generated = [
         artifact.relative_path
         for artifact in artifacts
         if (
@@ -731,102 +755,14 @@ def _ensure_tsv_artifacts_are_generated(*, upload):
         )
     ]
 
-    if missing_metadata:
+    if len(artifacts) != len(selected_tables) or not_generated:
         raise ValueError(
-            "Some TSV artifacts are missing generated file metadata. "
-            f"Run generate_upload_tsvs first. Missing: {missing_metadata}"
+            f"Expected {len(selected_tables)} generated TSV artifacts, found "
+            f"{len(artifacts)} with {len(not_generated)} missing file metadata. "
+            "Run generate_upload_tsvs first."
         )
 
     return artifacts
-
-
-def _build_upload_manifest_dict(*, upload):
-    """
-    Build manifest data for the generated table TSV package.
-
-    Important: this manifest describes the generated TSV artifacts. It does not
-    include the manifest artifact itself, because doing that would create a
-    self-referential checksum problem.
-    """
-
-    upload.refresh_from_db()
-
-    table_tsv_artifacts = _ensure_tsv_artifacts_are_generated(upload=upload)
-    upload_tables = upload.upload_tables.order_by("table_name")
-    validation_runs = upload.validation_runs.order_by("started_at")
-
-    table_entries = []
-
-    for upload_table in upload_tables:
-        table_entries.append(
-            {
-                "table_name": upload_table.table_name,
-                "generation_status": upload_table.generation_status,
-                "row_count": upload_table.row_count,
-                "column_names": upload_table.column_names,
-                "source_summary": upload_table.source_summary,
-                "generation_error": upload_table.generation_error,
-            }
-        )
-
-    artifact_entries = []
-
-    for artifact in table_tsv_artifacts:
-        artifact_entries.append(
-            {
-                "relative_path": artifact.relative_path,
-                "file_name": artifact.file_name,
-                "artifact_type": artifact.artifact_type,
-                "generation_status": artifact.generation_status,
-                "content_type": artifact.content_type,
-                "byte_size": artifact.byte_size,
-                "sha256": artifact.sha256,
-                "storage_uri": artifact.storage_uri,
-                "upload_table": (
-                    artifact.upload_table.table_name
-                    if artifact.upload_table_id
-                    else None
-                ),
-                "generation_error": artifact.generation_error,
-                "metadata": artifact.metadata,
-            }
-        )
-
-    validation_entries = []
-
-    for validation_run in validation_runs:
-        validation_entries.append(
-            {
-                "validator_type": validation_run.validator_type,
-                "validator_version": validation_run.validator_version,
-                "status": validation_run.status,
-                "started_at": _json_safe_datetime(validation_run.started_at),
-                "finished_at": _json_safe_datetime(validation_run.finished_at),
-                "error_count": validation_run.error_count,
-                "warning_count": validation_run.warning_count,
-                "message": validation_run.message,
-            }
-        )
-
-    return {
-        "manifest_version": "dashboard-anvil-upload-manifest-v0.1",
-        "generated_at": timezone.now().isoformat(),
-        "upload": {
-            "upload_id": str(upload.upload_id),
-            "status": upload.status,
-            "gregor_model_version": upload.gregor_model_version,
-            "created_at": _json_safe_datetime(upload.created_at),
-            "updated_at": _json_safe_datetime(upload.updated_at),
-        },
-        "summary": {
-            "table_count": upload_tables.count(),
-            "table_tsv_artifact_count": len(table_tsv_artifacts),
-            "validation_run_count": validation_runs.count(),
-        },
-        "tables": table_entries,
-        "table_tsv_artifacts": artifact_entries,
-        "validation_runs": validation_entries,
-    }
 
 
 def _build_initialized_manifest(*, upload, selected_tables):
@@ -881,7 +817,11 @@ def collect_upload_package_validation_errors(*, upload):
 
 
 @transaction.atomic
-def validate_upload_package(*, upload, changed_by=None):
+def validate_upload_package(
+    *,
+    upload: AnvilUpload,
+    changed_by: User | None = None
+) -> AnvilUploadValidationRun:
     """
     Validate generated package files and metadata for one upload.
 
@@ -938,7 +878,11 @@ def validate_upload_package(*, upload, changed_by=None):
 
 
 @transaction.atomic
-def validate_upload_source_data(*, upload, changed_by=None):
+def validate_upload_source_data(
+    *,
+    upload: AnvilUpload,
+    changed_by: User | None = None
+) -> AnvilUploadValidationRun:
     """
     Validate currently loaded Dashboard source data for an AnVIL upload.
 
@@ -985,7 +929,6 @@ def validate_upload_source_data(*, upload, changed_by=None):
             validation_results = validator.get_validation_results()
 
             if not validation_results["valid"]:
-                import pdb; pdb.set_trace()
                 excluded_rows.append(
                     {
                         "pk": str(obj.pk),
@@ -1068,7 +1011,6 @@ def validate_upload_source_data(*, upload, changed_by=None):
 
     validation_run.error_count = error_count
     validation_run.warning_count = warning_count
-    validation_run.summary = summary
     validation_run.mark_complete(
         passed=passed,
         message=(
@@ -1078,7 +1020,6 @@ def validate_upload_source_data(*, upload, changed_by=None):
         ),
         summary=summary,
     )
-    validation_run.summary = summary
     validation_run.save()
 
     upload.status = (
@@ -1096,7 +1037,12 @@ def validate_upload_source_data(*, upload, changed_by=None):
 
 
 @transaction.atomic
-def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
+def generate_upload_tsvs(
+    *,
+    upload: AnvilUpload,
+    output_dir: str,
+    changed_by: User | None = None
+) -> dict:
     """
     Generate TSV files for the initialized AnVIL upload package.
 
@@ -1111,8 +1057,11 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
 
     manifest_artifact = get_upload_manifest_artifact(upload=upload)
 
+    if manifest_artifact is None:
+        raise ValueError("Upload manifest does not exist. Run initialize first.")
+
     manifest = manifest_artifact.metadata or {}
-    selected_tables = manifest.get("tables", {}).get("include", [])
+    selected_tables = manifest.get("tables", {}).get("included", [])
 
     upload_tables_by_name = {
         upload_table.table_name: upload_table
@@ -1131,15 +1080,22 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
     tables_dir = package_dir / "tables"
     tables_dir.mkdir(parents=True, exist_ok=True)
 
+    tables_by_name = manifest.get("tables", {}).get("by_name", {})
+
     generated = []
 
     for table_name in selected_tables:
         model_class = _get_upload_table_model(table_name=table_name)
         fields = _get_export_fields(model_class)
 
-        column_names = [field.column for field in fields]
+        column_names = [field.name for field in fields]
 
         queryset = model_class.objects.all().order_by(model_class._meta.pk.name)
+
+        excluded_pks = {
+            excluded_row["pk"]
+            for excluded_row in tables_by_name.get(table_name, {}).get("excluded_rows", [])
+        }
 
         upload_table = upload_tables_by_name[table_name]
         artifact = artifacts_by_table_name[table_name]
@@ -1159,6 +1115,9 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
             writer.writeheader()
 
             for obj in queryset:
+                if str(obj.pk) in excluded_pks:
+                    continue
+
                 writer.writerow(
                     _row_from_object(
                         obj=obj,
@@ -1183,11 +1142,7 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
         artifact.byte_size = file_path.stat().st_size
         artifact.sha256 = _sha256_file(file_path)
         artifact.storage_uri = str(file_path)
-        artifact.generation_status = _get_generation_status(
-            AnvilUploadArtifact.GenerationStatus,
-            "GENERATED",
-            "generated",
-        )
+        artifact.generation_status = AnvilUploadArtifact.GenerationStatus.GENERATED
 
         if changed_by is not None:
             artifact.changed_by = changed_by
@@ -1215,16 +1170,55 @@ def generate_upload_tsvs(*, upload, output_dir, changed_by=None):
 
 
 @transaction.atomic
-def generate_upload_manifest(*, upload, output_dir, changed_by=None):
+def generate_upload_manifest(
+    *,
+    upload: AnvilUpload,
+    output_dir: str,
+    changed_by: User | None = None
+)-> dict:
     """
-    Generate manifest.json for a Dashboard-generated AnVIL upload package.
+    Write manifest.json for a Dashboard-generated AnVIL upload package.
 
+    The manifest artifact's metadata is the living upload plan (created at
+    initialize, enriched by validate-source). This stage enriches that same
+    plan with generated TSV artifact details and writes it to disk — it must
+    never replace the plan.
     """
+
+    artifact = get_upload_manifest_artifact(upload=upload)
+
+    if artifact is None:
+        raise ValueError("Upload manifest does not exist. Run initialize first.")
+
+    manifest = artifact.metadata or {}
+    selected_tables = manifest.get("tables", {}).get("included", [])
+
+    tsv_artifacts = _get_selected_tsv_artifacts(
+        upload=upload,
+        selected_tables=selected_tables,
+    )
+
+    manifest.setdefault("artifacts", {})
+    manifest["artifacts"]["table_tsvs"] = [
+        {
+            "table_name": tsv_artifact.upload_table.table_name,
+            "relative_path": tsv_artifact.relative_path,
+            "file_name": tsv_artifact.file_name,
+            "content_type": tsv_artifact.content_type,
+            "byte_size": tsv_artifact.byte_size,
+            "sha256": tsv_artifact.sha256,
+            "storage_uri": tsv_artifact.storage_uri,
+            "row_count": tsv_artifact.upload_table.row_count,
+            "column_names": tsv_artifact.upload_table.column_names,
+        }
+        for tsv_artifact in tsv_artifacts
+    ]
+
+    manifest["generated_at"] = timezone.now().isoformat()
+    manifest["manifest_state"] = "package_generated"
 
     package_dir = Path(output_dir) / str(upload.upload_id)
     package_dir.mkdir(parents=True, exist_ok=True)
-
-    manifest = _build_upload_manifest_dict(upload=upload)
     manifest_path = package_dir / "manifest.json"
 
     with manifest_path.open("w", encoding="utf-8") as file_handle:
@@ -1236,35 +1230,15 @@ def generate_upload_manifest(*, upload, output_dir, changed_by=None):
         )
         file_handle.write("\n")
 
-    artifact, _created = AnvilUploadArtifact.objects.get_or_create(
-        upload=upload,
-        relative_path="manifest.json",
-        defaults={
-            "artifact_type": AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST,
-            "generation_status": AnvilUploadArtifact.GenerationStatus.PENDING,
-            "file_name": "manifest.json",
-            "content_type": MANIFEST_CONTENT_TYPE,
-            "changed_by": changed_by,
-        },
-    )
+    # The written file's own checksum/size cannot live inside the file
+    # (self-referential hash); record them on the artifact only.
+    manifest["artifacts"]["manifest"] = {"relative_path": "manifest.json"}
 
-    artifact.artifact_type = AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST
-    artifact.generation_status = _get_generation_status(
-        AnvilUploadArtifact.GenerationStatus,
-        "GENERATED",
-        "generated",
-    )
-    artifact.file_name = "manifest.json"
-    artifact.content_type = MANIFEST_CONTENT_TYPE
+    artifact.generation_status = AnvilUploadArtifact.GenerationStatus.GENERATED
     artifact.byte_size = manifest_path.stat().st_size
     artifact.sha256 = _sha256_file(manifest_path)
     artifact.storage_uri = str(manifest_path)
-    artifact.metadata = {
-        "manifest_version": manifest["manifest_version"],
-        "table_count": manifest["summary"]["table_count"],
-        "table_tsv_artifact_count": manifest["summary"]["table_tsv_artifact_count"],
-        "validation_run_count": manifest["summary"]["validation_run_count"],
-    }
+    artifact.metadata = manifest
 
     if changed_by is not None:
         artifact.changed_by = changed_by
@@ -1279,7 +1253,12 @@ def generate_upload_manifest(*, upload, output_dir, changed_by=None):
     }
 
 
-def initialize_upload_manifest_artifact(*, upload, selected_tables, changed_by=None):
+def initialize_upload_manifest_artifact(
+    *,
+    upload:AnvilUpload,
+    selected_tables: list[str],
+    changed_by: User | None = None
+)-> AnvilUploadArtifact:
     manifest = _build_initialized_manifest(
         upload=upload,
         selected_tables=selected_tables,
@@ -1312,7 +1291,7 @@ def initialize_upload_manifest_artifact(*, upload, selected_tables, changed_by=N
     return artifact
 
 
-def get_upload_manifest_artifact(upload):
+def get_upload_manifest_artifact(upload: AnvilUpload) -> AnvilUploadArtifact | None:
     return (
         upload.artifacts.filter(
             artifact_type=AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST,

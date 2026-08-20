@@ -90,12 +90,16 @@ class AnvilUploadApiTests(APITestCase):
                 status.HTTP_200_OK,
             )
             self.assertEqual(
-                generate_manifest_response.data["summary"]["table_count"],
+                generate_manifest_response.data["table_count"],
                 21,
             )
             self.assertEqual(
-                generate_manifest_response.data["summary"]["table_tsv_artifact_count"],
+                generate_manifest_response.data["table_tsv_artifact_count"],
                 21,
+            )
+            self.assertEqual(
+                generate_manifest_response.data["manifest_state"],
+                "package_generated",
             )
 
             package_validation_response = self.client.post(

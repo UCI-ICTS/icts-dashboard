@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # anvil/apis.py
 
+from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
@@ -41,6 +42,11 @@ class AnvilUploadViewSet(
     lookup_field = "upload_id"
     permission_classes = [AllowAny]
 
+    def _changed_by(self) -> User | None:
+        """changed_by FKs require a User instance; map AnonymousUser to None."""
+        user = self.request.user
+        return user if user.is_authenticated else None
+
     def get_serializer_class(self):
         if self.action == "create":
             return AnvilUploadCreateSerializer
@@ -51,7 +57,7 @@ class AnvilUploadViewSet(
         return AnvilUploadDetailSerializer
 
     def perform_create(self, serializer):
-        serializer.save(changed_by=self.request.user)
+        serializer.save(changed_by=self._changed_by())
 
     @swagger_auto_schema(
         request_body=AnvilUploadInitializeSerializer,
@@ -74,7 +80,7 @@ class AnvilUploadViewSet(
         initialize_upload_package(
             upload=upload,
             tables=tables,
-            changed_by=request.user,
+            changed_by=self._changed_by(),
         )
 
         upload = (
@@ -95,7 +101,7 @@ class AnvilUploadViewSet(
 
         validation_run = validate_upload_source_data(
             upload=upload,
-            changed_by=request.user,
+            changed_by=self._changed_by(),
         )
 
         upload.refresh_from_db()
@@ -121,7 +127,7 @@ class AnvilUploadViewSet(
         result = generate_upload_tsvs(
             upload=upload,
             output_dir=output_dir,
-            changed_by=request.user,
+            changed_by=self._changed_by(),
         )
 
         upload.refresh_from_db()
@@ -146,18 +152,24 @@ class AnvilUploadViewSet(
         result = generate_upload_manifest(
             upload=upload,
             output_dir=output_dir,
-            changed_by=request.user,
+            changed_by=self._changed_by(),
         )
 
         upload.refresh_from_db()
         serializer = self.get_serializer(upload)
+
+        manifest = result["manifest"]
 
         return Response(
             {
                 "upload": serializer.data,
                 "manifest_path": result["manifest_path"],
                 "artifact_id": result["artifact"].pk,
-                "summary": result["manifest"]["summary"],
+                "manifest_state": manifest.get("manifest_state"),
+                "table_count": len(manifest.get("tables", {}).get("included", [])),
+                "table_tsv_artifact_count": len(
+                    manifest.get("artifacts", {}).get("table_tsvs", [])
+                ),
             },
             status=status.HTTP_200_OK,
         )
@@ -168,7 +180,7 @@ class AnvilUploadViewSet(
 
         validation_run = validate_upload_package(
             upload=upload,
-            changed_by=request.user,
+            changed_by=self._changed_by(),
         )
 
         upload.refresh_from_db()

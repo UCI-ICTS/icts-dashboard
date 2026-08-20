@@ -10,7 +10,12 @@ from django.test import TestCase
 
 from anvil.constants import ANVIL_UPLOAD_TABLES
 from anvil.models import AnvilUpload, AnvilUploadArtifact
-from anvil.services import generate_upload_tsvs
+from anvil.services import (
+    generate_upload_tsvs,
+    get_upload_manifest_artifact,
+    initialize_upload_package,
+    validate_upload_source_data,
+)
 
 
 class AnvilUploadTsvGenerationTests(TestCase):
@@ -22,6 +27,21 @@ class AnvilUploadTsvGenerationTests(TestCase):
             upload_id="UCI_GREGoR_test_tsv_generation_v1",
             changed_by=self.user,
         )
+        initialize_upload_package(upload=self.upload, changed_by=self.user)
+
+    def test_generate_upload_tsvs_requires_initialize(self):
+        upload = AnvilUpload.objects.create(
+            upload_id="UCI_GREGoR_tsv_uninitialized_v1",
+            changed_by=self.user,
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaisesMessage(ValueError, "Run initialize first"):
+                generate_upload_tsvs(
+                    upload=upload,
+                    output_dir=temp_dir,
+                    changed_by=self.user,
+                )
 
     def test_generate_upload_tsvs_writes_21_tsv_files(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -39,6 +59,29 @@ class AnvilUploadTsvGenerationTests(TestCase):
                     expected_path.exists(),
                     msg=f"Missing generated TSV: {expected_path}",
                 )
+
+    def test_generate_upload_tsvs_writes_only_selected_tables(self):
+        upload = AnvilUpload.objects.create(
+            upload_id="UCI_GREGoR_tsv_partial_v1",
+            changed_by=self.user,
+        )
+        initialize_upload_package(
+            upload=upload,
+            tables=["family", "participant"],
+            changed_by=self.user,
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = generate_upload_tsvs(
+                upload=upload,
+                output_dir=temp_dir,
+                changed_by=self.user,
+            )
+
+            tables_dir = Path(result["tables_dir"])
+            written = sorted(path.name for path in tables_dir.iterdir())
+
+            self.assertEqual(written, ["family.tsv", "participant.tsv"])
 
     def test_generate_upload_tsvs_updates_artifacts_as_generated(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -60,6 +103,10 @@ class AnvilUploadTsvGenerationTests(TestCase):
                 self.assertTrue(artifact.sha256)
                 self.assertTrue(artifact.storage_uri)
                 self.assertTrue(artifact.relative_path.endswith(".tsv"))
+                self.assertEqual(
+                    artifact.generation_status,
+                    AnvilUploadArtifact.GenerationStatus.GENERATED,
+                )
 
     def test_generate_upload_tsvs_updates_table_row_counts(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -84,7 +131,7 @@ class AnvilUploadTsvGenerationTests(TestCase):
             self.assertEqual(table_row_counts["analyte"], 31)
             self.assertEqual(table_row_counts["genetic_findings"], 5)
 
-    def test_generated_participant_tsv_has_header_and_rows(self):
+    def test_generated_participant_tsv_uses_gregor_schema_columns(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             result = generate_upload_tsvs(
                 upload=self.upload,
@@ -100,8 +147,76 @@ class AnvilUploadTsvGenerationTests(TestCase):
 
             self.assertEqual(len(rows), 6)
             self.assertIn("participant_id", reader.fieldnames)
-            self.assertIn("family_id_id", reader.fieldnames)
             self.assertIn("solve_status", reader.fieldnames)
+
+            # FK columns must use the schema key, not the DB column.
+            self.assertIn("family_id", reader.fieldnames)
+            self.assertNotIn("family_id_id", reader.fieldnames)
+
+    def test_generated_set_tsv_serializes_m2m_as_pipe_delimited(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = generate_upload_tsvs(
+                upload=self.upload,
+                output_dir=temp_dir,
+                changed_by=self.user,
+            )
+
+            set_path = (
+                Path(result["tables_dir"]) / "aligned_dna_short_read_set.tsv"
+            )
+
+            with set_path.open("r", newline="", encoding="utf-8") as file_handle:
+                reader = csv.DictReader(file_handle, delimiter="\t")
+                rows = list(reader)
+
+            self.assertIn("aligned_dna_short_read_id", reader.fieldnames)
+
+            multi_member_values = [
+                row["aligned_dna_short_read_id"]
+                for row in rows
+                if "|" in row["aligned_dna_short_read_id"]
+            ]
+            self.assertGreater(
+                len(multi_member_values),
+                0,
+                msg="Expected at least one multi-member set with pipe-delimited ids",
+            )
+
+    def test_generate_upload_tsvs_skips_manifest_excluded_rows(self):
+        validate_upload_source_data(upload=self.upload, changed_by=self.user)
+
+        # Simulate a review decision: exclude one participant row in the plan.
+        manifest_artifact = get_upload_manifest_artifact(upload=self.upload)
+        manifest = manifest_artifact.metadata
+        participant_plan = manifest["tables"]["by_name"]["participant"]
+        participant_plan["excluded_rows"] = [
+            {
+                "pk": "GREGoR_test-006-006-0",
+                "reason": "excluded for test",
+                "errors": [],
+            }
+        ]
+        manifest_artifact.metadata = manifest
+        manifest_artifact.save()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = generate_upload_tsvs(
+                upload=self.upload,
+                output_dir=temp_dir,
+                changed_by=self.user,
+            )
+
+            participant_path = Path(result["tables_dir"]) / "participant.tsv"
+
+            with participant_path.open("r", newline="", encoding="utf-8") as file_handle:
+                reader = csv.DictReader(file_handle, delimiter="\t")
+                participant_ids = [row["participant_id"] for row in reader]
+
+            self.assertEqual(len(participant_ids), 5)
+            self.assertNotIn("GREGoR_test-006-006-0", participant_ids)
+
+        participant_table = self.upload.upload_tables.get(table_name="participant")
+        self.assertEqual(participant_table.row_count, 5)
 
     def test_generate_upload_tsvs_is_repeatable(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -122,6 +237,9 @@ class AnvilUploadTsvGenerationTests(TestCase):
             )
 
             self.assertEqual(
-                AnvilUploadArtifact.objects.filter(upload=self.upload).count(),
+                AnvilUploadArtifact.objects.filter(
+                    upload=self.upload,
+                    artifact_type=AnvilUploadArtifact.ArtifactType.TABLE_TSV,
+                ).count(),
                 21,
             )
