@@ -12,7 +12,11 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
 
-from config.selectors import TableValidator, remove_na
+from config.selectors import (
+    TableValidator,
+    get_model_schema_path,
+    remove_na
+)
 
 from anvil.constants import (
     ANVIL_UPLOAD_TABLES,
@@ -119,6 +123,10 @@ def initialize_upload_package(*,
 
     It does not write TSV files.
     """
+
+    # Initialization freezes the model version for this upload. Reject an
+    # unavailable version before creating any table or artifact bookkeeping.
+    get_model_schema_path(upload.gregor_model_version)
 
     selected_tables = _get_selected_upload_tables(tables=tables)
 
@@ -938,7 +946,7 @@ def validate_upload_source_data(
         for obj in queryset:
             row = _row_from_object(obj=obj, fields=fields)
 
-            validator = TableValidator()
+            validator = TableValidator(model_version=upload.gregor_model_version)
             validator.validate_json(remove_na(row), table_name)
             validation_results = validator.get_validation_results()
 

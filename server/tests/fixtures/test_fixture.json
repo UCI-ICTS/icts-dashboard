@@ -8124,7 +8124,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-001-001-0-D-2.vcf.gz",
       "md5sum": "32a14e3bddaf67f106a55afa6d5b40ab",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8215,7 +8215,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-002-001-2-D-2.vcf.gz",
       "md5sum": "dfa282ec5d8f3225b4a52d585ac5a946",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8307,7 +8307,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-003-001-1-D-2.vcf.gz",
       "md5sum": "e456cef3b2e96e1246a23c34322fb7f9",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }

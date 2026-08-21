@@ -5,8 +5,11 @@ from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from config.selectors import ModelVersionError
 
 from anvil.models import AnvilUpload
 from anvil.serializers import (
@@ -77,11 +80,16 @@ class AnvilUploadViewSet(
         input_serializer.is_valid(raise_exception=True)
 
         tables = input_serializer.validated_data.get("tables")
-        initialize_upload_package(
-            upload=upload,
-            tables=tables,
-            changed_by=self._changed_by(),
-        )
+        try:
+            initialize_upload_package(
+                upload=upload,
+                tables=tables,
+                changed_by=self._changed_by(),
+            )
+        except ModelVersionError as error:
+            raise ValidationError(
+                {"gregor_model_version": str(error)}
+            ) from error
 
         upload = (
             self.get_queryset()

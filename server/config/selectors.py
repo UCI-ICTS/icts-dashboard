@@ -3,6 +3,7 @@
 
 import csv
 import os
+import re
 from io import StringIO, BytesIO
 import zipfile
 import jsonref
@@ -10,9 +11,9 @@ import jsonschema
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Model, QuerySet
+from pathlib import Path
 from requests.models import PreparedRequest
 from rest_framework import status
-from typing import Type
 from urllib.parse import urlparse
 
 """DB Level Services
@@ -22,8 +23,66 @@ from urllib.parse import urlparse
     API data conversion, and constructing standardized response objects.
 """
 
-SCHEMA_VERSION = settings.SCHEMA_VERSION
 
+MODEL_VERSION_PATTERN = re.compile(r"v?\d+\.\d+(?:\.\d+)?")
+
+
+class ModelVersionError(ValueError):
+    """The requested GREGoR model version is invalid or unavailable."""
+
+
+def normalize_model_version(model_version: str) -> str:
+    """Return a model version without the optional leading ``v``."""
+
+    if not isinstance(model_version, str) or not MODEL_VERSION_PATTERN.fullmatch(
+        model_version
+    ):
+        raise ModelVersionError(
+            f"Invalid GREGoR model version: {model_version}"
+        )
+
+    return model_version.removeprefix("v")
+
+
+def get_supported_model_versions() -> list[str]:
+    """Return GREGoR model versions with generated JSON schemas available."""
+
+    schema_root = Path(settings.BASE_DIR) / "utilities" / "json_schemas"
+    versions = []
+
+    for path in schema_root.glob("v*"):
+        if not path.is_dir() or not any(path.glob("*.json")):
+            continue
+
+        try:
+            versions.append(normalize_model_version(path.name))
+        except ModelVersionError:
+            continue
+
+    return sorted(
+        versions,
+        key=lambda value: tuple(int(part) for part in value.split(".")),
+    )
+
+
+def get_model_schema_path(model_version: str) -> Path:
+    """Return the generated-schema directory for a supported model version."""
+
+    normalized_version = normalize_model_version(model_version)
+    supported_versions = get_supported_model_versions()
+
+    if normalized_version not in supported_versions:
+        raise ModelVersionError(
+            f"Unsupported GREGoR model version: {normalized_version}. "
+            f"Available versions: {supported_versions}"
+        )
+
+    return (
+        Path(settings.BASE_DIR)
+        / "utilities"
+        / "json_schemas"
+        / f"v{normalized_version}"
+    )
 
 class TableValidator:
     """
@@ -38,13 +97,20 @@ class TableValidator:
             Returns the validation results as a dictionary.
     """
 
-    def __init__(self):
-        """Initializes the TableValidator with the path to JSON schemas."""
-        self.base_path = os.path.join(
-            settings.BASE_DIR, f"utilities/json_schemas/{SCHEMA_VERSION}"
-        )
+    def __init__(self, model_version: str | None = None):
+        """
+        Initialize the validator for one GREGoR model version.
+
+        Existing CRUD validation uses settings.SCHEMA_VERSION by default.
+        Upload validation supplies the version frozen on the AnvilUpload.
+        """
+
+        configured_version = model_version or settings.SCHEMA_VERSION
+        self.model_version = normalize_model_version(configured_version)
+        self.base_path = get_model_schema_path(self.model_version)
         self.valid = False
         self.errors = []
+
 
     def validate_json(self, json_object: dict, table_name: str):
         """
@@ -62,7 +128,7 @@ class TableValidator:
             None
         """
 
-        schema_path = os.path.join(self.base_path, f"{table_name}.json")
+        schema_path = self.base_path / f"{table_name}.json"
         try:
             with open(schema_path, "r") as schema_file:
                 schema = jsonref.load(schema_file)
