@@ -350,8 +350,8 @@
           "data_type": "enumeration",
           "enumerations": ["SNV", "INDEL", "SV", "RE"],
           "multi_value_delimiter": "|",
-          "examples": "SNV|CNV",
-          "notes": "SNV: single nucelotide variants\nINDEL: short insertion/deletions (<50bp)\nSV: structural variants\nRE: repeat elements\nCNV: copy number variants\nMEI: mobile element insertions\nSTR: short tandem repeats"
+          "examples": "SNV|SV",
+          "notes": "SNV: single nucelotide variants\nINDEL: short insertion/deletions (<50bp)\nSV: structural variants\nRE: repeat elements"
         },
         {
           "column": "sv_type",
@@ -743,7 +743,7 @@
           "column": "table_name",
           "required": true,
           "data_type": "enumeration",
-          "enumerations": ["experiment_dna_short_read", "experiment_rna_short_read", "experiment_nanopore", "experiment_pac_bio", "experiment_atac_short_read"],
+          "enumerations": ["experiment_dna_short_read", "experiment_rna_short_read", "experiment_nanopore", "experiment_pac_bio", "experiment_atac_short_read", "experiment_optical_mapping", "experiment_iclr"],
           "examples": "experiment_dna_short_read"
         },
         {
@@ -776,7 +776,7 @@
           "column": "table_name",
           "required": true,
           "data_type": "enumeration",
-          "enumerations": ["aligned_dna_short_read", "aligned_rna_short_read", "aligned_nanopore", "aligned_pac_bio", "aligned_atac_short_read"],
+          "enumerations": ["aligned_dna_short_read", "aligned_rna_short_read", "aligned_nanopore", "aligned_pac_bio", "aligned_atac_short_read", "aligned_molecules_optical_mapping", "aligned_iclr"],
           "examples": "aligned_dna_short_read"
         },
         {

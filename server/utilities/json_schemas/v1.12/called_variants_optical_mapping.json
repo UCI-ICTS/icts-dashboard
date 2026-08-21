@@ -1,69 +1,34 @@
 {
+    "$id": "urn:gregor:data-model:1.12:called_variants_optical_mapping",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/called_variants_optical_mapping.json",
-    "title": "called_variants_optical_mapping",
-    "version": "1.11",
-    "type": "object",
-    "required": [
-        "aligned_optical_mapping_set_id",
-        "optical_mapping_vcf_file",
-        "md5sum",
-        "called_cnv_heterozygosity_variants_optical_mapping_file",
-        "solve_version"
-    ],
     "definitions": {},
     "properties": {
-        "called_variants_optical_mapping_id": {
-            "type": "string",
-            "description": "unique key for table (anvil requirement)"
-        },
         "aligned_optical_mapping_set_id": {
+            "description": "identifier for set",
             "type": "string",
-            "description": "identifier for set"
+            "x-references": "> aligned_optical_mapping_set.aligned_optical_mapping_set_id"
         },
-        "optical_mapping_vcf_file": {
-            "type": "string",
-            "description": "name and path of the file with optical mapping variant calls",
-            "examples": [
-                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.vcf",
-                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SNV.gvcf",
-                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.EH.vcf"
-            ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
-        },
-        "md5sum": {
-            "type": "string",
-            "description": "md5 checksum for vcf file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
-            "examples": [
-                "129c28163df082"
-            ]
+        "analysis_details": {
+            "description": "brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or github repository",
+            "type": "string"
         },
         "called_cnv_heterozygosity_variants_optical_mapping_file": {
-            "type": "string",
             "description": "name and path of the file with copy number variation and absence of heterozygosity calls",
             "examples": [
                 "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.json"
             ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
-        },
-        "solve_version": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "description": "Bionano Solve Version (software that made the structural variation calls)",
-                "examples": [
-                    "Solve3.8"
-                ]
-            }
-        },
-        "analysis_details": {
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
             "type": "string",
-            "description": "brief description of the analysis pipeline used for producing the file; perhaps a link to something like a WDL file or github repository"
+            "x-is_bucket_path": true
+        },
+        "called_variants_optical_mapping_id": {
+            "description": "unique key for table (anvil requirement)",
+            "type": "string",
+            "x-primary-key": true,
+            "x-references": "from:md5sum"
         },
         "chrom": {
-            "type": "string",
+            "description": "chromosome of the variants in the VCF file\n\nNotes: Use ALL for VCFs with autosomes + sex chromosomes",
             "enum": [
                 "ALL",
                 "1",
@@ -92,7 +57,45 @@
                 "Y",
                 "MT"
             ],
-            "description": "chromosome of the variants in the VCF file\n\nNotes: Use ALL for VCFs with autosomes + sex chromosomes"
+            "type": "string"
+        },
+        "md5sum": {
+            "description": "md5 checksum for vcf file\n\nNotes: md5sum computed prior to upload (used to verify file integrity)",
+            "examples": [
+                "129c28163df082"
+            ],
+            "type": "string"
+        },
+        "optical_mapping_vcf_file": {
+            "description": "name and path of the file with optical mapping variant calls",
+            "examples": [
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SV.vcf",
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.SNV.gvcf",
+                "gs://fc-fed09429-e563-44a7-aaeb-776c8336ba02/COL_FAM1_1_D1.EH.vcf"
+            ],
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "solve_version": {
+            "items": {
+                "description": "Bionano Solve Version (software that made the structural variation calls)",
+                "examples": [
+                    "Solve3.8"
+                ],
+                "type": "string"
+            },
+            "type": "array"
         }
-    }
+    },
+    "required": [
+        "aligned_optical_mapping_set_id",
+        "optical_mapping_vcf_file",
+        "md5sum",
+        "called_cnv_heterozygosity_variants_optical_mapping_file",
+        "solve_version"
+    ],
+    "title": "called_variants_optical_mapping",
+    "type": "object",
+    "version": "1.12"
 }

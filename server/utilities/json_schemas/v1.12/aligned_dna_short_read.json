@@ -1,9 +1,100 @@
 {
+    "$id": "urn:gregor:data-model:1.12:aligned_dna_short_read",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned_dna_short_read.json",
-    "title": "aligned_dna_short_read",
-    "version": "1.11",
-    "type": "object",
+    "definitions": {},
+    "properties": {
+        "aligned_dna_short_read_file": {
+            "description": "name and path of file with aligned reads",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram"
+            ],
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "aligned_dna_short_read_id": {
+            "description": "identifier for aligned_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ],
+            "type": "string",
+            "x-primary-key": true
+        },
+        "aligned_dna_short_read_index_file": {
+            "description": "name and path of index file corresponding to aligned reads file",
+            "examples": [
+                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai"
+            ],
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "alignment_software": {
+            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "BWA-MEM-2.3"
+            ],
+            "type": "string"
+        },
+        "analysis_details": {
+            "description": "brief description of the analysis pipeline used for producing the file; perhaps a DOI or link to something like a WDL file or github repository",
+            "examples": [
+                "DOI:10.5281/zenodo.4469317"
+            ],
+            "type": "string"
+        },
+        "experiment_dna_short_read_id": {
+            "description": "identifier for experiment",
+            "type": "string",
+            "x-references": "> experiment_dna_short_read.experiment_dna_short_read_id"
+        },
+        "md5sum": {
+            "description": "md5 checksum for file",
+            "examples": [
+                "129c28163df082"
+            ],
+            "type": "string"
+        },
+        "mean_coverage": {
+            "description": "For WGS, mean coverage is calculated as total aligned bases divided by length of the genome. For WES, mean coverage is calculated as total bases within capture regions divided by length of the capture regions. The capture regions are defined in the BED file for the sample (linked in the experiment_dna_short_read table targeted_region_bed_file field).\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "100"
+            ],
+            "type": "number"
+        },
+        "quality_issues": {
+            "description": "describe if there are any QC issues that would be important to note",
+            "type": "string"
+        },
+        "reference_assembly": {
+            "description": "Which reference assembly was used for alignment?",
+            "enum": [
+                "GRCh38",
+                "GRCh37",
+                "NCBI36",
+                "NCBI35",
+                "NCBI34"
+            ],
+            "examples": [
+                "GRCh38"
+            ],
+            "type": "string"
+        },
+        "reference_assembly_details": {
+            "description": "Describe any details about the specific reference assembly used (e.g. primary, chrY-masked)",
+            "examples": [
+                "primary, chrY-masked"
+            ],
+            "type": "string"
+        },
+        "reference_assembly_uri": {
+            "description": "URI (link) to download the specific reference assembly used",
+            "examples": [
+                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
+            ],
+            "type": "string"
+        }
+    },
     "required": [
         "aligned_dna_short_read_id",
         "experiment_dna_short_read_id",
@@ -13,96 +104,8 @@
         "reference_assembly",
         "alignment_software"
     ],
-    "definitions": {},
-    "properties": {
-        "aligned_dna_short_read_id": {
-            "type": "string",
-            "description": "identifier for aligned_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
-            "examples": [
-                "BCM_H7YG5DSX2-3-IDUDI0014-1"
-            ]
-        },
-        "experiment_dna_short_read_id": {
-            "type": "string",
-            "description": "identifier for experiment"
-        },
-        "aligned_dna_short_read_file": {
-            "type": "string",
-            "description": "name and path of file with aligned reads",
-            "examples": [
-                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram"
-            ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
-        },
-        "aligned_dna_short_read_index_file": {
-            "type": "string",
-            "description": "name and path of index file corresponding to aligned reads file",
-            "examples": [
-                "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai"
-            ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
-        },
-        "md5sum": {
-            "type": "string",
-            "description": "md5 checksum for file",
-            "examples": [
-                "129c28163df082"
-            ]
-        },
-        "reference_assembly": {
-            "type": "string",
-            "enum": [
-                "GRCh38",
-                "GRCh37",
-                "NCBI36",
-                "NCBI35",
-                "NCBI34"
-            ],
-            "description": "Which reference assembly was used for alignment?",
-            "examples": [
-                "GRCh38"
-            ]
-        },
-        "reference_assembly_uri": {
-            "type": "string",
-            "description": "URI (link) to download the specific reference assembly used",
-            "examples": [
-                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
-            ]
-        },
-        "reference_assembly_details": {
-            "type": "string",
-            "description": "Describe any details about the specific reference assembly used (e.g. primary, chrY-masked)",
-            "examples": [
-                "primary, chrY-masked"
-            ]
-        },
-        "alignment_software": {
-            "type": "string",
-            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
-            "examples": [
-                "BWA-MEM-2.3"
-            ]
-        },
-        "mean_coverage": {
-            "type": "number",
-            "description": "For WGS, mean coverage is calculated as total aligned bases divided by length of the genome. For WES, mean coverage is calculated as total bases within capture regions divided by length of the capture regions. The capture regions are defined in the BED file for the sample (linked in the experiment_dna_short_read table targeted_region_bed_file field).\n\nNotes: Can be unknown if RC receives external data",
-            "examples": [
-                "100"
-            ]
-        },
-        "analysis_details": {
-            "type": "string",
-            "description": "brief description of the analysis pipeline used for producing the file; perhaps a DOI or link to something like a WDL file or github repository",
-            "examples": [
-                "DOI:10.5281/zenodo.4469317"
-            ]
-        },
-        "quality_issues": {
-            "type": "string",
-            "description": "describe if there are any QC issues that would be important to note"
-        }
-    }
+    "title": "aligned_dna_short_read",
+    "type": "object",
+    "version": "1.12",
+    "x-table-required": "CONDITIONAL (aligned_dna_short_read_set, called_variants_dna_short_read)"
 }
