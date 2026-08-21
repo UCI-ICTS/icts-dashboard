@@ -84,6 +84,16 @@ def get_model_schema_path(model_version: str) -> Path:
         / f"v{normalized_version}"
     )
 
+
+def load_table_schema(*, model_version: str, table_name: str) -> dict:
+    """Load one generated table schema from a versioned schema bundle."""
+
+    schema_path = get_model_schema_path(model_version) / f"{table_name}.json"
+
+    with open(schema_path, "r", encoding="utf-8") as schema_file:
+        return jsonref.load(schema_file)
+
+
 class TableValidator:
     """
     The Table Validator class is used to validate JSON objects against
@@ -128,10 +138,12 @@ class TableValidator:
             None
         """
 
-        schema_path = self.base_path / f"{table_name}.json"
         try:
-            with open(schema_path, "r") as schema_file:
-                schema = jsonref.load(schema_file)
+            
+            schema = load_table_schema(
+                model_version=self.model_version,
+                table_name=table_name
+            )
 
             validator = jsonschema.Draft7Validator(schema)
             self.errors = [

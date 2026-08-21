@@ -23,6 +23,7 @@ from anvil.services import (
     validate_upload_source_data,
 )
 
+from metadata.models import Family
 
 class SourceValidationRequiresInitializeTests(TestCase):
     fixtures = ["tests/fixtures/test_fixture_valid.json"]
@@ -194,4 +195,78 @@ class ValidAnvilUploadValidationTests(TestCase):
         self.assertEqual(
             set(validation_run.summary["tables"]),
             {"family", "participant"},
+        )
+
+    def test_foreign_key_exclusions_cascade_to_dependent_rows(self):
+        """A schema-excluded parent makes dependent FK values unresolved."""
+
+        family = Family.objects.get(family_id="GREGoR_test-001")
+
+        # update() bypasses model choice validation to simulate dirty source data.
+        Family.objects.filter(pk=family.pk).update(
+            consanguinity="invalid value"
+        )
+
+        validation_run = validate_upload_source_data(
+            upload=self.upload,
+            changed_by=self.user,
+        )
+
+        self.assertEqual(
+            validation_run.status,
+            AnvilUploadValidationRun.Status.FAILED,
+        )
+
+        manifest = get_upload_manifest_artifact(upload=self.upload).metadata
+        tables = manifest["tables"]["by_name"]
+
+        self.assertEqual(tables["family"]["excluded_row_count"], 1)
+
+        excluded_participants = [
+            row
+            for row in tables["participant"]["excluded_rows"]
+            if row["reason"] == "foreign key validation failed"
+        ]
+
+        self.assertGreater(len(excluded_participants), 0)
+
+        self.assertTrue(
+            any(
+                "family.family_id" in error["error"]
+                for row in excluded_participants
+                for error in row["errors"]
+            )
+        )
+
+        excluded_phenotypes = [
+            row
+            for row in tables["phenotype"]["excluded_rows"]
+            if row["reason"] == "foreign key validation failed"
+        ]
+
+        self.assertGreater(len(excluded_phenotypes), 0)
+
+    def test_foreign_key_check_skips_unselected_reference_tables(self):
+        """Workspace-table lookups are deferred when the parent is unselected."""
+
+        upload = AnvilUpload.objects.create(
+            upload_id="UCI_GREGoR_fk_unselected_v1",
+            changed_by=self.user,
+        )
+
+        # Phenotype references participant, but participant is not selected.
+        initialize_upload_package(
+            upload=upload,
+            tables=["phenotype"],
+            changed_by=self.user,
+        )
+
+        validation_run = validate_upload_source_data(
+            upload=upload,
+            changed_by=self.user,
+        )
+
+        self.assertEqual(
+            validation_run.status,
+            AnvilUploadValidationRun.Status.PASSED,
         )

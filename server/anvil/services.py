@@ -15,6 +15,7 @@ from django.utils import timezone
 from config.selectors import (
     TableValidator,
     get_model_schema_path,
+    load_table_schema,
     remove_na
 )
 
@@ -163,6 +164,117 @@ DASHBOARD_ONLY_EXPORT_FIELDS = {
 }
 
 
+SOURCE_VALIDATOR_VERSION = "dashboard-source-data-v0.3"
+
+
+def _get_schema_foreign_keys(
+    *,
+    model_version: str,
+    table_names: list[str],
+) -> dict[str, list[dict]]:
+    """Return the canonical FK edges for the selected table schemas."""
+
+    foreign_keys = {}
+
+    for table_name in table_names:
+        schema = load_table_schema(
+            model_version=model_version,
+            table_name=table_name,
+        )
+        edges = []
+
+        for column_name, column_schema in schema.get("properties", {}).items():
+            reference = column_schema.get("x-references", "")
+
+            if not (isinstance(reference, str) and reference.startswith(">")):
+                continue
+
+            referenced_table, separator, referenced_column = (
+                reference.lstrip("> ").strip().partition(".")
+            )
+
+            if not separator:
+                continue
+
+            edges.append(
+                {
+                    "column": column_name,
+                    "referenced_table": referenced_table,
+                    "referenced_column": referenced_column,
+                }
+            )
+
+        if edges:
+            foreign_keys[table_name] = edges
+
+    return foreign_keys
+
+
+def _get_foreign_key_values(value) -> list[str]:
+    """Normalize one scalar or multi-valued FK column into string values."""
+
+    if value in (None, "", "NA"):
+        return []
+
+    if isinstance(value, list):
+        return [
+            str(item)
+            for item in value
+            if item not in (None, "", "NA")
+        ]
+
+    return [str(value)]
+
+
+def _collect_foreign_key_errors(
+    *,
+    included_rows: list[tuple[str, dict]],
+    foreign_keys: list[dict],
+    included_rows_by_table: dict[str, list[tuple[str, dict]]],
+) -> dict[str, list[dict]]:
+    """
+    Find references that do not resolve among rows included in this upload.
+
+    References to unselected tables are skipped. The DCC can resolve those
+    against tables already present in an AnVIL workspace; Dashboard support
+    for that behavior requires workspace access and belongs to a later stage.
+    """
+
+    errors_by_pk = {}
+
+    for foreign_key in foreign_keys:
+        referenced_table = foreign_key["referenced_table"]
+
+        if referenced_table not in included_rows_by_table:
+            continue
+
+        valid_values = {
+            str(row.get(foreign_key["referenced_column"]))
+            for _pk, row in included_rows_by_table[referenced_table]
+        }
+
+        for pk, row in included_rows:
+            values = _get_foreign_key_values(row.get(foreign_key["column"]))
+
+            for value in values:
+                if value in valid_values:
+                    continue
+
+                errors_by_pk.setdefault(pk, []).append(
+                    {
+                        "field": foreign_key["column"],
+                        "error": (
+                            f"'{value}' not found in "
+                            f"{referenced_table}."
+                            f"{foreign_key['referenced_column']} among rows "
+                            "included in this upload"
+                        ),
+                    }
+                )
+
+    return errors_by_pk
+
+
 def _get_upload_table_model(*, table_name: str) -> type:
     app_label, model_name = ANVIL_UPLOAD_TABLE_MODEL_MAP[table_name]
     return apps.get_model(app_label, model_name)
@@ -183,7 +295,7 @@ def _get_export_fields(model_class: type) -> list:
     for field in list(model_class._meta.fields) + list(model_class._meta.many_to_many):
         if field.name in DASHBOARD_ONLY_EXPORT_FIELDS:
             continue
-
+            
         fields.append(field)
 
     return fields
@@ -203,40 +315,69 @@ def _serialize_tsv_value(value) -> str:
     return str(value)
 
 
-def _row_from_object(*, obj, fields: list, serialize_for_tsv: bool = False) -> dict:
+def _rows_from_object(
+    *,
+    obj,
+    fields: list,
+    schema: dict,
+    serialize_for_tsv: bool = False,
+) -> list[dict]:
     """
-    Build a {column_name: value} dict for one Django object.
+    Build one or more GREGoR rows from one Django object.
 
     Uses field.name (not field.column) so ForeignKey fields export as the
-    GREGoR schema key ('family_id'), not the database column ('family_id_id').
+    GREGoR schema key ("family_id"), not the database column ("family_id_id").
+
+    Django M2M fields map to two GREGoR representations:
+    - schema arrays remain one pipe-delimited TSV value
+    - schema scalars (set membership tables) expand to one TSV row per member
     """
 
-    row = {}
+    rows = [{}]
+    schema_properties = schema.get("properties", {})
 
     for field in fields:
         column_name = field.name
-
         value = field.value_from_object(obj)
 
         if field.many_to_many:
-            # M2M values arrive as model instances; schema expects string arrays.
-            # Related models with natural-key PKs (set tables) export the pk;
-            # lookup models with surrogate auto-PKs export their 'name' value.
             related_pk_is_auto = field.related_model._meta.pk.auto_created
+
             value = [
-                str(getattr(item, "name", item.pk)) if related_pk_is_auto else str(item.pk)
+                (
+                    str(getattr(item, "name", item.pk))
+                    if related_pk_is_auto
+                    else str(item.pk)
+                )
                 for item in value
             ]
+
+            if schema_properties.get(column_name, {}).get("type") != "array":
+                values = value or [None]
+
+                rows = [
+                    {**row, column_name: item}
+                    for row in rows
+                    for item in values
+                ]
+                continue
+
         elif isinstance(value, (datetime.date, datetime.datetime)):
-            # Schema expects ISO date strings, not Python date objects.
             value = value.isoformat()
 
-        if serialize_for_tsv:
-            value = _serialize_tsv_value(value=value)
+        for row in rows:
+            row[column_name] = value
 
-        row[column_name] = value
+    if serialize_for_tsv:
+        return [
+            {
+                column_name: _serialize_tsv_value(value=value)
+                for column_name, value in row.items()
+            }
+            for row in rows
+        ]
 
-    return row
+    return rows
 
 
 def _sha256_file(path: Path) -> str:
@@ -417,7 +558,11 @@ def _read_tsv_header_and_validate_rows(*, artifact):
             )
         )
 
-    if duplicate_primary_keys:
+    # Set-table TSVs intentionally repeat the set_id once per member. The
+    # DCC's AnvilDataModels::check_primary_keys skips *_set tables for the
+    # same reason.
+    if duplicate_primary_keys and not table_name.endswith("_set"):
+
         errors.append(
             _package_error(
                 code="duplicate_tsv_primary_keys",
@@ -854,7 +999,7 @@ def validate_upload_package(
     validation_run = AnvilUploadValidationRun.objects.create(
         upload=upload,
         validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
-        validator_version="dashboard-package-v0.1",
+        validator_version=SOURCE_VALIDATOR_VERSION,
         changed_by=changed_by,
     )
 
@@ -923,7 +1068,7 @@ def validate_upload_source_data(
     validation_run = AnvilUploadValidationRun.objects.create(
         upload=upload,
         validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
-        validator_version="dashboard-source-data-v0.2",
+        validator_version=SOURCE_VALIDATOR_VERSION,
         changed_by=changed_by,
     )
 
@@ -932,33 +1077,108 @@ def validate_upload_source_data(
 
     table_results = {}
     table_summaries = {}
+    source_row_counts = {}
+    included_rows_by_table = {}
+    excluded_rows_by_table = {}
     error_count = 0
     warning_count = 0
 
+    foreign_keys_by_table = _get_schema_foreign_keys(
+        model_version=upload.gregor_model_version,
+        table_names=selected_tables,
+    )
+
+    # Pass 1: validate each row against its versioned JSON schema. Passing
+    # rows become candidates for cross-table reference validation.
     for table_name in selected_tables:
         model_class = _get_upload_table_model(table_name=table_name)
         fields = _get_export_fields(model_class=model_class)
+        schema = load_table_schema(
+            model_version=upload.gregor_model_version,
+            table_name=table_name,
+        )
         queryset = model_class.objects.all().order_by(model_class._meta.pk.name)
 
-        source_row_count = queryset.count()
+        source_row_counts[table_name] = queryset.count()
+        included_rows = []
         excluded_rows = []
 
         for obj in queryset:
-            row = _row_from_object(obj=obj, fields=fields)
+            object_rows = _rows_from_object(
+                obj=obj,
+                fields=fields,
+                schema=schema,
+            )
+            row_errors = []
 
-            validator = TableValidator(model_version=upload.gregor_model_version)
-            validator.validate_json(remove_na(row), table_name)
-            validation_results = validator.get_validation_results()
+            for row in object_rows:
+                validator = TableValidator(
+                    model_version=upload.gregor_model_version
+                )
+                validator.validate_json(remove_na(row), table_name)
+                validation_results = validator.get_validation_results()
 
-            if not validation_results["valid"]:
+                if validation_results["valid"]:
+                    continue
+
+                row_errors.extend(validation_results["errors"])
+
+            if row_errors:
                 excluded_rows.append(
                     {
                         "pk": str(obj.pk),
                         "reason": "schema validation failed",
-                        "errors": validation_results["errors"],
+                        "errors": row_errors,
                     }
                 )
+            else:
+                included_rows.extend(
+                    (str(obj.pk), row)
+                    for row in object_rows
+                )
 
+        included_rows_by_table[table_name] = included_rows
+        excluded_rows_by_table[table_name] = excluded_rows
+
+    # Pass 2: resolve FKs against rows that remain included after schema
+    # validation. Canonical table order is parent-first, so exclusions cascade
+    # from family -> participant -> phenotype and through experiment chains.
+    foreign_key_order = [
+        table_name
+        for table_name in ANVIL_UPLOAD_TABLES
+        if table_name in selected_tables
+    ]
+
+    for table_name in foreign_key_order:
+        foreign_key_errors = _collect_foreign_key_errors(
+            included_rows=included_rows_by_table[table_name],
+            foreign_keys=foreign_keys_by_table.get(table_name, []),
+            included_rows_by_table=included_rows_by_table,
+        )
+
+        failed_pks = set(foreign_key_errors)
+
+        remaining_rows = [
+            (pk, row)
+            for pk, row in included_rows_by_table[table_name]
+            if pk not in failed_pks
+        ]
+
+        for pk, errors in foreign_key_errors.items():
+            excluded_rows_by_table[table_name].append(
+                {
+                    "pk": pk,
+                    "reason": "foreign key validation failed",
+                    "errors": errors,
+                }
+            )
+
+        included_rows_by_table[table_name] = remaining_rows
+
+    # Persist the combined schema and FK decisions.
+    for table_name in selected_tables:
+        source_row_count = source_row_counts[table_name]
+        excluded_rows = excluded_rows_by_table[table_name]
         excluded_row_count = len(excluded_rows)
         included_row_count = source_row_count - excluded_row_count
         table_error_count = excluded_row_count
@@ -981,7 +1201,9 @@ def validate_upload_source_data(
 
         table_summaries[table_name] = table_summary
 
-        upload_table = upload.upload_tables.filter(table_name=table_name).first()
+        upload_table = upload.upload_tables.filter(
+            table_name=table_name
+        ).first()
 
         if upload_table is not None:
             upload_table.source_summary = table_summary
@@ -996,7 +1218,7 @@ def validate_upload_source_data(
     passed = error_count == 0
 
     summary = {
-        "validator": "dashboard-source-data-v0.2",
+        "validator": SOURCE_VALIDATOR_VERSION,
         "passed": passed,
         "error_count": error_count,
         "warning_count": warning_count,
@@ -1009,7 +1231,7 @@ def validate_upload_source_data(
     manifest.setdefault("validation", {})
     manifest["validation"]["source"] = {
         "status": "passed" if passed else "failed",
-        "validator": "dashboard-source-data-v0.2",
+        "validator": SOURCE_VALIDATOR_VERSION,
         "error_count": error_count,
         "warning_count": warning_count,
         "run_id": validation_run.id,
@@ -1109,6 +1331,11 @@ def generate_upload_tsvs(
         model_class = _get_upload_table_model(table_name=table_name)
         fields = _get_export_fields(model_class)
 
+        schema = load_table_schema(
+            model_version=upload.gregor_model_version,
+            table_name=table_name,
+        )
+
         column_names = [field.name for field in fields]
 
         queryset = model_class.objects.all().order_by(model_class._meta.pk.name)
@@ -1139,14 +1366,15 @@ def generate_upload_tsvs(
                 if str(obj.pk) in excluded_pks:
                     continue
 
-                writer.writerow(
-                    _row_from_object(
-                        obj=obj,
-                        fields=fields,
-                        serialize_for_tsv=True,
-                    )
+                rows = _rows_from_object(
+                    obj=obj,
+                    fields=fields,
+                    schema=schema,
+                    serialize_for_tsv=True,
                 )
-                row_count += 1
+
+                writer.writerows(rows)
+                row_count += len(rows)
 
         upload_table.row_count = row_count
         upload_table.column_names = column_names

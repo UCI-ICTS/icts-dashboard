@@ -165,13 +165,13 @@ class AnvilUploadTsvGenerationTests(TestCase):
             self.assertIn("family_id", reader.fieldnames)
             self.assertNotIn("family_id_id", reader.fieldnames)
 
-    def test_generated_set_tsv_serializes_m2m_as_pipe_delimited(self):
+
+    def test_generated_set_tsv_expands_m2m_members_to_rows(self):
         with tempfile.TemporaryDirectory() as temp_dir, override_settings(
             ANVIL_PACKAGE_ROOT=temp_dir,
         ):
             result = generate_upload_tsvs(
                 upload=self.upload,
-                
                 changed_by=self.user,
             )
 
@@ -185,16 +185,21 @@ class AnvilUploadTsvGenerationTests(TestCase):
 
             self.assertIn("aligned_dna_short_read_id", reader.fieldnames)
 
-            multi_member_values = [
-                row["aligned_dna_short_read_id"]
-                for row in rows
-                if "|" in row["aligned_dna_short_read_id"]
-            ]
-            self.assertGreater(
-                len(multi_member_values),
-                0,
-                msg="Expected at least one multi-member set with pipe-delimited ids",
+            self.assertTrue(
+                all(
+                    "|" not in row["aligned_dna_short_read_id"]
+                    for row in rows
+                )
             )
+
+            set_ids = [
+                row["aligned_dna_short_read_set_id"]
+                for row in rows
+            ]
+
+            # Multi-member sets produce repeated set IDs, one row per member.
+            self.assertGreater(len(set_ids), len(set(set_ids)))
+
 
     def test_generate_upload_tsvs_skips_manifest_excluded_rows(self):
         validate_upload_source_data(upload=self.upload, changed_by=self.user)
