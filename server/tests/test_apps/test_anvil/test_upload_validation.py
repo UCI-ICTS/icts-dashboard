@@ -270,3 +270,35 @@ class ValidAnvilUploadValidationTests(TestCase):
             validation_run.status,
             AnvilUploadValidationRun.Status.PASSED,
         )
+
+
+    def test_malformed_phenotype_term_id_is_excluded(self):
+        """term_id must match its declared ontology's identifier format
+        (DCC check_term_id equivalent)."""
+
+        from metadata.models import Phenotype
+
+        phenotype = Phenotype.objects.first()
+        # update() bypasses model validation to simulate dirty source data.
+        Phenotype.objects.filter(pk=phenotype.pk).update(term_id="HP:12345")
+
+        validation_run = validate_upload_source_data(
+            upload=self.upload,
+            changed_by=self.user,
+        )
+
+        self.assertEqual(
+            validation_run.status,
+            AnvilUploadValidationRun.Status.FAILED,
+        )
+
+        manifest = get_upload_manifest_artifact(upload=self.upload).metadata
+        excluded = manifest["tables"]["by_name"]["phenotype"]["excluded_rows"]
+
+        self.assertEqual(len(excluded), 1)
+        self.assertTrue(
+            any(
+                "does not match the HPO identifier format" in error["error"]
+                for error in excluded[0]["errors"]
+            )
+        )

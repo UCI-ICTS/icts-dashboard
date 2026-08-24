@@ -5,6 +5,7 @@ import csv
 import datetime
 import hashlib
 import json
+import re
 from pathlib import Path
 from django.apps import apps
 from django.conf import settings
@@ -31,6 +32,51 @@ from anvil.models import (
     AnvilUploadTable,
     AnvilUploadValidationRun,
 )
+
+
+SOURCE_VALIDATOR_VERSION = "dashboard-source-data-v0.4"
+
+# Phenotype term_id format per ontology. These mirror the DCC's
+# validate_gregor_model check_term_id task (gregor-file-checks), so a term
+# rejected here would also be rejected by the AnVIL-side workflow.
+PHENOTYPE_TERM_ID_PATTERNS = {
+    "HPO": re.compile(r"^HP:[0-9]{7}$"),
+    "MONDO": re.compile(r"^MONDO:[0-9]{7}$"),
+    "OMIM": re.compile(r"^OMIM:[0-9]{6}$"),
+    "ORPHANET": re.compile(r"^ORPHA:[0-9]+$"),
+    "SNOMED": re.compile(r"^SCTID:[0-9]+$"),
+    "ICD10": re.compile(r"^[A-Z][0-9]{2}([.][0-9]+)?$"),
+}
+
+
+def _collect_term_format_errors(*, row: dict) -> list[dict]:
+    """
+    Check a phenotype row's term_id format against its declared ontology.
+
+    Unknown ontologies are the schema enum's job; blank values are the
+    schema required-ness check's job. This check only asserts that a present
+    term_id matches its present ontology's identifier format.
+    """
+
+    ontology = row.get("ontology")
+    term_id = row.get("term_id")
+    pattern = PHENOTYPE_TERM_ID_PATTERNS.get(ontology)
+
+    if not term_id or pattern is None:
+        return []
+
+    if pattern.fullmatch(str(term_id)):
+        return []
+
+    return [
+        {
+            "field": "term_id",
+            "error": (
+                f"'{term_id}' does not match the {ontology} identifier "
+                f"format ({pattern.pattern})"
+            ),
+        }
+    ]
 
 
 @transaction.atomic
@@ -162,9 +208,6 @@ DASHBOARD_ONLY_EXPORT_FIELDS = {
     "needs_review",
     "changed_by",
 }
-
-
-SOURCE_VALIDATOR_VERSION = "dashboard-source-data-v0.3"
 
 
 def _get_schema_foreign_keys(
@@ -1118,10 +1161,10 @@ def validate_upload_source_data(
                 validator.validate_json(remove_na(row), table_name)
                 validation_results = validator.get_validation_results()
 
-                if validation_results["valid"]:
-                    continue
-
-                row_errors.extend(validation_results["errors"])
+                if not validation_results["valid"]:
+                    row_errors.extend(validation_results["errors"])
+                if table_name == "phenotype":
+                    row_errors.extend(_collect_term_format_errors(row=row))
 
             if row_errors:
                 excluded_rows.append(
