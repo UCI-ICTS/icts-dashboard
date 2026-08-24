@@ -36,9 +36,64 @@ from anvil.models import (
 
 SOURCE_VALIDATOR_VERSION = "dashboard-source-data-v0.4"
 
+FILE_VALIDATOR_VERSION = "dashboard-file-checks-v0.1"
+
+FILE_CHECK_TABLES = {
+    "aligned_dna_short_read": {
+        "kind": "alignment",
+        "file_field": "aligned_dna_short_read_file",
+        "index_field": "aligned_dna_short_read_index_file",
+        "experiment_field": "experiment_dna_short_read_id",
+    },
+    "aligned_rna_short_read": {
+        "kind": "alignment",
+        "file_field": "aligned_rna_short_read_file",
+        "index_field": "aligned_rna_short_read_index_file",
+        "experiment_field": "experiment_rna_short_read_id",
+    },
+    "aligned_nanopore": {
+        "kind": "alignment",
+        "file_field": "aligned_nanopore_file",
+        "index_field": "aligned_nanopore_index_file",
+        "experiment_field": "experiment_nanopore_id",
+    },
+    "aligned_pac_bio": {
+        "kind": "alignment",
+        "file_field": "aligned_pac_bio_file",
+        "index_field": "aligned_pac_bio_index_file",
+        "experiment_field": "experiment_pac_bio_id",
+    },
+    "called_variants_dna_short_read": {
+        "kind": "vcf",
+        "file_field": "called_variants_dna_file",
+        "set_field": "aligned_dna_short_read_set_id",
+        "members_field": "aligned_dna_short_read_id",
+        "experiment_field": "experiment_dna_short_read_id",
+    },
+    "called_variants_nanopore": {
+        "kind": "vcf",
+        "file_field": "called_variants_dna_file",
+        "set_field": "aligned_nanopore_set_id",
+        "members_field": "aligned_nanopore_id",
+        "experiment_field": "experiment_nanopore_id",
+    },
+    "called_variants_pac_bio": {
+        "kind": "vcf",
+        "file_field": "called_variants_dna_file",
+        "set_field": "aligned_pac_bio_set_id",
+        "members_field": "aligned_pac_bio_id",
+        "experiment_field": "experiment_pac_bio_id",
+    },
+}
+
 # Phenotype term_id format per ontology. These mirror the DCC's
 # validate_gregor_model check_term_id task (gregor-file-checks), so a term
 # rejected here would also be rejected by the AnVIL-side workflow.
+# The DCC keeps these regexes in R code, not the data model — so we did the 
+# same rather than inventing schema annotations upstream doesn't have. If 
+# GREGoR ever adds term patterns to the canonical model, this constant is 
+# the one thing to delete. 
+
 PHENOTYPE_TERM_ID_PATTERNS = {
     "HPO": re.compile(r"^HP:[0-9]{7}$"),
     "MONDO": re.compile(r"^MONDO:[0-9]{7}$"),
@@ -1591,3 +1646,184 @@ def get_upload_manifest_artifact(upload: AnvilUpload) -> AnvilUploadArtifact | N
         .order_by("-updated_at", "-created_at")
         .first()
     )
+
+def _expected_file_samples(*, obj, config: dict) -> list[str]:
+    if config["kind"] == "alignment":
+        experiment = getattr(obj, config["experiment_field"])
+        return [experiment.experiment_sample_id]
+
+    aligned_set = getattr(obj, config["set_field"])
+    samples = []
+    for aligned in getattr(aligned_set, config["members_field"]).all():
+        experiment = getattr(aligned, config["experiment_field"])
+        sample = experiment.experiment_sample_id
+        if sample not in samples:
+            samples.append(sample)
+    return samples
+
+
+@transaction.atomic
+def validate_upload_files(
+    *,
+    upload: AnvilUpload,
+    changed_by: User | None = None,
+    provider=None,
+) -> AnvilUploadValidationRun:
+    from anvil.file_checks import (
+        FAIL,
+        UNVERIFIED,
+        LocalFileProvider,
+        check_alignment_samples,
+        check_file_md5,
+        check_index_uri,
+        check_vcf_sample_set,
+    )
+
+    manifest_artifact = get_upload_manifest_artifact(upload=upload)
+    if manifest_artifact is None:
+        raise ValueError("Upload manifest does not exist. Run initialize first.")
+
+    if provider is None:
+        provider = LocalFileProvider(root=settings.ANVIL_FILE_STAGING_ROOT)
+
+    manifest = manifest_artifact.metadata or {}
+    selected_tables = manifest.get("tables", {}).get("included", [])
+    table_plans = manifest.get("tables", {}).get("by_name", {})
+    excluded = {
+        table: {row["pk"] for row in plan.get("excluded_rows", [])}
+        for table, plan in table_plans.items()
+    }
+
+    run = AnvilUploadValidationRun.objects.create(
+        upload=upload,
+        validator_type=AnvilUploadValidationRun.ValidatorType.LOCAL,
+        validator_version=FILE_VALIDATOR_VERSION,
+        changed_by=changed_by,
+    )
+    run.mark_running()
+    run.save()
+
+    error_count = 0
+    warning_count = 0
+    table_results = {}
+
+    for table_name in selected_tables:
+        config = FILE_CHECK_TABLES.get(table_name)
+        if config is None:
+            continue
+
+        model = _get_upload_table_model(table_name=table_name)
+        results = []
+        for obj in model.objects.all().order_by(model._meta.pk.name):
+            if str(obj.pk) in excluded.get(table_name, set()):
+                continue
+
+            file_uri = getattr(obj, config["file_field"]) or ""
+            local_path = provider.materialize(uri=file_uri)
+            checks = []
+
+            index_field = config.get("index_field")
+            if index_field:
+                index_check = check_index_uri(
+                    file_uri=file_uri,
+                    index_uri=getattr(obj, index_field) or "",
+                )
+                if index_check:
+                    checks.append(index_check)
+
+            checks.append(
+                check_file_md5(
+                    local_path=local_path,
+                    declared_md5=obj.md5sum or "",
+                )
+            )
+            expected_samples = _expected_file_samples(obj=obj, config=config)
+            if config["kind"] == "alignment":
+                checks.append(
+                    check_alignment_samples(
+                        local_path=local_path,
+                        expected_samples=expected_samples,
+                    )
+                )
+            else:
+                checks.append(
+                    check_vcf_sample_set(
+                        local_path=local_path,
+                        expected_samples=expected_samples,
+                    )
+                )
+
+            statuses = {check["status"] for check in checks}
+            row_status = (
+                FAIL if FAIL in statuses
+                else UNVERIFIED if UNVERIFIED in statuses
+                else "PASS"
+            )
+            if row_status == FAIL:
+                error_count += 1
+            elif row_status == UNVERIFIED:
+                warning_count += 1
+
+            results.append(
+                {
+                    "pk": str(obj.pk),
+                    "file_uri": file_uri,
+                    "status": row_status,
+                    "checks": checks,
+                }
+            )
+
+        table_results[table_name] = {
+            "checked_row_count": len(results),
+            "passed_row_count": sum(r["status"] == "PASS" for r in results),
+            "failed_row_count": sum(r["status"] == FAIL for r in results),
+            "unverified_row_count": sum(
+                r["status"] == UNVERIFIED for r in results
+            ),
+            "rows": results,
+        }
+
+    passed = error_count == 0
+    summary = {
+        "validator": FILE_VALIDATOR_VERSION,
+        "provider": provider.name,
+        "passed": passed,
+        "error_count": error_count,
+        "warning_count": warning_count,
+        "tables": table_results,
+    }
+
+    manifest.setdefault("validation", {})
+    manifest["validation"]["files"] = {
+        "status": "passed" if passed else "failed",
+        "validator": FILE_VALIDATOR_VERSION,
+        "provider": provider.name,
+        "error_count": error_count,
+        "warning_count": warning_count,
+        "run_id": run.id,
+    }
+    manifest_artifact.metadata = manifest
+    if changed_by is not None:
+        manifest_artifact.changed_by = changed_by
+    manifest_artifact.save()
+
+    run.error_count = error_count
+    run.warning_count = warning_count
+    run.mark_complete(
+        passed=passed,
+        message=(
+            "Pre-flight file validation passed."
+            if passed
+            else "Pre-flight file validation failed."
+        ),
+        summary=summary,
+    )
+    run.save()
+
+    if not passed:
+        upload.status = AnvilUpload.Status.VALIDATION_FAILED
+        if changed_by is not None:
+            upload.changed_by = changed_by
+        upload.save()
+
+    return run

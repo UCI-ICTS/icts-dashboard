@@ -176,6 +176,27 @@ class AnvilUploadViewSet(
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["post"], url_path="validate-files")
+    def validate_files(self, request, upload_id=None):
+        upload = self.get_object()
+        validation_run = validate_upload_files(
+            upload=upload,
+            changed_by=self._changed_by(),
+        )
+        upload.refresh_from_db()
+
+        return Response(
+            {
+                "upload": self.get_serializer(upload).data,
+                "validation_run_id": validation_run.pk,
+                "passed": validation_run.status == validation_run.Status.PASSED,
+                "error_count": validation_run.error_count,
+                "warning_count": validation_run.warning_count,
+                "summary": validation_run.summary,
+            },
+            status=status.HTTP_200_OK,
+        )
+
     @action(detail=True, methods=["post"], url_path="validate-package")
     def validate_package(self, request, upload_id=None):
         upload = self.get_object()

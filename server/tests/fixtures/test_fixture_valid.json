@@ -6069,7 +6069,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1.crai",
-      "md5sum": "615fb1d2d88635b7461fd4c978bbc64a",
+      "md5sum": "1c65df463b76f2e2e8acd9f70df0d856",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6090,7 +6090,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1.crai",
-      "md5sum": "70754026de72938744accd00e32ea0dd",
+      "md5sum": "3f84e85fef2b8f991a5f0fe110801b0d",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6111,7 +6111,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1.crai",
-      "md5sum": "9dc8fda6c177a94aa5ae4d2c19721c3d",
+      "md5sum": "2e05065b597e486494a1f25d208916c4",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6132,7 +6132,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-004-004-0-D-1_SQ6125.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-004-004-0-D-1_SQ6125.crai",
-      "md5sum": "2c509adc50e9edf16bc24ed03707f252",
+      "md5sum": "30608b2f291c79808dbe729dcbc972be",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6153,7 +6153,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-005-004-2-D-1_DNA.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-3cbd4d3d-7331-46f9-a98f-ebba0a894562/cram/UCI_GREGoR_test-005-004-2-D-1_DNA.crai",
-      "md5sum": "19f4add867068bee89befdd359cf5b65",
+      "md5sum": "685d17f10614cc813615e85eee6eb0f8",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6174,7 +6174,7 @@
       "experiment_dna_short_read_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1",
       "aligned_dna_short_read_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned-1.cram",
       "aligned_dna_short_read_index_file": "gs://fc-secure-be182c9d-e20a-43aa-b158-39113ea47705/cram/UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned-1.crai",
-      "md5sum": "d40d08e98a441d285bc63cbf4797dbde",
+      "md5sum": "a95d5520616f724c3e04f14a8022acf0",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz",
       "reference_assembly_details": "GRCh38, no alts",
@@ -6192,7 +6192,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6203,7 +6205,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6214,7 +6218,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6225,7 +6231,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6236,7 +6244,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6247,7 +6257,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6258,7 +6270,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6269,7 +6283,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6280,7 +6296,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6291,7 +6309,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6302,7 +6322,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6313,7 +6335,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6324,7 +6348,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6335,7 +6361,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6346,7 +6374,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6357,7 +6387,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6368,7 +6400,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6379,7 +6413,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6390,7 +6426,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6401,7 +6439,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6412,7 +6452,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6423,7 +6465,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6434,7 +6478,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6445,7 +6491,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"]
+      "aligned_dna_short_read_id": [
+        "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1"
+      ]
     }
   },
   {
@@ -6487,7 +6535,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001_Fam_chr1_SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001.chr1.snv.vcf.gz",
-      "md5sum": "121d0ef48e593df56845e019bc5679e4",
+      "md5sum": "629fe911589ab315423e057958fd6be8",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6510,7 +6558,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.snv.vcf.gz",
-      "md5sum": "312f44607cef922725f21f3c7861135c",
+      "md5sum": "313dfdbc5bb90581e84b0954ffcd1cb6",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6533,7 +6581,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.snv.g.vcf.gz",
-      "md5sum": "159487ae09bacb35c4f8acf322c3dd86",
+      "md5sum": "1f658be6b94939032018878bf8397708",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6556,12 +6604,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "502fbc2af7225ddc37861ec85b867db5",
+      "md5sum": "eef1cf6f1eb901f4aa3baa7ae7c5bda1",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6576,14 +6626,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-001-001-0-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "a2d4f24cd7be3b4af1a8a05d68d71edf",
+      "md5sum": "71824a6c840dd4d3816bd5ef0ed7b249",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6598,7 +6650,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.snv.vcf.gz",
-      "md5sum": "b49eed18ca0c364e4f710de6e67df2ac",
+      "md5sum": "f16810fe274a8fae6d7948f6484b4fcf",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6621,7 +6673,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.snv.g.vcf.gz",
-      "md5sum": "786b00fc412403b8cb5c413bc9bd7a7a",
+      "md5sum": "6a7253363ee716eb3b57c177715d9c0b",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6644,12 +6696,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "a0b10afcacf2b70e005ca0cd219b606c",
+      "md5sum": "08b0e0b19621f4edbc9c3908bef6cdb5",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6664,14 +6718,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-002-001-2-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "0584fbca8020c241cb79751bd3cf5d06",
+      "md5sum": "0a2c7f1b0aab6cd06e8adff660821b2a",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6686,7 +6742,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.snv.vcf.gz",
-      "md5sum": "3862ac327ac4c5d47efb4c7e7ba097c4",
+      "md5sum": "24954fa81b22aedf854c9bc660b41778",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6709,7 +6765,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.snv.g.vcf.gz",
-      "md5sum": "5d4e992dfae6ea4ca7ff03da5299220b",
+      "md5sum": "9e0e8795296c05e158f2e25d5b6d5ce6",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6732,12 +6788,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "5d40fe81cd036de37bda879bb7cdaeaa",
+      "md5sum": "261a763ca5d63d4e919a262fdaafb91e",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6752,14 +6810,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-003-001-1-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-003-001-1-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "dd1239a4d5e6b7418ecd1acdc0c37285",
+      "md5sum": "d2ed13f4d74899ce67c55a82d6c5dba9",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6774,7 +6834,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004_Fam_chr1_SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004.snv.vcf.gz",
-      "md5sum": "b89f5dde079ef987f6ef86b1bcdcc275",
+      "md5sum": "d115fd711d858fcc192f5016c1408df7",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6797,7 +6857,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.snv.vcf.gz",
-      "md5sum": "b1cb0884fbab36a436108f92989042e8",
+      "md5sum": "684ff77c3d62da632b040732c99a6306",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6820,7 +6880,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.snv.g.vcf.gz",
-      "md5sum": "b78c4c1bc9ac75f8999babeb1cd32a5d",
+      "md5sum": "eed20e7d7d45163562c2b788dc9885dc",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6843,12 +6903,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "37f1880ce212c5a179ddb816d2e940d6",
+      "md5sum": "7c1a09010d30da28ae094fd5c4368db7",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6863,14 +6925,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-004-004-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-004-004-0-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "7e7892dcc6dd0477dbe1dafeb3ac4ef2",
+      "md5sum": "9e3fa8c6129d7212b8f579c0f90378c8",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6885,7 +6949,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.snv.vcf.gz",
-      "md5sum": "98e9a305af734659d790580f496142d2",
+      "md5sum": "65053c8278bd8941cdceecc83c64fd33",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6908,7 +6972,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.snv.g.vcf.gz",
-      "md5sum": "56e9270559d5e524d7928378f2b0efe4",
+      "md5sum": "3ac594970ba8a43ac3e51d6f35dbaa83",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6931,12 +6995,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "8679abc801e832681ded228babd7d936",
+      "md5sum": "b39de73cd867a3e2461da75a4e19131d",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -6951,14 +7017,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-005-004-2-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-005-004-2-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "b9e5fd96592e64eb05e38bda4bb19982",
+      "md5sum": "4dbbb96b9d939755de7fa5b479906530",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -6973,7 +7041,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.snv.vcf.gz",
-      "md5sum": "0e3660b72e3e2d3862bd32bbfdda7838",
+      "md5sum": "41f243015c4aad18b564cffe86feee1d",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -6996,7 +7064,7 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SNV_G_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.snv.g.vcf.gz",
-      "md5sum": "6021eff438e64e0e25c7fdf0067ac550",
+      "md5sum": "e245a800e05aa1c947d40fe0fefdcecb",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -7019,12 +7087,14 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SV_Lenient_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.sv.endpoint-lenient.vcf.gz",
-      "md5sum": "86572ce8eacb28a5cb8cae1462f1aa6c",
+      "md5sum": "1390a2198a1477972e745e00e71aa717",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta duphold",
       "chrom": "ALL"
     }
@@ -7039,14 +7109,16 @@
       "changed_by": "wheel",
       "aligned_dna_short_read_set_id": "UCI_GREGoR_test-006-006-0-D-1_DNA_1-Aligned_1-SV_Strict_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/illumina/GREGoR_test-006-006-0-D-1.sv.endpoint-strict.vcf.gz",
-      "md5sum": "6e95f68de3f47f5e6a458d257b06419a",
+      "md5sum": "7814b0794672d2408ff9e4b8dabe8072",
       "caller_software": [
         "SVDB_version=2.8.2",
         "manta_version=1.6.0",
         "delly_version=v1.3.3",
         "lumpy_version=0.2.13"
       ],
-      "variant_types": ["SV"],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "Invitae wgs calling v1.0, svdb merged calls from Manta, Delly, Lumpy",
       "chrom": "ALL"
     }
@@ -7248,7 +7320,7 @@
       "experiment_rna_short_read_id": "UCI_GREGoR_test-001-001-0-R-1_RNA_1",
       "aligned_rna_short_read_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1.cram",
       "aligned_rna_short_read_index_file": "gs://fc-secure-e3641cc8-359e-4504-97ff-51d8d9580f55/cram/RNA/UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1.cram.crai",
-      "md5sum": "25129ce37d1d28d765074f50e7a49660",
+      "md5sum": "25ba9bd510e499d6bbf284274b3299cf",
       "reference_assembly": "GRCh38",
       "reference_assembly_uri": "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa",
       "reference_assembly_details": null,
@@ -7350,7 +7422,7 @@
       "experiment_nanopore_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-001-001-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-001-001-0-D-3.bai",
-      "md5sum": "ddc246dee454c5b74837aba8ff44c61e",
+      "md5sum": "92b7ee56fce7fd7ea76dce65177e9b15",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "Minimap2-2.23-r1111",
       "analysis_details": null,
@@ -7382,7 +7454,7 @@
       "experiment_nanopore_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-004-004-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-004-004-0-D-3.bai",
-      "md5sum": "6de703ded5b577276144f38af92787b7",
+      "md5sum": "6c4d57411ae042653eea8ea1416882de",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "Minimap2-2.23-r1111",
       "analysis_details": null,
@@ -7414,7 +7486,7 @@
       "experiment_nanopore_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1",
       "aligned_nanopore_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-006-006-0-D-3.bam",
       "aligned_nanopore_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/nanopore/GREGoR_test-006-006-0-D-3.bai",
-      "md5sum": "63d609796a14366cf80e85ff6ad283bd",
+      "md5sum": "c4680086ac19b948e9cae23449e9cf3b",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "Minimap2-2.23-r1111",
       "analysis_details": null,
@@ -7443,7 +7515,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7454,7 +7528,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7465,7 +7541,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7476,7 +7554,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7487,7 +7567,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7498,7 +7580,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"]
+      "aligned_nanopore_id": [
+        "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7526,7 +7610,7 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-NANO-joint-chr1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-NANO-joint.chr1.phased.vcf.gz",
-      "md5sum": "69f8957a4dd665c6ae2487e51b10ef61",
+      "md5sum": "ce51fae7628d88446baeda1606af6a20",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -7549,8 +7633,10 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-001-001-0.phased.vcf.gz",
-      "md5sum": "936d7bf2fcc9702d95eb8cb2ba45d594",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "e5d8d8e7aa2737d9651a63ba39f3b285",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -7569,9 +7655,13 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-001-001-0.sniffles.vcf.gz",
-      "md5sum": "f17939e60aa8c92474dd55b898ea2870",
-      "caller_software": ["Sniffles=v2.0.3"],
-      "variant_types": ["SV"],
+      "md5sum": "d519a7f83ae8195dbd21a637508d932a",
+      "caller_software": [
+        "Sniffles=v2.0.3"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7586,8 +7676,10 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-004-004-0.phased.vcf.gz",
-      "md5sum": "229e2bb0cc9935d9cf6eeeae3bd678a7",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "4311873585457b2a3ab29853f7297992",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -7606,9 +7698,13 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-004-004-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-004-004-0.sniffles.vcf.gz",
-      "md5sum": "b6c8a71c68e77a5f026a536fd49a6f5c",
-      "caller_software": ["Sniffles=v2.0.3"],
-      "variant_types": ["SV"],
+      "md5sum": "690ef74539506da5fb797bb49d5883fc",
+      "caller_software": [
+        "Sniffles=v2.0.3"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7623,8 +7719,10 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SNV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-006-006-0.phased.vcf.gz",
-      "md5sum": "de66ae668203ea1af28396bc8151865a",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "0886d139301533dcaefccb89476bb500",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -7643,9 +7741,13 @@
       "changed_by": "wheel",
       "aligned_nanopore_set_id": "UCI_GREGoR_test-006-006-0-D-3_NANO_1-Aligned_1-SV_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/nanopore/GREGoR_test-006-006-0.sniffles.vcf.gz",
-      "md5sum": "0d212f2586bcd3a65d63a7c6d25cdb1c",
-      "caller_software": ["Sniffles=v2.0.3"],
-      "variant_types": ["SV"],
+      "md5sum": "1aa41b86f4ee87db621232ae2538a036",
+      "caller_software": [
+        "Sniffles=v2.0.3"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "",
       "chrom": "ALL"
     }
@@ -7766,7 +7868,7 @@
       "experiment_pac_bio_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-001-001-0-D-2.bai",
-      "md5sum": "6e06cbe92700dfc5cd7ad07d7f6d3b8a",
+      "md5sum": "420814bb513b77cf0f69a6743078c692",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "pbmm2 v1.10.0",
       "analysis_details": null,
@@ -7798,7 +7900,7 @@
       "experiment_pac_bio_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-002-001-2-D-2.bai",
-      "md5sum": "1e4020ccca6fe9c93c64747afa59eff1",
+      "md5sum": "d9f57302a11c188ba9c9dcb3a149445b",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "pbmm2 v1.10.0",
       "analysis_details": null,
@@ -7830,7 +7932,7 @@
       "experiment_pac_bio_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1",
       "aligned_pac_bio_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1-D-2.bam",
       "aligned_pac_bio_index_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/bam/pacbio/GREGoR_test-003-001-1-D-2.bai",
-      "md5sum": "727f9869058ef757cc3ff66503f1e036",
+      "md5sum": "da9ef39f75ffda65cf56df53dc3b2397",
       "reference_assembly": "GRCh38_noalt",
       "alignment_software": "pbmm2 v1.10.0",
       "analysis_details": null,
@@ -7859,7 +7961,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7870,7 +7974,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7881,7 +7987,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7892,7 +8000,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7903,7 +8013,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7914,7 +8026,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7925,7 +8039,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7936,7 +8052,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7947,7 +8065,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7958,7 +8078,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7969,7 +8091,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7980,7 +8104,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -7991,7 +8117,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -8002,7 +8130,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -8013,7 +8143,9 @@
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"]
+      "aligned_pac_bio_id": [
+        "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1"
+      ]
     }
   },
   {
@@ -8041,7 +8173,7 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-joint-deepvariant-chr1_vcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001.GRCh38.deepvariant.chr1.vcf.gz",
-      "md5sum": "69f8957a4dd665c6ae2487e51b10ef61",
+      "md5sum": "e51c7f3937d1dda76abb81050571dd49",
       "caller_software": [
         "DeepVariant_version=1.5.0",
         "GLNexus_version=v1.4.1"
@@ -8064,8 +8196,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.deepvariant.phased.vcf.gz",
-      "md5sum": "35129f0eb034efc0d5256a1d64c8cca7",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "84365f87d5b721a7260570ddcd173db4",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8084,8 +8218,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.deepvariant.g.vcf.gz",
-      "md5sum": "409c9d1b8536329d69f9420b7ce290fa",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "df998403872b1b7dabd3c5654c8b4bdd",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8104,14 +8240,17 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.pbsv.phased.vcf.gz",
-      "md5sum": "1ae118cdedbaeba443d2dee6a91ab7ac",
-      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
-      "variant_types": ["SV"],
+      "md5sum": "5aabfc700085760247e634251e61c6ab",
+      "caller_software": [
+        "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
-
   {
     "model": "experiments.calledvariantspacbio",
     "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-hificnv_1",
@@ -8122,9 +8261,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-001-001-0-D-2.vcf.gz",
-      "md5sum": "32a14e3bddaf67f106a55afa6d5b40ab",
-      "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["SV"],
+      "md5sum": "5327ad9cf21edc389f0bcca2d6933e4d",
+      "caller_software": [
+        "source=hificnv v0.1.7-70e9988"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8139,9 +8282,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-001-001-0-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
-      "md5sum": "8a0ff19e407070869c605f7c9b80b3db",
-      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
-      "variant_types": ["RE"],
+      "md5sum": "5967a3506c58eaa480a31b5442e03fde",
+      "caller_software": [
+        "trgtVersion=0.5.0-a70fa16"
+      ],
+      "variant_types": [
+        "RE"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8156,8 +8303,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.deepvariant.phased.vcf.gz",
-      "md5sum": "3ec89391f86668a8d3309fcb439a5581",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "8324391039a5b07a033e22fe31393ca9",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8176,8 +8325,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.deepvariant.g.vcf.gz",
-      "md5sum": "34c6226e9245c2a4f994b7bf9bb1e3b9",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "22e8d6b058db0ed570d3a1def133fa34",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8196,9 +8347,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.pbsv.phased.vcf.gz",
-      "md5sum": "5b4c838b11925af208d7285db2ead3f8",
-      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
-      "variant_types": ["SV"],
+      "md5sum": "5bcf3328ba856a669d97c7c958a277b0",
+      "caller_software": [
+        "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8213,14 +8368,17 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-002-001-2-D-2.vcf.gz",
-      "md5sum": "dfa282ec5d8f3225b4a52d585ac5a946",
-      "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["SV"],
+      "md5sum": "ff78f4eb30634f4c717fb86c43ec5457",
+      "caller_software": [
+        "source=hificnv v0.1.7-70e9988"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
-
   {
     "model": "experiments.calledvariantspacbio",
     "pk": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-trgt_1",
@@ -8231,9 +8389,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-002-001-2-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-002-001-2-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
-      "md5sum": "3e5ed7ae2b72ca4f975d7caee5fe15b8",
-      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
-      "variant_types": ["RE"],
+      "md5sum": "67877075e1655b8a900699270bde9f57",
+      "caller_software": [
+        "trgtVersion=0.5.0-a70fa16"
+      ],
+      "variant_types": [
+        "RE"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8248,8 +8410,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.deepvariant.phased.vcf.gz",
-      "md5sum": "ca9be587841b5c388dc0ec5853b5fe22",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "33174d901040fe6ff28c625be4d115ff",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8268,8 +8432,10 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-deepvariant_gvcf_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.deepvariant.g.vcf.gz",
-      "md5sum": "6bee2de0edbe3ad91066c1d6fb3ee5e4",
-      "caller_software": ["DeepVariant_version=1.5.0"],
+      "md5sum": "afb5db3d8531797544183fe601f31983",
+      "caller_software": [
+        "DeepVariant_version=1.5.0"
+      ],
       "variant_types": [
         "SNV",
         "INDEL"
@@ -8288,9 +8454,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-pbsv_phased_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.pbsv.phased.vcf.gz",
-      "md5sum": "7d194af7751b3fd24ab88fe06fd40ba5",
-      "caller_software": ["source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"],
-      "variant_types": ["SV"],
+      "md5sum": "28907f56101d7c4b2fc2abed031b049d",
+      "caller_software": [
+        "source=pbsv 2.9.0 (commit v2.9.0-2-gce1559a)"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8305,14 +8475,17 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-hificnv_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-003-001-1-D-2.vcf.gz",
-      "md5sum": "e456cef3b2e96e1246a23c34322fb7f9",
-      "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["SV"],
+      "md5sum": "d371bb7ee77928399c2ff8ca19c1ba44",
+      "caller_software": [
+        "source=hificnv v0.1.7-70e9988"
+      ],
+      "variant_types": [
+        "SV"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
   },
-
   {
     "model": "experiments.calledvariantspacbio",
     "pk": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-trgt_1",
@@ -8323,9 +8496,13 @@
       "changed_by": "wheel",
       "aligned_pac_bio_set_id": "UCI_GREGoR_test-003-001-1-D-2_PB_1-Aligned_1-trgt_1",
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/GREGoR_test-003-001-1-D-2.GRCh38.haplotagged.trgt.sorted.vcf.gz",
-      "md5sum": "953335999118aca5234be7f33dec366b",
-      "caller_software": ["trgtVersion=0.5.0-a70fa16"],
-      "variant_types": ["RE"],
+      "md5sum": "87bdf8061f9b9e2d74bc58dfd3f4923b",
+      "caller_software": [
+        "trgtVersion=0.5.0-a70fa16"
+      ],
+      "variant_types": [
+        "RE"
+      ],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8381,5 +8558,747 @@
     "model": "submodels.twinid",
     "pk": "0",
     "fields": {}
+  },
+  {
+    "model": "submodels.pmidid",
+    "pk": "30000001",
+    "fields": {}
+  },
+  {
+    "model": "submodels.pmidid",
+    "pk": "30000002",
+    "fields": {}
+  },
+  {
+    "model": "metadata.family",
+    "pk": "UCI_GREGoR_prodshape-001",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "consanguinity": "Present",
+      "consanguinity_detail": "Synthetic first-cousin relationship",
+      "pedigree_file": "s3://synthetic-test/pedigree/UCI_GREGoR_prodshape-001.ped",
+      "pedigree_file_detail": "Synthetic three-generation pedigree",
+      "family_history_detail": "Synthetic family used for production-shape fixture coverage"
+    }
+  },
+  {
+    "model": "metadata.participant",
+    "pk": "UCI_GREGoR_prodshape-001-001",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "gregor_center": "UCI",
+      "consent_code": "GRU",
+      "recontactable": "Yes",
+      "prior_testing": [
+        "Synthetic nondiagnostic gene panel"
+      ],
+      "family_id": "UCI_GREGoR_prodshape-001",
+      "paternal_id": "0",
+      "maternal_id": "0",
+      "proband_relationship": "Self",
+      "proband_relationship_detail": "",
+      "sex": "Female",
+      "sex_detail": "",
+      "reported_ethnicity": "Not Hispanic or Latino",
+      "ancestry_detail": "Synthetic ancestry detail",
+      "age_at_last_observation": 28.0,
+      "affected_status": "Affected",
+      "phenotype_description": [
+        "Synthetic multisystem phenotype"
+      ],
+      "age_at_enrollment": 25.0,
+      "solve_status": "Partially solved",
+      "missing_variant_case": "No",
+      "missing_variant_details": "",
+      "internal_project_id": [
+        "UTAortaStudy"
+      ],
+      "pmid_id": [
+        "30000001",
+        "30000002"
+      ],
+      "twin_id": [
+        "0"
+      ],
+      "reported_race": [
+        "White"
+      ]
+    }
+  },
+  {
+    "model": "metadata.participant",
+    "pk": "UCI_GREGoR_prodshape-001-002",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "gregor_center": "UCI",
+      "consent_code": "GRU",
+      "recontactable": "No",
+      "prior_testing": [],
+      "family_id": "UCI_GREGoR_prodshape-001",
+      "paternal_id": "0",
+      "maternal_id": "0",
+      "proband_relationship": "Sibling",
+      "proband_relationship_detail": "",
+      "sex": "Male",
+      "sex_detail": "",
+      "reported_ethnicity": "Not Hispanic or Latino",
+      "ancestry_detail": "",
+      "age_at_last_observation": 31.0,
+      "affected_status": "Unaffected",
+      "phenotype_description": [
+        "Synthetic unaffected sibling"
+      ],
+      "age_at_enrollment": 29.0,
+      "solve_status": "Unsolved",
+      "missing_variant_case": "No",
+      "missing_variant_details": "",
+      "internal_project_id": [],
+      "pmid_id": [],
+      "twin_id": [
+        "0"
+      ],
+      "reported_race": [
+        "White"
+      ]
+    }
+  },
+  {
+    "model": "metadata.participant",
+    "pk": "UCI_GREGoR_prodshape-001-003",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "gregor_center": "UCI",
+      "consent_code": "GRU",
+      "recontactable": "No",
+      "prior_testing": [],
+      "family_id": "UCI_GREGoR_prodshape-001",
+      "paternal_id": "0",
+      "maternal_id": "UCI_GREGoR_prodshape-001-001",
+      "proband_relationship": "Child",
+      "proband_relationship_detail": "",
+      "sex": "Unknown",
+      "sex_detail": "Synthetic sex chromosome detail",
+      "reported_ethnicity": "Not Hispanic or Latino",
+      "ancestry_detail": "",
+      "age_at_last_observation": 4.0,
+      "affected_status": "Unknown",
+      "phenotype_description": [
+        "Synthetic child of proband"
+      ],
+      "age_at_enrollment": 3.0,
+      "solve_status": "Unsolved",
+      "missing_variant_case": "Unknown",
+      "missing_variant_details": "",
+      "internal_project_id": [],
+      "pmid_id": [],
+      "twin_id": [
+        "0"
+      ],
+      "reported_race": [
+        "White"
+      ]
+    }
+  },
+  {
+    "model": "metadata.participant",
+    "pk": "UCI_GREGoR_prodshape-001-004",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "gregor_center": "UCI",
+      "consent_code": "HMB",
+      "recontactable": "No",
+      "prior_testing": [],
+      "family_id": "UCI_GREGoR_prodshape-001",
+      "paternal_id": "0",
+      "maternal_id": "0",
+      "proband_relationship": "Other",
+      "proband_relationship_detail": "Maternal first cousin once removed",
+      "sex": "Female",
+      "sex_detail": "",
+      "reported_ethnicity": "Hispanic or Latino",
+      "ancestry_detail": "Synthetic mixed ancestry detail",
+      "age_at_last_observation": 52.0,
+      "affected_status": "Possibly affected",
+      "phenotype_description": [
+        "Synthetic distant relative"
+      ],
+      "age_at_enrollment": 50.0,
+      "solve_status": "Unsolved",
+      "missing_variant_case": "No",
+      "missing_variant_details": "",
+      "internal_project_id": [],
+      "pmid_id": [
+        "30000001"
+      ],
+      "twin_id": [
+        "0"
+      ],
+      "reported_race": [
+        "White"
+      ]
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-001_MONDO-0000001",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "term_id": "MONDO:0000001",
+      "presence": "Present",
+      "ontology": "MONDO",
+      "additional_details": "Synthetic MONDO phenotype",
+      "onset_age_range": "HP:0011463",
+      "additional_modifiers": [
+        "MONDO:0021125"
+      ],
+      "syndromic": "syndromic"
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-001_OMIM-123456",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "term_id": "OMIM:123456",
+      "presence": "Present",
+      "ontology": "OMIM",
+      "additional_details": "Synthetic OMIM phenotype",
+      "onset_age_range": "HP:0003581",
+      "additional_modifiers": [],
+      "syndromic": "syndromic"
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-002_ORPHA-12345",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-002",
+      "term_id": "ORPHA:12345",
+      "presence": "Absent",
+      "ontology": "ORPHANET",
+      "additional_details": "Synthetic absent ORPHANET phenotype",
+      "onset_age_range": "HP:0011463",
+      "additional_modifiers": [],
+      "syndromic": "non-syndromic"
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-003_SCTID-1234567",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-003",
+      "term_id": "SCTID:1234567",
+      "presence": "Unknown",
+      "ontology": "SNOMED",
+      "additional_details": "Synthetic unknown SNOMED phenotype",
+      "onset_age_range": "HP:0030674",
+      "additional_modifiers": [],
+      "syndromic": "non-syndromic"
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-004_ICD10-G40.3",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-004",
+      "term_id": "G40.3",
+      "presence": "Present",
+      "ontology": "ICD10",
+      "additional_details": "Synthetic ICD10 phenotype",
+      "onset_age_range": "HP:0003577",
+      "additional_modifiers": [],
+      "syndromic": "non-syndromic"
+    }
+  },
+  {
+    "model": "metadata.phenotype",
+    "pk": "UCI_GREGoR_prodshape-001-001_HP-0001250",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "term_id": "HP:0001250",
+      "presence": "Absent",
+      "ontology": "HPO",
+      "additional_details": "Synthetic absent HPO phenotype",
+      "onset_age_range": "HP:0011463",
+      "additional_modifiers": [
+        "HP:0011009"
+      ],
+      "syndromic": "syndromic"
+    }
+  },
+  {
+    "model": "metadata.analyte",
+    "pk": "UCI_GREGoR_prodshape-001-001-R-1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "analyte_type": "RNA",
+      "analyte_processing_details": "Synthetic total RNA extraction",
+      "primary_biosample": "UBERON:0001003",
+      "primary_biosample_id": "PRODSHAPE-FIBROBLAST-1",
+      "primary_biosample_details": "Synthetic skin-derived RNA sample",
+      "tissue_affected_status": "Yes",
+      "age_at_collection": 25.0,
+      "participant_drugs_intake": "none",
+      "participant_special_diet": "none",
+      "hours_since_last_meal": 4.0,
+      "passage_number": 3,
+      "time_to_freeze": 15.0,
+      "sample_transformation_detail": "none",
+      "quality_issues": "Synthetic low RNA yield",
+      "internal_analyte_id": "PRODSHAPE-RNA-1"
+    }
+  },
+  {
+    "model": "metadata.analyte",
+    "pk": "UCI_GREGoR_prodshape-001-002-D-1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-002",
+      "analyte_type": "high molecular weight DNA",
+      "analyte_processing_details": "Synthetic HMW DNA extraction",
+      "primary_biosample": "UBERON:0000178",
+      "primary_biosample_id": "PRODSHAPE-BLOOD-1",
+      "primary_biosample_details": "Synthetic unaffected whole blood",
+      "tissue_affected_status": "No",
+      "age_at_collection": 29.0,
+      "participant_drugs_intake": null,
+      "participant_special_diet": null,
+      "hours_since_last_meal": null,
+      "passage_number": null,
+      "time_to_freeze": 20.0,
+      "sample_transformation_detail": null,
+      "quality_issues": "No known quality issues",
+      "internal_analyte_id": "PRODSHAPE-DNA-1"
+    }
+  },
+  {
+    "model": "experiments.experiment",
+    "pk": "experiment_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "table_name": "experiment_rna_short_read",
+      "id_in_table": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1",
+      "participant_id": "UCI_GREGoR_prodshape-001-001"
+    }
+  },
+  {
+    "model": "experiments.experimentrnashortread",
+    "pk": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "analyte_id": "UCI_GREGoR_prodshape-001-001-R-1",
+      "experiment_sample_id": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1",
+      "rna_sample_type": "GREGoR_sample",
+      "seq_library_prep_kit_method": "Synthetic ribosomal and globin depletion",
+      "read_length": 150,
+      "single_or_paired_ends": "paired-end",
+      "date_data_generation": "2026-08-01",
+      "sequencing_platform": "NovaSeq",
+      "within_site_batch_name": "PRODSHAPE-RNA-BATCH-1",
+      "RIN": 7.8,
+      "estimated_library_size": 350.0,
+      "total_reads": 125000000.0,
+      "library_prep_type": [
+        3,
+        4
+      ],
+      "prep_targets_detail": [],
+      "experiment_type": [
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "experiments.aligned",
+    "pk": "aligned_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "table_name": "aligned_rna_short_read",
+      "id_in_table": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "aligned_file": "s3://synthetic-test/cram/RNA/UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1.cram",
+      "aligned_index_file": "s3://synthetic-test/cram/RNA/UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1.cram.crai"
+    }
+  },
+  {
+    "model": "experiments.alignedrnashortread",
+    "pk": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "experiment_rna_short_read_id": "UCI_GREGoR_prodshape-001-001-R-1_RNA_1",
+      "aligned_rna_short_read_file": "s3://synthetic-test/cram/RNA/UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1.cram",
+      "aligned_rna_short_read_index_file": "s3://synthetic-test/cram/RNA/UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1.cram.crai",
+      "md5sum": "8434aaf80e9496206284cc7ed33839c8",
+      "reference_assembly": "GRCh38",
+      "reference_assembly_uri": "https://example.org/reference/GRCh38.fa",
+      "reference_assembly_details": "GRCh38 no-alt analysis set",
+      "gene_annotation": "GENCODEv41",
+      "gene_annotation_details": "gencode_comprehensive_chr",
+      "alignment_software": "STARv2.7.10a",
+      "alignment_log_file": "s3://synthetic-test/qc/UCI_GREGoR_prodshape-RNA-1.log",
+      "alignment_postprocessing": "Duplicate marking and base recalibration",
+      "mean_coverage": 48.5,
+      "percent_uniquely_aligned": 86.2,
+      "percent_multimapped": 8.1,
+      "percent_unaligned": 5.7,
+      "quality_issues": "Synthetic 3-prime bias",
+      "alignment_QC_output_file": "s3://synthetic-test/qc/UCI_GREGoR_prodshape-RNA-1.tsv",
+      "percent_rRNA": 4.2,
+      "percent_mRNA": 78.0,
+      "percent_mtRNA": 3.1,
+      "percent_Globin": 1.0,
+      "percent_UMI": 0.0,
+      "five_prime_three_prime_bias": 1.15,
+      "percent_GC": 51.3,
+      "percent_chrX_Y": 4.8
+    }
+  },
+  {
+    "model": "metadata.geneticfindings",
+    "pk": "1_100001_PRODSHAPE_INDEL",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "experiment_id": [
+        "experiment_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1"
+      ],
+      "variant_type": [
+        "INDEL"
+      ],
+      "sv_type": "",
+      "variant_reference_assembly": "GRCh38",
+      "chrom": "1",
+      "chrom_end": "",
+      "pos": 100001,
+      "pos_end": null,
+      "ref": "AT",
+      "alt": "A",
+      "copy_number": null,
+      "ClinGen_allele_ID": "CA2877328",
+      "gene_of_interest": [
+        "GENE1"
+      ],
+      "transcript": "ENST00000000001.1",
+      "hgvsc": "c.100del",
+      "hgvsp": "p.Lys34SerfsTer5",
+      "hgvs": "NC_000001.11:g.100001del",
+      "zygosity": "Heterozygous",
+      "allele_balance_or_heteroplasmy_percentage": 48.0,
+      "variant_inheritance": "maternal",
+      "linked_variant": "",
+      "linked_variant_phase": "",
+      "gene_known_for_phenotype": "Known",
+      "known_condition_name": "Synthetic condition one",
+      "condition_id": "OMIM:123456",
+      "condition_inheritance": [
+        "Autosomal dominant"
+      ],
+      "GREGoR_variant_classification": "Pathogenic",
+      "GREGoR_ClinVar_SCV": "SCV000000001",
+      "gene_disease_validity": "Definitive",
+      "public_database_other": [
+        "ClinVar"
+      ],
+      "public_database_ID_other": [
+        "VCV000000001"
+      ],
+      "phenotype_contribution": "Full",
+      "partial_contribution_explained": [],
+      "method_of_discovery": [
+        "SR-GS"
+      ],
+      "notes": "Synthetic rich INDEL finding",
+      "additional_family_members_with_variant": [
+        "UCI_GREGoR_prodshape-001-004"
+      ]
+    }
+  },
+  {
+    "model": "metadata.geneticfindings",
+    "pk": "2_200001_250001_PRODSHAPE_SV",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "experiment_id": [
+        "see_MOD"
+      ],
+      "variant_type": [
+        "SV"
+      ],
+      "sv_type": "DUP",
+      "variant_reference_assembly": "GRCh38",
+      "chrom": "2",
+      "chrom_end": "2",
+      "pos": 200001,
+      "pos_end": 250001,
+      "ref": null,
+      "alt": null,
+      "copy_number": 3,
+      "ClinGen_allele_ID": "",
+      "gene_of_interest": [
+        "GENE2"
+      ],
+      "transcript": "",
+      "hgvsc": "",
+      "hgvsp": "",
+      "hgvs": "NC_000002.12:g.200001_250001dup",
+      "zygosity": "Heterozygous",
+      "allele_balance_or_heteroplasmy_percentage": null,
+      "variant_inheritance": "de novo",
+      "linked_variant": "",
+      "linked_variant_phase": "",
+      "gene_known_for_phenotype": "Candidate",
+      "known_condition_name": "",
+      "condition_id": "",
+      "condition_inheritance": [],
+      "GREGoR_variant_classification": "Uncertain significance",
+      "GREGoR_ClinVar_SCV": "",
+      "gene_disease_validity": "Limited",
+      "public_database_other": [
+        "dbVar"
+      ],
+      "public_database_ID_other": [
+        "nsv0000001"
+      ],
+      "phenotype_contribution": "Uncertain",
+      "partial_contribution_explained": [],
+      "method_of_discovery": [
+        "LR-GS"
+      ],
+      "notes": "Synthetic structural variant with populated end coordinates",
+      "additional_family_members_with_variant": []
+    }
+  },
+  {
+    "model": "metadata.geneticfindings",
+    "pk": "3_300001_PRODSHAPE_RE",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "experiment_id": [
+        "see_MOD"
+      ],
+      "variant_type": [
+        "RE"
+      ],
+      "sv_type": "",
+      "variant_reference_assembly": "GRCh38",
+      "chrom": "3",
+      "chrom_end": "",
+      "pos": 300001,
+      "pos_end": null,
+      "ref": "CAG",
+      "alt": "CAGCAGCAGCAG",
+      "copy_number": null,
+      "ClinGen_allele_ID": "",
+      "gene_of_interest": [
+        "GENE3"
+      ],
+      "transcript": "ENST00000000003.1",
+      "hgvsc": "c.300_302CAG[40]",
+      "hgvsp": "p.Gln100[40]",
+      "hgvs": "",
+      "zygosity": "Heterozygous",
+      "allele_balance_or_heteroplasmy_percentage": null,
+      "variant_inheritance": "paternal",
+      "linked_variant": "",
+      "linked_variant_phase": "",
+      "gene_known_for_phenotype": "Candidate",
+      "known_condition_name": "",
+      "condition_id": "",
+      "condition_inheritance": [
+        "Unknown"
+      ],
+      "GREGoR_variant_classification": "Curation in progress",
+      "GREGoR_ClinVar_SCV": "",
+      "gene_disease_validity": "Curation in progress",
+      "public_database_other": [],
+      "public_database_ID_other": [],
+      "phenotype_contribution": "Uncertain",
+      "partial_contribution_explained": [],
+      "method_of_discovery": [
+        "LR-GS",
+        "LR RNA-seq"
+      ],
+      "notes": "Synthetic repeat expansion finding",
+      "additional_family_members_with_variant": []
+    }
+  },
+  {
+    "model": "metadata.geneticfindings",
+    "pk": "4_400001_PRODSHAPE_SNV",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "experiment_id": [
+        "experiment_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1"
+      ],
+      "variant_type": [
+        "SNV"
+      ],
+      "sv_type": "",
+      "variant_reference_assembly": "GRCh38",
+      "chrom": "4",
+      "chrom_end": "",
+      "pos": 400001,
+      "pos_end": null,
+      "ref": "G",
+      "alt": "A",
+      "copy_number": null,
+      "ClinGen_allele_ID": "CA2877329",
+      "gene_of_interest": [
+        "GENE4"
+      ],
+      "transcript": "ENST00000000004.1",
+      "hgvsc": "c.400G>A",
+      "hgvsp": "p.Gly134Arg",
+      "hgvs": "NC_000004.12:g.400001G>A",
+      "zygosity": "Mosaic",
+      "allele_balance_or_heteroplasmy_percentage": 22.5,
+      "variant_inheritance": "unknown",
+      "linked_variant": "",
+      "linked_variant_phase": "unknown",
+      "gene_known_for_phenotype": "Known",
+      "known_condition_name": "Synthetic condition four",
+      "condition_id": "MONDO:0000001",
+      "condition_inheritance": [
+        "Somatic mosaicism"
+      ],
+      "GREGoR_variant_classification": "Likely pathogenic",
+      "GREGoR_ClinVar_SCV": "SCV000000004",
+      "gene_disease_validity": "Strong",
+      "public_database_other": [
+        "ClinVar",
+        "LOVD"
+      ],
+      "public_database_ID_other": [
+        "VCV000000004",
+        "LOVD000004"
+      ],
+      "phenotype_contribution": "Partial",
+      "partial_contribution_explained": [
+        "HP:0001250"
+      ],
+      "method_of_discovery": [
+        "SR RNA-seq",
+        "SR-GS-reanalysis"
+      ],
+      "notes": "Synthetic mosaic SNV with production-shape optional fields",
+      "additional_family_members_with_variant": [
+        "UCI_GREGoR_prodshape-001-002"
+      ]
+    }
+  },
+  {
+    "model": "metadata.biobank",
+    "pk": "UCI_GREGoR_prodshape-001-001-R-1",
+    "fields": {
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
+      "participant_id": "UCI_GREGoR_prodshape-001-001",
+      "collection_source": "Synthetic clinical collection",
+      "received_date": "2026-07-01",
+      "specimen_type": "R",
+      "current_location": "Synthetic biobank",
+      "freezer_id": "F1",
+      "shelf_id": "S1",
+      "rack_id": "R1",
+      "box_type": "9x9 cryobox",
+      "box_id": "PRODSHAPE-BOX-1",
+      "box_position": "A01",
+      "tube_barcode": "PRODSHAPE-TUBE-1",
+      "plate_barcode": null,
+      "status": "Data delivered",
+      "shipment_date": "2026-07-02",
+      "tracking_number": "SYNTHETIC-TRACKING-1",
+      "test_indication": "Research",
+      "requested_test": "Synthetic RNA sequencing",
+      "external_id": "PRODSHAPE-EXT-1",
+      "internal_analysis": "Synthetic RNA pipeline v1",
+      "comments": "Synthetic production-shape biobank row",
+      "completed": true,
+      "child_analytes": [
+        "UCI_GREGoR_prodshape-001-001-R-1"
+      ],
+      "experiments": [
+        "experiment_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1"
+      ],
+      "alignments": [
+        "aligned_rna_short_read.UCI_GREGoR_prodshape-001-001-R-1_RNA_1-Aligned_1"
+      ]
+    }
   }
 ]

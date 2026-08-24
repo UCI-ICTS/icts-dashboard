@@ -46,6 +46,12 @@ ANVIL_PACKAGE_ROOT = secrets.get(
     fallback=os.path.join(BASE_DIR, "anvil_packages"),
 )
 
+ANVIL_FILE_STAGING_ROOT = secrets.get(
+    "SERVER",
+    "ANVIL_FILE_STAGING_ROOT",
+    fallback=os.path.join(BASE_DIR, "anvil_file_staging"),
+)
+
 EMAIL_BACKEND = secrets.get(
     "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
 )

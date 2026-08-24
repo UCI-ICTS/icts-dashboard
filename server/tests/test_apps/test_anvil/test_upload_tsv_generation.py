@@ -135,11 +135,11 @@ class AnvilUploadTsvGenerationTests(TestCase):
                 for upload_table in upload_tables
             }
 
-            self.assertEqual(table_row_counts["family"], 4)
-            self.assertEqual(table_row_counts["participant"], 6)
-            self.assertEqual(table_row_counts["phenotype"], 21)
-            self.assertEqual(table_row_counts["analyte"], 31)
-            self.assertEqual(table_row_counts["genetic_findings"], 5)
+            self.assertEqual(table_row_counts["family"], 5)
+            self.assertEqual(table_row_counts["participant"], 10)
+            self.assertEqual(table_row_counts["phenotype"], 27)
+            self.assertEqual(table_row_counts["analyte"], 33)
+            self.assertEqual(table_row_counts["genetic_findings"], 9)
 
     def test_generated_participant_tsv_uses_gregor_schema_columns(self):
         with tempfile.TemporaryDirectory() as temp_dir, override_settings(
@@ -157,7 +157,7 @@ class AnvilUploadTsvGenerationTests(TestCase):
                 reader = csv.DictReader(file_handle, delimiter="\t")
                 rows = list(reader)
 
-            self.assertEqual(len(rows), 6)
+            self.assertEqual(len(rows), 10)
             self.assertIn("participant_id", reader.fieldnames)
             self.assertIn("solve_status", reader.fieldnames)
 
@@ -233,11 +233,11 @@ class AnvilUploadTsvGenerationTests(TestCase):
                 reader = csv.DictReader(file_handle, delimiter="\t")
                 participant_ids = [row["participant_id"] for row in reader]
 
-            self.assertEqual(len(participant_ids), 5)
+            self.assertEqual(len(participant_ids), 9)
             self.assertNotIn("GREGoR_test-006-006-0", participant_ids)
 
         participant_table = self.upload.upload_tables.get(table_name="participant")
-        self.assertEqual(participant_table.row_count, 5)
+        self.assertEqual(participant_table.row_count, 9)
 
     def test_generate_upload_tsvs_is_repeatable(self):
         with tempfile.TemporaryDirectory() as temp_dir, override_settings(

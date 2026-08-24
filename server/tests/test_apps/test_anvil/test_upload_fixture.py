@@ -46,25 +46,25 @@ class AnvilUploadFixtureTests(TestCase):
     fixtures = ["tests/fixtures/test_fixture_valid.json"]
 
     def test_valid_upload_fixture_has_expected_core_counts(self):
-        self.assertEqual(Family.objects.count(), 4)
-        self.assertEqual(Participant.objects.count(), 6)
-        self.assertEqual(Phenotype.objects.count(), 21)
-        self.assertEqual(Analyte.objects.count(), 31)
-        self.assertEqual(GeneticFindings.objects.count(), 5)
+        self.assertEqual(Family.objects.count(), 5)
+        self.assertEqual(Participant.objects.count(), 10)
+        self.assertEqual(Phenotype.objects.count(), 27)
+        self.assertEqual(Analyte.objects.count(), 33)
+        self.assertEqual(GeneticFindings.objects.count(), 9)
 
     def test_valid_upload_fixture_has_expected_generic_experiment_and_alignment_counts(self):
-        self.assertEqual(Experiment.objects.count(), 13)
-        self.assertEqual(Aligned.objects.count(), 13)
+        self.assertEqual(Experiment.objects.count(), 14)
+        self.assertEqual(Aligned.objects.count(), 14)
 
     def test_valid_upload_fixture_has_expected_detailed_experiment_counts(self):
         self.assertEqual(ExperimentDnaShortRead.objects.count(), 6)
-        self.assertEqual(ExperimentRnaShortRead.objects.count(), 1)
+        self.assertEqual(ExperimentRnaShortRead.objects.count(), 2)
         self.assertEqual(ExperimentNanopore.objects.count(), 3)
         self.assertEqual(ExperimentPacBio.objects.count(), 3)
 
     def test_valid_upload_fixture_has_expected_detailed_alignment_counts(self):
         self.assertEqual(AlignedDnaShortRead.objects.count(), 6)
-        self.assertEqual(AlignedRnaShortRead.objects.count(), 1)
+        self.assertEqual(AlignedRnaShortRead.objects.count(), 2)
         self.assertEqual(AlignedNanopore.objects.count(), 3)
         self.assertEqual(AlignedPacBio.objects.count(), 3)
 
