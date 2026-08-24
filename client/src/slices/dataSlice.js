@@ -11,6 +11,7 @@ const initialState = {
   tableID: "participant_id",
   tableName: "Participants",
   jsonData: null,
+  fetchSummary: null,
   familyDetail: null,
   caseQueue: null,
   participants: [],
@@ -55,6 +56,9 @@ export const dataSlice = createSlice({
       if (index !== -1) {
         state.rag_hpos[index].choice = choice
       }
+    },
+    clearFetchSummary: (state) => {
+      state.fetchSummary = null;
     },
     clearRagHpos: (state) => {
       state.rag_hpos = [];
@@ -200,6 +204,16 @@ export const dataSlice = createSlice({
       .addCase(deleteEntry.rejected, (state, action) => {
         state.status = "rejected";
       })
+      .addCase(fetchSummary.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(fetchSummary.rejected, (state, action) => {
+        state.status = "rejected";
+      })
+      .addCase(fetchSummary.fulfilled, (state, action) => {
+        state.fetchSummary = action.payload
+        state.status = "fulfilled";
+      })
       .addCase(familyDetail.pending, (state, action) => {
         state.status = "loading";
       })
@@ -235,6 +249,19 @@ export const dataSlice = createSlice({
       })
   }
 });
+
+export const fetchSummary = createAsyncThunk(
+  "fetchSummary",
+  async (thunkAPI) => {
+    try {
+      const response = await dataService.fetchSummary();
+      return response.data
+    } catch(error) {
+      message.error(errorService.printErrorMessages(error));
+      return thunkAPI.rejectWithValue()
+    }
+  }
+);
 
 export const openReport = createAsyncThunk(
   "openReport",

@@ -2,7 +2,7 @@
 # config/urls.py
 
 """
-Main URL configuration for GREGoRDB Dashboard. 
+Main URL configuration for GREGoRDB Dashboard.
 """
 
 from django.conf import settings
@@ -59,5 +59,4 @@ urlpatterns = [
         "api/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
     path("api/admin/", admin.site.urls),
-    
 ]

@@ -1,0 +1,19 @@
+{% extends "drf-yasg/swagger-ui.html" %}
+{% block extra_scripts %}
+  <script>
+    window.addEventListener('load', function () {
+      const token = sessionStorage.getItem('swagger_access_token');
+      if (token && window.ui) {
+        console.log("Authorizing with ", token)
+        window.ui.authActions.authorize({
+          Bearer: {
+            name: "Bearer",
+            schema: { type: "apiKey", in: "header", name: "Authorization" },
+            value: "Bearer " + token
+          }
+        });
+        sessionStorage.removeItem('swagger_access_token');
+      }
+    });
+  </script>
+{% endblock %}

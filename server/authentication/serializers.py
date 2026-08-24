@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# authentication/services.py
+# authentication/serializers.py
 
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User, update_last_login
@@ -211,3 +211,14 @@ class CustomAuthentication(BaseAuthentication):
 
         # Return the user and the token
         return user, token
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    token = serializers.CharField(help_text="Google ID token from the frontend")
+
+
+class FirecloudUploadSerializer(serializers.Serializer):
+    bucket_name = serializers.CharField(help_text="GCS bucket name for the workspace, e.g. 'fc-secure-abc123-...")
+    google_project_id = serializers.CharField(help_text="Terra billing project / Google project ID for the workspace (for requester-pays billing)")
+    destination_path = serializers.CharField(help_text="Path within the workspace bucket, e.g. 'uploads/data.csv'")
+    file = serializers.FileField()

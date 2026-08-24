@@ -1,21 +1,36 @@
 #!/usr/bin/env python
 # authentication/apis.py
 
-import string
+
+from datetime import timedelta
 import secrets
+import string
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login as django_login, logout as django_logout
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.shortcuts import render, redirect
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
+import requests as http_requests
+
 from rest_framework import status, permissions, viewsets
+from rest_framework.permissions import IsAdminUser
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import (
     TokenRefreshSerializer,
@@ -23,22 +38,25 @@ from rest_framework_simplejwt.serializers import (
     TokenBlacklistSerializer,
 )
 
-from authentication.services import (
+from authentication.models import GoogleCredential
+from authentication.selectors import IsSuperUser, get_active_user_emails
+from authentication.serializers import (
     UserInputSerializer,
     UserOutputSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     ChangePasswordSerializer,
+    CustomAuthentication,
     CustomTokenObtainPairSerializer,
     ActivateUserSerializer,
-    IsSuperUser,
-    EmailActiveUsers
+    GoogleAuthSerializer,
+    EmailActiveUsers,
+    FirecloudUploadSerializer,
 )
+from authentication.firecloud_utils import get_google_credentials, upload_to_workspace
 
-from authentication.selectors import IsSuperUser, get_active_user_emails
 
 User = get_user_model()
-
 
 class TokenViewSet(viewsets.ViewSet):
     """
@@ -74,6 +92,9 @@ class TokenViewSet(viewsets.ViewSet):
     def login(self, request):
         serializer = CustomTokenObtainPairSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        django_login(request, user)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -100,25 +121,19 @@ class TokenViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         request_body=TokenBlacklistSerializer,
-        responses={200: openapi.Response("Token blacklisted successfully")},
+        responses={200: openapi.Response("Token successfully blacklisted.")},
         tags=["JWT Auth"],
     )
-    @action(detail=False, methods=["post"], url_path="logout")
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="logout",
+        permission_classes=[permissions.IsAuthenticated],
+        authentication_classes=[CustomAuthentication, SessionAuthentication],
+    )
     def logout(self, request):
-        try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response(
-                    {"error": "Refresh token required."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"message": "Token successfully blacklisted."}, status=200)
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        django_logout(request)
+        return Response({"message": "Token successfully blacklisted."}, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -395,7 +410,7 @@ class EmailUsersViewSet(viewsets.ViewSet):
             self.action, self.permission_classes
         )
         return [perm() for perm in perms]
-    
+
     @swagger_auto_schema(
         request_body=EmailActiveUsers,
         responses={200: "Email sent successfully"},
@@ -416,7 +431,7 @@ class EmailUsersViewSet(viewsets.ViewSet):
         body=serializer.validated_data.get("body", "")
         html_template=serializer.validated_data.get("html_template", "string")
         if html_template == "string":
-            html_template= "emails/email_users.html" 
+            html_template= "emails/email_users.html"
         bcc=get_active_user_emails()
 
         html_content= render_to_string(html_template, serializer.validated_data)
@@ -430,3 +445,183 @@ class EmailUsersViewSet(viewsets.ViewSet):
         )
 
         return Response(serializer.errors, status=400)
+
+
+class GoogleAuthViewSet(viewsets.ViewSet):
+    authentication_classes = []
+    permission_classes_by_action = {
+        "swagger_helper": [permissions.AllowAny],  # change to IsSuperUser before prod
+        "google": [permissions.AllowAny],
+        "oauth_callback": [permissions.IsAuthenticated],
+    }
+
+    def get_permissions(self):
+        perms = self.permission_classes_by_action.get(
+            self.action, self.permission_classes
+        )
+        return [perm() for perm in perms]
+
+    @swagger_auto_schema(auto_schema=None)
+    @action(detail=False, methods=["get"], url_path="helper", authentication_classes=[SessionAuthentication])
+    def swagger_helper(self, request):
+        get_token(request)  # ensures the csrftoken cookie is set for this page's fetch() calls
+        return render(request, "swagger_auth_helper.html", {
+            "google_client_id": settings.GOOGLE_CLIENT_ID,
+            "google_redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        })
+
+    @swagger_auto_schema(
+        request_body=GoogleAuthSerializer,
+        responses={200: "Authenticated with Google OAuth"},
+        operation_description="Authenticate with Google OAuth",
+        tags=["Google OAuth"],
+    )
+
+    @action(detail=False, methods=["post"], url_path="google")
+    def google(self, request):
+        token = request.data.get("token")
+        if not token:
+            return Response({"error": "No token provided"}, status=400)
+
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            return Response({"error": "Invalid token"}, status=401)
+
+        username = idinfo.get("username", "")
+        email = idinfo["email"]
+
+        user, _ = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": username,
+                "email": email,
+            },
+        )
+
+        # Establish a real Django session so browser-redirect flows (like the
+        # Google OAuth callback, which can't carry a JWT Authorization header)
+        # can still identify the authenticated user.
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        django_login(request, user)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "user": {
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+                "date_joined": user.date_joined,
+            },
+        }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={200: "User credentials"},
+        operation_description="OAuth user information",
+        tags=["Google OAuth"],
+    )
+    @action(detail=False, methods=["get"], url_path="whoami", authentication_classes=[CustomAuthentication, SessionAuthentication])
+    def whoami(self, request):
+        user = request.user
+        creds = get_google_credentials(user)
+        return Response({
+            "user_id": user.pk,
+            "username": user.username,
+            "email": user.email,
+            "google_connected": creds is not None,
+        }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={200: "OAuth token"},
+        operation_description="OAuth callback",
+        tags=["Google OAuth"],
+        )
+    @action(detail=False, methods=["get"], url_path="callback", authentication_classes=[CustomAuthentication, SessionAuthentication])
+    def oauth_callback(self, request):
+        code = request.GET.get("code")
+        if not code:
+            return Response({"error": "No code provided"}, status=400)
+
+        token_response = http_requests.post("https://oauth2.googleapis.com/token", data={
+            "code": code,
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+            "grant_type": "authorization_code",
+        })
+        tokens = token_response.json()
+
+        if "error" in tokens:
+            return Response({"error": tokens.get("error_description", tokens["error"])}, status=400)
+
+        access_token = tokens.get("access_token")
+        refresh_token = tokens.get("refresh_token")
+        expires_in = tokens.get("expires_in", 3600)
+
+        if not refresh_token:
+            # Google only sends a refresh_token on first consent. If this user
+            # already has one on file, keep it rather than overwriting with nothing.
+            existing = GoogleCredential.objects.filter(user=request.user).first()
+            if existing:
+                refresh_token = existing.refresh_token
+            else:
+                return Response(
+                    {"error": "No refresh token returned. Revoke prior access at "
+                              "https://myaccount.google.com/permissions and try again."},
+                    status=400,
+                )
+
+        GoogleCredential.objects.update_or_create(
+            user=request.user,
+            defaults={
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "expires_at": timezone.now() + timedelta(seconds=expires_in),
+            },
+        )
+
+        return redirect(f"http://localhost:8000/api/swagger/")
+
+    @swagger_auto_schema(
+        request_body=FirecloudUploadSerializer,
+        responses={200: "File uploaded to workspace bucket"},
+        operation_description="Upload a file to a Firecloud/Terra workspace bucket using the caller's stored Google credentials",
+        tags=["Google OAuth"],
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="upload",
+        parser_classes=[MultiPartParser],
+        permission_classes=[permissions.IsAuthenticated],
+        authentication_classes=[CustomAuthentication, SessionAuthentication],
+    )
+    def upload(self, request):
+        serializer = FirecloudUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        creds = get_google_credentials(request.user)
+        if creds is None:
+            return Response(
+                {"error": "No Google credentials on file. Visit /api/auth/oauth/helper/ to connect."},
+                status=400,
+            )
+
+        bucket_name = serializer.validated_data["bucket_name"]
+        google_project_id = serializer.validated_data["google_project_id"]
+        destination_path = serializer.validated_data["destination_path"]
+        file_obj = serializer.validated_data["file"]
+
+        try:
+            gs_path = upload_to_workspace(creds, bucket_name, google_project_id, destination_path, file_obj)
+        except Exception as e:
+            return Response({"error": f"Upload failed: {e}"}, status=502)
+
+        return Response({"gs_path": gs_path}, status=status.HTTP_200_OK)

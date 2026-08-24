@@ -33,7 +33,7 @@ class IsSuperUser(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)
-    
+
 def get_active_user_emails():
     email_list = [email['email'] for email in User.objects.filter(is_active=True).values('email')]
     return email_list

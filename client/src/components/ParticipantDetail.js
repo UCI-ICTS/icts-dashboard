@@ -19,7 +19,7 @@ export default function ParticipantDetail({
   const familyData =  useSelector((state) => state.data.familyDetail)
   const rows = Array.isArray(familyData) ? familyData[0] : []
   const familyName = selectedRow.participant_id
-  
+
   const handleOpen = (schemaKey, record) => {
     if (openModal && record) {
       openModal("edit", { schemaKey, record });

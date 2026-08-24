@@ -52,8 +52,6 @@ DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
 CORS_ALLOWED_ORIGINS = secrets.get("SERVER", "CORS_ALLOWED_ORIGINS", fallback="http://localhost:3000").split(",")
 
 backup = [
-    "https://example.com",
-    "https://sub.example.com",
     "http://localhost:3000",
     "http://127.0.0.1:9000",
     "https://icts8001.hs.uci.edu",
@@ -95,10 +93,15 @@ EMBED_BASE_URL=secrets.get("RAG+HPO", "EMBED_BASE_URL", fallback="https://api.op
 EMBED_API_KEY=secrets.get("RAG+HPO", "EMBED_API_KEY", fallback="OOPS")
 EMBED_MODEL=secrets.get("RAG+HPO", "EMBED_MODEL", fallback="text-embedding-3-large")
 
-# AWS S3 
+# AWS S3
 AWS_ACCESS_KEY=secrets.get("AWS", "AWS_ACCESS_KEY", fallback="OOPS")
 AWS_SECRET_ACCESS_KEY=secrets.get("AWS", "AWS_SECRET_ACCESS_KEY", fallback="OOPS")
 AWS_REGION_NAME=secrets.get("AWS", "AWS_REGION_NAME", fallback="us-east-2")
+
+# GOOGLE OAUTH
+GOOGLE_CLIENT_ID=secrets.get("GOOGLE", "GOOGLE_CLIENT_ID", fallback="")
+GOOGLE_CLIENT_SECRET=secrets.get("GOOGLE", "GOOGLE_CLIENT_SECRET", fallback="")
+GOOGLE_REDIRECT_URI=secrets.get("GOOGLE", "GOOGLE_REDIRECT_URI", fallback="")
 
 # Application definition
 
@@ -110,20 +113,23 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.sites",
     "django.contrib.staticfiles",
     "django_extensions",
+    "authentication",
     "drf_yasg",
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "authentication",
     "metadata.apps.Metadata",
     "experiments.apps.Experiment",
     "submodels",
     "hpo.apps.HpoConfig",
     "utilities"
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -138,6 +144,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 TEMPLATES = [
     {
@@ -203,7 +211,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "authentication.services.CustomAuthentication",
+        "authentication.serializers.CustomAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
@@ -225,7 +233,29 @@ SWAGGER_SETTINGS = {
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
     },
     "DEEP_LINKING": True,
+    "PERSIST_AUTH": True,
+    "USE_SESSION_AUTH": False,
 }
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Google OAuth config
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True,
+        'APP': {
+            'client_id': GOOGLE_CLIENT_ID,
+            'secret': GOOGLE_CLIENT_SECRET,
+            'key': ''
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL = '/api/swagger'
 
 #MIGRATION_MODULES = {
 #    'auth': None,
