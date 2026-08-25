@@ -19,9 +19,9 @@ from anvil.serializers import (
     AnvilUploadInitializeSerializer,
 )
 from anvil.services import (
-    generate_upload_manifest,
     generate_upload_tsvs,
     initialize_upload_package,
+    validate_upload_files,
     validate_upload_package,
     validate_upload_source_data,
 )
@@ -138,40 +138,16 @@ class AnvilUploadViewSet(
         upload.refresh_from_db()
         serializer = self.get_serializer(upload)
 
-        return Response(
-            {
-                "upload": serializer.data,
-                "package_dir": result["package_dir"],
-                "tables_dir": result["tables_dir"],
-                "generated_count": len(result["generated"]),
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    @action(detail=True, methods=["post"], url_path="generate-manifest")
-    def generate_manifest(self, request, upload_id=None):
-        upload = self.get_object()
-
-        result = generate_upload_manifest(
-            upload=upload,
-            changed_by=self._changed_by(),
-        )
-
-        upload.refresh_from_db()
-        serializer = self.get_serializer(upload)
-
         manifest = result["manifest"]
 
         return Response(
             {
                 "upload": serializer.data,
+                "package_dir": result["package_dir"],
+                "tables_dir": result["tables_dir"],
                 "manifest_path": result["manifest_path"],
-                "artifact_id": result["artifact"].pk,
                 "manifest_state": manifest.get("manifest_state"),
-                "table_count": len(manifest.get("tables", {}).get("included", [])),
-                "table_tsv_artifact_count": len(
-                    manifest.get("artifacts", {}).get("table_tsvs", [])
-                ),
+                "generated_count": len(result["generated"]),
             },
             status=status.HTTP_200_OK,
         )

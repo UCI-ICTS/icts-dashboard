@@ -81,27 +81,8 @@ class AnvilUploadApiTests(APITestCase):
 
             self.assertEqual(generate_tsvs_response.status_code, status.HTTP_200_OK)
             self.assertEqual(generate_tsvs_response.data["generated_count"], 21)
-
-            generate_manifest_response = self.client.post(
-                self.upload_action_url("generate-manifest"),
-                data={"output_dir": temp_dir},
-                format="json",
-            )
-
             self.assertEqual(
-                generate_manifest_response.status_code,
-                status.HTTP_200_OK,
-            )
-            self.assertEqual(
-                generate_manifest_response.data["table_count"],
-                21,
-            )
-            self.assertEqual(
-                generate_manifest_response.data["table_tsv_artifact_count"],
-                21,
-            )
-            self.assertEqual(
-                generate_manifest_response.data["manifest_state"],
+                generate_tsvs_response.data["manifest_state"],
                 "package_generated",
             )
 

@@ -13,7 +13,6 @@ from anvil.models import (
     AnvilUploadValidationRun,
 )
 from anvil.services import (
-    generate_upload_manifest,
     generate_upload_tsvs,
     initialize_upload_package,
     validate_upload_package,
@@ -41,10 +40,6 @@ class AnvilUploadPackageValidationTests(TestCase):
         )
         validate_upload_source_data(upload=upload, changed_by=self.user)
         generate_upload_tsvs(
-            upload=upload,
-            changed_by=self.user,
-        )
-        generate_upload_manifest(
             upload=upload,
             changed_by=self.user,
         )

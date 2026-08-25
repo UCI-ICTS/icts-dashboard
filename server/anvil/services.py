@@ -35,6 +35,7 @@ from anvil.models import (
 
 
 SOURCE_VALIDATOR_VERSION = "dashboard-source-data-v0.4"
+PACKAGE_VALIDATOR_VERSION = "dashboard-package-v0.1"
 
 FILE_VALIDATOR_VERSION = "dashboard-file-checks-v0.1"
 
@@ -757,7 +758,7 @@ def _load_manifest_payload(*, upload):
                 observed=0,
                 message=(
                     "Upload package is missing an UPLOAD_MANIFEST artifact. "
-                    "Run generate_upload_manifest first."
+                    "Run initialize first."
                 ),
             )
         ]
@@ -1030,6 +1031,14 @@ def _get_selected_tsv_artifacts(
     return artifacts
 
 
+MANIFEST_VERSION = "dashboard-anvil-upload-manifest-v0.2"
+
+# Pipeline stages recorded in manifest["validation"]. Ordering defines the
+# derived upload status: any failed stage fails the upload; the upload is
+# ready for review only when every present stage has passed.
+MANIFEST_VALIDATION_STAGES = ["source", "files", "package"]
+
+
 def _build_initialized_manifest(*, upload, selected_tables):
     excluded_tables = [
         {
@@ -1041,7 +1050,7 @@ def _build_initialized_manifest(*, upload, selected_tables):
     ]
 
     return {
-        "manifest_version": "dashboard-anvil-upload-manifest-v0.1",
+        "manifest_version": MANIFEST_VERSION,
         "manifest_state": "initialized",
         "upload": {
             "upload_id": str(upload.upload_id),
@@ -1056,13 +1065,108 @@ def _build_initialized_manifest(*, upload, selected_tables):
         },
         "validation": {
             "source": None,
+            "files": None,
             "package": None,
         },
         "artifacts": {
             "table_tsvs": [],
-            "manifest": None,
+            "manifest": {"relative_path": "manifest.json"},
         },
     }
+
+
+def _record_stage_result(
+    *,
+    manifest: dict,
+    stage: str,
+    passed: bool,
+    validator: str,
+    run_id: int,
+    error_count: int,
+    warning_count: int = 0,
+    extra: dict | None = None,
+) -> None:
+    """
+    Record one pipeline stage's latest result in manifest["validation"].
+
+    Stages only ever write their own key; the validation dict itself is never
+    rebuilt, so results from other stages survive reruns of any single stage.
+    """
+
+    entry = {
+        "status": "passed" if passed else "failed",
+        "validator": validator,
+        "run_id": run_id,
+        "error_count": error_count,
+        "warning_count": warning_count,
+        "completed_at": timezone.now().isoformat(),
+    }
+
+    if extra:
+        entry.update(extra)
+
+    manifest.setdefault(
+        "validation",
+        {stage_name: None for stage_name in MANIFEST_VALIDATION_STAGES},
+    )
+    manifest["validation"][stage] = entry
+    manifest["manifest_state"] = (
+        f"{stage}_validated" if passed else f"{stage}_validation_failed"
+    )
+
+
+def derive_upload_status(*, manifest: dict) -> str:
+    """
+    Derive the upload lifecycle status from the latest result of every
+    pipeline stage, instead of letting the last stage to run clobber it.
+    """
+
+    stage_results = [
+        manifest.get("validation", {}).get(stage)
+        for stage in MANIFEST_VALIDATION_STAGES
+    ]
+    completed = [entry for entry in stage_results if entry is not None]
+
+    if any(entry["status"] == "failed" for entry in completed):
+        return AnvilUpload.Status.VALIDATION_FAILED
+
+    if completed:
+        return AnvilUpload.Status.READY_FOR_REVIEW
+
+    return AnvilUpload.Status.DRAFT
+
+
+def _apply_derived_upload_status(*, upload, manifest, changed_by=None) -> None:
+    upload.status = derive_upload_status(manifest=manifest)
+
+    if changed_by is not None:
+        upload.changed_by = changed_by
+
+    upload.save()
+
+
+def _sync_manifest_to_disk(*, upload, artifact) -> Path:
+    """
+    Serialize the manifest artifact's metadata to <package>/manifest.json.
+
+    Every stage that mutates the manifest calls this last, so the on-disk
+    file always matches the database record and there is no separate
+    "generate manifest" step to forget.
+    """
+
+    package_dir = _get_package_dir(upload=upload)
+    package_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = package_dir / "manifest.json"
+
+    with manifest_path.open("w", encoding="utf-8") as file_handle:
+        json.dump(artifact.metadata, file_handle, indent=2, sort_keys=True)
+        file_handle.write("\n")
+
+    artifact.byte_size = manifest_path.stat().st_size
+    artifact.sha256 = _sha256_file(manifest_path)
+    artifact.storage_uri = str(manifest_path)
+
+    return manifest_path
 
 
 def collect_upload_package_validation_errors(*, upload):
@@ -1097,7 +1201,7 @@ def validate_upload_package(
     validation_run = AnvilUploadValidationRun.objects.create(
         upload=upload,
         validator_type=AnvilUploadValidationRun.ValidatorType.DASHBOARD,
-        validator_version=SOURCE_VALIDATOR_VERSION,
+        validator_version=PACKAGE_VALIDATOR_VERSION,
         changed_by=changed_by,
     )
 
@@ -1108,7 +1212,7 @@ def validate_upload_package(
     passed = len(errors) == 0
 
     summary = {
-        "validator": "dashboard-package-v0.1",
+        "validator": PACKAGE_VALIDATOR_VERSION,
         "passed": passed,
         "error_count": len(errors),
         "warning_count": 0,
@@ -1128,16 +1232,33 @@ def validate_upload_package(
     )
     validation_run.save()
 
-    upload.status = (
-        AnvilUpload.Status.READY_FOR_REVIEW
-        if passed
-        else AnvilUpload.Status.VALIDATION_FAILED
-    )
+    manifest_artifact = get_upload_manifest_artifact(upload=upload)
 
-    if changed_by is not None:
-        upload.changed_by = changed_by
+    if manifest_artifact is not None:
+        manifest = manifest_artifact.metadata or {}
 
-    upload.save()
+        _record_stage_result(
+            manifest=manifest,
+            stage="package",
+            passed=passed,
+            validator=PACKAGE_VALIDATOR_VERSION,
+            run_id=validation_run.id,
+            error_count=len(errors),
+        )
+
+        manifest_artifact.metadata = manifest
+
+        if changed_by is not None:
+            manifest_artifact.changed_by = changed_by
+
+        _sync_manifest_to_disk(upload=upload, artifact=manifest_artifact)
+        manifest_artifact.save()
+
+        _apply_derived_upload_status(
+            upload=upload,
+            manifest=manifest,
+            changed_by=changed_by,
+        )
 
     return validation_run
 
@@ -1291,6 +1412,8 @@ def validate_upload_source_data(
             "error_count": table_error_count,
         }
 
+        # The manifest is summary-first: full per-row detail only appears for
+        # failures. Clean tables stay as counts.
         table_results[table_name] = {
             "selected": True,
             **table_summary,
@@ -1326,18 +1449,20 @@ def validate_upload_source_data(
     manifest.setdefault("tables", {})
     manifest["tables"]["by_name"] = table_results
 
-    manifest.setdefault("validation", {})
-    manifest["validation"]["source"] = {
-        "status": "passed" if passed else "failed",
-        "validator": SOURCE_VALIDATOR_VERSION,
-        "error_count": error_count,
-        "warning_count": warning_count,
-        "run_id": validation_run.id,
-    }
-
-    manifest["manifest_state"] = (
-        "source_validated" if passed else "source_validation_failed"
+    _record_stage_result(
+        manifest=manifest,
+        stage="source",
+        passed=passed,
+        validator=SOURCE_VALIDATOR_VERSION,
+        run_id=validation_run.id,
+        error_count=error_count,
+        warning_count=warning_count,
     )
+
+    # Rerunning source validation supersedes any downstream results: the
+    # included-row plan they were computed from may have changed.
+    manifest["validation"]["files"] = None
+    manifest["validation"]["package"] = None
 
     manifest_artifact.metadata = manifest
     manifest_artifact.generation_status = (
@@ -1349,6 +1474,7 @@ def validate_upload_source_data(
     if changed_by is not None:
         manifest_artifact.changed_by = changed_by
 
+    _sync_manifest_to_disk(upload=upload, artifact=manifest_artifact)
     manifest_artifact.save()
 
     validation_run.error_count = error_count
@@ -1364,16 +1490,11 @@ def validate_upload_source_data(
     )
     validation_run.save()
 
-    upload.status = (
-        AnvilUpload.Status.READY_FOR_REVIEW
-        if passed
-        else AnvilUpload.Status.VALIDATION_FAILED
+    _apply_derived_upload_status(
+        upload=upload,
+        manifest=manifest,
+        changed_by=changed_by,
     )
-
-    if changed_by is not None:
-        upload.changed_by = changed_by
-
-    upload.save()
 
     return validation_run
 
@@ -1508,94 +1629,54 @@ def generate_upload_tsvs(
             }
         )
 
+    # Embed the artifact catalog in the manifest and write it to disk here:
+    # the manifest describes the files this stage just produced, so there is
+    # no separate "generate manifest" step.
+    manifest.setdefault("artifacts", {})
+    manifest["artifacts"]["table_tsvs"] = [
+        {
+            "table_name": entry["table_name"],
+            "relative_path": entry["relative_path"],
+            "file_name": f"{entry['table_name']}.tsv",
+            "content_type": TSV_CONTENT_TYPE,
+            "byte_size": entry["byte_size"],
+            "sha256": entry["sha256"],
+            "storage_uri": entry["file_path"],
+            "row_count": entry["row_count"],
+            "column_names": entry["column_names"],
+        }
+        for entry in generated
+    ]
+    manifest["artifacts"]["manifest"] = {"relative_path": "manifest.json"}
+    manifest["generated_at"] = timezone.now().isoformat()
+    manifest["manifest_state"] = "package_generated"
+
+    # Regenerated TSVs invalidate any prior file/package validation results.
+    manifest.setdefault("validation", {})
+    manifest["validation"]["files"] = None
+    manifest["validation"]["package"] = None
+
+    manifest_artifact.metadata = manifest
+    manifest_artifact.generation_status = (
+        AnvilUploadArtifact.GenerationStatus.GENERATED
+    )
+
+    if changed_by is not None:
+        manifest_artifact.changed_by = changed_by
+
+    manifest_path = _sync_manifest_to_disk(
+        upload=upload,
+        artifact=manifest_artifact,
+    )
+    manifest_artifact.save()
+
     return {
         "upload": upload,
         "package_dir": str(package_dir),
         "tables_dir": str(tables_dir),
-        "generated": generated,
-    }
-
-
-@transaction.atomic
-def generate_upload_manifest(
-    *,
-    upload: AnvilUpload,
-    changed_by: User | None = None
-)-> dict:
-    """
-    Write manifest.json for a Dashboard-generated AnVIL upload package.
-
-    The manifest artifact's metadata is the living upload plan (created at
-    initialize, enriched by validate-source). This stage enriches that same
-    plan with generated TSV artifact details and writes it to disk — it must
-    never replace the plan.
-    """
-
-    artifact = get_upload_manifest_artifact(upload=upload)
-
-    if artifact is None:
-        raise ValueError("Upload manifest does not exist. Run initialize first.")
-
-    manifest = artifact.metadata or {}
-    selected_tables = manifest.get("tables", {}).get("included", [])
-
-    tsv_artifacts = _get_selected_tsv_artifacts(
-        upload=upload,
-        selected_tables=selected_tables,
-    )
-
-    manifest.setdefault("artifacts", {})
-    manifest["artifacts"]["table_tsvs"] = [
-        {
-            "table_name": tsv_artifact.upload_table.table_name,
-            "relative_path": tsv_artifact.relative_path,
-            "file_name": tsv_artifact.file_name,
-            "content_type": tsv_artifact.content_type,
-            "byte_size": tsv_artifact.byte_size,
-            "sha256": tsv_artifact.sha256,
-            "storage_uri": tsv_artifact.storage_uri,
-            "row_count": tsv_artifact.upload_table.row_count,
-            "column_names": tsv_artifact.upload_table.column_names,
-        }
-        for tsv_artifact in tsv_artifacts
-    ]
-
-    manifest["generated_at"] = timezone.now().isoformat()
-    manifest["manifest_state"] = "package_generated"
-
-    package_dir = _get_package_dir(upload=upload)
-    package_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = package_dir / "manifest.json"
-
-    with manifest_path.open("w", encoding="utf-8") as file_handle:
-        json.dump(
-            manifest,
-            file_handle,
-            indent=2,
-            sort_keys=True,
-        )
-        file_handle.write("\n")
-
-    # The written file's own checksum/size cannot live inside the file
-    # (self-referential hash); record them on the artifact only.
-    manifest["artifacts"]["manifest"] = {"relative_path": "manifest.json"}
-
-    artifact.generation_status = AnvilUploadArtifact.GenerationStatus.GENERATED
-    artifact.byte_size = manifest_path.stat().st_size
-    artifact.sha256 = _sha256_file(manifest_path)
-    artifact.storage_uri = str(manifest_path)
-    artifact.metadata = manifest
-
-    if changed_by is not None:
-        artifact.changed_by = changed_by
-
-    artifact.save()
-
-    return {
-        "upload": upload,
         "manifest": manifest,
         "manifest_path": str(manifest_path),
-        "artifact": artifact,
+        "generated": generated,
     }
 
 
@@ -1632,6 +1713,7 @@ def initialize_upload_manifest_artifact(
     if changed_by is not None:
         artifact.changed_by = changed_by
 
+    _sync_manifest_to_disk(upload=upload, artifact=artifact)
     artifact.save()
 
     return artifact
@@ -1793,18 +1875,50 @@ def validate_upload_files(
         "tables": table_results,
     }
 
-    manifest.setdefault("validation", {})
-    manifest["validation"]["files"] = {
-        "status": "passed" if passed else "failed",
-        "validator": FILE_VALIDATOR_VERSION,
-        "provider": provider.name,
-        "error_count": error_count,
-        "warning_count": warning_count,
-        "run_id": run.id,
-    }
+    # Per-table file results in the manifest: summary counts always, full
+    # per-row detail only for non-passing rows. The complete row-level record
+    # (including passes) lives in the validation run's summary.
+    for table_name, result in table_results.items():
+        table_entry = manifest.setdefault("tables", {}).setdefault(
+            "by_name", {}
+        ).setdefault(table_name, {"selected": True})
+
+        table_entry["files"] = {
+            "checked_row_count": result["checked_row_count"],
+            "passed_row_count": result["passed_row_count"],
+            "failed_row_count": result["failed_row_count"],
+            "unverified_row_count": result["unverified_row_count"],
+        }
+        table_entry["file_check_failures"] = [
+            {
+                "pk": row["pk"],
+                "file_uri": row["file_uri"],
+                "status": row["status"],
+                "checks": [
+                    check
+                    for check in row["checks"]
+                    if check["status"] != "PASS"
+                ],
+            }
+            for row in result["rows"]
+            if row["status"] != "PASS"
+        ]
+
+    _record_stage_result(
+        manifest=manifest,
+        stage="files",
+        passed=passed,
+        validator=FILE_VALIDATOR_VERSION,
+        run_id=run.id,
+        error_count=error_count,
+        warning_count=warning_count,
+        extra={"provider": provider.name},
+    )
+
     manifest_artifact.metadata = manifest
     if changed_by is not None:
         manifest_artifact.changed_by = changed_by
+    _sync_manifest_to_disk(upload=upload, artifact=manifest_artifact)
     manifest_artifact.save()
 
     run.error_count = error_count
@@ -1820,10 +1934,10 @@ def validate_upload_files(
     )
     run.save()
 
-    if not passed:
-        upload.status = AnvilUpload.Status.VALIDATION_FAILED
-        if changed_by is not None:
-            upload.changed_by = changed_by
-        upload.save()
+    _apply_derived_upload_status(
+        upload=upload,
+        manifest=manifest,
+        changed_by=changed_by,
+    )
 
     return run
