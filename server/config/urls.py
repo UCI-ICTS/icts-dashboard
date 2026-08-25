@@ -49,6 +49,7 @@ urlpatterns = [
     path("api/experiments/", include("experiments.urls")),
     path("api/search/", include("search.urls")),
     path("api/hpo/", include("hpo.urls")),
+    path("api/anvil/", include("anvil.urls")),
     path("api/s3/", include("s3.urls")),
     path(
         "api/swagger/",

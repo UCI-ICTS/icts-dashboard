@@ -122,9 +122,13 @@ class UpdateDNAShortReadSetAPITest(APITestCaseWithAuth):
 
 class DeleteAlignedDNAShortReadSetAPITest(APITestCaseWithAuth):
     def test_delete_dna_short_read_set_api(self):
-        url2 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1-delete,DNE-01-1"
+        url = "/api/experiments/aligned_dna_short_read_set/create/"
+        aligned = {"aligned_dna_short_read_set_id": "UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_2","aligned_dna_short_read_id": ["UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1"]}
+
+        url2 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=UCI_GREGoR_test-002-001-2-D-1_DNA_1-Aligned_1-SNV_2,DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=DNE-1,DNE2"
 
+        response_200 = self.client.post(url, [aligned], format="json")
         response_207 = self.client.delete(url2, format="json")
         response_400 = self.client.delete(url3, format="json")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)

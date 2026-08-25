@@ -2,25 +2,11 @@
 
 import axios from "axios";
 import { store } from "../store";
-import api from "../utils/axiosConfig";
+import api, {getAuthHeaders} from "../utils/axiosConfig";
 
 
 const APIDB = process.env.REACT_APP_APIDB;
 const metadata = ["participant", "family", "genetic_findings", "analyte", "biobank", "phenotype"]
-
-const getAuthHeaders = () => {
-  const state = store.getState(); // Get Redux state
-  const token = state.account.user.access_token; // Retrieve the latest token from Redux
-
-  if (!token) {
-    throw new Error("No authentication token found.");
-  }
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-};
 
 const openReport = async (objectKey) => {
   const bucket = "icts-dashboard-analysis-files"

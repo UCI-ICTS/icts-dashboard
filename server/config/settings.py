@@ -37,6 +37,21 @@ VERSION = secrets.get("SERVER", "SERVER_VERSION", fallback="BETA")
 PUBLIC_HOSTNAME = secrets.get("SERVER", "DASHBOARD_URL", fallback="http://localhost:3000/")
 SCHEMA_VERSION = secrets.get("SERVER", "SCHEMA_VERSION", fallback="v1.11")
 
+# Root directory for generated AnVIL upload packages. Each upload writes to
+# ANVIL_PACKAGE_ROOT/<upload_id>/. Packages are durable upload snapshots and
+# are never auto-deleted. Later this may move behind a cloud storage backend.
+ANVIL_PACKAGE_ROOT = secrets.get(
+    "SERVER",
+    "ANVIL_PACKAGE_ROOT",
+    fallback=os.path.join(BASE_DIR, "anvil_packages"),
+)
+
+ANVIL_FILE_STAGING_ROOT = secrets.get(
+    "SERVER",
+    "ANVIL_FILE_STAGING_ROOT",
+    fallback=os.path.join(BASE_DIR, "anvil_file_staging"),
+)
+
 EMAIL_BACKEND = secrets.get(
     "EMAIL", "EMAIL_BACKEND", fallback="django.core.mail.backends.console.EmailBackend"
 )
@@ -122,6 +137,7 @@ INSTALLED_APPS = [
     "experiments.apps.Experiment",
     "submodels",
     "hpo.apps.HpoConfig",
+    "anvil.apps.AnvilConfig",
     "utilities"
 ]
 

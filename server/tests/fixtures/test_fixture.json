@@ -3062,7 +3062,7 @@
         "Aortopathy"
       ],
       "age_at_enrollment": 0.0,
-      "solve_status": "Affected",
+      "solve_status": "Unsolved",
       "missing_variant_case": "Unknown",
       "missing_variant_details": "",
       "internal_project_id": [
@@ -3234,7 +3234,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "truncal hypotonia",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3252,7 +3252,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "healthy",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3270,7 +3270,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "Strabismus",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3288,7 +3288,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "spasticity",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3403,24 +3403,6 @@
   },
   {
     "model": "metadata.phenotype",
-    "pk": "GREGoR_test-005-004-2_HP:0032322",
-    "fields": {
-      "created_at": "2025-12-08T00:00:00Z",
-      "updated_at": "2025-12-08T00:00:00Z",
-      "needs_review": false,
-      "changed_by": "wheel",
-      "participant_id": "GREGoR_test-005-004-2",
-      "term_id": "HP:0032322",
-      "presence": "Present",
-      "ontology": "HPO",
-      "additional_details": "healthy",
-      "onset_age_range": "unknown",
-      "additional_modifiers": [],
-      "syndromic": "non-syndromic"
-    }
-  },
-  {
-    "model": "metadata.phenotype",
     "pk": "GREGoR_test-006-006-0_HP:0001631",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -3432,7 +3414,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "ASD",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3450,7 +3432,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "prematurity; 31wks",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -3468,7 +3450,7 @@
       "presence": "Present",
       "ontology": "HPO",
       "additional_details": "triangular mouth",
-      "onset_age_range": "unknown",
+      "onset_age_range": "",
       "additional_modifiers": [],
       "syndromic": "non-syndromic"
     }
@@ -6204,17 +6186,6 @@
   },
   {
     "model": "experiments.aligneddnashortreadset",
-    "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1-delete",
-    "fields": {
-      "created_at": "2025-12-08T00:00:00Z",
-      "updated_at": "2025-12-08T00:00:00Z",
-      "needs_review": false,
-      "changed_by": "wheel",
-      "aligned_dna_short_read_id": ["UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1"]
-    }
-  },
-  {
-    "model": "experiments.aligneddnashortreadset",
     "pk": "UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -7466,17 +7437,6 @@
   },
   {
     "model": "experiments.alignednanoporeset",
-    "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1-delete",
-    "fields": {
-      "created_at": "2025-12-08T00:00:00Z",
-      "updated_at": "2025-12-08T00:00:00Z",
-      "needs_review": false,
-      "changed_by": "wheel",
-      "aligned_nanopore_id": ["UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1"]
-    }
-  },
-  {
-    "model": "experiments.alignednanoporeset",
     "pk": "UCI_GREGoR_test-001-001-0-D-3_NANO_1-Aligned_1-SNV_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -7893,17 +7853,6 @@
   },
   {
     "model": "experiments.alignedpacbioset",
-    "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1-delete",
-    "fields": {
-      "created_at": "2025-12-08T00:00:00Z",
-      "updated_at": "2025-12-08T00:00:00Z",
-      "needs_review": false,
-      "changed_by": "wheel",
-      "aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]
-    }
-  },
-  {
-    "model": "experiments.alignedpacbioset",
     "pk": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
@@ -8175,7 +8124,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-001-001-0-D-2.vcf.gz",
       "md5sum": "32a14e3bddaf67f106a55afa6d5b40ab",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8266,7 +8215,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-002-001-2-D-2.vcf.gz",
       "md5sum": "dfa282ec5d8f3225b4a52d585ac5a946",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }
@@ -8358,7 +8307,7 @@
       "called_variants_dna_file": "gs://fc-secure-1b1e1ff4-3496-466f-8952-12f034c3c469/vcf/pacbio/hificnv.GREGoR_test-003-001-1-D-2.vcf.gz",
       "md5sum": "e456cef3b2e96e1246a23c34322fb7f9",
       "caller_software": ["source=hificnv v0.1.7-70e9988"],
-      "variant_types": ["CNV"],
+      "variant_types": ["SV"],
       "analysis_details": "PacBio HiFi-Human-WGS-WDL v1.0",
       "chrom": "ALL"
     }

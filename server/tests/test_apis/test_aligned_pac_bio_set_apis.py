@@ -121,9 +121,12 @@ class UpdatePacBioSetAPITest(APITestCaseWithAuth):
 
 class DeleteAlignedPacBioSetAPITest(APITestCaseWithAuth):
     def test_delete_pac_bio_set_api(self):
-        url2 = "/api/experiments/aligned_pac_bio_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1-delete,DNE-01-1"
+        url = "/api/experiments/aligned_pac_bio_set/create/"
+        aligned = {"aligned_pac_bio_set_id": "UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_2","aligned_pac_bio_id": ["UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1"]}
+        url2 = "/api/experiments/aligned_pac_bio_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_2,DNE-01-1"
         url3 = "/api/experiments/aligned_pac_bio_set/delete/?ids=DNE-1,DNE2"
 
+        response_200 = self.client.post(url, [aligned], format="json")
         response_207 = self.client.delete(url2, format="json")
         response_400 = self.client.delete(url3, format="json")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
