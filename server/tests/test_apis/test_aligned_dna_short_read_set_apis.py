@@ -126,6 +126,7 @@ class DeleteAlignedDNAShortReadSetAPITest(APITestCaseWithAuth):
         url3 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=DNE-1,DNE2"
 
         response_207 = self.client.delete(url2, format="json")
+        import pdb; pdb.set_trace()
         response_400 = self.client.delete(url3, format="json")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)

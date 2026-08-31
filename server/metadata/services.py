@@ -3,7 +3,7 @@
 
 import re
 from django.db import transaction, IntegrityError
-from django.db.models import Q
+from django.db.models import Q, ProtectedError
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from rest_framework import serializers
@@ -862,6 +862,17 @@ def delete_metadata(table_name: str, identifier: str, id_field: str = "id"):
                 ),
                 "rejected_request",
             )
+
+    except ProtectedError as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="PROTECTED ERROR",
+                code=409,
+                data=str(error)
+            ),
+            "rejected_request",
+        )
 
     except Exception as error:
         return (

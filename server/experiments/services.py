@@ -2,6 +2,7 @@
 # experiments/servces.py
 
 from django.db import transaction
+from django.db.models import ProtectedError
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from config.selectors import (
@@ -1274,6 +1275,16 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
                 "rejected_request",
             )
 
+    except ProtectedError as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="PROTECTED ERROR",
+                code=409,
+                data=str(error)
+            ),
+        )
+
     except Exception as error:
         return (
             response_constructor(
@@ -1593,6 +1604,16 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
                 "rejected_request",
             )
 
+    except ProtectedError as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="PROTECTED ERROR",
+                code=409,
+                data=str(error)
+            ),
+        )
+
     except Exception as error:
         return (
             response_constructor(
@@ -1864,6 +1885,16 @@ def delete_called(table_name: str, identifier: str, id_field: str = "id"):
                 ),
                 "rejected_request",
             )
+
+    except ProtectedError as error:
+        return (
+            response_constructor(
+                identifier=identifier,
+                request_status="PROTECTED ERROR",
+                code=409,
+                data=str(error)
+            ),
+        )
 
     except Exception as error:
         return (
