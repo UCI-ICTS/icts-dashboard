@@ -24,7 +24,7 @@ class DeleteFamilyAPITest(APITestCaseWithAuth):
         bad_response = self.client.delete(url1, format="json")
         good_response = self.client.delete(url2, format="json")
         self.assertEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(bad_response.data[0]["request_status"], "SERVER ERROR")
+        self.assertEqual(bad_response.data[0]["request_status"], "PROTECTED ERROR")
         self.assertEqual(good_response.status_code, status.HTTP_200_OK)
         self.assertEqual(good_response.data[0]["request_status"], "DELETED")
 

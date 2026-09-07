@@ -122,13 +122,13 @@ class UpdateDNAShortReadSetAPITest(APITestCaseWithAuth):
 
 class DeleteAlignedDNAShortReadSetAPITest(APITestCaseWithAuth):
     def test_delete_dna_short_read_set_api(self):
-        url2 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1-delete,DNE-01-1"
+        url2 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1-delete,UCI_GREGoR_test-001-001-0-D-1_DNA_1-Aligned_1-SNV_1,DNE-01-1"
         url3 = "/api/experiments/aligned_dna_short_read_set/delete/?ids=DNE-1,DNE2"
 
         response_207 = self.client.delete(url2, format="json")
-        import pdb; pdb.set_trace()
         response_400 = self.client.delete(url3, format="json")
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_207.data[0]["request_status"], "DELETED")
-        self.assertEqual(response_207.data[1]["request_status"], "NOT FOUND")
+        self.assertEqual(response_207.data[1]["request_status"], "PROTECTED ERROR")
+        self.assertEqual(response_207.data[2]["request_status"], "NOT FOUND")

@@ -121,7 +121,7 @@ class UpdatePacBioSetAPITest(APITestCaseWithAuth):
 
 class DeleteAlignedPacBioSetAPITest(APITestCaseWithAuth):
     def test_delete_pac_bio_set_api(self):
-        url2 = "/api/experiments/aligned_pac_bio_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1-delete,DNE-01-1"
+        url2 = "/api/experiments/aligned_pac_bio_set/delete/?ids=UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1-delete,UCI_GREGoR_test-001-001-0-D-2_PB_1-Aligned_1-deepvariant_phased_1,DNE-01-1"
         url3 = "/api/experiments/aligned_pac_bio_set/delete/?ids=DNE-1,DNE2"
 
         response_207 = self.client.delete(url2, format="json")
@@ -129,4 +129,5 @@ class DeleteAlignedPacBioSetAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_207.data[0]["request_status"], "DELETED")
-        self.assertEqual(response_207.data[1]["request_status"], "NOT FOUND")
+        self.assertEqual(response_207.data[1]["request_status"], "PROTECTED ERROR")
+        self.assertEqual(response_207.data[2]["request_status"], "NOT FOUND")

@@ -1283,6 +1283,7 @@ def delete_experiment(table_name: str, identifier: str, id_field: str = "id"):
                 code=409,
                 data=str(error)
             ),
+            "rejected_request",
         )
 
     except Exception as error:
@@ -1612,6 +1613,7 @@ def delete_aligned(table_name: str, identifier: str, id_field: str = "id"):
                 code=409,
                 data=str(error)
             ),
+            "rejected_request",
         )
 
     except Exception as error:
@@ -1894,6 +1896,7 @@ def delete_called(table_name: str, identifier: str, id_field: str = "id"):
                 code=409,
                 data=str(error)
             ),
+            "rejected_request",
         )
 
     except Exception as error:
