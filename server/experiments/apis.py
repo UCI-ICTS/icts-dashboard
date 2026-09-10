@@ -67,7 +67,20 @@ from experiments.services import (
 from experiments.selectors import get_experiment
 
 
-class ExperimentViewSet(viewsets.ViewSet):
+class OptimizedListViewSet(viewsets.ViewSet):
+    select_related_fields = ()
+    prefetch_related_fields = ()
+
+    def get_optimized_queryset(self, model):
+        qs = model.objects.all()
+        if self.select_related_fields:
+            qs = qs.select_related(*self.select_related_fields)
+        if self.prefetch_related_fields:
+            qs = qs.prefetch_related(*self.prefetch_related_fields)
+        return qs
+
+
+class ExperimentViewSet(OptimizedListViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Experiment entries",
@@ -76,7 +89,7 @@ class ExperimentViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Experiment.objects.all()
+        queryset = self.get_optimized_queryset(Experiment)
         serializer = ExperimentSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -121,7 +134,7 @@ class ExperimentViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedViewSet(viewsets.ViewSet):
+class AlignedViewSet(OptimizedListViewSet):
     @swagger_auto_schema(
         method="get",
         operation_description="Retrieve all Aligned entries",
@@ -130,7 +143,7 @@ class AlignedViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = Aligned.objects.all()
+        queryset = self.get_optimized_queryset(Aligned)
         serializer = AlignedSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -176,7 +189,7 @@ class AlignedViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
+class ExperimentRNAShortReadViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -188,7 +201,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = ExperimentRNAShortRead.objects.all()
+        queryset = self.get_optimized_queryset(ExperimentRNAShortRead)
         serializer = ExperimentRNAOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -365,7 +378,7 @@ class ExperimentRNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedRNAShortReadViewSet(viewsets.ViewSet):
+class AlignedRNAShortReadViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -380,7 +393,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedRNAShortRead.objects.all()
+        queryset = self.get_optimized_queryset(AlignedRNAShortRead)
         serializer = AlignedRNAShortReadOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -558,7 +571,7 @@ class AlignedRNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
+class ExperimentDNAShortReadViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -570,7 +583,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = ExperimentDNAShortRead.objects.all()
+        queryset = self.get_optimized_queryset(ExperimentDNAShortRead)
         serializer = ExperimentDNAOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -747,7 +760,7 @@ class ExperimentDNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedDNAShortReadViewSet(viewsets.ViewSet):
+class AlignedDNAShortReadViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -759,7 +772,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedDNAShortRead.objects.all()
+        queryset = self.get_optimized_queryset(AlignedDNAShortRead)
         serializer = AlignedDNAShortReadSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -936,7 +949,7 @@ class AlignedDNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedDNAShortReadSetViewSet(viewsets.ViewSet):
+class AlignedDNAShortReadSetViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -948,7 +961,7 @@ class AlignedDNAShortReadSetViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedDNAShortReadSet.objects.all()
+        queryset = self.get_optimized_queryset(AlignedDNAShortReadSet)
         serializer = AlignedDNAShortReadSetSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -1116,7 +1129,7 @@ class AlignedDNAShortReadSetViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
+class CalledVariantsDNAShortReadViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -1128,7 +1141,7 @@ class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = CalledVariantsDNAShortRead.objects.all()
+        queryset = self.get_optimized_queryset(CalledVariantsDNAShortRead)
         serializer = CalledVariantsDNAShortReadOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -1296,7 +1309,7 @@ class CalledVariantsDNAShortReadViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class ExperimentPacBioViewSet(viewsets.ViewSet):
+class ExperimentPacBioViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -1308,7 +1321,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = ExperimentPacBio.objects.all()
+        queryset = self.get_optimized_queryset(ExperimentPacBio)
         serializer = ExperimentPacBioSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -1480,7 +1493,7 @@ class ExperimentPacBioViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedPacBioViewSet(viewsets.ViewSet):
+class AlignedPacBioViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -1492,7 +1505,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedPacBio.objects.all()
+        queryset = self.get_optimized_queryset(AlignedPacBio)
         serializer = AlignedPacBioSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -1660,7 +1673,7 @@ class AlignedPacBioViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedPacBioSetViewSet(viewsets.ViewSet):
+class AlignedPacBioSetViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -1672,7 +1685,7 @@ class AlignedPacBioSetViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedPacBioSet.objects.all()
+        queryset = self.get_optimized_queryset(AlignedPacBioSet)
         serializer = AlignedPacBioSetSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -1840,7 +1853,7 @@ class AlignedPacBioSetViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class CalledVariantsPacBioViewSet(viewsets.ViewSet):
+class CalledVariantsPacBioViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -1852,7 +1865,7 @@ class CalledVariantsPacBioViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = CalledVariantsPacBio.objects.all()
+        queryset = self.get_optimized_queryset(CalledVariantsPacBio)
         serializer = CalledVariantsPacBioOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -2020,7 +2033,7 @@ class CalledVariantsPacBioViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class ExperimentNanoporeViewSet(viewsets.ViewSet):
+class ExperimentNanoporeViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -2032,7 +2045,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = ExperimentNanopore.objects.all()
+        queryset = self.get_optimized_queryset(ExperimentNanopore)
         serializer = ExperimentNanoporeSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -2206,7 +2219,7 @@ class ExperimentNanoporeViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedNanoporeViewSet(viewsets.ViewSet):
+class AlignedNanoporeViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -2218,7 +2231,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedNanopore.objects.all()
+        queryset = self.get_optimized_queryset(AlignedNanopore)
         serializer = AlignedNanoporeSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -2386,7 +2399,7 @@ class AlignedNanoporeViewSet(viewsets.ViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
-class AlignedNanoporeSetViewSet(viewsets.ViewSet):
+class AlignedNanoporeSetViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -2398,7 +2411,7 @@ class AlignedNanoporeSetViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = AlignedNanoporeSet.objects.all()
+        queryset = self.get_optimized_queryset(AlignedNanoporeSet)
         serializer = AlignedNanoporeSetSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -2567,7 +2580,7 @@ class AlignedNanoporeSetViewSet(viewsets.ViewSet):
 
 
 
-class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
+class CalledVariantsNanoporeViewSet(OptimizedListViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -2579,7 +2592,7 @@ class CalledVariantsNanoporeViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = CalledVariantsNanopore.objects.all()
+        queryset = self.get_optimized_queryset(CalledVariantsNanopore)
         serializer = CalledVariantsNanoporeOutputSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 

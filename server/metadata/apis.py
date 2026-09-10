@@ -45,13 +45,28 @@ from metadata.services import (
 )
 
 
+class OptimizedQuerysetMixin:
+    select_related_fields = ()
+    prefetch_related_fields = ()
+
+    def optimize_queryset(self, queryset):
+        if self.select_related_fields:
+            queryset = queryset.select_related(*self.select_related_fields)
+        if self.prefetch_related_fields:
+            queryset = queryset.prefetch_related(*self.prefetch_related_fields)
+        return queryset
+
+
 class ParticipantViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ParticipantOutputSerializer
+    select_related_fields = ("changed_by", "family_id")
+    prefetch_related_fields = ("internal_project_id", "pmid_id", "twin_id", "reported_race")
 
     @swagger_auto_schema(
         method="get",
@@ -62,9 +77,11 @@ class ParticipantViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            model=Participant,
-            superuser=self.request.user.is_superuser
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=Participant,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
@@ -116,7 +133,7 @@ class ParticipantViewSet(
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
         participants = bulk_retrieve(Participant, ids, "participant_id")
-            
+
         response_data, accepted, rejected = [], False, False
 
         for participant_id in ids:
@@ -258,11 +275,13 @@ class ParticipantViewSet(
 
 class FamilyViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = FamilySerializer
+    select_related_fields = ("changed_by", )
 
     @swagger_auto_schema(
         method="get",
@@ -273,9 +292,11 @@ class FamilyViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            superuser=self.request.user.is_superuser,
-            model=Family
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=Family,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
@@ -466,11 +487,13 @@ class FamilyViewSet(
 
 class AnalyteViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = AnalyteSerializer
+    select_related_fields = ("changed_by", "participant_id")
 
     @swagger_auto_schema(
         method="get",
@@ -481,9 +504,11 @@ class AnalyteViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            model=Analyte,
-            superuser=self.request.user.is_superuser
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=Analyte,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
@@ -673,11 +698,13 @@ class AnalyteViewSet(
 
 class PhenotypeViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = PhenotypeSerializer
+    select_related_fields = ("changed_by", "participant_id")
 
     @swagger_auto_schema(
         method="get",
@@ -688,9 +715,11 @@ class PhenotypeViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            model=Phenotype,
-            superuser=self.request.user.is_superuser
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=Phenotype,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
@@ -882,11 +911,14 @@ class PhenotypeViewSet(
 
 class GeneticFindingsViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = GeneticFindingsOutputSerializer
+    select_related_fields = ("changed_by", "participant_id")
+    prefetch_related_fields = ("additional_family_members_with_variant", )
 
     @swagger_auto_schema(
         method="get",
@@ -897,9 +929,11 @@ class GeneticFindingsViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            model=GeneticFindings,
-            superuser=self.request.user.is_superuser
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=GeneticFindings,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
@@ -1029,7 +1063,7 @@ class GeneticFindingsViewSet(
                             code=403,
                         )
                     )
-                    
+
                 else:
                     data, result = update_metadata_entry(
                         "genetic_findings",
@@ -1097,11 +1131,14 @@ class GeneticFindingsViewSet(
 
 class BiobankViewSet(
     SuppressSerializerFieldsMixin,
+    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = BiobankSerializer
+    select_related_fields = ("changed_by", "participant_id")
+    prefetch_related_fields = ("child_analytes", "experiments", "alignments")
 
     @swagger_auto_schema(
         method="get",
@@ -1112,9 +1149,11 @@ class BiobankViewSet(
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = get_visible_objects(
-            model=Biobank,
-            superuser=self.request.user.is_superuser
+        queryset = self.optimize_queryset(
+            get_visible_objects(
+                model=Biobank,
+                superuser=self.request.user.is_superuser
+            )
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=200)
