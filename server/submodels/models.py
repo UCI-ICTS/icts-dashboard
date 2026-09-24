@@ -3,8 +3,9 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from metadata.models import TimeStampedModel
 
-class ReportedRace(models.Model):
+class ReportedRace(TimeStampedModel):
     name = models.CharField(
         primary_key=True,
         max_length=100,
@@ -15,7 +16,7 @@ class ReportedRace(models.Model):
     def __str__(self):
         return self.name
 
-class InternalProjectId(models.Model):
+class InternalProjectId(TimeStampedModel):
     internal_project_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -27,7 +28,7 @@ class InternalProjectId(models.Model):
         return self.internal_project_id
 
 
-class PmidId(models.Model):
+class PmidId(TimeStampedModel):
     pmid_id = models.CharField(
         max_length=255,
         primary_key=True,
@@ -155,7 +156,7 @@ class Consanguinity(models.TextChoices):
     UNKNOWN = "Unknown", _("Unknown")
 
 
-class TwinId(models.Model):
+class TwinId(TimeStampedModel):
     twin_id = models.CharField(
         max_length=255,
         primary_key=True,
