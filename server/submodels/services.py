@@ -28,7 +28,7 @@ class ReportedRaceSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ReportedRace
-        fields = ["name"]
+        fields = "__all__"
 
 
 class InternalProjectIdSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class InternalProjectIdSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = InternalProjectId
-        fields = ["name"]
+        fields = "__all__"
 
 
 class PmidIdSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class PmidIdSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = PmidId
-        fields = ["name"]
+        fields = "__all__"
 
 
 class TwinIdSerializer(serializers.ModelSerializer):
@@ -55,7 +55,7 @@ class TwinIdSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = TwinId
-        fields = ["name"]
+        fields = "__all__"
 
 
 class PrepTargetsDetailSerializer(serializers.ModelSerializer):
@@ -64,7 +64,7 @@ class PrepTargetsDetailSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = PrepTargetsDetail
-        fields = ["name"]
+        fields = "__all__"
 
 
 def create_submodel(table_name: str, identifier: str, datum: dict, current_user: User):

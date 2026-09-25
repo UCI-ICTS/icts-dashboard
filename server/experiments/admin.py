@@ -15,6 +15,7 @@ from experiments.models import (
     ExperimentRNAShortRead,
     ExperimentType,
     LibraryPrepType,
+    PrepTargetsDetail,
 )
 
 
@@ -59,6 +60,7 @@ class ExperimentRNAShortReadAdmin(admin.ModelAdmin):
 
 
 admin.site.register(LibraryPrepType)
+admin.site.register(PrepTargetsDetail)
 admin.site.register(ExperimentType)
 admin.site.register(Aligned, AlignedAdmin)
 admin.site.register(Experiment, ExperimentAdmin)

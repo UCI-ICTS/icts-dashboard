@@ -6,6 +6,8 @@ from metadata.models import (
     InternalProjectId,
     Family,
     PmidId,
+    TwinId,
+    ReportedRace,
     Phenotype,
     GeneticFindings,
     Analyte,
@@ -27,6 +29,14 @@ class FamilyAdmin(admin.ModelAdmin):
 
 class PmidIdAdmin(admin.ModelAdmin):
     list_display = ["pmid_id"]
+
+
+class TwinIdAdmin(admin.ModelAdmin):
+    list_display = ["twin_id"]
+
+
+class ReportedRaceAdmin(admin.ModelAdmin):
+    list_display = ["name"]
 
 
 class PhenotypeAdmin(admin.ModelAdmin):
@@ -71,6 +81,8 @@ admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(InternalProjectId, InternalProjectIdAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(PmidId, PmidIdAdmin)
+admin.site.register(TwinId, TwinIdAdmin)
+admin.site.register(ReportedRace, ReportedRaceAdmin)
 admin.site.register(Phenotype, PhenotypeAdmin)
 admin.site.register(GeneticFindings, GeneticFindingsAdmin)
 admin.site.register(Analyte, AnalyteAdmin)

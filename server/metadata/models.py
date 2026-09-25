@@ -7,6 +7,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from submodels.models import (
+    TimeStampedModel,
     ReportedRace,
     InternalProjectId,
     PmidId,
@@ -25,37 +26,6 @@ from submodels.models import (
     ReportedEthnicity,
     GREGoRVariantClassification
 )
-from simple_history.models import HistoricalRecords
-
-
-class TimeStampedModel(models.Model):
-    # set to default=django.utils.timezone.now before migrating. Revert after migration
-    created_at = models.DateTimeField(auto_now_add=True)
-    # set to default=django.utils.timezone.now before migrating. Revert after migration
-    updated_at = models.DateTimeField(auto_now=True)
-    needs_review = models.BooleanField(default=False)
-    # `inherit=True` forces every subclass of TimeStampedModel to get history
-    history = HistoricalRecords(inherit=True)
-    # Track user modifications on who last edited a given model. Change default 'wheel' to an existing username
-    changed_by = models.ForeignKey(
-        'auth.User',
-        to_field='username',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name='+',
-    )
-
-    class Meta:
-        abstract = True
-
-    @property
-    def _history_user(self):
-        return self.changed_by
-
-    @_history_user.setter
-    def _history_user(self, value):
-        self.changed_by = value
 
 
 class Family(TimeStampedModel):

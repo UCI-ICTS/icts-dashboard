@@ -11,12 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.selectors import bulk_model_retrieve, bulk_retrieve, get_visible_objects
-
-from config.api_mixins import (
-    SuppressSerializerFieldsMixin,
-    SUPPRESS_FIELDS_PARAMETER,
-)
+from config.selectors import bulk_model_retrieve, bulk_retrieve
 
 from submodels.models import (
     ReportedRace,
@@ -37,24 +32,9 @@ from submodels.services import (
     update_submodel,
     delete_submodel,
 )
-from experiments.selectors import get_experiment
-
-
-class OptimizedQuerysetMixin:
-    select_related_fields = ()
-    prefetch_related_fields = ()
-
-    def optimize_queryset(self, queryset):
-        if self.select_related_fields:
-            queryset = queryset.select_related(*self.select_related_fields)
-        if self.prefetch_related_fields:
-            queryset = queryset.prefetch_related(*self.prefetch_related_fields)
-        return queryset
 
 
 class ReportedRaceViewSet(
-    SuppressSerializerFieldsMixin,
-    OptimizedQuerysetMixin,
     viewsets.GenericViewSet,
 ):
     authentication_classes = [JWTAuthentication]
@@ -64,23 +44,20 @@ class ReportedRaceViewSet(
 
     @swagger_auto_schema(
         method="get",
+        operation_id="list_all_reported_races",
         operation_description="Retrieve all ReportedRace entries",
-        manual_parameters=[SUPPRESS_FIELDS_PARAMETER],
         responses={200: ReportedRaceSerializer(many=True), 400: "Bad request"},
         tags=["ReportedRace"],
     )
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
-        queryset = self.optimize_queryset(
-            get_visible_objects(
-                model=ReportedRace,
-                superuser=self.request.user.is_superuser
-            )
-        )
-        serializer = self.get_serializer(queryset, many=True)
+        queryset = ReportedRace.objects.all()
+        serializer = ReportedRaceSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
+        operation_id="create_reported_races",
+        operation_description="Create new ReportedRace entries. Must be a superuser.",
         request_body=ReportedRaceSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["ReportedRace"],
@@ -103,35 +80,7 @@ class ReportedRaceViewSet(
                 )
                 rejected = True
             else:
-                data, result = create_submodel("reported_race", name, datum, self.request.user)
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
-
-        return Response(response_data, status=response_status(accepted, rejected))
-
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                "ids",
-                openapi.IN_QUERY,
-                description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING,
-            ),
-            SUPPRESS_FIELDS_PARAMETER,
-        ],
-        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["ReportedRace"],
-    )
-    def list(self, request):
-        superuser = self.request.user.is_superuser
-        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        reported_races = bulk_retrieve(ReportedRace, ids, "name")
-        response_data, accepted, rejected = [], False, False
-
-        for name in ids:
-            if name in reported_races:
-                if not superuser and reported_races[name]["needs_review"]:
+                if not self.request.user.is_superuser:
                     response_data.append(
                         response_constructor(
                             identifier=name,
@@ -140,21 +89,43 @@ class ReportedRaceViewSet(
                         )
                     )
                     rejected = True
-
                 else:
-                    reported_race_data = self.suppress_mapping_fields(
-                        reported_races[name]
-                    )
+                    data, result = create_submodel("reported_race", name, datum, self.request.user)
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
 
-                    response_data.append(
-                        response_constructor(
-                            identifier=name,
-                            request_status="SUCCESS",
-                            code=200,
-                            data=reported_race_data,
-                        )
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        operation_id="list_reported_races",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["ReportedRace"],
+    )
+    def list(self, request):
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        reported_races = bulk_retrieve(ReportedRace, ids, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for name in ids:
+            if name in reported_races:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=reported_races[name],
                     )
-                    accepted = True
+                )
+                accepted = True
             else:
                 response_data.append(
                     response_constructor(
@@ -169,6 +140,8 @@ class ReportedRaceViewSet(
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
+        operation_id="update_reported_races",
+        operation_description="Update ReportedRace entries. Must be a superuser.",
         request_body=ReportedRaceSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
         tags=["ReportedRace"],
@@ -191,8 +164,7 @@ class ReportedRaceViewSet(
                 )
                 rejected = True
             else:
-                if not self.request.user.is_superuser \
-                    and reported_races[name].needs_review:
+                if not self.request.user.is_superuser:
                     response_data.append(
                         response_constructor(
                             identifier=name,
@@ -217,8 +189,8 @@ class ReportedRaceViewSet(
 
     @swagger_auto_schema(
         method="delete",
-        operation_id="bulk_delete_reported_race_entries",
-        operation_description="Bulk delete ReportedRace entries by comma-separated IDs in the `ids` query parameter.",
+        operation_id="delete_reported_races",
+        operation_description="Bulk delete ReportedRace entries by comma-separated IDs in the `ids` query parameter. Must be superuser to use.",
         manual_parameters=[
             openapi.Parameter(
                 "ids",
@@ -244,21 +216,31 @@ class ReportedRaceViewSet(
         reported_races = bulk_retrieve(ReportedRace, ids, "name")
         response_data, accepted, rejected = [], False, False
 
-        for name in ids:
-            if name in reported_races:
-                data, result = delete_submodel("reported_race", name, "name")
-                response_data.append(data)
-                accepted |= result == "accepted_request"
-                rejected |= result != "accepted_request"
-            else:
-                response_data.append(
-                    response_constructor(
-                        identifier=name,
-                        request_status="NOT FOUND",
-                        code=404,
-                        data="Not found",
-                    )
+        if not self.request.user.is_superuser:
+            response_data.append(
+                response_constructor(
+                    identifier=name,
+                    request_status="FORBIDDEN",
+                    code=403
                 )
-                rejected = True
+            )
+            rejected = True
+        else:
+            for name in ids:
+                if name in reported_races:
+                    data, result = delete_submodel("reported_race", name, "name")
+                    response_data.append(data)
+                    accepted |= result == "accepted_request"
+                    rejected |= result != "accepted_request"
+                else:
+                    response_data.append(
+                        response_constructor(
+                            identifier=name,
+                            request_status="NOT FOUND",
+                            code=404,
+                            data="Not found",
+                        )
+                    )
+                    rejected = True
 
         return Response(response_data, status=response_status(accepted, rejected))

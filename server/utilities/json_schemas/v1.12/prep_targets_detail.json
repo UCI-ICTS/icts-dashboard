@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/prep_targets_detail.json",
+    "title": "prep_targets_detail",
+    "version": "1.12",
+    "type": "object",
+    "required": [
+        "name"
+    ],
+    "definitions": {},
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "depletion kit or list of depletion targets used",
+            "examples": [
+                "Illumina Ribo-Zero Plus rRNA Depletion Kit",
+                "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)"
+            ]
+        },
+        "display_name": {
+            "type": "string",
+            "description": "display name, usually the same as the name"
+        }
+    }
+}
