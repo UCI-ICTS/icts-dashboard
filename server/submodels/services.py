@@ -22,7 +22,12 @@ from experiments.models import PrepTargetsDetail
 from rest_framework import serializers
 
 
-class ReportedRaceSerializer(serializers.ModelSerializer):
+class TimeStampedSerializerMixin(serializers.ModelSerializer):
+    needs_review = serializers.BooleanField(default=False, required=False)
+    changed_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+
+class ReportedRaceSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ReportedRaceSerializer
     """
@@ -31,7 +36,7 @@ class ReportedRaceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class InternalProjectIdSerializer(serializers.ModelSerializer):
+class InternalProjectIdSerializer(TimeStampedSerializerMixin):
     """
     Docstring for InternalProjectIdSerializer
     """
@@ -40,7 +45,7 @@ class InternalProjectIdSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PmidIdSerializer(serializers.ModelSerializer):
+class PmidIdSerializer(TimeStampedSerializerMixin):
     """
     Docstring for PmidIdSerializer
     """
@@ -49,7 +54,7 @@ class PmidIdSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TwinIdSerializer(serializers.ModelSerializer):
+class TwinIdSerializer(TimeStampedSerializerMixin):
     """
     Docstring for TwinIdSerializer
     """
@@ -58,7 +63,7 @@ class TwinIdSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PrepTargetsDetailSerializer(serializers.ModelSerializer):
+class PrepTargetsDetailSerializer(TimeStampedSerializerMixin):
     """
     Docstring for PrepTargetsDetail
     """

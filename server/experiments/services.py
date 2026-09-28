@@ -50,9 +50,10 @@ from metadata.selectors import get_analyte
 
 from rest_framework import serializers
 from experiments.models import ExperimentRNAShortRead, LibraryPrepType, ExperimentType
+from submodels.services import TimeStampedSerializerMixin
 
 
-class LibraryPrepTypeSerializer(serializers.ModelSerializer):
+class LibraryPrepTypeSerializer(TimeStampedSerializerMixin):
     """
     Docstring for LibraryPrepTypeSerializer
     """
@@ -61,7 +62,7 @@ class LibraryPrepTypeSerializer(serializers.ModelSerializer):
         fields = ["name"]
 
 
-class ExperimentTypeSerializer(serializers.ModelSerializer):
+class ExperimentTypeSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentTypeSerializer
     """
@@ -70,7 +71,7 @@ class ExperimentTypeSerializer(serializers.ModelSerializer):
         fields = ["name"]
 
 
-class ExperimentRNAInputSerializer(serializers.ModelSerializer):
+class ExperimentRNAInputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentRNAInputSerializer
     """
@@ -133,7 +134,7 @@ class ExperimentRNAInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
+class ExperimentRNAOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentRNAOutputSerializer
     """
@@ -152,7 +153,7 @@ class ExperimentRNAOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ExperimentDNAInputSerializer(serializers.ModelSerializer):
+class ExperimentDNAInputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentDNAInputSerializer
     """
@@ -163,7 +164,7 @@ class ExperimentDNAInputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
+class ExperimentDNAOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentDNAOutputSerializer
     """
@@ -177,7 +178,7 @@ class ExperimentDNAOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ExperimentNanoporeSerializer(serializers.ModelSerializer):
+class ExperimentNanoporeSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentNanoporeSerializer
     """
@@ -203,7 +204,7 @@ class ExperimentNanoporeSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ExperimentPacBioSerializer(serializers.ModelSerializer):
+class ExperimentPacBioSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentPacBioSerializer
     """
@@ -229,7 +230,7 @@ class ExperimentPacBioSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ExperimentSerializer(serializers.ModelSerializer):
+class ExperimentSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ExperimentSerializer
     """
@@ -294,7 +295,7 @@ class ExperimentService:
         return validator.get_validation_results()
 
 
-class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
+class AlignedRNAShortReadInputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedRNAShortReadInputSerializer
     """
@@ -331,7 +332,7 @@ class AlignedRNAShortReadInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
+class AlignedRNAShortReadOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedRNAShortReadOutputSerializer
     """
@@ -347,7 +348,7 @@ class AlignedRNAShortReadOutputSerializer(serializers.ModelSerializer):
         return data
 
 
-class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
+class AlignedDNAShortReadSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedDNAShortReadSerializer
     """
@@ -371,7 +372,7 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
+class AlignedDNAShortReadSetSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedDNAShortReadSetSerializer
     """
@@ -448,7 +449,7 @@ class AlignedDNAShortReadSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
+class CalledVariantsDNAShortReadInputSerializer(TimeStampedSerializerMixin):
     """
     """
     caller_software = serializers.JSONField(required=True)
@@ -519,7 +520,7 @@ class CalledVariantsDNAShortReadInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsDNAShortReadOutputSerializer(serializers.ModelSerializer):
+class CalledVariantsDNAShortReadOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for CalledVariantsDNAShortReadSerializder
     """
@@ -533,7 +534,7 @@ class CalledVariantsDNAShortReadOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedSerializer(serializers.ModelSerializer):
+class AlignedSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedSerializer
     """
@@ -558,7 +559,7 @@ class AlignedSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
+class AlignedDNAShortReadSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedDNAShortReadSerializer
     """
@@ -567,7 +568,7 @@ class AlignedDNAShortReadSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedPacBioSerializer(serializers.ModelSerializer):
+class AlignedPacBioSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedPacBioSerializer
     """
@@ -576,7 +577,7 @@ class AlignedPacBioSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedPacBioSetSerializer(serializers.ModelSerializer):
+class AlignedPacBioSetSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedPacBioSetSerializer
     """
@@ -653,7 +654,7 @@ class AlignedPacBioSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
+class CalledVariantsPacBioInputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for CalledVariantsPacBioSerializer
     """
@@ -726,7 +727,7 @@ class CalledVariantsPacBioInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsPacBioOutputSerializer(serializers.ModelSerializer):
+class CalledVariantsPacBioOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for CalledVariantsPacBioSerializer
     """
@@ -740,7 +741,7 @@ class CalledVariantsPacBioOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedNanoporeSerializer(serializers.ModelSerializer):
+class AlignedNanoporeSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedNanoporeSerializer
     """
@@ -749,7 +750,7 @@ class AlignedNanoporeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
+class AlignedNanoporeSetSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedNanoporeSetSerializer
     """
@@ -826,7 +827,7 @@ class AlignedNanoporeSetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
+class CalledVariantsNanoporeInputSerializer(TimeStampedSerializerMixin):
     """
     """
     caller_software = serializers.JSONField(required=True)
@@ -900,7 +901,7 @@ class CalledVariantsNanoporeInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalledVariantsNanoporeOutputSerializer(serializers.ModelSerializer):
+class CalledVariantsNanoporeOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for CalledVariantsNanopore
     """
@@ -914,7 +915,7 @@ class CalledVariantsNanoporeOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AlignedRNASerializer(serializers.ModelSerializer):
+class AlignedRNASerializer(TimeStampedSerializerMixin):
     """
     Docstring for AlignedRNASerializer
     """

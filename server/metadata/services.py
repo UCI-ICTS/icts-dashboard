@@ -44,8 +44,10 @@ from submodels.models import (
     DiscoveryMethod
 )
 
+from submodels.services import TimeStampedSerializerMixin
 
-class TrackedModelSerializer(serializers.ModelSerializer):
+
+class TrackedModelSerializer(TimeStampedSerializerMixin):
     """
     Base serializer that assigns request.user to _history_user
     on create. Requires 'context["request"]'.
@@ -63,7 +65,7 @@ class TrackedModelSerializer(serializers.ModelSerializer):
         return instance
 
 
-class GeneticFindingsInputSerializer(serializers.ModelSerializer):
+class GeneticFindingsInputSerializer(TimeStampedSerializerMixin):
     """
     Validate fields for GeneticFindings
     """
@@ -274,7 +276,7 @@ class GeneticFindingsInputSerializer(serializers.ModelSerializer):
         return instance
 
 
-class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
+class GeneticFindingsOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for GeneticFindingsOutputSerializer
     """
@@ -296,7 +298,7 @@ class GeneticFindingsOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AnalyteSerializer(serializers.ModelSerializer):
+class AnalyteSerializer(TimeStampedSerializerMixin):
     """
     Docstring for AnalyteSerializer
     """
@@ -326,7 +328,7 @@ class AnalyteSerializer(serializers.ModelSerializer):
         return instance
 
 
-class BiobankSerializer(serializers.ModelSerializer):
+class BiobankSerializer(TimeStampedSerializerMixin):
     """
     Serializer for the Biobank model.
     Handles full serialization and deserialization of nested ManyToMany and ForeignKey fields.
@@ -360,7 +362,7 @@ class BiobankSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PhenotypeSerializer(serializers.ModelSerializer):
+class PhenotypeSerializer(TimeStampedSerializerMixin):
     """
     Docstring for PhenotypeSerializer
     """
@@ -381,7 +383,7 @@ class PhenotypeSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FamilySerializer(serializers.ModelSerializer):
+class FamilySerializer(TimeStampedSerializerMixin):
     """
     Docstring for FamilySerializer
     """
@@ -406,7 +408,7 @@ class FamilySerializer(serializers.ModelSerializer):
         return instance
 
 
-class ParticipantOutputSerializer(serializers.ModelSerializer):
+class ParticipantOutputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ParticipantOutputSerializer
     """
@@ -415,7 +417,7 @@ class ParticipantOutputSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ParticipantInputSerializer(serializers.ModelSerializer):
+class ParticipantInputSerializer(TimeStampedSerializerMixin):
     """
     Docstring for ParticipantInputSerializer
     """

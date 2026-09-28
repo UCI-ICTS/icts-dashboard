@@ -312,7 +312,7 @@ class CalledVariantsDNAShortRead(TimeStampedModel):
 class LibraryPrepType(TimeStampedModel):
     name = models.CharField(
         max_length=255,
-        unique=True,
+        primary_key=True,
         choices=[
             ("stranded poly-A pulldown", "stranded poly-A pulldown"),
             ("stranded total RNA", "stranded total RNA"),
@@ -328,7 +328,10 @@ class LibraryPrepType(TimeStampedModel):
 
 
 class PrepTargetsDetail(TimeStampedModel):
-    name = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    name = models.CharField(
+        primary_key=True,
+        max_length=255,
+    )
     display_name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -338,7 +341,7 @@ class PrepTargetsDetail(TimeStampedModel):
 class ExperimentType(TimeStampedModel):
     name = models.CharField(
         max_length=255,
-        unique=True,
+        primary_key=True,
         choices=[
             ("single-end", "single-end"),
             ("paired-end", "paired-end"),
