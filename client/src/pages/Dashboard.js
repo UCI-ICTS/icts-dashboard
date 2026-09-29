@@ -31,6 +31,19 @@ const Dashboard = () => {
   const auth = useSelector((state) => state.account);
   const isAdmin = auth?.user?.is_superuser;
 
+  const anvilIcon = (
+    <img
+      src="/anvil-sidebar-icon.png"
+      alt="AnVIL"
+      style={{
+        width: 22,
+        height: 22,
+        objectFit: "contain",
+        display: "inline-block",
+      }}
+    />
+  );
+
   const handleLogout = () => {
     const refresh_token = auth?.user?.refresh_token;
     localStorage.removeItem('authToken');
@@ -49,6 +62,7 @@ const Dashboard = () => {
     { key: 'raghpo', icon: <OpenAIOutlined />, label: <Link to="rag-hpo">RAG-HPO</Link> },
     { key: 'cohort', icon: <UsergroupAddOutlined />, label: <Link to="cohort">PhenoCohort</Link> },
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
+    ...(isAdmin ? [{ key: 'anvil', icon: anvilIcon, label: <Link to="anvil">AnVIL</Link> }] : []),
   ];
 
   return (

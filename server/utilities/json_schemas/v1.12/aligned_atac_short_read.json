@@ -1,58 +1,107 @@
 {
+    "$id": "urn:gregor:data-model:1.12:aligned_atac_short_read",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/aligned_atac_short_read.json",
-    "title": "aligned_atac_short_read",
-    "version": "1.11",
-    "type": "object",
-    "required": [
-        "aligned_atac_short_read_id",
-        "experiment_atac_short_read_id",
-        "aligned_atac_short_read_file",
-        "aligned_atac_short_read_index_file",
-        "md5sum",
-        "reference_assembly",
-        "alignment_software"
-    ],
     "definitions": {},
     "properties": {
-        "aligned_atac_short_read_id": {
-            "type": "string",
-            "description": "identifier for aligned_atac_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
-            "examples": [
-                "BCM_H7YG5DSX2-3-IDUDI0014-1"
-            ]
-        },
-        "experiment_atac_short_read_id": {
-            "type": "string",
-            "description": "identifier for experiment"
-        },
         "aligned_atac_short_read_file": {
-            "type": "string",
             "description": "name and path of file with aligned reads",
             "examples": [
                 "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.cram"
             ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "aligned_atac_short_read_id": {
+            "description": "identifier for aligned_atac_short_read (primary key)\n\nNotes: experiment_short_read_id + alignment indicator",
+            "examples": [
+                "BCM_H7YG5DSX2-3-IDUDI0014-1"
+            ],
+            "type": "string",
+            "x-primary-key": true
         },
         "aligned_atac_short_read_index_file": {
-            "type": "string",
             "description": "name and path of index file corresponding to aligned reads file",
             "examples": [
                 "gs://fc-eb352699-d849-483f-aefe-9d35ce2b21ac/Broad_COL_FAM1_1_D1.crai"
             ],
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "alignment_log_file": {
+            "description": "path of (log) file with all parameters for alignment software",
+            "pattern": "^(https?|gs|s3):\\/\\/.+$",
+            "type": "string",
+            "x-is_bucket_path": true
+        },
+        "alignment_postprocessing": {
+            "description": "If any post processing was applied",
+            "examples": [
+                "multimapped reads removed, reads trimmed"
+            ],
+            "type": "string"
+        },
+        "alignment_software": {
+            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "bowtie2"
+            ],
+            "type": "string"
+        },
+        "experiment_atac_short_read_id": {
+            "description": "identifier for experiment",
+            "type": "string",
+            "x-references": "> experiment_atac_short_read.experiment_atac_short_read_id"
+        },
+        "gene_annotation_details": {
+            "enum": [
+                "gencode_comprehensive_chr gencode_comprehensive_all gencode_comprehensive_pri  gencode_basic_chr gencode_basic_all gencode_basic_pri  lncRNA_annotation polyA_feature_annotation consensus_pseudogenes predicted_tRNA_genes"
+            ],
+            "examples": [
+                "examples corresponding to GENCODE options",
+                "gencode_comprehensive_chr",
+                "gencode_comprehensive_all",
+                "gencode_comprehensive_pri"
+            ],
+            "type": "string"
         },
         "md5sum": {
-            "type": "string",
             "description": "md5 checksum for file",
             "examples": [
                 "129c28163df082"
-            ]
+            ],
+            "type": "string"
+        },
+        "mean_coverage": {
+            "description": "Mean coverage of either the genome or the targeted regions\n\nNotes: Can be unknown if RC receives external data",
+            "examples": [
+                "100"
+            ],
+            "type": "number"
+        },
+        "percent_multimapped": {
+            "description": "how many reads aligned to multiple places",
+            "examples": [
+                "10"
+            ],
+            "type": "number"
+        },
+        "percent_unaligned": {
+            "description": "how many reads didn't align",
+            "examples": [
+                "9"
+            ],
+            "type": "number"
+        },
+        "percent_uniquely_aligned": {
+            "description": "how many reads aligned to just one place",
+            "examples": [
+                "81"
+            ],
+            "type": "number"
         },
         "reference_assembly": {
-            "type": "string",
             "enum": [
                 "GRCh38",
                 "GRCh37",
@@ -62,79 +111,33 @@
             ],
             "examples": [
                 "GRCh38"
-            ]
-        },
-        "reference_assembly_uri": {
-            "type": "string",
-            "examples": [
-                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
-            ]
+            ],
+            "type": "string"
         },
         "reference_assembly_details": {
-            "type": "string",
             "examples": [
                 "primary, chrY-masked"
-            ]
-        },
-        "alignment_software": {
-            "type": "string",
-            "description": "Software including version number\n\nNotes: Can be unknown if RC receives external data",
-            "examples": [
-                "bowtie2"
-            ]
-        },
-        "gene_annotation_details": {
-            "type": "string",
-            "enum": [
-                "gencode_comprehensive_chr gencode_comprehensive_all gencode_comprehensive_pri  gencode_basic_chr gencode_basic_all gencode_basic_pri  lncRNA_annotation polyA_feature_annotation consensus_pseudogenes predicted_tRNA_genes"
             ],
-            "examples": [
-                "examples corresponding to GENCODE options",
-                "gencode_comprehensive_chr",
-                "gencode_comprehensive_all",
-                "gencode_comprehensive_pri"
-            ]
+            "type": "string"
         },
-        "alignment_log_file": {
-            "type": "string",
-            "description": "path of (log) file with all parameters for alignment software",
-            "x-is_bucket_path": true,
-            "pattern": "^(https?|gs|s3):\\/\\/.+$"
-        },
-        "alignment_postprocessing": {
-            "type": "string",
-            "description": "If any post processing was applied",
+        "reference_assembly_uri": {
             "examples": [
-                "multimapped reads removed, reads trimmed"
-            ]
-        },
-        "mean_coverage": {
-            "type": "number",
-            "description": "Mean coverage of either the genome or the targeted regions\n\nNotes: Can be unknown if RC receives external data",
-            "examples": [
-                "100"
-            ]
-        },
-        "percent_uniquely_aligned": {
-            "type": "number",
-            "description": "how many reads aligned to just one place",
-            "examples": [
-                "81"
-            ]
-        },
-        "percent_multimapped": {
-            "type": "number",
-            "description": "how many reads aligned to multiple places",
-            "examples": [
-                "10"
-            ]
-        },
-        "percent_unaligned": {
-            "type": "number",
-            "description": "how many reads didn't align",
-            "examples": [
-                "9"
-            ]
+                "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/GRCh38.primary_assembly.genome.fa.gz"
+            ],
+            "type": "string"
         }
-    }
+    },
+    "required": [
+        "aligned_atac_short_read_id",
+        "experiment_atac_short_read_id",
+        "aligned_atac_short_read_file",
+        "aligned_atac_short_read_index_file",
+        "md5sum",
+        "reference_assembly",
+        "alignment_software"
+    ],
+    "title": "aligned_atac_short_read",
+    "type": "object",
+    "version": "1.12",
+    "x-table-required": "CONDITIONAL (called_peaks_atac_short_read, allele_specific_atac_short_read)"
 }

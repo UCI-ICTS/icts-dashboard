@@ -56,6 +56,31 @@ class TableValidatorTests(TestCase):
             "'Nope' is not one of ['None suspected', 'Suspected', 'Present', 'Unknown']"
         )
 
+
+    def test_explicit_model_version_selects_versioned_schema_directory(self):
+        validator = TableValidator(model_version="1.12")
+
+        self.assertEqual(validator.model_version, "1.12")
+        self.assertEqual(validator.base_path.name, "v1.12")
+
+
+    def test_model_version_accepts_v_prefix(self):
+        validator = TableValidator(model_version="v1.12")
+
+        self.assertEqual(validator.model_version, "1.12")
+        self.assertEqual(validator.base_path.name, "v1.12")
+
+
+    def test_invalid_model_version_raises(self):
+        with self.assertRaisesMessage(ValueError, "Invalid GREGoR model version"):
+            TableValidator(model_version="../../1.12")
+
+
+    def test_unsupported_model_version_raises(self):
+        with self.assertRaisesMessage(ValueError, "Unsupported GREGoR model version"):
+            TableValidator(model_version="99.99")
+
+
 class UtilityFunctionTests(TestCase):
     """Tests for utility functions."""
     fixtures = ['tests/fixtures/test_fixture.json']  # Auto-load fixture

@@ -20,6 +20,7 @@ import HomePage from './pages/Home';
 import { handleExpiredJWT } from './slices/accountSlice';
 import { Uploader } from "./pages/Uploader";
 import PhenotypeCohort from './pages/PhenotypeCohort';
+import AnvilUpload from './pages/AnvilUpload.js';
 
 function setupTokenExpirationAlert(expirationTime, onExpireCallback) {
   const currentTime = Date.now() / 1000;
@@ -87,10 +88,11 @@ const AppRoutes = () => {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="cohort" element={<PhenotypeCohort />} />
         <Route path="rag-hpo" element={<RAGHPO />} />
+        <Route path="anvil" element={<AnvilUpload />} />
       </Route>
 
       {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}
-      {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 

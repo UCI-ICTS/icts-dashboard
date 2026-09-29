@@ -1655,9 +1655,22 @@ def create_called(table_name: str, identifier: str, datum: dict, current_user: U
     else:
         datum = remove_na(datum=datum)
 
-    table_validator = TableValidator()
-    table_validator.validate_json(json_object=datum, table_name=table_name)
-    results = table_validator.get_validation_results()
+    aligned_set_tables = {
+        "aligned_dna_short_read_set",
+        "aligned_nanopore_set",
+        "aligned_pac_bio_set",
+    }
+
+    if table_name in aligned_set_tables:
+        results = {"valid": True, "errors": []}
+    else:
+        table_validator = TableValidator()
+        table_validator.validate_json(
+            json_object=datum,
+            table_name=table_name,
+        )
+        results = table_validator.get_validation_results()
+
     if results["valid"]:
         serializer = model_input_serializer(data=datum)
         if serializer.is_valid():

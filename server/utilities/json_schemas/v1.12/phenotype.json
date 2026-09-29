@@ -1,95 +1,18 @@
 {
+    "$id": "urn:gregor:data-model:1.12:phenotype",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/phenotype.json",
-    "title": "phenotype",
-    "version": "1.11",
-    "type": "object",
-    "required": [
-        "participant_id",
-        "term_id",
-        "presence",
-        "ontology"
-    ],
     "definitions": {},
     "properties": {
-        "phenotype_id": {
-            "type": "string",
-            "description": "Identifier for phenotype (primary key), automatically generated as part of data deposition\n\nNotes: This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file"
-        },
-        "participant_id": {
-            "type": "string",
-            "description": "Subject/Participant Identifier",
-            "examples": [
-                "BCM_Subject_1",
-                "BROAD_subj89054"
-            ]
-        },
-        "term_id": {
-            "type": "string",
-            "description": "The phenotype code, including prefix, from a defined ontology. The specific ontology used is named in the ontology field.",
-            "examples": [
-                "HP:0001627",
-                "MONDO:0003847"
-            ]
-        },
-        "presence": {
-            "type": "string",
-            "enum": [
-                "Present",
-                "Absent",
-                "Unknown"
-            ],
-            "description": "Indicate whether the indicated phenotype is present in this participant."
-        },
-        "ontology": {
-            "type": "string",
-            "enum": [
-                "HPO",
-                "MONDO",
-                "OMIM",
-                "ORPHANET",
-                "SNOMED",
-                "ICD10"
-            ],
-            "description": "Which ontology does the term_id field entry come from?\n\nNotes: HPO (requirement that phenotype must be described in HPO)\nMONDO (optional)\nOMIM (opt)\nORPHANET (opt)\nSNOMED (opt)\nICD10 (opt)"
-        },
         "additional_details": {
-            "type": "string",
             "description": "modifier of a term where the additional details are not supported/available as a term in HPO",
             "examples": [
                 "intellectual disability, no IQ test but 3rd grade reading level at 15 years old"
-            ]
-        },
-        "onset_age_range": {
-            "type": "string",
-            "enum": [
-                "HP:0003581",
-                "HP:0030674",
-                "HP:0011463",
-                "HP:0003577",
-                "HP:0025708",
-                "HP:0011460",
-                "HP:0011461",
-                "HP:0003593",
-                "HP:0025709",
-                "HP:0003621",
-                "HP:0034199",
-                "HP:0003584",
-                "HP:0025710",
-                "HP:0003596",
-                "HP:0003623",
-                "HP:0410280",
-                "HP:4000040",
-                "HP:0034198",
-                "HP:0034197",
-                "HP:0011462"
             ],
-            "description": "The onset age range for the phenotype. Allowable values are subterms of 'Onset' HP:0003674.\n\nNotes: values are subterm of 'Onset' HP:0003674 - specifically,\nHP:0003581 | Adult onset\nHP:0030674 | Antenatal onset\nHP:0011463 | Childhood onset\nHP:0003577 | Congenital onset\nHP:0025708 | Early young adult onset\nHP:0011460 | Embryonal onset\nHP:0011461 | Fetal onset\nHP:0003593 | Infantile onset\nHP:0025709 | Intermediate young adult onset\nHP:0003621 | Juvenile onset\nHP:0034199 | Late first trimester onset\nHP:0003584 | Late onset\nHP:0025710 | Late young adult onset\nHP:0003596 | Middle age onset\nHP:0003623 | Neonatal onset\nHP:0410280 | Pediatric onset\nHP:4000040 | Puerpural onset\nHP:0034198 | Second trimester onset\nHP:0034197 | Third trimester onset\nHP:0011462 | Young adult onset"
+            "type": "string"
         },
         "additional_modifiers": {
-            "type": "array",
             "items": {
-                "type": "string",
+                "description": "Human Phenotype Ontology (HPO) modifiers used to detail phenotypic aspects of the phenotype named with the term_id field (like age of onset or severity).\n\nNotes: this field should use the same ontology as above (e.g. Mondo disease characteristic if using mondo). \nIt should be a | delimited list of valid HPO IDs that are subordinate to HP:0012823 (clinical modifier) (For HPO terms) or a\n| delimited list of valid MONDO IDs that are subordinate to MONDO_0021125 (disease characteristic) (For MONDO terms)",
                 "enum": [
                     "HP:0025292",
                     "HP:0011009",
@@ -320,19 +243,100 @@
                     "MONDO:0024490",
                     "MONDO:0024496"
                 ],
-                "description": "Human Phenotype Ontology (HPO) modifiers used to detail phenotypic aspects of the phenotype named with the term_id field (like age of onset or severity).\n\nNotes: this field should use the same ontology as above (e.g. Mondo disease characteristic if using mondo). \nIt should be a | delimited list of valid HPO IDs that are subordinate to HP:0012823 (clinical modifier) (For HPO terms) or a\n| delimited list of valid MONDO IDs that are subordinate to MONDO_0021125 (disease characteristic) (For MONDO terms)"
-            }
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "onset_age_range": {
+            "description": "The onset age range for the phenotype. Allowable values are subterms of 'Onset' HP:0003674.\n\nNotes: values are subterm of 'Onset' HP:0003674 - specifically,\nHP:0003581 | Adult onset\nHP:0030674 | Antenatal onset\nHP:0011463 | Childhood onset\nHP:0003577 | Congenital onset\nHP:0025708 | Early young adult onset\nHP:0011460 | Embryonal onset\nHP:0011461 | Fetal onset\nHP:0003593 | Infantile onset\nHP:0025709 | Intermediate young adult onset\nHP:0003621 | Juvenile onset\nHP:0034199 | Late first trimester onset\nHP:0003584 | Late onset\nHP:0025710 | Late young adult onset\nHP:0003596 | Middle age onset\nHP:0003623 | Neonatal onset\nHP:0410280 | Pediatric onset\nHP:4000040 | Puerpural onset\nHP:0034198 | Second trimester onset\nHP:0034197 | Third trimester onset\nHP:0011462 | Young adult onset",
+            "enum": [
+                "HP:0003581",
+                "HP:0030674",
+                "HP:0011463",
+                "HP:0003577",
+                "HP:0025708",
+                "HP:0011460",
+                "HP:0011461",
+                "HP:0003593",
+                "HP:0025709",
+                "HP:0003621",
+                "HP:0034199",
+                "HP:0003584",
+                "HP:0025710",
+                "HP:0003596",
+                "HP:0003623",
+                "HP:0410280",
+                "HP:4000040",
+                "HP:0034198",
+                "HP:0034197",
+                "HP:0011462"
+            ],
+            "type": "string"
+        },
+        "ontology": {
+            "description": "Which ontology does the term_id field entry come from?\n\nNotes: HPO (requirement that phenotype must be described in HPO)\nMONDO (optional)\nOMIM (opt)\nORPHANET (opt)\nSNOMED (opt)\nICD10 (opt)",
+            "enum": [
+                "HPO",
+                "MONDO",
+                "OMIM",
+                "ORPHANET",
+                "SNOMED",
+                "ICD10"
+            ],
+            "type": "string"
+        },
+        "participant_id": {
+            "description": "Subject/Participant Identifier",
+            "examples": [
+                "BCM_Subject_1",
+                "BROAD_subj89054"
+            ],
+            "type": "string",
+            "x-references": "> participant.participant_id"
+        },
+        "phenotype_id": {
+            "description": "Identifier for phenotype (primary key), automatically generated as part of data deposition\n\nNotes: This ID generated when loading into AnVIL data table and is not included in the uploaded .tsv file",
+            "type": "string",
+            "x-primary-key": true,
+            "x-references": "from: participant_id, term_id, presence"
+        },
+        "presence": {
+            "description": "Indicate whether the indicated phenotype is present in this participant.",
+            "enum": [
+                "Present",
+                "Absent",
+                "Unknown"
+            ],
+            "type": "string"
         },
         "syndromic": {
-            "type": "string",
+            "description": "For participants with few HPO terms, this optional field is to provide context on whether it is likely the most notable phenotype or cohort level phenotype or whether the individual really only has one trait.\n\nNotes: this field is intended to address a concern that if someone has only entered one trait/HPO term, there may be uncertainy about whether it is just the most notable phenotype or cohort level phenotype or whether the individual really only has one trait. For example, there could be a hearing loss cohort and someone might enter only 'sensorineural hearing loss' only, but an individual could have a syndromic hearing loss. Adding the syndromic/non-syndromic would provide a bit more assurance that if there are only one or two traits/HPO terms entered that there is not 'missing' traits/phenotype.",
             "enum": [
                 "syndromic",
                 "non-syndromic"
             ],
-            "description": "For participants with few HPO terms, this optional field is to provide context on whether it is likely the most notable phenotype or cohort level phenotype or whether the individual really only has one trait.\n\nNotes: this field is intended to address a concern that if someone has only entered one trait/HPO term, there may be uncertainy about whether it is just the most notable phenotype or cohort level phenotype or whether the individual really only has one trait. For example, there could be a hearing loss cohort and someone might enter only 'sensorineural hearing loss' only, but an individual could have a syndromic hearing loss. Adding the syndromic/non-syndromic would provide a bit more assurance that if there are only one or two traits/HPO terms entered that there is not 'missing' traits/phenotype.",
             "examples": [
                 "non-syndromic"
-            ]
+            ],
+            "type": "string"
+        },
+        "term_id": {
+            "description": "The phenotype code, including prefix, from a defined ontology. The specific ontology used is named in the ontology field.",
+            "examples": [
+                "HP:0001627",
+                "MONDO:0003847"
+            ],
+            "type": "string"
         }
-    }
+    },
+    "required": [
+        "participant_id",
+        "term_id",
+        "presence",
+        "ontology"
+    ],
+    "title": "phenotype",
+    "type": "object",
+    "version": "1.12",
+    "x-table-required": true
 }
