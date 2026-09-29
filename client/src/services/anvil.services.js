@@ -38,8 +38,8 @@ const generateAnvilTsvsService = async ({ uploadId }) => {
   return response;
 };
 
-const generateAnvilManifestService = async ({ uploadId }) => {
-  const response = api.post(`${BASE_URL}${uploadId}/generate-manifest/`, {});
+const validateAnvilFilesService = async (uploadId) => {
+  const response = api.post(`${BASE_URL}${uploadId}/validate-files/`, {});
   return response;
 };
 
@@ -53,10 +53,10 @@ const anvilService = {
     fetchAnvilUploadDetailService,
     createAnvilUploadService,
     initializeAnvilUploadService,
+    validateAnvilFilesService,
     validateAnvilPackageService,
     validateAnvilSourceService,
     generateAnvilTsvsService,
-    generateAnvilManifestService,
 };
 
 export default anvilService;

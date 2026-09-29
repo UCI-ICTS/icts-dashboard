@@ -100,6 +100,7 @@ class AnvilUploadDetailSerializer(serializers.ModelSerializer):
     upload_tables = AnvilUploadTableSerializer(many=True, read_only=True)
     artifacts = AnvilUploadArtifactSerializer(many=True, read_only=True)
     validation_runs = AnvilUploadValidationRunSerializer(many=True, read_only=True)
+    manifest = serializers.SerializerMethodField()
 
     class Meta:
         model = AnvilUpload
@@ -110,10 +111,34 @@ class AnvilUploadDetailSerializer(serializers.ModelSerializer):
             "notes",
             "created_at",
             "updated_at",
+            "manifest",
             "upload_tables",
             "artifacts",
             "validation_runs",
         ]
+
+    def get_manifest(self, upload):
+        """
+        The manifest document is the single source of truth for pipeline
+        state; the UI renders stage status and failure detail directly
+        from it.
+        """
+
+        manifest_artifact = next(
+            (
+                artifact
+                for artifact in upload.artifacts.all()
+                if artifact.artifact_type
+                == AnvilUploadArtifact.ArtifactType.UPLOAD_MANIFEST
+                and artifact.relative_path == "manifest.json"
+            ),
+            None,
+        )
+
+        if manifest_artifact is None:
+            return None
+
+        return manifest_artifact.metadata or None
 
 class AnvilUploadInitializeSerializer(serializers.Serializer):
     tables = serializers.ListField(

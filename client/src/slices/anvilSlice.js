@@ -128,12 +128,22 @@ export const generateAnvilTsvs = createAsyncThunk(
 );
 
 
-export const generateAnvilManifest = createAsyncThunk(
-  "anvil/generateManifest",
-  async ({ uploadId }, thunkAPI) => {
+export const validateAnvilFiles = createAsyncThunk(
+  "anvil/validateFiles",
+  async (uploadId, thunkAPI) => {
     try {
-      const response = await anvilService.generateAnvilManifestService({uploadId});
-      message.success("AnVIL upload manifest generated.");
+      const response = await anvilService.validateAnvilFilesService(uploadId);
+
+      if (response.data?.passed === false) {
+        message.warning("File validation completed with errors.");
+      } else if (response.data?.warning_count > 0) {
+        message.info(
+          `File validation passed with ${response.data.warning_count} unverified file(s).`
+        );
+      } else {
+        message.success("File validation passed.");
+      }
+
       return response.data;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -293,12 +303,12 @@ const anvilSlice = createSlice({
       .addCase(generateAnvilTsvs.fulfilled, setActionFulfilled)
       .addCase(generateAnvilTsvs.rejected, setActionRejected)
 
-      // Generate manifest.
-      .addCase(generateAnvilManifest.pending, (state) => {
-        setActionPending(state, "generateAnvilManifest");
+      // Validate files (pre-flight genomic file checks).
+      .addCase(validateAnvilFiles.pending, (state) => {
+        setActionPending(state, "validateAnvilFiles");
       })
-      .addCase(generateAnvilManifest.fulfilled, setActionFulfilled)
-      .addCase(generateAnvilManifest.rejected, setActionRejected)
+      .addCase(validateAnvilFiles.fulfilled, setActionFulfilled)
+      .addCase(validateAnvilFiles.rejected, setActionRejected)
 
       // Validate package.
       .addCase(validateAnvilPackage.pending, (state) => {
