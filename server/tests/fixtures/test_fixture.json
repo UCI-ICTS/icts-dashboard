@@ -7082,157 +7082,144 @@
   },
   {
     "model": "experiments.librarypreptype",
-    "pk": 1,
+    "pk": "stranded poly-A pulldown",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "stranded poly-A pulldown",
       "display_name": "stranded poly-A pulldown"
     }
   },
   {
     "model": "experiments.librarypreptype",
-    "pk": 2,
+    "pk": "stranded total RNA",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "stranded total RNA",
       "display_name": "stranded total RNA"
     }
   },
   {
     "model": "experiments.librarypreptype",
-    "pk": 3,
+    "pk": "rRNA depletion",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "rRNA depletion",
       "display_name": "rRNA depletion"
     }
   },
   {
     "model": "experiments.librarypreptype",
-    "pk": 4,
+    "pk": "globin depletion",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "globin depletion",
       "display_name": "globin depletion"
     }
   },
   {
     "model": "experiments.preptargetsdetail",
-    "pk": 1,
+    "pk": "Illumina Ribo-Zero Plus rRNA Depletion Kit",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "Illumina Ribo-Zero Plus rRNA Depletion Kit",
       "display_name": "Illumina Ribo-Zero Plus rRNA Depletion Kit"
     }
   },
   {
     "model": "experiments.preptargetsdetail",
-    "pk": 2,
+    "pk": "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)",
       "display_name": "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)"
     }
   },
   {
     "model": "experiments.preptargetsdetail",
-    "pk": 3,
+    "pk": "NEBNext rRNA & Globin mRNA Depletion Kit (Human/Mouse/Rat)",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "NEBNext rRNA & Globin mRNA Depletion Kit (Human/Mouse/Rat)",
       "display_name": "NEBNext rRNA & Globin mRNA Depletion Kit (Human/Mouse/Rat)"
     }
   },
   {
     "model": "experiments.preptargetsdetail",
-    "pk": 4,
+    "pk": "Watchmaker Polaris Depletion",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "Watchmaker Polaris Depletion",
       "display_name": "Watchmaker Polaris Depletion"
     }
   },
   {
     "model": "experiments.preptargetsdetail",
-    "pk": 5,
+    "pk": "KAPA RiboErase (HMR) Globin",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "KAPA RiboErase (HMR) Globin",
       "display_name": "KAPA RiboErase (HMR) Globin"
     }
   },
   {
     "model": "experiments.experimenttype",
-    "pk": 1,
+    "pk": "single-end",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "single-end",
       "display_name": "single-end"
     }
   },
   {
     "model": "experiments.experimenttype",
-    "pk": 2,
+    "pk": "paired-end",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "paired-end",
       "display_name": "paired-end"
     }
   },
   {
     "model": "experiments.experimenttype",
-    "pk": 3,
+    "pk": "targeted",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "targeted",
       "display_name": "targeted"
     }
   },
   {
     "model": "experiments.experimenttype",
-    "pk": 4,
+    "pk": "untargeted",
     "fields": {
       "created_at": "2025-12-08T00:00:00Z",
       "updated_at": "2025-12-08T00:00:00Z",
       "needs_review": false,
       "changed_by": "wheel",
-      "name": "untargeted",
       "display_name": "untargeted"
     }
   },
@@ -7256,13 +7243,13 @@
       "estimated_library_size": null,
       "total_reads": 240349679.0,
       "library_prep_type": [
-        3,
-        4
+        "rRNA depletion",
+        "globin depletion"
       ],
       "prep_targets_detail": [],
       "experiment_type": [
-        2,
-        4
+        "paired-end",
+        "untargeted"
       ]
     }
   },
@@ -8385,6 +8372,10 @@
     "model": "submodels.reportedrace",
     "pk": "American Indian or Alaska Native",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "American Indian or Alaska Native"
     }
   },
@@ -8392,6 +8383,10 @@
     "model": "submodels.reportedrace",
     "pk": "Asian",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Asian"
     }
   },
@@ -8399,6 +8394,10 @@
     "model": "submodels.reportedrace",
     "pk": "Black or African American",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Black or African American"
     }
   },
@@ -8406,6 +8405,10 @@
     "model": "submodels.reportedrace",
     "pk": "Middle Eastern or North African",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Middle Eastern or North African"
     }
   },
@@ -8413,6 +8416,10 @@
     "model": "submodels.reportedrace",
     "pk": "Native Hawaiian or Other Pacific Islander",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Native Hawaiian or Other Pacific Islander"
     }
   },
@@ -8420,17 +8427,41 @@
     "model": "submodels.reportedrace",
     "pk": "White",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "White"
     }
   },
   {
     "model": "submodels.internalprojectid",
     "pk": "UTAortaStudy",
-    "fields": {}
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
+  },
+  {
+    "model": "submodels.pmidid",
+    "pk": "0",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
   },
   {
     "model": "submodels.twinid",
     "pk": "0",
-    "fields": {}
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
   }
 ]

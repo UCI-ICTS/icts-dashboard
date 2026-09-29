@@ -20,14 +20,20 @@ from submodels.models import (
     TwinId,
 )
 
-from experiments.models import PrepTargetsDetail
+from experiments.models import (
+    LibraryPrepType,
+    PrepTargetsDetail,
+    ExperimentType,
+)
 
 from submodels.services import (
     ReportedRaceSerializer,
     InternalProjectIdSerializer,
     PmidIdSerializer,
     TwinIdSerializer,
+    LibraryPrepTypeSerializer,
     PrepTargetsDetailSerializer,
+    ExperimentTypeSerializer,
     create_submodel,
     update_submodel,
     delete_submodel,
@@ -787,6 +793,187 @@ class TwinIdViewSet(viewsets.GenericViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
 
+class LibraryPrepTypeViewSet(viewsets.GenericViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = LibraryPrepTypeSerializer
+    select_related_fields = "changed_by"
+
+    @swagger_auto_schema(
+        method="get",
+        operation_id="list_all_library_prep_type",
+        operation_description="Retrieve all LibraryPrepType entries",
+        responses={200: LibraryPrepTypeSerializer(many=True), 400: "Bad request"},
+        tags=["LibraryPrepType"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = LibraryPrepType.objects.all()
+        serializer = LibraryPrepTypeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        operation_id="create_library_prep_type",
+        operation_description="Create new LibraryPrepType entries.",
+        request_body=LibraryPrepTypeSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["LibraryPrepType"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_library_prep_type(self, request):
+        library_prep_type = bulk_model_retrieve(request.data, LibraryPrepType, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            name = datum.get("name")
+            if name and name in library_prep_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="LibraryPrepType entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_submodel("library_prep_type", name, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        operation_id="list_library_prep_type",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["LibraryPrepType"],
+    )
+    def list(self, request):
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        library_prep_type = bulk_retrieve(LibraryPrepType, ids, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for name in ids:
+            if name in library_prep_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=library_prep_type[name],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        operation_id="update_library_prep_type",
+        operation_description="Update LibraryPrepType entries.",
+        request_body=LibraryPrepTypeSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["LibraryPrepType"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_library_prep_type(self, request):
+        library_prep_type = bulk_model_retrieve(request.data, LibraryPrepType, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            name = datum.get("name")
+            if name not in library_prep_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_submodel(
+                    "library_prep_type",
+                    name,
+                    library_prep_type[name],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="delete_library_prep_type",
+        operation_description="Delete LibraryPrepType entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Names (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["LibraryPrepType"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete LibraryPrepType entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        library_prep_type = bulk_retrieve(LibraryPrepType, ids, "name")
+        response_data, accepted, rejected = [], False, False
+
+
+        for name in ids:
+            if name in library_prep_type:
+                data, result = delete_submodel("library_prep_type", name, "name")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
 class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -795,7 +982,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
 
     @swagger_auto_schema(
         method="get",
-        operation_id="list_all_prep_targets_details",
+        operation_id="list_all_prep_targets_detail",
         operation_description="Retrieve all PrepTargetsDetail entries",
         responses={200: PrepTargetsDetailSerializer(many=True), 400: "Bad request"},
         tags=["PrepTargetsDetail"],
@@ -807,7 +994,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        operation_id="create_prep_targets_details",
+        operation_id="create_prep_targets_detail",
         operation_description="Create new PrepTargetsDetail entries.",
         request_body=PrepTargetsDetailSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
@@ -815,12 +1002,12 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
     )
     @action(detail=False, methods=["post"], url_path="create")
     def create_prep_targets_detail(self, request):
-        prep_targets_details = bulk_model_retrieve(request.data, PrepTargetsDetail, "name")
+        prep_targets_detail = bulk_model_retrieve(request.data, PrepTargetsDetail, "name")
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
             name = datum.get("name")
-            if name and name in prep_targets_details:
+            if name and name in prep_targets_detail:
                 response_data.append(
                     response_constructor(
                         identifier=name,
@@ -839,7 +1026,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        operation_id="list_prep_targets_details",
+        operation_id="list_prep_targets_detail",
         manual_parameters=[
             openapi.Parameter(
                 "ids",
@@ -853,17 +1040,17 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
     )
     def list(self, request):
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        prep_targets_details = bulk_retrieve(PrepTargetsDetail, ids, "name")
+        prep_targets_detail = bulk_retrieve(PrepTargetsDetail, ids, "name")
         response_data, accepted, rejected = [], False, False
 
         for name in ids:
-            if name in prep_targets_details:
+            if name in prep_targets_detail:
                 response_data.append(
                     response_constructor(
                         identifier=name,
                         request_status="SUCCESS",
                         code=200,
-                        data=prep_targets_details[name],
+                        data=prep_targets_detail[name],
                     )
                 )
                 accepted = True
@@ -881,7 +1068,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
         return Response(response_data, status=response_status(accepted, rejected))
 
     @swagger_auto_schema(
-        operation_id="update_prep_targets_details",
+        operation_id="update_prep_targets_detail",
         operation_description="Update PrepTargetsDetail entries.",
         request_body=PrepTargetsDetailSerializer(many=True),
         responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
@@ -889,12 +1076,12 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
     )
     @action(detail=False, methods=["post"], url_path="update")
     def update_prep_targets_detail(self, request):
-        prep_targets_details = bulk_model_retrieve(request.data, PrepTargetsDetail, "name")
+        prep_targets_detail = bulk_model_retrieve(request.data, PrepTargetsDetail, "name")
         response_data, accepted, rejected = [], False, False
 
         for datum in request.data:
             name = datum.get("name")
-            if name not in prep_targets_details:
+            if name not in prep_targets_detail:
                 response_data.append(
                     response_constructor(
                         identifier=name,
@@ -908,7 +1095,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
                 data, result = update_submodel(
                     "prep_targets_detail",
                     name,
-                    prep_targets_details[name],
+                    prep_targets_detail[name],
                     datum,
                     self.request.user
                 )
@@ -920,7 +1107,7 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
 
     @swagger_auto_schema(
         method="delete",
-        operation_id="delete_prep_targets_details",
+        operation_id="delete_prep_targets_detail",
         operation_description="Delete PrepTargetsDetail entries by comma-separated IDs in the `ids` query parameter.",
         manual_parameters=[
             openapi.Parameter(
@@ -944,12 +1131,193 @@ class PrepTargetsDetailViewSet(viewsets.GenericViewSet):
         Bulk delete PrepTargetsDetail entries by ID.
         """
         ids = request.GET.get("ids", "").split(",")
-        prep_targets_details = bulk_retrieve(PrepTargetsDetail, ids, "name")
+        prep_targets_detail = bulk_retrieve(PrepTargetsDetail, ids, "name")
         response_data, accepted, rejected = [], False, False
 
 
         for name in ids:
-            if name in prep_targets_details:
+            if name in prep_targets_detail:
+                data, result = delete_submodel("prep_targets_detail", name, "name")
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+
+class ExperimentTypeViewSet(viewsets.GenericViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExperimentTypeSerializer
+    select_related_fields = "changed_by"
+
+    @swagger_auto_schema(
+        method="get",
+        operation_id="list_all_experiment_type",
+        operation_description="Retrieve all ExperimentType entries",
+        responses={200: ExperimentTypeSerializer(many=True), 400: "Bad request"},
+        tags=["ExperimentType"],
+    )
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
+        queryset = ExperimentType.objects.all()
+        serializer = ExperimentTypeSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
+    @swagger_auto_schema(
+        operation_id="create_experiment_type",
+        operation_description="Create new ExperimentType entries.",
+        request_body=ExperimentTypeSerializer(many=True),
+        responses={200: "All created", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentType"],
+    )
+    @action(detail=False, methods=["post"], url_path="create")
+    def create_prep_targets_detail(self, request):
+        experiment_type = bulk_model_retrieve(request.data, ExperimentType, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            name = datum.get("name")
+            if name and name in experiment_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="ExperimentType entry already exists",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = create_submodel("prep_targets_detail", name, datum, self.request.user)
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        operation_id="list_experiment_type",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of IDs",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentType"],
+    )
+    def list(self, request):
+        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
+        experiment_type = bulk_retrieve(ExperimentType, ids, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for name in ids:
+            if name in experiment_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="SUCCESS",
+                        code=200,
+                        data=experiment_type[name],
+                    )
+                )
+                accepted = True
+            else:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="NOT FOUND",
+                        code=404,
+                        data="Not found",
+                    )
+                )
+                rejected = True
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        operation_id="update_experiment_type",
+        operation_description="Update ExperimentType entries.",
+        request_body=ExperimentTypeSerializer(many=True),
+        responses={200: "All updated", 207: "Partial success", 400: "Bad request"},
+        tags=["ExperimentType"],
+    )
+    @action(detail=False, methods=["post"], url_path="update")
+    def update_prep_targets_detail(self, request):
+        experiment_type = bulk_model_retrieve(request.data, ExperimentType, "name")
+        response_data, accepted, rejected = [], False, False
+
+        for datum in request.data:
+            name = datum.get("name")
+            if name not in experiment_type:
+                response_data.append(
+                    response_constructor(
+                        identifier=name,
+                        request_status="BAD REQUEST",
+                        code=400,
+                        data="Entry does not exist",
+                    )
+                )
+                rejected = True
+            else:
+                data, result = update_submodel(
+                    "prep_targets_detail",
+                    name,
+                    experiment_type[name],
+                    datum,
+                    self.request.user
+                )
+                response_data.append(data)
+                accepted |= result == "accepted_request"
+                rejected |= result != "accepted_request"
+
+        return Response(response_data, status=response_status(accepted, rejected))
+
+    @swagger_auto_schema(
+        method="delete",
+        operation_id="delete_experiment_type",
+        operation_description="Delete ExperimentType entries by comma-separated IDs in the `ids` query parameter.",
+        manual_parameters=[
+            openapi.Parameter(
+                "ids",
+                openapi.IN_QUERY,
+                description="Comma-separated list of Names (e.g., B1,B2,B3)",
+                required=True,
+                type=openapi.TYPE_STRING,
+            )
+        ],
+        responses={
+            200: "All deletions successful",
+            207: "Some deletions failed",
+            400: "Bad request",
+        },
+        tags=["ExperimentType"],
+    )
+    @action(detail=False, methods=["delete"], url_path="delete")
+    def delete(self, request):
+        """
+        Bulk delete ExperimentType entries by ID.
+        """
+        ids = request.GET.get("ids", "").split(",")
+        experiment_type = bulk_retrieve(ExperimentType, ids, "name")
+        response_data, accepted, rejected = [], False, False
+
+
+        for name in ids:
+            if name in experiment_type:
                 data, result = delete_submodel("prep_targets_detail", name, "name")
                 response_data.append(data)
                 accepted |= result == "accepted_request"

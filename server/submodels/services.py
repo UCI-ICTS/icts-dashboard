@@ -17,7 +17,11 @@ from submodels.models import (
     TwinId,
 )
 
-from experiments.models import PrepTargetsDetail
+from experiments.models import (
+    LibraryPrepType,
+    PrepTargetsDetail,
+    ExperimentType,
+)
 
 from rest_framework import serializers
 
@@ -63,12 +67,30 @@ class TwinIdSerializer(TimeStampedSerializerMixin):
         fields = "__all__"
 
 
+class LibraryPrepTypeSerializer(TimeStampedSerializerMixin):
+    """
+    Docstring for LibraryPrepType
+    """
+    class Meta:
+        model = LibraryPrepType
+        fields = "__all__"
+
+
 class PrepTargetsDetailSerializer(TimeStampedSerializerMixin):
     """
     Docstring for PrepTargetsDetail
     """
     class Meta:
         model = PrepTargetsDetail
+        fields = "__all__"
+
+
+class ExperimentTypeSerializer(TimeStampedSerializerMixin):
+    """
+    Docstring for ExperimentType
+    """
+    class Meta:
+        model = ExperimentType
         fields = "__all__"
 
 
@@ -102,9 +124,17 @@ def create_submodel(table_name: str, identifier: str, datum: dict, current_user:
             "input_serializer": TwinIdSerializer,
             "output_serializer": TwinIdSerializer,
         },
+        "library_prep_type": {
+            "input_serializer": LibraryPrepTypeSerializer,
+            "output_serializer": LibraryPrepTypeSerializer,
+        },
         "prep_targets_detail": {
             "input_serializer": PrepTargetsDetailSerializer,
             "output_serializer": PrepTargetsDetailSerializer,
+        },
+        "experiment_type": {
+            "input_serializer": ExperimentTypeSerializer,
+            "output_serializer": ExperimentTypeSerializer,
         },
     }
 
@@ -287,7 +317,9 @@ def delete_submodel(table_name: str, identifier: str, id_field: str = "id"):
         "internal_project_id": InternalProjectId,
         "pmid_id": PmidId,
         "twin_id": TwinId,
+        "library_prep_type": LibraryPrepType,
         "prep_targets_detail": PrepTargetsDetail,
+        "experiment_type": ExperimentType,
     }
 
     model_class = model_mapping.get(table_name)
