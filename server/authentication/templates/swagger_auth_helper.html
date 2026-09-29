@@ -1,0 +1,111 @@
+<div id="g_id_onload"
+     data-client_id="{{ google_client_id }}"
+     data-callback="handleCredentialResponse">
+</div>
+<div class="g_id_signin" data-type="standard"></div>
+
+<pre id="token-output"></pre>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  function slugify(text) {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  function storeAuthAndRedirect(accessToken) {
+    const swaggerPath = '/api/swagger';
+    const key = slugify(swaggerPath) + '-drf-yasg-auth';
+    const authObj = {
+      Bearer: {
+        name: "Bearer",
+        schema: { type: "apiKey", in: "header", name: "Authorization" },
+        value: "Bearer " + accessToken
+      }
+    };
+    localStorage.setItem(key, JSON.stringify(authObj));
+    window.location.href = swaggerPath; // wherever your Swagger UI is served
+  }
+
+  function handleCredentialResponse(response) {
+    fetch('/api/auth/oauth/google/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: response.credential })
+    })
+      .then(res => res.json())
+      .then(data => {
+        storeAuthAndRedirect(data.access);
+      });
+  }
+</script>
+
+<script>
+  function getCookie(name) {
+    const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return match ? match.pop() : '';
+  }
+</script>
+
+<a href="https://accounts.google.com/o/oauth2/v2/auth?client_id={{ google_client_id }}&redirect_uri={{ google_redirect_uri|urlencode }}&response_type=code&scope=openid%20email%20profile%20https://www.googleapis.com/auth/cloud-platform&access_type=offline&prompt=consent">
+  Connect Google for Firecloud
+</a>
+
+<form id="login-form">
+  <input type="text" id="username" placeholder="Username" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button type="submit">Log in</button>
+</form>
+<p id="login-error" style="color: red;"></p>
+
+<script>
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch('/api/auth/token/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+      if (ok && data.access) {
+        storeAuthAndRedirect(data.access);
+      } else {
+        document.getElementById('login-error').textContent =
+          data.detail || 'Invalid username or password.';
+      }
+    })
+    .catch(() => {
+      document.getElementById('login-error').textContent = 'Something went wrong. Try again.';
+    });
+  });
+</script>
+
+<button id="logout-btn">Log out</button>
+
+<script>
+  document.getElementById('logout-btn').addEventListener('click', function () {
+    fetch('/api/auth/token/logout/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') },
+    })
+      .then(() => {
+        // Clear the Swagger UI auth Django stashed in localStorage
+        const swaggerPath = '/api/swagger';
+        const key = slugify(swaggerPath) + '-drf-yasg-auth';
+        localStorage.removeItem(key);
+
+        window.location.href = '/api/auth/oauth/helper/';
+      });
+  });
+</script>

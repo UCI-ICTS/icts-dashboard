@@ -22,6 +22,11 @@ const getAuthHeaders = () => {
   };
 };
 
+const fetchSummary = async () => {
+    const response = api.get(APIDB + `api/search/summary/`)
+    return response
+}
+
 const openReport = async (objectKey) => {
   const bucket = "icts-dashboard-analysis-files"
   const response = api.get(`${APIDB}api/s3/get_pre_signed_url/?bucket=${bucket}&key=${objectKey}`, {
@@ -98,6 +103,7 @@ const extractPhenotypes = async (userText) => {
 const dataService = {
   openReport,
   createEntry,
+  fetchSummary,
   familyDetail,
   createPhenotypeCohort,
   caseQueue,

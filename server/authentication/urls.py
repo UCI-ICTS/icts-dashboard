@@ -7,7 +7,8 @@ from authentication.apis import (
     TokenViewSet,
     UserViewSet,
     PasswordViewSet,
-    EmailUsersViewSet
+    EmailUsersViewSet,
+    GoogleAuthViewSet,
 )
 
 router = DefaultRouter()
@@ -15,9 +16,9 @@ router.register(r'users', UserViewSet, basename='user')
 router.register(r"password", PasswordViewSet, basename="password")
 router.register(r"token", TokenViewSet, basename="token")
 router.register(r"email", EmailUsersViewSet, basename="email")
-
+router.register(r"oauth", GoogleAuthViewSet, basename="oauth")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(router.urls))
 ]

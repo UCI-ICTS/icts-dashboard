@@ -1,6 +1,8 @@
 // src/pages/SummaryPage.js
 
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSummary } from "../slices/dataSlice";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Layout, Typography, Tooltip, Button, Alert } from "antd";
@@ -16,28 +18,16 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const SummaryPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [summary, setSummary] = useState();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchSummary = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${APIDB}api/search/summary/`);
-      setSummary(response.data);
-      setError(null);
-    } catch (err) {
-      console.error("Error loading summary:", err);
-      setError("Failed to load summary data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const summary = useSelector((state) => state.data.fetchSummary);
+  const status = useSelector((state) => state.data.status);
+  const error = "";
+  const loading = status === "loading";
 
   useEffect(() => {
-    fetchSummary();
-  }, []);
+    dispatch(fetchSummary());
+  }, [dispatch]);
 
   const get = (obj, key, fallback = "-") =>
     loading ? "Loading..." : obj?.[key] ?? fallback;
@@ -129,7 +119,7 @@ const SummaryPage = () => {
 
           <Title className="primary-title">GREGoR Project Status Summary</Title>
 
-          <div /> 
+          <div />
         </Header>
 
       {error && (
@@ -143,12 +133,12 @@ const SummaryPage = () => {
       )}
 
       <Content className="site-content">
-        <div style={{ marginBottom: "24px" }} /> 
+        <div style={{ marginBottom: "24px" }} />
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Proband Solve Status</span>} className="primary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={solveStatusData}
                 chartType="doughnut"
               />
@@ -157,7 +147,7 @@ const SummaryPage = () => {
 
           <Col xs={24} md={8}>
             <Card title={<span className="card-title">Participant Snapshot</span>} className="primary-card">
-              <SummaryPieChart 
+              <SummaryPieChart
                 data={[
                   {label: "Total Participants", value:summary?.participants},
                   {label: "Total Probands", value:summary?.probands},

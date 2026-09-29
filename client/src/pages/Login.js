@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Form, Input, Button, Checkbox, message, Modal, Layout } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login, resetPassword } from '../slices/accountSlice';
+import { googleLogin, login, resetPassword } from '../slices/accountSlice';
 import SiteFooter from '../components/SiteFooter';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 
 const Login = () => {
@@ -14,6 +16,8 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [passwordResetModal, setPasswordResetModal] = useState(false);
   const { isLoggedIn, loading, error } = useSelector((state) => state.account);
+
+  //const { setUser } = useContext(AuthContext);
 
   const onFinish = async (values) => {
     dispatch(login({...values, rememberMe}))
@@ -40,6 +44,21 @@ const Login = () => {
   const handleCancel = () => {
     form.resetFields();
     setPasswordResetModal(false);
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    dispatch(googleLogin({
+      token: credentialResponse.credential,
+      rememberMe: rememberMe,
+    }))
+    .unwrap()
+    .then(() => {
+      message.success("OAuth Login successful");
+    })
+    .catch((err) => {
+      const msg = typeof err === "string" ? err: err?.message || "OAuth Login failed. Please check your credentials.";
+      message.error(msg)
+    });
   };
 
   // Redirect after login
@@ -94,6 +113,10 @@ const Login = () => {
             </Form.Item>
           </Form>
           {error && <p style={{ color: 'red' }}>{error}</p>}
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.log("OAuth Login Failed")}
+          />
         </div>
         <Modal
           className="uci-modal"
@@ -127,4 +150,5 @@ const Login = () => {
   );
 };
 
+axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("access")}`;
 export default Login;
