@@ -142,22 +142,18 @@ def participant_parser(participant: dict) -> dict:
             participant["reported_race"] == "Unknown"
             or participant["reported_race"] == "More than one race"
         ):
-            participant["reported_race"] = ["NA"]
+            participant["reported_race"] = "NA"
     if "reported_ethnicity" in participant:
         if participant["reported_ethnicity"] == "Unknown":
-            participant["reported_ethnicity"] = ["NA"]
+            participant["reported_ethnicity"] = "NA"
 
     split_participant = multi_value_split(participant)
 
     for key in multi_value:
-        try:
-            if key in split_participant and not isinstance(
-                split_participant[key], list
-            ):
-                split_participant[key] = [split_participant[key]]
-        except Exception as error:
-            oops = error
-            split_participant[key] = [oops]
+        if key in split_participant and not isinstance(
+            split_participant[key], list
+        ):
+            split_participant[key] = [split_participant[key]]
 
     return split_participant
 

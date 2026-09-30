@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
 from experiments.models import Aligned
+from experiments.services import AlignedRNAShortReadOutputSerializer
 from datetime import datetime
 
 
@@ -296,42 +297,12 @@ class UpdateAlignedRNAShortReadAPITest(APITestCaseWithAuth):
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.data[0]["request_status"], "BAD REQUEST")
 
-        aligned_rna_attributes = [
-            "created_at",
-            "updated_at",
-            "needs_review",
-            "changed_by_id",
-            "aligned_rna_short_read_id",
-            "experiment_rna_short_read_id_id",
-            "aligned_rna_short_read_file",
-            "aligned_rna_short_read_index_file",
-            "md5sum",
-            "reference_assembly",
-            "reference_assembly_uri",
-            "reference_assembly_details",
-            "gene_annotation",
-            "gene_annotation_details",
-            "alignment_software",
-            "alignment_log_file",
-            "alignment_postprocessing",
-            "mean_coverage",
-            "percent_uniquely_aligned",
-            "percent_multimapped",
-            "percent_unaligned",
-            "quality_issues",
-            "alignment_QC_output_file",
-            "percent_rRNA",
-            "percent_mRNA",
-            "percent_mtRNA",
-            "percent_Globin",
-            "percent_UMI",
-            "5prime3prime_bias",
-            "percent_GC",
-            "percent_chrX_Y",
-        ]
-        aligned1_read = self.client.get("/api/experiments/aligned_rna_short_read/?ids=UCI_GREGoR_test-001-001-0-R-1_RNA_1-Aligned_1", format="json")
-        for attr in aligned_rna_attributes:
-            assert attr in aligned1_read.data[0]["data"]  # ensure all updated attributes are not null
+        aligned1_read = self.client.get(f"/api/experiments/aligned_rna_short_read/?ids={aligned1['aligned_rna_short_read_id']}", format="json")
+        aligned_rna_attrs = {AlignedRNAShortReadOutputSerializer().RENAMES.get(k, k) for k in AlignedRNAShortReadOutputSerializer().fields}  # account for renamed five_prime_three_prime_bias
+        self.assertEqual(set(aligned1_read.data[0]["data"].keys()), aligned_rna_attrs)  # ensure all keys from model are returned
+
+        for k, v in aligned1_read.data[0]["data"].items():  # ensure all updated attributes are not null
+            self.assertIsNotNone(v, f"{k} is null")
 
 
 class DeleteAlignedRNAShortReadAPITest(APITestCaseWithAuth):

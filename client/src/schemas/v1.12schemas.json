@@ -3304,5 +3304,168 @@
                 "description": "Whether the full pipeline is complete for this sample"
             }
         }
+    },
+    "reported_race": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.12/json_schemas/reported_race.json",
+        "title": "reported_race",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "name"
+        ],
+        "definitions": {},
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Self/submitter-reported race (OMB categories)",
+                "examples": [
+                    "American Indian or Alaska Native",
+                    "Asian"
+                ]
+            },
+            "description": {
+                "type": "string",
+                "description": "description, usually the same as the name"
+            }
+        }
+    },
+    "internal_project_id": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/internal_project_id.json",
+        "title": "internal_project_id",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "internal_project_id"
+        ],
+        "definitions": {},
+        "properties": {
+            "internal_project_id": {
+                "type": "string",
+                "description": "An identifier used by GREGoR research centers to identify a set of participants for their internal tracking",
+                "examples": [
+                    "UWCDR_uwcmg_distal_arthrogryposis_type 1_212",
+                    "UWCDR_uwcmg_sponastrime_dysplasia_487"
+                ]
+            }
+        }
+    },
+    "pmid_id": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/pmid_id.json",
+        "title": "pmid_id",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "pmid_id"
+        ],
+        "definitions": {},
+        "properties": {
+            "pmid_id": {
+                "type": "string",
+                "description": "Case specific PubMed ID if applicable",
+                "examples": [
+                    "25683120"
+                ]
+            }
+        }
+    },
+    "twin_id": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/twin_id.json",
+        "title": "twin_id",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "twin_id"
+        ],
+        "definitions": {},
+        "properties": {
+            "twin_id": {
+                "type": "string",
+                "description": "participant_id for twins, triplets, etc; 0 if not availableW",
+                "examples": [
+                    "BCM_Subject_1",
+                    "BROAD_subj89054",
+                    "BROAD_subj89054|BROAD_subj89055"
+                ]
+            }
+        }
+    },
+    "library_prep_type": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/library_prep_type.json",
+        "title": "library_prep_type",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "name"
+        ],
+        "definitions": {},
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "type of library prep",
+                "examples": [
+                    "stranded poly-A pulldown",
+                    "stranded total RNA"
+                ]
+            },
+            "display_name": {
+                "type": "string",
+                "description": "display name, usually the same as the name"
+            }
+        }
+    },
+    "prep_targets_detail": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/prep_targets_detail.json",
+        "title": "prep_targets_detail",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "name"
+        ],
+        "definitions": {},
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "depletion kit or list of depletion targets used",
+                "examples": [
+                    "Illumina Ribo-Zero Plus rRNA Depletion Kit",
+                    "NEBNext rRNA Depletion Kit v2 (Human/Mouse/Rat)"
+                ]
+            },
+            "display_name": {
+                "type": "string",
+                "description": "display name, usually the same as the name"
+            }
+        }
+    },
+    "experiment_type": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/experiment_type.json",
+        "title": "experiment_type",
+        "version": "1.12",
+        "type": "object",
+        "required": [
+            "name"
+        ],
+        "definitions": {},
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "single-end or paired-end? targeted or untargeted RNA-seq experiment?",
+                "examples": [
+                    "single-end",
+                    "paired-end"
+                ]
+            },
+            "display_name": {
+                "type": "string",
+                "description": "display name, usually the same as the name"
+            }
+        }
     }
 }

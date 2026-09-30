@@ -56,6 +56,31 @@ class OptimizedQuerysetMixin:
             queryset = queryset.prefetch_related(*self.prefetch_related_fields)
         return queryset
 
+    def get_instances_by_id(self, model, ids, id_field):
+        """
+        Fetch model instances for a `list` request, keyed by str(id_field).
+
+        Unlike bulk_retrieve (which returns obj.__dict__ and therefore omits
+        ManyToMany relations), this returns real instances with select/prefetch
+        applied, so they can be run through the viewset's serializer.
+        """
+        if not ids:
+            return {}
+        queryset = self.optimize_queryset(
+            model.objects.filter(**{f"{id_field}__in": ids})
+        )
+        return {str(getattr(obj, id_field)): obj for obj in queryset}
+
+    def serialize_instance(self, instance):
+        """
+        Serialize with the viewset's serializer class directly (not get_serializer),
+        so `suppress` handling stays in suppress_mapping_fields, as before.
+        """
+        serializer_class = self.get_serializer_class()
+        return serializer_class(
+            instance, context=self.get_serializer_context()
+        ).data
+
 
 class ParticipantViewSet(
     SuppressSerializerFieldsMixin,
@@ -132,13 +157,13 @@ class ParticipantViewSet(
     def list(self, request):
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        participants = bulk_retrieve(Participant, ids, "participant_id")
+        participants = self.get_instances_by_id(Participant, ids, "participant_id")
 
         response_data, accepted, rejected = [], False, False
 
         for participant_id in ids:
             if participant_id in participants:
-                if not superuser and participants[participant_id]["needs_review"]:
+                if not superuser and participants[participant_id].needs_review:
                     response_data.append(
                         response_constructor(
                             identifier=participant_id,
@@ -150,7 +175,7 @@ class ParticipantViewSet(
 
                 else:
                     participant_data = self.suppress_mapping_fields(
-                        participants[participant_id]
+                        self.serialize_instance(participants[participant_id])
                     )
 
                     response_data.append(
@@ -347,12 +372,12 @@ class FamilyViewSet(
     def list(self, request):
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        family = bulk_retrieve(Family, ids, "family_id")
+        family = self.get_instances_by_id(Family, ids, "family_id")
         response_data, accepted, rejected = [], False, False
 
         for family_id in ids:
             if family_id in family:
-                if not superuser and family[family_id]["needs_review"]:
+                if not superuser and family[family_id].needs_review:
                     response_data.append(
                         response_constructor(
                             identifier=family_id,
@@ -364,7 +389,7 @@ class FamilyViewSet(
 
                 else:
                     family_data = self.suppress_mapping_fields(
-                        family[family_id]
+                        self.serialize_instance(family[family_id])
                     )
 
                     response_data.append(
@@ -559,12 +584,12 @@ class AnalyteViewSet(
     def list(self, request):
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        analyte = bulk_retrieve(Analyte, ids, "analyte_id")
+        analyte = self.get_instances_by_id(Analyte, ids, "analyte_id")
         response_data, accepted, rejected = [], False, False
 
         for analyte_id in ids:
             if analyte_id in analyte:
-                if not superuser and analyte[analyte_id]["needs_review"]:
+                if not superuser and analyte[analyte_id].needs_review:
                     response_data.append(
                         response_constructor(
                             identifier=analyte_id,
@@ -575,7 +600,7 @@ class AnalyteViewSet(
                     rejected = True
                 else:
                     analyte_data = self.suppress_mapping_fields(
-                        analyte[analyte_id]
+                        self.serialize_instance(analyte[analyte_id])
                     )
 
                     response_data.append(
@@ -770,12 +795,12 @@ class PhenotypeViewSet(
     def list(self, request):
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        phenotype = bulk_retrieve(Phenotype, ids, "phenotype_id")
+        phenotype = self.get_instances_by_id(Phenotype, ids, "phenotype_id")
         response_data, accepted, rejected = [], False, False
 
         for phenotype_id in ids:
             if phenotype_id in phenotype:
-                if not superuser and phenotype[phenotype_id]["needs_review"]:
+                if not superuser and phenotype[phenotype_id].needs_review:
                     response_data.append(
                         response_constructor(
                             identifier=phenotype_id,
@@ -787,7 +812,7 @@ class PhenotypeViewSet(
 
                 else:
                     phenotype_data = self.suppress_mapping_fields(
-                        phenotype[phenotype_id]
+                        self.serialize_instance(phenotype[phenotype_id])
                     )
                     response_data.append(
                         response_constructor(
@@ -989,12 +1014,12 @@ class GeneticFindingsViewSet(
     def list(self, request):
         superuser = self.request.user.is_superuser
         ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        genetic_findings = bulk_retrieve(GeneticFindings, ids, "genetic_findings_id")
+        genetic_findings = self.get_instances_by_id(GeneticFindings, ids, "genetic_findings_id")
         response_data, accepted, rejected = [], False, False
 
         for genetic_findings_id in ids:
             if genetic_findings_id in genetic_findings:
-                if not superuser and genetic_findings[genetic_findings_id]["needs_review"]:
+                if not superuser and genetic_findings[genetic_findings_id].needs_review:
                     response_data.append(
                         response_constructor(
                             identifier=genetic_findings_id,
@@ -1002,9 +1027,10 @@ class GeneticFindingsViewSet(
                             code=403
                         )
                     )
+                    rejected = True
                 else:
                     genetic_findings_data = self.suppress_mapping_fields(
-                        genetic_findings[genetic_findings_id]
+                        self.serialize_instance(genetic_findings[genetic_findings_id])
                     )
                     response_data.append(
                         response_constructor(
@@ -1159,65 +1185,6 @@ class BiobankViewSet(
         return Response(serializer.data, status=200)
 
     @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                "id",
-                openapi.IN_QUERY,
-                description="Comma-separated list of IDs",
-                type=openapi.TYPE_STRING,
-                required=True
-            ),
-            SUPPRESS_FIELDS_PARAMETER,
-        ],
-        responses={200: "All success", 207: "Partial success", 400: "Bad request"},
-        tags=["Biobank"],
-    )
-    def list(self, request):
-        superuser = self.request.user.is_superuser
-        ids = [i.strip() for i in request.GET.get("ids", "").split(",") if i.strip()]
-        biobanks = bulk_retrieve(Biobank, ids, "bioank_id")
-
-        response_data, accepted, rejected = [], False, False
-
-        for biobank_id in ids:
-            if biobank_id in biobanks:
-                if not superuser and biobanks[biobank_id]["needs_review"]:
-                    response_data.append(
-                        response_constructor(
-                            identifier=biobank_id,
-                            request_status="FORBIDDEN",
-                            code=403
-                        )
-                    )
-                    rejected = True
-
-                else:
-                    biobank_data = self.suppress_mapping_fields(
-                        biobanks[biobank_id]
-                     )
-                    response_data.append(
-                        response_constructor(
-                            identifier=biobank_id,
-                            request_status="SUCCESS",
-                            code=200,
-                            data=biobank_data,
-                        )
-                    )
-                    accepted = True
-            else:
-                response_data.append(
-                    response_constructor(
-                        identifier=biobank_id,
-                        request_status="NOT FOUND",
-                        code=404,
-                        data="Not found",
-                    )
-                )
-                rejected = True
-
-        return Response(response_data, status=response_status(accepted, rejected))
-
-    @swagger_auto_schema(
         request_body=BiobankSerializer(many=True),
         responses={200: "All created", 207: "Partial success", 400: "Bad request"},
         tags=["Biobank"],
@@ -1268,7 +1235,7 @@ class BiobankViewSet(
             )
         ids = ids.split(",")
 
-        biobank = bulk_retrieve(Biobank, ids, "biobank_id")
+        biobank = self.get_instances_by_id(Biobank, ids, "biobank_id")
         response_data, accepted, rejected = [], False, False
 
         for biobank_id in ids:
@@ -1278,7 +1245,7 @@ class BiobankViewSet(
                         identifier=biobank_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=biobank[biobank_id],
+                        data=self.serialize_instance(biobank[biobank_id]),
                     )
                 )
                 accepted = True

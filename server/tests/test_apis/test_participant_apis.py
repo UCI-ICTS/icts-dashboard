@@ -4,10 +4,13 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
+from metadata.services import ParticipantOutputSerializer
 from datetime import datetime
 
 
-testuser = "testuser"
+TESTUSER = "testuser"
+
+EMPTY = (None, "", [], {})
 
 
 def changed_by(self, response_dict, changed_by):
@@ -32,6 +35,16 @@ def timestamps(self, response_dict):
     self.assertGreater(updated_at, created_at)
 
 
+def populated(self, data, allow_empty=()):
+    """
+    Assert every returned field has a value, except those in allow_empty.
+    """
+    for key, value in data.items():
+        if key in allow_empty:
+            continue
+        self.assertNotIn(value, EMPTY, f"{key} is empty: {value!r}")
+
+
 class APITestCaseWithAuth(APITestCase):
     fixtures = ["tests/fixtures/test_fixture.json"]
 
@@ -48,20 +61,38 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
         url = "/api/metadata/participant/create/"
         part1 = {  # Valid submission
             "participant_id": "P-002-101-0",
+            "internal_project_id": ["UTAortaStudy"],
             "gregor_center": "UCI",
             "consent_code": "HMB",
+            "recontactable": "Yes",
+            "prior_testing": [
+                "2021 Invitae clinical exome; variant in CBL c.1259G>A (p.Arg420Gln) likely pathogenic- same in father and brother; Beckwith Wiedemann syndrome methlyation studies and seqeunced the CDKN1C gene normal; CMA: 73kbp deletion at 2q23.1 (maternally inherited). Check if this complete message is visible past 256 characters.",
+                "Karyotype - 46,XY",
+                "SRY qPCR - normal",
+            ],
+            "pmid_id": ["0"],
             "family_id": "GREGoR_test-001",
             "paternal_id": "0",
             "maternal_id": "0",
+            "twin_id": ["0"],
             "proband_relationship": "Self",
+            "proband_relationship_detail": "Self",
             "sex": "Male",
-            # "reported_race": "More than one",
-            # "reported_ethnicity": "Unknown",
+            "sex_detail": "Possible DSD",
+            "reported_race": ["Asian", "White"],
+            "reported_ethnicity": "Not Hispanic or Latino",
+            "ancestry_detail": "Check father and brother",
             "age_at_last_observation": 20,
             "affected_status": "Affected",
+            "phenotype_description": [
+                "Absent nasal bridge",
+                "Global developmental delay",
+                "ADHD",
+            ],
             "age_at_enrollment": 20,
             "solve_status": "Unsolved",
             "missing_variant_case": "No",
+            "missing_variant_details": "No missing variants yet",
         }
         part2 = {  # Invalid submission; missing participant_id
             "gregor_center": "UCI",
@@ -125,12 +156,17 @@ class CreateParticipantAPITest(APITestCaseWithAuth):
         response_200 = self.client.post(url, [part3], format="json")
         response_207 = self.client.post(url, [part1, part3, part4], format="json")
         response_400 = self.client.post(url, [part2], format="json")
-        changed_by(self, response_200.data[0], testuser)
+        changed_by(self, response_200.data[0], TESTUSER)
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)
+
         self.assertEqual(response_207.data[0]["request_status"], "CREATED")
-        changed_by(self, response_207.data[0], testuser)
+        changed_by(self, response_207.data[0], TESTUSER)
+        part1_response = self.client.get(f"/api/metadata/participant/?ids={part1['participant_id']}", format="json")
+        participant_attrs = set(ParticipantOutputSerializer().fields.keys())
+        self.assertEqual(set(part1_response.data[0]["data"].keys()), participant_attrs)  # Verify all keys from the model are returned
+        populated(self, part1_response.data[0]["data"])  # Verify all attributes are populated
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_207.data[2]["request_status"], "BAD REQUEST")
 
@@ -201,11 +237,11 @@ class UpdateParticipantAPITest(APITestCaseWithAuth):
         response_400 = self.client.post(url, [part2, part2], format="json")
 
         self.assertEqual(response_200.status_code, status.HTTP_200_OK)
-        changed_by(self, response_200.data[0], testuser)
+        changed_by(self, response_200.data[0], TESTUSER)
         timestamps(self, response_200.data[0])
         self.assertEqual(response_207.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response_207.data[0]["request_status"], "UPDATED")
-        changed_by(self, response_207.data[0], testuser)
+        changed_by(self, response_207.data[0], TESTUSER)
         timestamps(self, response_207.data[0])
         self.assertEqual(response_207.data[1]["request_status"], "BAD REQUEST")
         self.assertEqual(response_400.status_code, status.HTTP_400_BAD_REQUEST)

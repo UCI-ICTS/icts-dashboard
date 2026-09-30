@@ -79,6 +79,28 @@ class OptimizedListViewSet(viewsets.ViewSet):
             qs = qs.prefetch_related(*self.prefetch_related_fields)
         return qs
 
+    def get_instances_by_id(self, model, ids, id_field):
+        """
+        Fetch model instances for a `list` request, keyed by str(id_field).
+
+        Unlike bulk_retrieve (which returns obj.__dict__ and therefore omits
+        ManyToMany relations), this returns real instances so they can be run
+        through the same serializer that `list_all` uses.
+        """
+        ids = [i for i in ids if i]
+        if not ids:
+            return {}
+        queryset = self.get_optimized_queryset(model).filter(
+            **{f"{id_field}__in": ids}
+        )
+        return {str(getattr(obj, id_field)): obj for obj in queryset}
+
+    @staticmethod
+    def serialize_instance(serializer_class, instance):
+        data = serializer_class(instance).data
+
+        return data
+
 
 class ExperimentViewSet(OptimizedListViewSet):
     @swagger_auto_schema(
@@ -107,7 +129,7 @@ class ExperimentViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        experiments = bulk_retrieve(Experiment, ids, "experiment_id")
+        experiments = self.get_instances_by_id(Experiment, ids, "experiment_id")
         response_data, accepted, rejected = [], False, False
         for experiment_id in ids:
             if experiment_id in experiments:
@@ -116,7 +138,7 @@ class ExperimentViewSet(OptimizedListViewSet):
                         identifier=experiment_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=experiments[experiment_id],
+                        data=self.serialize_instance(ExperimentSerializer, experiments[experiment_id]),
                     )
                 )
                 accepted = True
@@ -161,7 +183,7 @@ class AlignedViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned = bulk_retrieve(Aligned, ids, "aligned_id")
+        aligned = self.get_instances_by_id(Aligned, ids, "aligned_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_id in ids:
@@ -171,7 +193,7 @@ class AlignedViewSet(OptimizedListViewSet):
                         identifier=aligned_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned[aligned_id],
+                        data=self.serialize_instance(AlignedSerializer, aligned[aligned_id]),
                     )
                 )
                 accepted = True
@@ -256,9 +278,7 @@ class ExperimentRNAShortReadViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        experiment_rna_short_read = bulk_retrieve(
-            ExperimentRNAShortRead, ids, "experiment_rna_short_read_id"
-        )
+        experiment_rna_short_read = self.get_instances_by_id(ExperimentRNAShortRead, ids, "experiment_rna_short_read_id")
         response_data, accepted, rejected = [], False, False
 
         for experiment_rna_short_read_id in ids:
@@ -268,7 +288,7 @@ class ExperimentRNAShortReadViewSet(OptimizedListViewSet):
                         identifier=experiment_rna_short_read_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=experiment_rna_short_read[experiment_rna_short_read_id],
+                        data=self.serialize_instance(ExperimentRNAOutputSerializer, experiment_rna_short_read[experiment_rna_short_read_id]),
                     )
                 )
                 accepted = True
@@ -448,10 +468,7 @@ class AlignedRNAShortReadViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_rna_short_read = bulk_retrieve(
-            AlignedRNAShortRead, ids, "aligned_rna_short_read_id",
-            rename_map={"five_prime_three_prime_bias": "5prime3prime_bias"},
-        )
+        aligned_rna_short_read = self.get_instances_by_id(AlignedRNAShortRead, ids, "aligned_rna_short_read_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_rna_short_read_id in ids:
@@ -461,7 +478,7 @@ class AlignedRNAShortReadViewSet(OptimizedListViewSet):
                         identifier=aligned_rna_short_read_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_rna_short_read[aligned_rna_short_read_id],
+                        data=self.serialize_instance(AlignedRNAShortReadOutputSerializer, aligned_rna_short_read[aligned_rna_short_read_id]),
                     )
                 )
                 accepted = True
@@ -638,9 +655,7 @@ class ExperimentDNAShortReadViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        experiment_dna_short_read = bulk_retrieve(
-            ExperimentDNAShortRead, ids, "experiment_dna_short_read_id"
-        )
+        experiment_dna_short_read = self.get_instances_by_id(ExperimentDNAShortRead, ids, "experiment_dna_short_read_id")
         response_data, accepted, rejected = [], False, False
 
         for experiment_dna_short_read_id in ids:
@@ -650,7 +665,7 @@ class ExperimentDNAShortReadViewSet(OptimizedListViewSet):
                         identifier=experiment_dna_short_read_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=experiment_dna_short_read[experiment_dna_short_read_id],
+                        data=self.serialize_instance(ExperimentDNAOutputSerializer, experiment_dna_short_read[experiment_dna_short_read_id]),
                     )
                 )
                 accepted = True
@@ -827,9 +842,7 @@ class AlignedDNAShortReadViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_dna_short_read = bulk_retrieve(
-            AlignedDNAShortRead, ids, "aligned_dna_short_read_id"
-        )
+        aligned_dna_short_read = self.get_instances_by_id(AlignedDNAShortRead, ids, "aligned_dna_short_read_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_dna_short_read_id in ids:
@@ -839,7 +852,7 @@ class AlignedDNAShortReadViewSet(OptimizedListViewSet):
                         identifier=aligned_dna_short_read_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_dna_short_read[aligned_dna_short_read_id],
+                        data=self.serialize_instance(AlignedDNAShortReadSerializer, aligned_dna_short_read[aligned_dna_short_read_id]),
                     )
                 )
                 accepted = True
@@ -1013,7 +1026,7 @@ class AlignedDNAShortReadSetViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_dna_short_read_set = bulk_retrieve(AlignedDNAShortReadSet, ids, "aligned_dna_short_read_set_id")
+        aligned_dna_short_read_set = self.get_instances_by_id(AlignedDNAShortReadSet, ids, "aligned_dna_short_read_set_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_dna_short_read_set_id in ids:
@@ -1023,7 +1036,7 @@ class AlignedDNAShortReadSetViewSet(OptimizedListViewSet):
                         identifier=aligned_dna_short_read_set_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_dna_short_read_set[aligned_dna_short_read_set_id],
+                        data=self.serialize_instance(AlignedDNAShortReadSetSerializer, aligned_dna_short_read_set[aligned_dna_short_read_set_id]),
                     )
                 )
                 accepted = True
@@ -1193,7 +1206,7 @@ class CalledVariantsDNAShortReadViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        called_variants_dna_short_read = bulk_retrieve(CalledVariantsDNAShortRead, ids, "called_variants_dna_short_read_id")
+        called_variants_dna_short_read = self.get_instances_by_id(CalledVariantsDNAShortRead, ids, "called_variants_dna_short_read_id")
         response_data, accepted, rejected = [], False, False
 
         for called_variants_dna_short_read_id in ids:
@@ -1203,7 +1216,7 @@ class CalledVariantsDNAShortReadViewSet(OptimizedListViewSet):
                         identifier=called_variants_dna_short_read_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=called_variants_dna_short_read[called_variants_dna_short_read_id],
+                        data=self.serialize_instance(CalledVariantsDNAShortReadOutputSerializer, called_variants_dna_short_read[called_variants_dna_short_read_id]),
                     )
                 )
                 accepted = True
@@ -1373,9 +1386,7 @@ class ExperimentPacBioViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        experiment_pac_bio = bulk_retrieve(
-            ExperimentPacBio, ids, "experiment_pac_bio_id"
-        )
+        experiment_pac_bio = self.get_instances_by_id(ExperimentPacBio, ids, "experiment_pac_bio_id")
         response_data, accepted, rejected = [], False, False
 
         for experiment_pac_bio_id in ids:
@@ -1385,7 +1396,7 @@ class ExperimentPacBioViewSet(OptimizedListViewSet):
                         identifier=experiment_pac_bio_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=experiment_pac_bio[experiment_pac_bio_id],
+                        data=self.serialize_instance(ExperimentPacBioSerializer, experiment_pac_bio[experiment_pac_bio_id]),
                     )
                 )
                 accepted = True
@@ -1557,7 +1568,7 @@ class AlignedPacBioViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_pac_bio = bulk_retrieve(AlignedPacBio, ids, "aligned_pac_bio_id")
+        aligned_pac_bio = self.get_instances_by_id(AlignedPacBio, ids, "aligned_pac_bio_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_pac_bio_id in ids:
@@ -1567,7 +1578,7 @@ class AlignedPacBioViewSet(OptimizedListViewSet):
                         identifier=aligned_pac_bio_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_pac_bio[aligned_pac_bio_id],
+                        data=self.serialize_instance(AlignedPacBioSerializer, aligned_pac_bio[aligned_pac_bio_id]),
                     )
                 )
                 accepted = True
@@ -1737,7 +1748,7 @@ class AlignedPacBioSetViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_pac_bio_set = bulk_retrieve(AlignedPacBioSet, ids, "aligned_pac_bio_set_id")
+        aligned_pac_bio_set = self.get_instances_by_id(AlignedPacBioSet, ids, "aligned_pac_bio_set_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_pac_bio_set_id in ids:
@@ -1747,7 +1758,7 @@ class AlignedPacBioSetViewSet(OptimizedListViewSet):
                         identifier=aligned_pac_bio_set_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_pac_bio_set[aligned_pac_bio_set_id],
+                        data=self.serialize_instance(AlignedPacBioSetSerializer, aligned_pac_bio_set[aligned_pac_bio_set_id]),
                     )
                 )
                 accepted = True
@@ -1917,7 +1928,7 @@ class CalledVariantsPacBioViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        called_variants_pac_bio = bulk_retrieve(CalledVariantsPacBio, ids, "called_variants_pac_bio_id")
+        called_variants_pac_bio = self.get_instances_by_id(CalledVariantsPacBio, ids, "called_variants_pac_bio_id")
         response_data, accepted, rejected = [], False, False
 
         for called_variants_pac_bio_id in ids:
@@ -1927,7 +1938,7 @@ class CalledVariantsPacBioViewSet(OptimizedListViewSet):
                         identifier=called_variants_pac_bio_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=called_variants_pac_bio[called_variants_pac_bio_id],
+                        data=self.serialize_instance(CalledVariantsPacBioOutputSerializer, called_variants_pac_bio[called_variants_pac_bio_id]),
                     )
                 )
                 accepted = True
@@ -2097,9 +2108,7 @@ class ExperimentNanoporeViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        experiment_nanopore = bulk_retrieve(
-            ExperimentNanopore, ids, "experiment_nanopore_id"
-        )
+        experiment_nanopore = self.get_instances_by_id(ExperimentNanopore, ids, "experiment_nanopore_id")
         response_data, accepted, rejected = [], False, False
 
         for experiment_nanopore_id in ids:
@@ -2109,7 +2118,7 @@ class ExperimentNanoporeViewSet(OptimizedListViewSet):
                         identifier=experiment_nanopore_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=experiment_nanopore[experiment_nanopore_id],
+                        data=self.serialize_instance(ExperimentNanoporeSerializer, experiment_nanopore[experiment_nanopore_id]),
                     )
                 )
                 accepted = True
@@ -2283,7 +2292,7 @@ class AlignedNanoporeViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_nanopore = bulk_retrieve(AlignedNanopore, ids, "aligned_nanopore_id")
+        aligned_nanopore = self.get_instances_by_id(AlignedNanopore, ids, "aligned_nanopore_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_nanopore_id in ids:
@@ -2293,7 +2302,7 @@ class AlignedNanoporeViewSet(OptimizedListViewSet):
                         identifier=aligned_nanopore_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_nanopore[aligned_nanopore_id],
+                        data=self.serialize_instance(AlignedNanoporeSerializer, aligned_nanopore[aligned_nanopore_id]),
                     )
                 )
                 accepted = True
@@ -2463,7 +2472,7 @@ class AlignedNanoporeSetViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        aligned_nanopore_set = bulk_retrieve(AlignedNanoporeSet, ids, "aligned_nanopore_set_id")
+        aligned_nanopore_set = self.get_instances_by_id(AlignedNanoporeSet, ids, "aligned_nanopore_set_id")
         response_data, accepted, rejected = [], False, False
 
         for aligned_nanopore_set_id in ids:
@@ -2473,7 +2482,7 @@ class AlignedNanoporeSetViewSet(OptimizedListViewSet):
                         identifier=aligned_nanopore_set_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=aligned_nanopore_set[aligned_nanopore_set_id],
+                        data=self.serialize_instance(AlignedNanoporeSetSerializer, aligned_nanopore_set[aligned_nanopore_set_id]),
                     )
                 )
                 accepted = True
@@ -2644,7 +2653,7 @@ class CalledVariantsNanoporeViewSet(OptimizedListViewSet):
     )
     def list(self, request):
         ids = request.GET.get("ids", "").split(",")
-        called_variants_nanopore = bulk_retrieve(CalledVariantsNanopore, ids, "called_variants_nanopore_id")
+        called_variants_nanopore = self.get_instances_by_id(CalledVariantsNanopore, ids, "called_variants_nanopore_id")
         response_data, accepted, rejected = [], False, False
 
         for called_variants_nanopore_id in ids:
@@ -2654,7 +2663,7 @@ class CalledVariantsNanoporeViewSet(OptimizedListViewSet):
                         identifier=called_variants_nanopore_id,
                         request_status="SUCCESS",
                         code=200,
-                        data=called_variants_nanopore[called_variants_nanopore_id],
+                        data=self.serialize_instance(CalledVariantsNanoporeOutputSerializer, called_variants_nanopore[called_variants_nanopore_id]),
                     )
                 )
                 accepted = True

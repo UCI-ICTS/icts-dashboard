@@ -397,7 +397,7 @@ def bulk_retrieve(model_class, id_list: list, id_field: str = "id", rename_map: 
 
         # Convert queryset to JSON-like structure
         serialized_data = {
-            str(obj_id): obj.__dict__ for obj_id, obj in model_dict.items()
+            str(obj_id): dict(obj.__dict__) for obj_id, obj in model_dict.items()
         }
 
         # Remove internal Django fields (_state) from the response

@@ -340,11 +340,14 @@ class AlignedRNAShortReadOutputSerializer(TimeStampedSerializerMixin):
         model = AlignedRNAShortRead
         fields = "__all__"
 
+    RENAMES = {"five_prime_three_prime_bias": "5prime3prime_bias"}
+
     def to_representation(self, instance):
         """Rename `five_prime_three_prime_bias` to `5prime3prime_bias` in response"""
         data = super().to_representation(instance)
-        if "five_prime_three_prime_bias" in data:
-            data["5prime3prime_bias"] = data.pop("five_prime_three_prime_bias")
+        for old, new in self.RENAMES.items():
+            if old in data:
+                data[new] = data.pop(old)
         return data
 
 

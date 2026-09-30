@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/experiment_type.json",
+    "title": "experiment_type",
+    "version": "1.12",
+    "type": "object",
+    "required": [
+        "name"
+    ],
+    "definitions": {},
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "single-end or paired-end? targeted or untargeted RNA-seq experiment?",
+            "examples": [
+                "single-end",
+                "paired-end"
+            ]
+        },
+        "display_name": {
+            "type": "string",
+            "description": "display name, usually the same as the name"
+        }
+    }
+}

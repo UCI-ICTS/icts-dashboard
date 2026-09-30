@@ -558,41 +558,6 @@ class ParticipantInputSerializer(TimeStampedSerializerMixin):
             raise
 
 
-def get_or_create_sub_models(datum: dict) -> dict:
-    """
-    Create or retrieve related model instances based on the provided data.
-
-    This function processes the `datum` dictionary to handle the creation or retrieval
-    of related model instances. It updates the `datum` dictionary with the primary keys
-    of the related instances.
-
-    Args:
-        datum (dict): A dictionary containing the data for the main model and its related models.
-
-    Returns:
-        dict: The updated `datum` dictionary with primary keys of the related instances.
-    """
-    # Define how to handle creation of related objects
-    mapping = {
-        "family_id": (Family, "family_id"),
-        "internal_project_id": (InternalProjectId, "internal_project_id"),
-        "pmid_id": (PmidId, "pmid_id"),
-        "twin_id": (TwinId, "twin_id"),
-    }
-    for key, (model, field_name) in mapping.items():
-        if isinstance(datum.get(key), list):  # Handles list fields differently
-            objects = []
-            for item in datum[key]:
-                obj, created = model.objects.get_or_create(**{field_name: item})
-                objects.append(obj.pk)
-            datum[key] = objects
-        else:
-            if datum.get(key):
-                obj, created = model.objects.get_or_create(**{field_name: datum[key]})
-                datum[key] = obj.pk
-    return datum
-
-
 def create_metadata(table_name: str, identifier: str, datum: dict, current_user: User):
     """
     Create a new model instance based on the provided data.
