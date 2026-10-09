@@ -24,6 +24,7 @@ export default function TableToolBar({
   onRefresh,
   renderDetail,
   renderQueue,
+  group,
   extra,
 }) {
   const [open, setOpen] = useState(false);
@@ -143,7 +144,7 @@ export default function TableToolBar({
     </Tooltip>
 
     &nbsp;
-    <TableSelector />
+    <TableSelector group={group} />
     &nbsp;
 
     <Tooltip title="Refresh Data">

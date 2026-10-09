@@ -4,20 +4,24 @@ import "../App.css"
 import { Select, Tooltip } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { TABLE_MAPPING } from "../utils/schemaAndTables";
+import { TABLE_MAPPING, isSubmodel } from "../utils/schemaAndTables";
 
 const { Option } = Select;
 
-export default function TableSelector() {
+export default function TableSelector({ group = "main" }) {
   const navigate = useNavigate();
   const { table: urlTable } = useParams();
   const reduxTable = useSelector(s => s.data.tableView);
 
-  const validSchemas = new Set(TABLE_MAPPING.map(t => t.schema));
+  const wantSub = group === "submodels";
+  const tables = TABLE_MAPPING.filter((t) => isSubmodel(t.schema) === wantSub);
+  const basePath = wantSub ? "/dashboard/submodels" : "/dashboard/table-data";
+
+  const validSchemas = new Set(tables.map(t => t.schema));
   const selected =
     (urlTable && validSchemas.has(urlTable) && urlTable) ||
     (reduxTable && validSchemas.has(reduxTable) && reduxTable) ||
-    TABLE_MAPPING[0].schema; // final fallback
+    tables[0].schema;
 
   return (
     <Tooltip title="Select table" className="table-selector-container">
@@ -25,9 +29,9 @@ export default function TableSelector() {
       <Select
         className="table-selector"
         value={selected}
-        onChange={(val) => navigate(`/dashboard/table-data/${val}`)}
+        onChange={(val) => navigate(`${basePath}/${val}`)}
       >
-        {TABLE_MAPPING.map((t) => (
+        {tables.map((t) => (
           <Option key={t.schema} value={t.schema} className="table-selector-options">
             {t.name}
           </Option>

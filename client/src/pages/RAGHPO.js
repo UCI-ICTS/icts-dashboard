@@ -1,7 +1,7 @@
 // src/pages/RAGHPO.js
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Alert,
@@ -19,7 +19,13 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import { extractPhenotypes, createEntry, clearRagHpos, replaceRagHpoChoice } from "../slices/dataSlice";
+import {
+  extractPhenotypes,
+  createEntry,
+  clearRagHpos,
+  replaceRagHpoChoice,
+  fetchTable,
+} from "../slices/dataSlice";
 import { HPODownloadModal, PhenotypeImportFormModal } from "../components/Modals";
 import { dataDownload } from "../utils/utilitiyFunctions";
 

@@ -42,7 +42,15 @@ export function useTableSettings({
       return acc;
     }, {}));
     setWidths(keys.reduce((acc, k) => { acc[k] = saved.widths?.[k] ?? 180; return acc; }, {}));
-    setSorter(saved.sorter ?? null);
+
+    const validKeys = new Set(keys);
+    setFilters(
+      Object.fromEntries(
+        Object.entries(saved.filters ?? {}).filter(([k]) => validKeys.has(k))
+      )
+    );
+    setSorter(saved.sorter && validKeys.has(saved.sorter.key) ? saved.sorter : null);
+
     setFilters(saved.filters ?? {});
     hydratedKey.current = storageKey;
     // eslint-disable-next-line react-hooks/exhaustive-deps

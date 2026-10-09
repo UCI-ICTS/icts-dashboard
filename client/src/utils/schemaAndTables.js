@@ -560,10 +560,11 @@ export const TABLE_MAPPING = [
   { name: "Experiment Type", schema: "experiment_type", identifier: "experiment_type"},
 ];
 
-const SUBMODEL_TABLES = [
+export const SUBMODEL_TABLES = [
   "reported_race", "internal_project_id", "pmid_id", "twin_id",
   "library_prep_type", "prep_targets_detail", "experiment_type",
 ];
+export const isSubmodel = (t) => SUBMODEL_TABLES.includes(t);
 
 /**
  * Get collection name from schema key

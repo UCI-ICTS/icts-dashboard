@@ -87,6 +87,8 @@ const AppRoutes = () => {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="cohort" element={<PhenotypeCohort />} />
         <Route path="rag-hpo" element={<RAGHPO />} />
+        <Route path="submodels" element={<Navigate to="reported_race" replace />} />
+        <Route path="submodels/:table" element={<GregorDataSheets group="submodels" />} />
       </Route>
 
       {/* CATCH-ALL: Place this LAST so it doesn't block valid routes */}

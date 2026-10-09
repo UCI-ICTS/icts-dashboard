@@ -1,12 +1,12 @@
 // src/pages/GregorDataSheets.js
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Typography, Spin, Modal, Form, Input, Select, Button, message } from "antd";
 import { useTableSettings, buildColumns } from "../utils/tableSettings";
 import { setTableView, fetchTable, familyDetail, caseQueue } from "../slices/dataSlice";
-import { defaultVisibleColumns, getCollectionName, getPrimaryKeyField, getTableName } from "../utils/schemaAndTables";
+import { defaultVisibleColumns, getCollectionName, getPrimaryKeyField, getTableName, isSubmodel } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
 import schemas from "../schemas/v1.12schemas.json";
@@ -21,7 +21,7 @@ const { Option } = Select;
 const EMPTY_ARRAY = [];
 const EMPTY_SCHEMA = { properties: {} };
 
-export default function GregorDataSheets({ renderDetail=false, renderQueue=false }) {
+export default function GregorDataSheets({ renderDetail=false, renderQueue=false, group="main" }) {
   const { table } = useParams();
   const dispatch = useDispatch();
   const isAdmin  = useSelector((state) => state.account.user.is_superuser);
@@ -48,7 +48,8 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
   const [queueLoading, setQueueLoading ] = useState(true)
 // ---- Table URL state ----
 
-  const tableValid = useMemo(() => !!schemas[table], [table]);
+  const inGroup = isSubmodel(table) === (group === "submodels");
+  const tableValid = useMemo(() => !!schemas[table] && inGroup, [table, inGroup]);
 
   // create object for setTableView
   const meta = (schema) => ({
@@ -155,9 +156,11 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
     }
 
     // 2) Advanced filters (applied to same `filters` map)
-    const mergedFilters = { ...filters }; // header + advanced are the same store
+    const validFilters = Object.fromEntries(
+      Object.entries(filters).filter(([k]) => k in (schema.properties || {}))
+    );
     rows = rows.filter((row) =>
-      Object.entries(mergedFilters).every(([k, val]) => {
+      Object.entries(validFilters).every(([k, val]) => {
         if (!val) return true;
         const field = schema.properties?.[k];
         const str = String(row[k] ?? "");
@@ -271,6 +274,10 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
     dispatch(caseQueue(record.participant_id))
   };
 
+  if (table && schemas[table] && !inGroup) {
+    return <Navigate replace to={`/dashboard/${isSubmodel(table) ? "submodels" : "table-data"}/${table}`} />;
+  }
+
   return (
     <Layout className="admin-layout">
       {renderDetail ? (
@@ -309,7 +316,9 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
         </>
       ) : (
         <Header className="primary-header">
-          <Title className="primary-title">GREGoR Data Sheets</Title>
+          <Title className="primary-title">
+            {group === "submodels" ? "GREGoR Submodels" : "GREGoR Data Sheets"}
+          </Title>
         </Header>
       )}
 
@@ -333,6 +342,7 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
         onRefresh={handleRefresh}
         renderDetail={renderDetail}
         renderQueue={renderQueue}
+        group={group}
       />
       {status === "loading" ? (
         <Spin tip="Loading data..." style={{ display: "block", textAlign: "center", marginTop: 20 }}>

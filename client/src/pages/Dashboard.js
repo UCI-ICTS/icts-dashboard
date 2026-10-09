@@ -48,6 +48,7 @@ const Dashboard = () => {
     { key: 'profile', icon: <ProfileOutlined />, label: <Link to="profile">Profile</Link> },
     { key: 'raghpo', icon: <OpenAIOutlined />, label: <Link to="rag-hpo">RAG-HPO</Link> },
     { key: 'cohort', icon: <UsergroupAddOutlined />, label: <Link to="cohort">PhenoCohort</Link> },
+    { key: 'submodels', icon: <ProfileOutlined/>, label: <Link to="submodels">Submodels</Link>},
     ...(isAdmin ? [{ key: 'admin', icon: <SettingOutlined />, label: <Link to="admin">Admin</Link> }] : []),
   ];
 
