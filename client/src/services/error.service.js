@@ -2,6 +2,8 @@
 
 const printErrorMessages = (error) => {
   let errorMessage = "";
+  if (!error) return "An unknown error occurred.";
+  if (typeof error === "string") return error;
 
   console.log(error)
 
@@ -13,7 +15,7 @@ const printErrorMessages = (error) => {
         errorMessage = "Token is not valid. Please log in again."
       }
       if (error.response.message) {
-        errorMessage = error.response.message; 
+        errorMessage = error.response.message;
       } else if ( // Otherwise, if error.response.data is an array and has at least one element:
         error.response.data &&
         Array.isArray(error.response.data) &&
@@ -25,7 +27,7 @@ const printErrorMessages = (error) => {
           error.response.data[0].data.length > 0
         ) {
           for (const field in error.response.data[0].data[0]) {
-            errorMessage = `Error. ${field}: ${error.response.data[0].data[0][field]}\n`
+            errorMessage += `Error. ${field}: ${error.response.data[0].data[0][field]}\n`
           };
         }
         // Otherwise, if the first element itself has 'field' and 'error', use those.
@@ -44,13 +46,21 @@ const printErrorMessages = (error) => {
           else { errorMessage = JSON.stringify(error.response.data[0]) }
         }
       }
+      if (!errorMessage) {
+        const d = error.response.data;
+        errorMessage =
+          (typeof d === "string" && d.length < 200 && d) ||
+          d?.detail ||
+          d?.message ||
+          `Request failed (${error.response.status})`;
+      }
     }
     else if (error.message) { errorMessage = error.message }
     else if (error.request) { errorMessage = error.request }
   }
 
   // Fallback generic message.
-  else if (error.message==="Rejected") { errorMessage = error.message }
+  else if (error.message) { errorMessage = error.message }   // replaces the `=== "Rejected"` check
   else { errorMessage = "An unknown error occurred."; }
   console.log(errorMessage)
   return errorMessage;

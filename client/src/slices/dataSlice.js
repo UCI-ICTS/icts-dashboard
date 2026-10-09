@@ -3,7 +3,7 @@ import dataService from "../services/data.service";
 import errorService from "../services/error.service";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';  // combineSlices
 import { message } from "antd";
-import { getTableName } from "../utils/schemaAndTables";
+import { getTableName, getPrimaryKeyField } from "../utils/schemaAndTables";
 import { calc } from "antd/es/theme/internal";
 
 const initialState = {
@@ -35,6 +35,13 @@ const initialState = {
   called_variants_dna_short_read: [],
   called_variants_nanopore: [],
   called_variants_pac_bio: [],
+  reported_race: [],
+  internal_project_id: [],
+  pmid_id: [],
+  twin_id: [],
+  library_prep_type: [],
+  prep_targets_detail: [],
+  experiment_type: [],
   rag_hpos: [],
   phenotype_cohort: null,
   phenotype_cohort_error: null,
@@ -159,7 +166,14 @@ export const dataSlice = createSlice({
                                  table === "aligned_pac_bio_set" ? "aligned_pac_bio_set" :
                                  table === "called_variants_dna_short_read" ? "called_variants_dna_short_read" :
                                  table === "called_variants_nanopore" ? "called_variants_nanopore" :
-                                 table === "called_variants_pac_bio" ? "called_variants_pac_bio" : null
+                                 table === "called_variants_pac_bio" ? "called_variants_pac_bio" :
+                                 table === "internal_project_id" ? "internal_project_id" :
+                                 table === "pmid_id" ? "pmid_id" :
+                                 table === "twin_id" ? "twin_id" :
+                                 table === "reported_race" ? "reported_race" :
+                                 table === "library_prep_type" ? "library_prep_type" :
+                                 table === "prep_targets_detail" ? "prep_targets_detail" :
+                                 table === "experiment_type" ? "experiment_type" : null
 
           if (collectionName && state[collectionName]) {
             // Find the object to add in the relevant collection
@@ -189,7 +203,7 @@ export const dataSlice = createSlice({
         console.log("Before delete:", table, stateTable, idList, );
         if (state[stateTable]) {
           state[stateTable] = state[stateTable].filter(
-            (entry) => !idsToRemove.includes(entry[`${table}_id`])
+            (entry) => !idsToRemove.includes(entry[getPrimaryKeyField(table)])
           );
         }
         console.log(action.meta.arg)

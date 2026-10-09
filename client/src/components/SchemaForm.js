@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Divider, Form, Input, InputNumber, Select, Button, Switch, Tooltip, message, Modal, DatePicker } from "antd";
 import { InfoCircleOutlined, MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { createEntry, updateEntry, deleteEntry, fetchTable } from "../slices/dataSlice";
-import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping, normalizeArrays } from "../utils/schemaAndTables";
+import { getValidationRules, foreignKeyFields, onsetAgeRange, specimenType, biobankMapping, normalizeArrays, getPrimaryKeyField } from "../utils/schemaAndTables";
 import errorService from "../services/error.service";
 import dayjs from 'dayjs';
 
@@ -209,7 +209,7 @@ const SchemaField = ({ keyName, schema, requiredFields, form, readOnly, tableNam
 
   // ---------- Primitives ----------
   if (schema.type === "string") {
-    if (keyName === `${tableName}_id` && !readOnly) {
+    if (keyName === getPrimaryKeyField(tableName) && !readOnly) {
       return (
         <Form.Item
           key={keyName}
@@ -436,7 +436,7 @@ const SchemaForm = ({
   }, [open, initialValues, formInstance]);
 
   const handleDelete = () => {
-    const idList = initialValues?.[`${table}_id`];
+    const idList = initialValues?.[getPrimaryKeyField(table)];
     dispatch(deleteEntry({ table, idList }))
       .unwrap()
       .then(() => {

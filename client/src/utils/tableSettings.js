@@ -1,5 +1,7 @@
 // src/utils/useTableSettings.js
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+
+const NOOP_STORAGE = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
 
 export function useTableSettings({
   schema,
@@ -9,13 +11,20 @@ export function useTableSettings({
   storagePrefix = "columns" // optional namespace
 }) {
   const keys = useMemo(() => Object.keys(schema?.properties || {}), [schema]);
-  const storage = persist ? localStorage : {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {}
-  };
+  const storage = useMemo(() => (persist ? localStorage : NOOP_STORAGE), [persist]);
+
+  // Compare defaults by content, not by reference
+  const defaultsSig = defaults.join("|");
+  const stableDefaults = useMemo(
+    () => (defaultsSig ? defaultsSig.split("|") : []),
+    [defaultsSig]
+  );
+
+  // Compare keys by content too, so a fresh-but-identical schema can't retrigger
+  const keysSig = keys.join("|");
 
   const storageKey = `${storagePrefix}:${tableKey}`;
+  const hydratedKey = useRef(null);
 
   const [visible, setVisible] = useState({});
   const [widths, setWidths] = useState({});
@@ -25,31 +34,25 @@ export function useTableSettings({
   // init + hydrate
   useEffect(() => {
     let saved = {};
-    try {
-      saved = JSON.parse(storage.getItem(storageKey) || "{}");
-    } catch {}
+    try { saved = JSON.parse(storage.getItem(storageKey) || "{}"); } catch {}
 
-    const nextVisible = keys.reduce((acc, k) => {
+    setVisible(keys.reduce((acc, k) => {
       const savedVis = saved.visible?.[k];
-      acc[k] = savedVis != null ? savedVis : (defaults.length ? defaults.includes(k) : true);
+      acc[k] = savedVis != null ? savedVis : (stableDefaults.length ? stableDefaults.includes(k) : true);
       return acc;
-    }, {});
-    const nextWidths = keys.reduce((acc, k) => {
-      acc[k] = saved.widths?.[k] ?? 180;
-      return acc;
-    }, {});
-
-    setVisible(nextVisible);
-    setWidths(nextWidths);
+    }, {}));
+    setWidths(keys.reduce((acc, k) => { acc[k] = saved.widths?.[k] ?? 180; return acc; }, {}));
     setSorter(saved.sorter ?? null);
     setFilters(saved.filters ?? {});
-  }, [tableKey, keys, defaults, storageKey, storage]);
+    hydratedKey.current = storageKey;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, keysSig, defaultsSig, storage]);
 
-  // persist (debounced-ish write)
+  // persist, but only once state belongs to the current table
   useEffect(() => {
-    const payload = JSON.stringify({ visible, widths, sorter, filters });
+    if (hydratedKey.current !== storageKey) return;
     try {
-      storage.setItem(storageKey, payload);
+      storage.setItem(storageKey, JSON.stringify({ visible, widths, sorter, filters }));
     } catch {}
   }, [storage, storageKey, visible, widths, sorter, filters]);
 
@@ -64,13 +67,13 @@ export function useTableSettings({
 
   const reset = useCallback(() => {
     setVisible(keys.reduce((acc, k) => {
-      acc[k] = defaults.length ? defaults.includes(k) : true;
+      acc[k] = stableDefaults.length ? stableDefaults.includes(k) : true;
       return acc;
     }, {}));
     setWidths(keys.reduce((acc, k) => ({ ...acc, [k]: 180 }), {}));
     setSorter(null);
     setFilters({});
-  }, [keys, defaults]);
+  }, [keys, stableDefaults]);
 
   const setWidth = useCallback((k, w) => {
     setWidths((prev) => ({ ...prev, [k]: Math.max(80, w) }));

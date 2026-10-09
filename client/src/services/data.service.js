@@ -6,7 +6,17 @@ import api from "../utils/axiosConfig";
 
 
 const APIDB = process.env.REACT_APP_APIDB;
-const metadata = ["participant", "family", "genetic_findings", "analyte", "biobank", "phenotype"]
+const metadata = ["family", "participant", "analyte", "phenotype", "genetic_findings", "biobank"]
+const experiments = [
+  "experiment_dna_short_read", "experiment_rna_short_read", "experiment_pac_bio", "experiment_nanopore",
+  "aligned_dna_short_read", "aligned_rna_short_read", "aligned_pac_bio", "aligned_nanopore",
+  "aligned_dna_short_read_set", "aligned_pac_bio_set", "aligned_nanopore_set",
+  "called_variants_dna_short_read", "called_variants_pac_bio", "called_variants_nanopore",
+]
+const submodels = [
+  "reported_race", "internal_project_id", "pmid_id", "twin_id",
+  "library_prep_type", "prep_targets_detail", "experiment_type",
+]
 
 const getAuthHeaders = () => {
   const state = store.getState(); // Get Redux state
@@ -50,9 +60,14 @@ const fetchTable = async (table) => {
   if (metadata.includes(table)) {
     const response = api.get(APIDB + `api/metadata/${table}/all/`, {headers: getAuthHeaders()})
     return response
-  } else {
+  } else if (experiments.includes(table)) {
     const response = api.get(APIDB + `api/experiments/${table}/all/`, {headers: getAuthHeaders()})
     return response
+  } else if (submodels.includes(table)) {
+    const response = api.get(APIDB + `api/submodels/${table}/all/`, {headers: getAuthHeaders()})
+    return response
+  } else {
+    throw new Error(`Unknown table: ${table}`);
   }
 }
 
@@ -60,9 +75,14 @@ const createEntry = async (table, data) => {
   if (metadata.includes(table)) {
     const response = api.post(APIDB + `api/metadata/${table}/create/`, data, {headers: getAuthHeaders()})
     return response
-  } else {
+  } else if (experiments.includes(table)) {
     const response = api.post(APIDB + `api/experiments/${table}/create/`, data, {headers: getAuthHeaders()})
     return response
+  } else if (submodels.includes(table)) {
+    const response = api.post(APIDB + `api/submodels/${table}/create/`, data, {headers: getAuthHeaders()})
+    return response
+  } else {
+    throw new Error(`Unknown table: ${table}`);
   }
 }
 
@@ -70,23 +90,29 @@ const updateEntry = async (table, data) => {
   if (metadata.includes(table)) {
     const response = api.post(APIDB + `api/metadata/${table}/update/`, data, {headers: getAuthHeaders()})
     return response
-  } else {
+  } else if (experiments.includes(table)) {
     const response = api.post(APIDB + `api/experiments/${table}/update/`, data, {headers: getAuthHeaders()})
     return response
+  } else if (submodels.includes(table)) {
+    const response = api.post(APIDB + `api/submodels/${table}/update/`, data, {headers: getAuthHeaders()})
+    return response
+  } else {
+    throw new Error(`Unknown table: ${table}`);
   }
 }
 
 const deleteEntry = async (table, idList) => {
   if (metadata.includes(table)) {
-    const response = api.delete(APIDB + `api/metadata/${table}/delete/?ids=${idList}`, {
-      headers: getAuthHeaders()
-    })
+    const response = api.delete(APIDB + `api/metadata/${table}/delete/?ids=${idList}`, {headers: getAuthHeaders()})
+    return response
+  } else if (experiments.includes(table)) {
+    const response = api.delete(APIDB + `api/experiments/${table}/delete/?ids=${idList}`, {headers: getAuthHeaders()})
+    return response
+  } else if (submodels.includes(table)) {
+    const response = api.delete(APIDB + `api/submodels/${table}/delete/?ids=${idList}`, {headers: getAuthHeaders()})
     return response
   } else {
-    const response = api.delete(APIDB + `api/experiments/${table}/delete/?ids=${idList}`, {
-      headers: getAuthHeaders()
-    })
-    return response
+    throw new Error(`Unknown table: ${table}`);
   }
 }
 

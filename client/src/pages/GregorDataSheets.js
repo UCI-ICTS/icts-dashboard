@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Layout, Typography, Spin, Modal, Form, Input, Select, Button, message } from "antd";
 import { useTableSettings, buildColumns } from "../utils/tableSettings";
 import { setTableView, fetchTable, familyDetail, caseQueue } from "../slices/dataSlice";
-import { defaultVisibleColumns, getCollectionName, getTableName } from "../utils/schemaAndTables";
+import { defaultVisibleColumns, getCollectionName, getPrimaryKeyField, getTableName } from "../utils/schemaAndTables";
 import SchemaForm from "../components/SchemaForm";
 import GregorTable from "../components/GregorTable";
 import schemas from "../schemas/v1.12schemas.json";
@@ -18,15 +18,18 @@ const { Header } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 
+const EMPTY_ARRAY = [];
+const EMPTY_SCHEMA = { properties: {} };
+
 export default function GregorDataSheets({ renderDetail=false, renderQueue=false }) {
   const { table } = useParams();
   const dispatch = useDispatch();
   const isAdmin  = useSelector((state) => state.account.user.is_superuser);
   const status   = useSelector((state) => state.data.status);
   const tableView = useSelector((state) => state.data.tableView);
-  const data     = useSelector((state) => state.data[tableView]) || [];
+  const data     = useSelector((state) => state.data[tableView]) ?? EMPTY_ARRAY;
   const rowKey   = useSelector((state) => state.data.tableID);
-  const schema   = schemas[tableView] || { properties: {} };
+  const schema   = schemas[tableView] || EMPTY_SCHEMA;
   const rememberUI = Boolean(localStorage.getItem("user"));
 // ---- Global search + regex toggle ----
   const [useRegex, setUseRegex] = useState(false);
@@ -50,7 +53,7 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
   // create object for setTableView
   const meta = (schema) => ({
     schema,
-    identifier: schemas[schema]?.identifier || `${schema}_id`,
+    identifier: schemas[schema]?.identifier || getPrimaryKeyField(schema),
     name: schemas[schema]?.title || schema,
   })
 
@@ -93,8 +96,8 @@ export default function GregorDataSheets({ renderDetail=false, renderQueue=false
   // ---- Table settings (columns, widths) ----
   const dataTable = useTableSettings({
     schema,
-    tableView,
-    defaults: defaultVisibleColumns[tableView] || [],
+    tableKey: tableView,
+    defaults: defaultVisibleColumns[tableView] ?? EMPTY_ARRAY,
     persist: rememberUI,  // switch persistence on/off
     storagePrefix: "uci:tableSettings", // namespace for table preferences
   });

@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { 
+import {
   Alert,
   Button,
   Col,
@@ -20,8 +20,8 @@ import {
   Typography,
 } from "antd";
 import { extractPhenotypes, createEntry, clearRagHpos, replaceRagHpoChoice } from "../slices/dataSlice";
-import { HPODownloadModal, PhenotypeImportFormModal } from "../components/Modals"
-import { dataDownload } from "../utils/utilitiyFunctions"; 
+import { HPODownloadModal, PhenotypeImportFormModal } from "../components/Modals";
+import { dataDownload } from "../utils/utilitiyFunctions";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -37,6 +37,10 @@ const RAGHPO = () => {
   const [importOpen, setImportOpen] = useState(false);
   const [flattenedRows, setFlattenedRows] = useState([]);
   const [importParticipantId, setImportParticipantId] = useState(null);
+
+  useEffect(() => {
+    if (participants.length === 0) dispatch(fetchTable("participant"));
+  }, []);
 
   const handleSubmit = ({ action, exportFormat, participant }) => {
     const filename = "rag_hpo_export";
@@ -59,7 +63,7 @@ const RAGHPO = () => {
         reason: row.choice?.reason,
         phrase: row.phrase,
       }));
-      
+
       if (action === "import") {
         setImportParticipantId(participant);
         setFlattenedRows(rag_hpos.map((row) => ({
@@ -82,7 +86,7 @@ const RAGHPO = () => {
   const handleExpand = (expanded, record) => {
     setExpandedRowKey(expanded ? record.key : null);
   };
-  
+
   const handleReplace = (candidate) => {
     if (!expandedRowKey) return;
 
@@ -109,12 +113,12 @@ const RAGHPO = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-  
+
   const expandedRowRender = (record) => (
     <Table
       rowKey={(caondidate) => caondidate.hpo_id}
-      dataSource={Array.isArray(record.candidates) ? record.candidates : []} 
-      columns={candidateColumns} 
+      dataSource={Array.isArray(record.candidates) ? record.candidates : []}
+      columns={candidateColumns}
       pagination={false}
     />
   );
@@ -124,11 +128,11 @@ const RAGHPO = () => {
     { title: "Label",dataIndex: "label",key: "label" },
     { title: "score",dataIndex: "score",key: "score" },
     { title: "rank", dataIndex: "rank", key: "rank" },
-    { 
+    {
       title: "Replace",
       dataIndex: "replace",
       key: "replace",
-      render: (_, candidate, index) => ( 
+      render: (_, candidate, index) => (
       <Tooltip title="Replace LLM choice with this candidate">
         <Button
           className="replace-button"
@@ -139,7 +143,7 @@ const RAGHPO = () => {
     </Tooltip>)
     }
     ]
-  
+
   return (
     <Layout className="layout-container">
       <Header className="primary-header">
@@ -161,17 +165,17 @@ const RAGHPO = () => {
               className="text-area-input"
               rows={3}
               allowClear
-              placeholder="Enter your message here..." 
-            /> 
+              placeholder="Enter your message here..."
+            />
           </Form.Item>
 
           <Form.Item>
             <Space>
               {status === "fulfilled"  && rag_hpos.length > 0 ? (
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   className="logout-button"
-                  onClick={() => setActionsOpen(true)} 
+                  onClick={() => setActionsOpen(true)}
                 >
                   Import/Download
                 </Button>
@@ -191,15 +195,16 @@ const RAGHPO = () => {
               >Clear</Button>
             </Space>
           </Form.Item>
+
         </Form>
         <Table
           rowKey={(record) => record.id}
           className="table"
           dataSource={
             (Array.isArray(rag_hpos)
-             ? rag_hpos 
+             ? rag_hpos
              : []).map((item, index) => ({ ...item, key: item.id || index })
-            ) 
+            )
           }
           scroll
           expandable={{
@@ -209,56 +214,56 @@ const RAGHPO = () => {
           }}
         >
           <ColumnGroup title="LLM Choice">
-            <Column 
-              title="HPO Term" 
-              dataIndex="hpo_id" 
+            <Column
+              title="HPO Term"
+              dataIndex="hpo_id"
               render={(text, record) => {
                 return(<>{record.choice?.hpo_id ?? "-"}</>)
               }}
             />
-            <Column 
-              title="Label" 
-              dataIndex="label" 
+            <Column
+              title="Label"
+              dataIndex="label"
               render={(text, record) => {
                 return(<>{record.choice?.label ?? "-"}</>)
               }}
             />
-            <Column 
-              title="Score" 
-              dataIndex="score" 
+            <Column
+              title="Score"
+              dataIndex="score"
               render={(text, record) => {
                 return(<>{record.choice?.score ?? "-"}</>)
               }}
             />
-            <Column 
-              title="Rank" 
-              dataIndex="rank" 
+            <Column
+              title="Rank"
+              dataIndex="rank"
               render={(text, record) => {
                 return(<>{record.choice?.rank ?? "-"}</>)
               }}
             />
-            <Column 
-              title="Source" 
-              dataIndex="source" 
+            <Column
+              title="Source"
+              dataIndex="source"
               render={(text, record) => {
                 return(<>{record.choice?.source ?? "-"}</>)
               }}
             />
-            <Column 
-              title="Reason" 
-              dataIndex="reason" 
+            <Column
+              title="Reason"
+              dataIndex="reason"
               render={(text, record) => {
                 return(<>{record.choice?.reason ?? "-"}</>)
               }}
             />
           </ColumnGroup>
-          <Column 
-            title="Extracted Phrase" 
-            dataIndex="phrase" 
+          <Column
+            title="Extracted Phrase"
+            dataIndex="phrase"
             key="phrase"
           />
         </Table>
-          <HPODownloadModal 
+          <HPODownloadModal
             visible={actionsOpen}
             onCancel={() => setActionsOpen(false)}
             handleSubmit={handleSubmit}
@@ -268,7 +273,7 @@ const RAGHPO = () => {
           visible={importOpen}
           onCancel={() => setImportOpen(false)}
           onSubmit={(finalEntries) => {
-            dispatch(createEntry( {table:"phenotype", data:finalEntries})); 
+            dispatch(createEntry( {table:"phenotype", data:finalEntries}));
             setImportOpen(false);
             form.resetFields(); // Clear form
             dispatch(clearRagHpos()); // Clear table (rag_hpos)

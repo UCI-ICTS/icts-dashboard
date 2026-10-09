@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
  * Returns { op: 'ANY', tests: [{field, value}, ...] }
  *   - 'ANY' means any one test may satisfy (OR across comma-separated items)
  */
+
 export const parseRequiredCondition = (raw) => {
   if (!raw || typeof raw !== "string") return null;
   const m = raw.match(/^CONDITIONAL\s*\((.*)\)\s*$/i);
@@ -153,15 +154,25 @@ export const getValidationRules = (key, schema, requiredFields = [], getValue = 
 
 export const foreignKeyFields = {
   participant: {
+    internal_project_id: {
+      sourceTable: "internal_project_id",
+      valueKey: "internal_project_id",
+      apiKey: "internal_project_id",
+    },
+    pmid_id: {
+      sourceTable: "pmid_id",
+      valueKey: "pmid_id",
+      apiKey: "pmid_id",
+    },
     family_id: {
       sourceTable: "families",
       valueKey: "family_id",
       apiKey: "family",
     },
     twin_id: {
-      sourceTable: "participants",
-      valueKey: "participant_id",
-      apiKey: "participant",
+      sourceTable: "twin_id",
+      valueKey: "twin_id",
+      apiKey: "twin_id",
       default: "0"                         // add a default of `0`
     },
     paternal_id: {
@@ -175,7 +186,12 @@ export const foreignKeyFields = {
       valueKey: "participant_id",
       apiKey: "participant",
       default: "0"                         // add a default of `0`
-    }
+    },
+    reported_race: {
+      sourceTable: "reported_race",
+      valueKey: "name",
+      apiKey: "reported_race",
+    },
   },
   phenotype: {
     participant_id: {
@@ -233,28 +249,43 @@ export const foreignKeyFields = {
     }
   },
   experiment_dna_short_read: {
-    analyte_id:{
+    analyte_id: {
       sourceTable: "analytes",
       valueKey: "analyte_id",
       apiKey: "analyte",
     }
   },
   experiment_rna_short_read: {
-    analyte_id:{
+    analyte_id: {
       sourceTable: "analytes",
       valueKey: "analyte_id",
       apiKey: "analyte",
+    },
+    library_prep_type: {
+      sourceTable: "library_prep_type",
+      valueKey: "name",
+      apiKey: "library_prep_type",
+    },
+    prep_targets_detail: {
+      sourceTable: "prep_targets_detail",
+      valueKey: "name",
+      apiKey: "prep_targets_detail",
+    },
+    experiment_type: {
+      sourceTable: "experiment_type",
+      valueKey: "name",
+      apiKey: "experiment_type",
     }
   },
   experiment_pac_bio: {
-    analyte_id:{
+    analyte_id: {
       sourceTable: "analytes",
       valueKey: "analyte_id",
       apiKey: "analyte",
     }
   },
   experiment_nanopore: {
-    analyte_id:{
+    analyte_id: {
       sourceTable: "analytes",
       valueKey: "analyte_id",
       apiKey: "analyte",
@@ -353,6 +384,13 @@ export const defaultVisibleColumns = {
   called_variants_dna_short_read: ["aligned_dna_short_read_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
   called_variants_nanopore: ["aligned_nanopore_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
   called_variants_pac_bio: ["aligned_pac_bio_set_id", "called_variants_dna_file", "caller_software", "variant_types", "analysis_details"],
+  internal_project_id: ["internal_project_id"],
+  pmid_id: ["pmid_id"],
+  twin_id: ["twin_id"],
+  reported_race: ["name"],
+  library_prep_type: ["name"],
+  prep_targets_detail: ["name"],
+  experiment_type: ["name"],
 };
 
 export const onsetAgeRange = {
@@ -376,7 +414,7 @@ export const onsetAgeRange = {
   "HP:4000040" : "Puerpural onset",
   "HP:0034198" : "Second trimester onset",
   "HP:0034197" : "Third trimester onset",
-  "HP:0011462" : "Young adult onset"
+  "HP:0011462" : "Young adult onset",
 }
 
 export const primaryBiosample = {
@@ -398,7 +436,7 @@ export const primaryBiosample = {
 	"UBERON:0005291": "embryonic tissue",
 	"CL: 0011020": "iPSC NPC",
 	"UBERON:0002037": "cerebellum tissue",
-	"UBERON:0001133": "cardiac tissue"
+	"UBERON:0001133": "cardiac tissue",
 }
 
 export const specimenType = {  // Biobank specific mappings
@@ -408,7 +446,7 @@ export const specimenType = {  // Biobank specific mappings
   "SC": "OCD-100 buccal collection kit",
   "SG": "OGR-675 buccal collection kit",
   "X": "Extracted DNA",
-  "XR": "Extracted RNA"
+  "XR": "Extracted RNA",
 }
 
 export const collectionSource = [
@@ -513,6 +551,18 @@ export const TABLE_MAPPING = [
   { name: "Called Variants DNA Short Read", schema: "called_variants_dna_short_read", identifier: "called_variants_dna_short_read_id"},
   { name: "Called Variants Nanopore", schema: "called_variants_nanopore", identifier: "called_variants_nanopore_id"},
   { name: "Called Variants PacBio", schema: "called_variants_pac_bio", identifier: "called_variants_pac_bio_id"},
+  { name: "Internal Project ID", schema: "internal_project_id", identifier: "internal_project_id"},
+  { name: "PubMed ID", schema: "pmid_id", identifier: "pmid_id"},
+  { name: "Twin ID", schema: "twin_id", identifier: "twin_id"},
+  { name: "Reported Race", schema: "reported_race", identifier: "reported_race"},
+  { name: "Library Prep Type", schema: "library_prep_type", identifier: "library_prep_type"},
+  { name: "Prep Targets Detail", schema: "prep_targets_detail", identifier: "prep_targets_detail"},
+  { name: "Experiment Type", schema: "experiment_type", identifier: "experiment_type"},
+];
+
+const SUBMODEL_TABLES = [
+  "reported_race", "internal_project_id", "pmid_id", "twin_id",
+  "library_prep_type", "prep_targets_detail", "experiment_type",
 ];
 
 /**
@@ -521,6 +571,7 @@ export const TABLE_MAPPING = [
  * @returns {string|null} Identifier-friendly collection name
  */
 export const getCollectionName = (schema) => {
+  if (SUBMODEL_TABLES.includes(schema)) return schema;
   const entry = TABLE_MAPPING.find(item => item.schema === schema);
   return entry ? entry.identifier.replace(/_id$/, "") : null;
 };
@@ -531,15 +582,13 @@ export const getCollectionName = (schema) => {
  * @returns {string|null} Schema key
  */
 export const getTableName = (collectionName) => {
+  if (SUBMODEL_TABLES.includes(collectionName)) return collectionName;
+  if (collectionName === "aligned") return "aligned";
+  if (collectionName === "experiment") return "experiments";
+  if (collectionName === "submodel") return "submodels";
   const entry = TABLE_MAPPING.find(item =>
     item.identifier.replace(/_id$/, "") === collectionName
   );
-  if (collectionName === "aligned") {
-    return "aligned"
-  }
-  if (collectionName === "experiment") {
-    return "experiments"
-  }
   return entry ? entry.schema : null;
 };
 
@@ -548,6 +597,21 @@ export const getTableName = (collectionName) => {
  * @param {string} Schema key
  * @returns {string|null} Primary key field
  */
+
+// schemaAndTables.js
+const SUBMODEL_PK = {
+  reported_race: "name",
+  library_prep_type: "name",
+  prep_targets_detail: "name",
+  experiment_type: "name",
+  internal_project_id: "internal_project_id",
+  pmid_id: "pmid_id",
+  twin_id: "twin_id",
+};
+
+export const getPrimaryKeyField = (key) =>
+  SUBMODEL_PK[key] ?? getIdentifier(key) ?? `${key}_id`;
+
 export const getIdentifier = (schema) => {
   return TABLE_MAPPING.find(item => item.schema === schema)?.identifier || null;
 };

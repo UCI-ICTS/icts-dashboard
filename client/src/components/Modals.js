@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button, Form, Input, Modal, Select, Space, Typography } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { onsetAgeRange } from "../utils/schemaAndTables";
+import ForeignKeySelect from "./ForeignKeySelect";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -55,9 +56,9 @@ export const HPODownloadModal = ({ visible, onCancel, handleSubmit }) => {
           <Form.Item
             name="participant"
             label="Participant ID"
-            rules={[{ required: true, message: "Enter a participant ID" }]}
+            rules={[{ required: true, message: "Select a participant" }]}
           >
-            <Input placeholder="Participant ID" />
+            <ForeignKeySelect table="phenotype" field="participant_id" placeholder="Select a participant" />
           </Form.Item>
         )}
 
@@ -105,7 +106,7 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
         participant_id: participantId,
       }));
 
-      form.setFieldsValue({ phenotypes: fields });
+      form.setFieldsValue({ phenotypes: fields, participant_id: participantId });
     }
   }, [visible, flattenedData, participantId, form]);
 
@@ -114,7 +115,12 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
   };
 
   const handleFinish = (values) => {
-    const entries = values.phenotypes || [];
+    const pid = values.participant_id;
+    const entries = (values.phenotypes || []).map((e) => ({
+      ...e,
+      participant_id: pid,
+      phenotype_id: `${pid}_${e.term_id}`,
+    }));
     onSubmit(entries);
     form.resetFields();
   };
@@ -138,6 +144,22 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
         <Text type="secondary">
           You may review, add, or modify phenotype entries before submitting.
         </Text>
+        <Form.Item name="participant_id" label="Participant" rules={[{ required: true }]}>
+          <ForeignKeySelect
+            table="phenotype"
+            field="participant_id"
+            onChange={(pid) => {
+              const rows = form.getFieldValue("phenotypes") || [];
+              form.setFieldsValue({
+                phenotypes: rows.map((r) => ({
+                  ...r,
+                  participant_id: pid,
+                  phenotype_id: pid && r.term_id ? `${pid}_${r.term_id}` : undefined
+                })),
+              });
+            }}
+          />
+        </Form.Item>
         <Form.List name="phenotypes">
           {(fields, { add, remove }) => (
             <>
@@ -161,8 +183,6 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     {...restField}
                     name={[name, "phenotype_id"]}
                     label="Phenotype ID"
-                    rules={[{ required: true }]}
-                    
                   >
                     <Input style={{ width: 120 }} disabled/>
                   </Form.Item>
@@ -181,9 +201,9 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     rules={[{ required: true }]}
                   >
                     <Select style={{ width: 104 }}>
-                      <Option value="present">Present</Option>
-                      <Option value="absent">Absent</Option>
-                      <Option value="unknown">Unknown</Option>
+                      <Option value="Present">Present</Option>
+                      <Option value="Absent">Absent</Option>
+                      <Option value="Unknown">Unknown</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item
@@ -195,10 +215,10 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     <Select style={{ width: 100 }}>
                       <Option value="HPO">HPO</Option>
                       <Option value="MONDO">MONDO</Option>
-                      <Option value="ORPHA">ORPHA</Option>
                       <Option value="OMIM">OMIM</Option>
-                      <Option value="DOID">DOID</Option>
-                      <Option value="NCIT">NCIT</Option>
+                      <Option value="ORPHANET">ORPHANET</Option>
+                      <Option value="SNOMED">SNOMED</Option>
+                      <Option value="ICD10">ICD10</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item
@@ -227,8 +247,8 @@ export const PhenotypeImportFormModal = ({ visible, onCancel, onSubmit, flattene
                     label="Syndromic"
                   >
                     <Select style={{ width: 100 }} allowClear>
-                      <Option value="yes">yes</Option>
-                      <Option value="no">no</Option>
+                      <Option value="syndromic">syndromic</Option>
+                      <Option value="non-syndromic">non-syndromic</Option>
                     </Select>
                   </Form.Item>
                 </Space>
