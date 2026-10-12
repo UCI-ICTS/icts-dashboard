@@ -6,7 +6,8 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from metadata.models import Analyte, Participant, VariantType, TimeStampedModel
+from submodels.models import TimeStampedModel
+from metadata.models import Analyte, Participant, VariantType
 from config.selectors import validate_url
 
 

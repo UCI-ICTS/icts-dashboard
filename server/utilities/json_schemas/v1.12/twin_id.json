@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/UCI-GREGoR/GREGor_dashboard/blob/main/server/utilities/v1.7/json_schemas/twin_id.json",
+    "title": "twin_id",
+    "version": "1.12",
+    "type": "object",
+    "required": [
+        "twin_id"
+    ],
+    "definitions": {},
+    "properties": {
+        "twin_id": {
+            "type": "string",
+            "description": "participant_id for twins, triplets, etc; 0 if not availableW",
+            "examples": [
+                "BCM_Subject_1",
+                "BROAD_subj89054",
+                "BROAD_subj89054|BROAD_subj89055"
+            ]
+        }
+    }
+}

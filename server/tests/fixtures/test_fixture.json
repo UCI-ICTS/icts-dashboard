@@ -8385,6 +8385,10 @@
     "model": "submodels.reportedrace",
     "pk": "American Indian or Alaska Native",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "American Indian or Alaska Native"
     }
   },
@@ -8392,6 +8396,10 @@
     "model": "submodels.reportedrace",
     "pk": "Asian",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Asian"
     }
   },
@@ -8399,6 +8407,10 @@
     "model": "submodels.reportedrace",
     "pk": "Black or African American",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Black or African American"
     }
   },
@@ -8406,6 +8418,10 @@
     "model": "submodels.reportedrace",
     "pk": "Middle Eastern or North African",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Middle Eastern or North African"
     }
   },
@@ -8413,6 +8429,10 @@
     "model": "submodels.reportedrace",
     "pk": "Native Hawaiian or Other Pacific Islander",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "Native Hawaiian or Other Pacific Islander"
     }
   },
@@ -8420,17 +8440,41 @@
     "model": "submodels.reportedrace",
     "pk": "White",
     "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel",
       "description": "White"
     }
   },
   {
     "model": "submodels.internalprojectid",
     "pk": "UTAortaStudy",
-    "fields": {}
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
+  },
+  {
+    "model": "submodels.pmidid",
+    "pk": "0",
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
   },
   {
     "model": "submodels.twinid",
     "pk": "0",
-    "fields": {}
+    "fields": {
+      "created_at": "2025-12-08T00:00:00Z",
+      "updated_at": "2025-12-08T00:00:00Z",
+      "needs_review": false,
+      "changed_by": "wheel"
+    }
   }
 ]
